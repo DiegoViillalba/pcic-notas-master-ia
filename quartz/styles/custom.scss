@@ -14,3 +14,12 @@
 .center > article {
   font-size: calc(1em + 1pt);
 }
+
+// El tema abecedarium redefine --highlight a un rojo intenso, y la regla
+// base "a.internal { background-color: var(--highlight) }" lo usa como
+// fondo de todo wikilink interno. Se ve mal. Aquí fijamos ese fondo a un
+// azul claro directamente, sin tocar --highlight (el tema lo sigue usando
+// para otras cosas, como resaltar coincidencias de búsqueda).
+a.internal {
+  background-color: rgba(62, 147, 216, 0.18) !important;
+}
