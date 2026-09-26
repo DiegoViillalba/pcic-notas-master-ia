@@ -1,20 +1,20 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Prog_Avanzada/Indice|Programación Avanzada]]"
+materia: "[[Indice|Programación Avanzada]]"
 fecha: 2026-08-27
 unidad: Composición, invariantes y condicionales en lógica de Hoare
 profesor: Gustavo Marquez Flores
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Terna de Hoare|Terna de Hoare]]"
-  - "[[03_Conceptos/Axioma de asignación de Hoare|Axioma de asignación de Hoare]]"
-  - "[[03_Conceptos/Precondición más débil|Precondición más débil]]"
-  - "[[03_Conceptos/Regla de composición de Hoare|Regla de composición de Hoare]]"
-  - "[[03_Conceptos/Invariante de programa|Invariante de programa]]"
-  - "[[03_Conceptos/Regla condicional de Hoare|Regla condicional de Hoare]]"
-  - "[[03_Conceptos/Regla de consecuencia de Hoare|Regla de consecuencia de Hoare]]"
+  - "[[Terna de Hoare|Terna de Hoare]]"
+  - "[[Axioma de asignación de Hoare|Axioma de asignación de Hoare]]"
+  - "[[Precondición más débil|Precondición más débil]]"
+  - "[[Regla de composición de Hoare|Regla de composición de Hoare]]"
+  - "[[Invariante de programa|Invariante de programa]]"
+  - "[[Regla condicional de Hoare|Regla condicional de Hoare]]"
+  - "[[Regla de consecuencia de Hoare|Regla de consecuencia de Hoare]]"
 referencias:
-  - "[[01_Materias/Prog_Avanzada/Recursos/Clase5/Programación Avanzada Notas 5.pdf|Programación Avanzada Notas 5]]"
+  - "[[Programación Avanzada Notas 5.pdf|Programación Avanzada Notas 5]]"
 tags:
   - clase
   - programacion-avanzada
@@ -23,7 +23,7 @@ tags:
   - invariantes
   - condicionales
 ---
-![[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 5.pdf]]
+![[Programación Avanzada Notas 5.pdf]]
 # Composición, invariantes y condicionales de Hoare
 
 ## Pregunta central
@@ -52,13 +52,13 @@ La idea unificadora es que la ejecución avanza de izquierda a derecha, pero la 
 
 ## 1. Herramienta básica: sustitución en una asignación
 
-Para una asignación \(V:=E\), el [[03_Conceptos/Axioma de asignación de Hoare|axioma de asignación]] establece:
+Para una asignación \(V:=E\), el [[Axioma de asignación de Hoare|axioma de asignación]] establece:
 
 $$
 \boxed{\{Q[E/V]\}\ V:=E\ \{Q\}}.
 $$
 
-\(Q[E/V]\) significa sustituir en \(Q\) cada aparición libre de \(V\) por \(E\). El resultado es la [[03_Conceptos/Precondición más débil|precondición más débil]] que garantiza \(Q\).
+\(Q[E/V]\) significa sustituir en \(Q\) cada aparición libre de \(V\) por \(E\). El resultado es la [[Precondición más débil|precondición más débil]] que garantiza \(Q\).
 
 > [!important] Sentido de la sustitución
 > No se “despeja el programa”. Se imagina el valor que tendrá la variable después de la asignación y se reemplaza ese valor dentro de la postcondición.
@@ -211,7 +211,7 @@ flowchart TD
 
 ## 3. Concatenación de código
 
-La concatenación \(C_1;C_2\) ejecuta primero \(C_1\) y después \(C_2\). El estado final de \(C_1\) se convierte en el inicial de \(C_2\). La [[03_Conceptos/Regla de composición de Hoare|regla de composición]] es:
+La concatenación \(C_1;C_2\) ejecuta primero \(C_1\) y después \(C_2\). El estado final de \(C_1\) se convierte en el inicial de \(C_2\). La [[Regla de composición de Hoare|regla de composición]] es:
 
 $$
 \frac{\{P\}\ C_1\ \{R\}\qquad \{R\}\ C_2\ \{Q\}}
@@ -390,7 +390,7 @@ flowchart LR
 
 ## 7. Invariante de un programa
 
-Un [[03_Conceptos/Invariante de programa|invariante de programa]] para un bloque \(C\) es una aserción \(I\) preservada:
+Un [[Invariante de programa|invariante de programa]] para un bloque \(C\) es una aserción \(I\) preservada:
 
 $$
 \{I\}\ C\ \{I\}.
@@ -471,7 +471,7 @@ flowchart TD
 ~~~
 
 > [!note] Relación con los ciclos
-> Si el bloque es el cuerpo de un ciclo y la propiedad también vale antes de la primera iteración, entonces funciona como [[03_Conceptos/Invariante de ciclo|invariante de ciclo]].
+> Si el bloque es el cuerpo de un ciclo y la propiedad también vale antes de la primera iteración, entonces funciona como [[Invariante de ciclo|invariante de ciclo]].
 
 ---
 
@@ -482,7 +482,7 @@ En `if B then C1`:
 1. Si \(B\) es verdadera, se ejecuta \(C_1\).
 2. Si \(B\) es falsa, el estado queda igual.
 
-La [[03_Conceptos/Regla condicional de Hoare|regla condicional]] es:
+La [[Regla condicional de Hoare|regla condicional]] es:
 
 $$
 \frac{
@@ -681,11 +681,11 @@ Y := R
 
 **Paso 3.** La regla de composición elimina las aserciones intermedias y deja la terna del programa completo.
 
-![[01_Materias/Prog_Avanzada/Recursos/AllLectures-Hoare/slide-23.png]]
+![[slide-23.png]]
 
 En un condicional no hay una sola condición intermedia: hay dos obligaciones, una bajo \(B\) y otra bajo \(\neg B\). Ambas deben llegar a la misma \(Q\).
 
-![[01_Materias/Prog_Avanzada/Recursos/AllLectures-Hoare/slide-27.png]]
+![[slide-27.png]]
 
 ### Ejercicio corto
 
@@ -697,7 +697,7 @@ Demuestra \(\{\top\}\ \mathbf{if}\ a\le b\ \mathbf{then}\ m:=a\ \mathbf{else}\ m
 > 3. Las dos fórmulas son verdaderas bajo la guarda de su rama.
 > 4. La regla condicional une ambas derivaciones.
 
-Véase también [[01_Materias/Prog_Avanzada/Guía paso a paso - Lógica de Hoare#4. Condicionales demostrar todos los caminos|la explicación guiada de condicionales]].
+Véase también [[Guía paso a paso - Lógica de Hoare#4. Condicionales demostrar todos los caminos|la explicación guiada de condicionales]].
 
 ## 13. Referencia diapositiva por diapositiva
 
@@ -725,18 +725,18 @@ Véase también [[01_Materias/Prog_Avanzada/Guía paso a paso - Lógica de Hoare
 
 ## Conceptos atómicos
 
-- [[03_Conceptos/Terna de Hoare|Terna de Hoare]]
-- [[03_Conceptos/Axioma de asignación de Hoare|Axioma de asignación de Hoare]]
-- [[03_Conceptos/Precondición más débil|Precondición más débil]]
-- [[03_Conceptos/Regla de composición de Hoare|Regla de composición de Hoare]]
-- [[03_Conceptos/Invariante de programa|Invariante de programa]]
-- [[03_Conceptos/Invariante de ciclo|Invariante de ciclo]]
-- [[03_Conceptos/Regla condicional de Hoare|Regla condicional de Hoare]]
-- [[03_Conceptos/Regla de consecuencia de Hoare|Regla de consecuencia de Hoare]]
+- [[Terna de Hoare|Terna de Hoare]]
+- [[Axioma de asignación de Hoare|Axioma de asignación de Hoare]]
+- [[Precondición más débil|Precondición más débil]]
+- [[Regla de composición de Hoare|Regla de composición de Hoare]]
+- [[Invariante de programa|Invariante de programa]]
+- [[Invariante de ciclo|Invariante de ciclo]]
+- [[Regla condicional de Hoare|Regla condicional de Hoare]]
+- [[Regla de consecuencia de Hoare|Regla de consecuencia de Hoare]]
 
 ## Dudas para revisar
 
-- [ ] ¿Cómo se extienden estas reglas al `while` y cómo se demuestra terminación?
+- [x] ¿Cómo se extienden estas reglas al `while` y cómo se demuestra terminación? Véase [[Guía paso a paso - Lógica de Hoare#5. Ciclos invariante salida y variante|Ciclos: invariante, salida y variante]].
 - [ ] ¿Qué notación usará el curso para `skip`?
 - [ ] ¿Los ejercicios asumen números reales, racionales o punto flotante?
 
@@ -746,5 +746,5 @@ El axioma de asignación permite calcular precondiciones por sustitución y demo
 
 ## Referencia
 
-- [[01_Materias/Prog_Avanzada/Recursos/Clase5/Programación Avanzada Notas 5.pdf|Programación Avanzada Notas 5]], diapositivas 1–19 (láminas 82–100).
+- [[Programación Avanzada Notas 5.pdf|Programación Avanzada Notas 5]], diapositivas 1–19 (láminas 82–100).
 - `/Users/diegovillalba/Downloads/AllLectures.pdf`, páginas PDF 23–33 (composición, condicionales, regla de `while` e invariantes).

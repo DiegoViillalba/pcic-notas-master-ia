@@ -1,6 +1,6 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Modelacion_Matematica/Indice|Modelación Matemática]]"
+materia: "[[Indice|Modelación Matemática]]"
 fecha: 2026-08-24
 unidad: Métodos numéricos para problemas de valor inicial
 profesor: Alicia de la Mora
@@ -9,10 +9,10 @@ estado:
   - por-revisar
   - por-procesar
 conceptos:
-  - "[[03_Conceptos/Método de Euler|Método de Euler]]"
-  - "[[03_Conceptos/Ley de enfriamiento de Newton|Ley de enfriamiento de Newton]]"
-  - "[[03_Conceptos/Solución analítica y solución numérica|Solución analítica y solución numérica]]"
-  - "[[03_Conceptos/Experimento computacional|Experimento computacional]]"
+  - "[[Método de Euler|Método de Euler]]"
+  - "[[Ley de enfriamiento de Newton|Ley de enfriamiento de Newton]]"
+  - "[[Solución analítica y solución numérica|Solución analítica y solución numérica]]"
+  - "[[Experimento computacional|Experimento computacional]]"
 referencias:
   - Práctica1_MMyCHPC_Euler_clase.ipynb
 tags:

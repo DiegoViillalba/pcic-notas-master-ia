@@ -1,21 +1,21 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Inteligencia_Artificial/Indice|Inteligencia Artificial]]"
+materia: "[[Indice|Inteligencia Artificial]]"
 fecha: 2026-08-20
 unidad: Fundamentos y resolución de problemas
 profesor: Carlos Hernández
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Búsqueda en árbol y búsqueda en grafo|Búsqueda en árbol y búsqueda en grafo]]"
-  - "[[03_Conceptos/Frontera de búsqueda|Frontera de búsqueda]]"
-  - "[[03_Conceptos/Búsqueda en profundidad|Búsqueda en profundidad]]"
-  - "[[03_Conceptos/Búsqueda en anchura|Búsqueda en anchura]]"
-  - "[[03_Conceptos/Búsqueda de profundidad iterativa|Búsqueda de profundidad iterativa]]"
-  - "[[03_Conceptos/Búsqueda de costo uniforme|Búsqueda de costo uniforme]]"
-  - "[[03_Conceptos/Heurística|Heurística]]"
-  - "[[03_Conceptos/Búsqueda voraz primero el mejor|Búsqueda voraz primero el mejor]]"
-  - "[[03_Conceptos/Algoritmo A estrella|Algoritmo A estrella]]"
-  - "[[03_Conceptos/Criterios de evaluación de algoritmos de búsqueda|Criterios de evaluación de algoritmos de búsqueda]]"
+  - "[[Búsqueda en árbol y búsqueda en grafo|Búsqueda en árbol y búsqueda en grafo]]"
+  - "[[Frontera de búsqueda|Frontera de búsqueda]]"
+  - "[[Búsqueda en profundidad|Búsqueda en profundidad]]"
+  - "[[Búsqueda en anchura|Búsqueda en anchura]]"
+  - "[[Búsqueda de profundidad iterativa|Búsqueda de profundidad iterativa]]"
+  - "[[Búsqueda de costo uniforme|Búsqueda de costo uniforme]]"
+  - "[[Heurística|Heurística]]"
+  - "[[Búsqueda voraz primero el mejor|Búsqueda voraz primero el mejor]]"
+  - "[[Algoritmo A estrella|Algoritmo A estrella]]"
+  - "[[Criterios de evaluación de algoritmos de búsqueda|Criterios de evaluación de algoritmos de búsqueda]]"
 referencias:
   - "[[AI 3 Algoritmos de búsqueda.pdf|Diapositivas: AI 3 Algoritmos de búsqueda]]"
   - Russell y Norvig, *Artificial Intelligence: A Modern Approach*, capítulo 3
@@ -94,7 +94,7 @@ flowchart TB
   class E,X actual; class SOL meta;
 ```
 
-La [[03_Conceptos/Frontera de búsqueda|frontera]] o *fringe* contiene nodos generados aún no expandidos. Todos los algoritmos vistos pueden implementarse con una cola de prioridad cambiando su clave.
+La [[Frontera de búsqueda|frontera]] o *fringe* contiene nodos generados aún no expandidos. Todos los algoritmos vistos pueden implementarse con una cola de prioridad cambiando su clave.
 
 ## Criterios de evaluación
 
@@ -126,11 +126,11 @@ flowchart TB
 
 Usa los botones **DFS**, **BFS** e **IDS** para aplicar las tres estrategias sobre el mismo árbol. En cada paso se actualizan el nodo expandido, la frontera y el orden acumulado.
 
-<iframe src="../../inteligencia_artificial/recursos/recorridos-dfs-bfs-ids.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="recorridos-dfs-bfs-ids.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ## 1. Búsqueda en profundidad — DFS
 
-La [[03_Conceptos/Búsqueda en profundidad|DFS]] expande primero el nodo más profundo. Usa una pila LIFO.
+La [[Búsqueda en profundidad|DFS]] expande primero el nodo más profundo. Usa una pila LIFO.
 
 ### Corrida paso a paso
 
@@ -252,7 +252,7 @@ Orden: $A,B,D,H,I,E,J,K,C,F,L,M,G,N,O$.
 
 ## 2. Búsqueda en anchura — BFS
 
-La [[03_Conceptos/Búsqueda en anchura|BFS]] expande el nodo más superficial. Usa una cola FIFO.
+La [[Búsqueda en anchura|BFS]] expande el nodo más superficial. Usa una cola FIFO.
 
 ### Corrida paso a paso
 
@@ -367,7 +367,7 @@ Orden: $A,B,C,D,E,F,G,H,I,J,K,L,M,N,O$.
 
 ## 3. Profundidad iterativa — IDS
 
-La [[03_Conceptos/Búsqueda de profundidad iterativa|IDS]] repite DFS con límites crecientes.
+La [[Búsqueda de profundidad iterativa|IDS]] repite DFS con límites crecientes.
 
 La corrida interactiva anterior también incluye **IDS** y muestra cómo aumenta el límite y se regeneran niveles.
 
@@ -417,13 +417,13 @@ flowchart TB
 
 ## 4. Búsqueda de costo uniforme — UCS
 
-La [[03_Conceptos/Búsqueda de costo uniforme|UCS]] expande el nodo con menor costo acumulado $g(n)$. Las diapositivas usan el viaje de **Arad** a **Bucharest**.
+La [[Búsqueda de costo uniforme|UCS]] expande el nodo con menor costo acumulado $g(n)$. Las diapositivas usan el viaje de **Arad** a **Bucharest**.
 
 ### Corrida paso a paso en Rumania
 
 La animación mantiene ordenada la frontera por costo acumulado $g(n)$ y permite observar por qué Bucharest con costo 450 todavía no puede aceptarse.
 
-<iframe src="../../inteligencia_artificial/recursos/ucs-rumania-v2.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="ucs-rumania-v2.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 <details>
 <summary>Ver las instantáneas estáticas de UCS</summary>
@@ -592,7 +592,7 @@ Solución: Arad → Sibiu → Rimnicu Vilcea → Pitesti → Bucharest, costo $4
 
 ## 5. Búsqueda informada y heurísticas
 
-Una [[03_Conceptos/Heurística|heurística]] $h(n)$ estima qué tan cerca está un nodo de la meta y se diseña para cada problema. En Rumania se usa la distancia en línea recta a Bucharest.
+Una [[Heurística|heurística]] $h(n)$ estima qué tan cerca está un nodo de la meta y se diseña para cada problema. En Rumania se usa la distancia en línea recta a Bucharest.
 
 | Ciudad | $h(n)$ |
 |---|---:|
@@ -607,11 +607,11 @@ Una [[03_Conceptos/Heurística|heurística]] $h(n)$ estima qué tan cerca está 
 
 El selector permite comparar qué información determina la prioridad: solo $h(n)$ en voraz, o $g(n)+h(n)$ en A*. También incluye los dos errores centrales de la clase: aceptar una meta al generarla y usar una heurística que sobreestima.
 
-<iframe src="../../inteligencia_artificial/recursos/busqueda-informada.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="busqueda-informada.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ### Búsqueda voraz
 
-La [[03_Conceptos/Búsqueda voraz primero el mejor|búsqueda voraz]] prioriza solo $h(n)$.
+La [[Búsqueda voraz primero el mejor|búsqueda voraz]] prioriza solo $h(n)$.
 
 <details>
 <summary>Ver las instantáneas estáticas de búsqueda voraz</summary>
@@ -652,7 +652,7 @@ La ruta voraz Arad → Sibiu → Fagaras → Bucharest cuesta $450$, más que la
 
 ## 6. A* — costo uniforme + voraz
 
-El [[03_Conceptos/Algoritmo A estrella|algoritmo A*]] combina costo recorrido y estimación restante:
+El [[Algoritmo A estrella|algoritmo A*]] combina costo recorrido y estimación restante:
 
 $$f(n)=g(n)+h(n).$$
 

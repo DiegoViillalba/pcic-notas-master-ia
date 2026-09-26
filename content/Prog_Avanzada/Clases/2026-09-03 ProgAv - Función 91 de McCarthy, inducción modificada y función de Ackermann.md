@@ -1,19 +1,19 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Prog_Avanzada/Indice|Programación Avanzada]]"
+materia: "[[Indice|Programación Avanzada]]"
 fecha: 2026-09-03
 unidad: Recursión doble, inducción modificada y función de Ackermann
 profesor: Gustavo Marquez Flores
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Función 91 de McCarthy|Función 91 de McCarthy]]"
-  - "[[03_Conceptos/Principio de inducción matemática modificado|Principio de inducción matemática modificado]]"
-  - "[[03_Conceptos/Función de Ackermann|Función de Ackermann]]"
-  - "[[03_Conceptos/Terna de Hoare|Terna de Hoare]]"
-  - "[[03_Conceptos/Inducción matemática aplicada a ciclos|Inducción matemática aplicada a ciclos]]"
+  - "[[Función 91 de McCarthy|Función 91 de McCarthy]]"
+  - "[[Principio de inducción matemática modificado|Principio de inducción matemática modificado]]"
+  - "[[Función de Ackermann|Función de Ackermann]]"
+  - "[[Terna de Hoare|Terna de Hoare]]"
+  - "[[Inducción matemática aplicada a ciclos|Inducción matemática aplicada a ciclos]]"
 referencias:
-  - "[[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 7.pdf|Programación Avanzada Notas 7]]"
-  - "[[01_Materias/Prog_Avanzada/Recursos/Programación funcion 91 McCarthy Visual Studio.pdf|Programación función 91 McCarthy en Visual Studio]]"
+  - "[[Programación Avanzada Notas 7.pdf|Programación Avanzada Notas 7]]"
+  - "[[Programación funcion 91 McCarthy Visual Studio.pdf|Programación función 91 McCarthy en Visual Studio]]"
 tags:
   - clase
   - programacion-avanzada
@@ -22,8 +22,8 @@ tags:
   - verificacion-formal
   - logica-de-hoare
 ---
-![[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 7.pdf]]
-![[01_Materias/Prog_Avanzada/Recursos/Programación funcion 91 McCarthy Visual Studio.pdf]]
+![[Programación Avanzada Notas 7.pdf]]
+![[Programación funcion 91 McCarthy Visual Studio.pdf]]
 
 # Función 91 de McCarthy, inducción modificada y función de Ackermann
 
@@ -157,7 +157,7 @@ La tabla confirma el patrón que vamos a demostrar: **91 exactamente hasta x = 1
 
 ## 4. Simulador interactivo de la pila de llamadas
 
-<iframe src="../../prog_avanzada/recursos/funcion91-mccarthy-simulador.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="funcion91-mccarthy-simulador.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 Usa los valores sugeridos (`n=1`, `n=45`, `n=89`, `n=96`, `n=100`, `n=111`) o escribe cualquier entero entre 1 y 130. Observa:
 
@@ -346,7 +346,7 @@ $$
 El mismo patrón, sustituyendo \(y+2\) por \(2y+3\) y usando §7.2, prueba la segunda terna.
 
 > [!note] Complemento de `AllLectures`: evaluar la expresión también debe terminar
-> El axioma de asignación para **corrección total** supone que evaluar el lado derecho termina. En `w := A(x,y)`, demostrar solo el valor matemático de \(A(x,y)\) no basta si todavía no se ha justificado que la llamada recursiva termina para las entradas permitidas. Conviene separar: **(1)** el lema que calcula el resultado, **(2)** el argumento bien fundado de terminación y **(3)** la regla de consecuencia. Véase [[01_Materias/Prog_Avanzada/Guía paso a paso - Lógica de Hoare#5. Ciclos invariante salida y variante|invariante y variante]] para el análogo iterativo.
+> El axioma de asignación para **corrección total** supone que evaluar el lado derecho termina. En `w := A(x,y)`, demostrar solo el valor matemático de \(A(x,y)\) no basta si todavía no se ha justificado que la llamada recursiva termina para las entradas permitidas. Conviene separar: **(1)** el lema que calcula el resultado, **(2)** el argumento bien fundado de terminación y **(3)** la regla de consecuencia. Véase [[Guía paso a paso - Lógica de Hoare#5. Ciclos invariante salida y variante|invariante y variante]] para el análogo iterativo.
 
 > [!tip] La utilidad de haber demostrado A(1,z) y A(2,z) por separado
 > Una vez fijado un teorema (`A(1,z) = z+2`), se vuelve una pieza reutilizable: en la verificación de un programa ya no hay que "desenrollar" la recursión de Ackermann, solo aplicar el teorema y la regla de consecuencia — exactamente igual que usar un lema ya probado en una demostración matemática más grande.
@@ -431,9 +431,9 @@ El mismo patrón, sustituyendo \(y+2\) por \(2y+3\) y usando §7.2, prueba la se
 
 ## Conceptos atómicos
 
-- [[03_Conceptos/Función 91 de McCarthy|Función 91 de McCarthy]]
-- [[03_Conceptos/Principio de inducción matemática modificado|Principio de inducción matemática modificado]]
-- [[03_Conceptos/Función de Ackermann|Función de Ackermann]]
+- [[Función 91 de McCarthy|Función 91 de McCarthy]]
+- [[Principio de inducción matemática modificado|Principio de inducción matemática modificado]]
+- [[Función de Ackermann|Función de Ackermann]]
 
 ## Dudas para revisar
 
@@ -447,8 +447,9 @@ La función 91 de McCarthy y la función de Ackermann comparten un mismo reto: s
 
 ## Referencia
 
-- [[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 7.pdf|Programación Avanzada Notas 7]], diapositivas 1–24 (láminas 118–138).
-- [[01_Materias/Prog_Avanzada/Recursos/Programación funcion 91 McCarthy Visual Studio.pdf|Programación función 91 McCarthy en Visual Studio]], proyecto `Funcion91JohnMcCarthy`.
+- [[Programación Avanzada Notas 7.pdf|Programación Avanzada Notas 7]], diapositivas 1–24 (láminas 118–138).
+- [[Programación funcion 91 McCarthy Visual Studio.pdf|Programación función 91 McCarthy en Visual Studio]], proyecto `Funcion91JohnMcCarthy`.
 - Código fuente: `Funcion91JohnMcCarthy/Program.cs` (proyecto de Visual Studio adjunto).
+- `/Users/diegovillalba/Downloads/AllLectures.pdf`, páginas PDF 79–91 (corrección total y terminación de evaluaciones).
 - McCarthy, J. (1970). *The 91-function*, ejemplo clásico de verificación de programas recursivos.
 - Ackermann, W. (1928). Función doblemente recursiva usada como ejemplo canónico de crecimiento no primitivo-recursivo.

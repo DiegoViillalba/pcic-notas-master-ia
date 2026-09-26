@@ -1,18 +1,18 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Inteligencia_Artificial/Indice|Inteligencia Artificial]]"
+materia: "[[Indice|Inteligencia Artificial]]"
 fecha: "2026-09-10"
 unidad: Lógica, representación y aplicaciones
 profesor: Carlos Hernández
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Agente basado en conocimiento|Agente basado en conocimiento]]"
-  - "[[03_Conceptos/Base de conocimiento|Base de conocimiento]]"
-  - "[[03_Conceptos/Lógica proposicional|Lógica proposicional]]"
-  - "[[03_Conceptos/Modelo en lógica proposicional|Modelo en lógica proposicional]]"
-  - "[[03_Conceptos/Vinculación lógica|Vinculación lógica]]"
-  - "[[03_Conceptos/Satisfacibilidad proposicional|Satisfacibilidad proposicional]]"
-  - "[[03_Conceptos/Mundo del Wumpus|Mundo del Wumpus]]"
+  - "[[Agente basado en conocimiento|Agente basado en conocimiento]]"
+  - "[[Base de conocimiento|Base de conocimiento]]"
+  - "[[Lógica proposicional|Lógica proposicional]]"
+  - "[[Modelo en lógica proposicional|Modelo en lógica proposicional]]"
+  - "[[Vinculación lógica|Vinculación lógica]]"
+  - "[[Satisfacibilidad proposicional|Satisfacibilidad proposicional]]"
+  - "[[Mundo del Wumpus|Mundo del Wumpus]]"
 referencias:
   - "[[2026-09-08 IA - Incertidumbre y Expectimax]]"
   - "Russell & Norvig (AIMA 4.ª ed.), Cap. 7: Logical Agents"
@@ -42,7 +42,7 @@ tags:
 > Los métodos de búsqueda clásicos y de adversarios asumen estados atómicos opacos o funciones de utilidad sobre desenlaces inmediatos. Un **agente basado en conocimiento** mantiene una **Base de Conocimiento ($KB$)** compuesta por sentencias en un lenguaje formal (como la **lógica proposicional**). Cada nueva percepción añadida mediante `Tell` descarta mundos posibles ($M(KB) = \bigcap M(f)$). La inferencia responde preguntas `Ask` mediante **vinculación lógica ($KB \models f$)**, la cual se reduce algorítmicamente a verificar la **insatisfactibilidad** de $KB \cup \{\neg f\}$ (un caso especial de CSP booleano).
 
 **Cómo estudiar esta nota:**
-1. Comprende primero por qué el [[03_Conceptos/Mundo del Wumpus|Mundo del Wumpus]] obliga al agente a razonar con perceptos pasados y reglas del entorno en vez de limitarse a buscar caminos.
+1. Comprende primero por qué el [[Mundo del Wumpus|Mundo del Wumpus]] obliga al agente a razonar con perceptos pasados y reglas del entorno en vez de limitarse a buscar caminos.
 2. Domina la distinción formal entre **sintaxis** (árboles de derivación BNF, precedencia de conectores) y **semántica** (mundos posibles $w$, función de interpretación $I(f,w)$, conjunto de modelos $M(f)$).
 3. Interioriza la visualización de la $KB$ como una **intersección de modelos**: aprender información recorta mundos posibles; la contradicción vacía el conjunto de modelos ($M(KB) = \emptyset$).
 4. Analiza con rigor el **árbol de reducción de inferencia a SAT** (diapositiva 22) y su equivalencia formal con un **CSP** de variables booleanas.
@@ -108,7 +108,7 @@ Un agente puramente reactivo (reflejo) en $[2,1]$ percibe brisa y no sabe si el 
 
 Explora el recorrido paso a paso en el tablero oficial de la diapositiva 4, observando cómo se actualiza la Base de Conocimiento y cómo se deducen celdas seguras y trampas.
 
-<iframe src="../../inteligencia_artificial/recursos/mundo-wumpus-inferencia.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="mundo-wumpus-inferencia.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Idea central si el laboratorio no carga:** El agente en $[1,1]$ percibe vacío y sabe que $[2,1]$ y $[1,2]$ son seguras. En $[2,1]$ detecta brisa ($P_{2,2} \vee P_{3,1}$). En vez de adivinar, regresa y entra a $[1,2]$, donde detecta hedor pero no brisa ($\neg P_{2,2}$). Por silogismo disyuntivo, deduce que el pozo está en $[3,1]$ y que la celda $[2,2]$ es totalmente segura.
 
@@ -422,7 +422,7 @@ El agente consulta si una hipótesis $f$ es cierta. Las tres respuestas posibles
 
 Experimenta de forma interactiva con el espacio de modelos $2^n$, la intersección viva de fórmulas, la prueba de consultas `Ask`/`Tell` y la formulación gráfica como CSP.
 
-<iframe src="../../inteligencia_artificial/recursos/modelos-entailment-satisfaccion.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="modelos-entailment-satisfaccion.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Idea central si el laboratorio no carga:** Al añadir reglas a la KB, la tabla filtra filas no permitidas. Si una consulta $f$ abarca todas las filas restantes de la KB, hay *entailment* ($KB \models f$); si no abarca ninguna, hay contradicción; si abarca solo una parte, la fórmula es contingente.
 
@@ -640,6 +640,6 @@ Construir el espacio de modelos para $P$ y $Q$ ($2^2 = 4$ modelos) y encontrar $
 - **Anterior:** [[2026-09-08 IA - Incertidumbre y Expectimax|Clase 8: Incertidumbre, Expectimax y utilidad esperada]].
 - **Conexión algorítmica:** [[2026-08-27 IA - CSP-Backtracking|Clase 5: CSP, Backtracking y AC-3]] (SAT es un CSP binario).
 - **Recursos interactivos creados en esta clase:**
-  - `![[01_Materias/Inteligencia_Artificial/Recursos/mundo-wumpus-inferencia.html]]`
-  - `![[01_Materias/Inteligencia_Artificial/Recursos/modelos-entailment-satisfaccion.html]]`
+  - `![[mundo-wumpus-inferencia.html]]`
+  - `![[modelos-entailment-satisfaccion.html]]`
 - **Siguiente tema:** Clase 10: Cláusulas de Horn, encadenamiento hacia adelante/atrás y el principio de Resolución.

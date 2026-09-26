@@ -1,6 +1,6 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Inteligencia_Artificial/Indice|Inteligencia Artificial]]"
+materia: "[[Indice|Inteligencia Artificial]]"
 fecha: "2026-09-08"
 unidad: Búsqueda con adversarios e incertidumbre
 profesor: Carlos Hernández
@@ -285,7 +285,7 @@ MAX elige la rama izquierda. Observa dos detalles:
 
 Avanza nodo por nodo y modifica la distribución. El laboratorio normaliza los pesos y compara el resultado con la versión minimax.
 
-<iframe src="../../inteligencia_artificial/recursos/expectimax-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="expectimax-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Idea central si el laboratorio no carga:** con probabilidades uniformes, los nodos de azar valen $8$, $4$ y $7$; MAX elige $8$. Si cambian las probabilidades, pueden cambiar tanto los promedios como la acción óptima.
 
@@ -475,7 +475,7 @@ flowchart TD
 
 ### Laboratorio paso a paso
 
-<iframe src="../../inteligencia_artificial/recursos/maxn-tuplas-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="maxn-tuplas-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Idea central si el laboratorio no carga:** cada jugador maximiza únicamente su componente, pero no borra las demás; toda la tupla sube por el árbol.
 
@@ -685,7 +685,7 @@ No existe un solo valor que satisfaga ambas. Por eso este patrón de preferencia
 
 ### Laboratorio de loterías
 
-<iframe src="../../inteligencia_artificial/recursos/utilidad-esperada-loterias.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="utilidad-esperada-loterias.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Idea central si el laboratorio no carga:** al normalizar $U(\$4k)=1$, elegir B sobre A requiere $U(\$3k)>0.8$, mientras que elegir C sobre D requiere $U(\$3k)<0.8$.
 

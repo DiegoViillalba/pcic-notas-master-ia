@@ -1,18 +1,18 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Prog_Avanzada/Indice|Programación Avanzada]]"
+materia: "[[Indice|Programación Avanzada]]"
 fecha: 2026-08-18
 unidad: Técnicas de solución de problemas
 profesor: Gustavo Marquez Flores
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Divide y vencerás|Divide y vencerás]]"
-  - "[[03_Conceptos/QuickSort|QuickSort]]"
-  - "[[03_Conceptos/Backtracking|Backtracking]]"
+  - "[[Divide y vencerás|Divide y vencerás]]"
+  - "[[QuickSort|QuickSort]]"
+  - "[[Backtracking|Backtracking]]"
 referencias:
-  - "[[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 2.pdf|Programación Avanzada Notas 2]]"
-  - "[[01_Materias/Prog_Avanzada/Recursos/Algoritmo BackTracking y Divide-Venceras.pdf|Algoritmo BackTracking y Divide-Venceras]]"
-  - "[[01_Materias/Prog_Avanzada/Recursos/Qsort.PAS|Qsort.PAS]]"
+  - "[[Programación Avanzada Notas 2.pdf|Programación Avanzada Notas 2]]"
+  - "[[Algoritmo BackTracking y Divide-Venceras.pdf|Algoritmo BackTracking y Divide-Venceras]]"
+  - "[[Qsort.PAS|Qsort.PAS]]"
 tags:
   - clase
   - programacion-avanzada
@@ -35,8 +35,8 @@ Las dos técnicas estudiadas usan recursión, pero recorren estructuras distinta
 
 | Técnica | Estructura de la solución | Movimiento principal | Resultado típico |
 |---|---|---|---|
-| [[03_Conceptos/Divide y vencerás|Divide y vencerás]] | Subproblemas semejantes | dividir, resolver y combinar | una solución construida con soluciones parciales |
-| [[03_Conceptos/Backtracking|Backtracking]] | Árbol de decisiones | elegir, avanzar, descartar y retroceder | una, todas o la mejor solución factible |
+| [[Divide y vencerás|Divide y vencerás]] | Subproblemas semejantes | dividir, resolver y combinar | una solución construida con soluciones parciales |
+| [[Backtracking|Backtracking]] | Árbol de decisiones | elegir, avanzar, descartar y retroceder | una, todas o la mejor solución factible |
 
 ## Divide y vencerás
 
@@ -72,7 +72,7 @@ donde $D(n)$ es el costo de dividir y $C(n)$ el de combinar. Si hay $a$ subprobl
 
 ### Ejemplos
 
-- [[03_Conceptos/QuickSort|QuickSort]] particiona alrededor de un pivote y ordena recursivamente las regiones resultantes.
+- [[QuickSort|QuickSort]] particiona alrededor de un pivote y ordena recursivamente las regiones resultantes.
 - La búsqueda binaria conserva solo la mitad que puede contener el dato; su combinación es trivial.
 - La multiplicación de enteros grandes divide cada operando en una mitad alta y otra baja.
 
@@ -158,7 +158,7 @@ Las cuatro multiplicaciones $wy,wz,xy,xz$ se resuelven recursivamente hasta lleg
 
 ## Backtracking
 
-[[03_Conceptos/Backtracking|Backtracking]] construye una solución por etapas. En cada etapa genera opciones, acepta solo las que mantienen una solución parcial válida y profundiza. Si una rama ya no puede producir una solución, deshace la última decisión y prueba la siguiente.
+[[Backtracking|Backtracking]] construye una solución por etapas. En cada etapa genera opciones, acepta solo las que mantienen una solución parcial válida y profundiza. Si una rama ya no puede producir una solución, deshace la última decisión y prueba la siguiente.
 
 ```text
 buscar(estado):
@@ -201,15 +201,15 @@ Se necesita poder generar opciones, comprobar si una extensión es aceptable, re
 
 ## Conceptos atómicos completados
 
-- [[03_Conceptos/Divide y vencerás|Divide y vencerás]]
-- [[03_Conceptos/QuickSort|QuickSort]]
-- [[03_Conceptos/Backtracking|Backtracking]]
+- [[Divide y vencerás|Divide y vencerás]]
+- [[QuickSort|QuickSort]]
+- [[Backtracking|Backtracking]]
 
 ## Referencias mencionadas
 
-- [[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 2.pdf|Programación Avanzada Notas 2]], diapositivas 22-39.
-- [[01_Materias/Prog_Avanzada/Recursos/Algoritmo BackTracking y Divide-Venceras.pdf|Algoritmo BackTracking y Divide-Venceras]], páginas 1-2.
-- [[01_Materias/Prog_Avanzada/Recursos/Qsort.PAS|Qsort.PAS]], implementación de Borland International.
+- [[Programación Avanzada Notas 2.pdf|Programación Avanzada Notas 2]], diapositivas 22-39.
+- [[Algoritmo BackTracking y Divide-Venceras.pdf|Algoritmo BackTracking y Divide-Venceras]], páginas 1-2.
+- [[Qsort.PAS|Qsort.PAS]], implementación de Borland International.
 
 ## Resumen después de clase
 

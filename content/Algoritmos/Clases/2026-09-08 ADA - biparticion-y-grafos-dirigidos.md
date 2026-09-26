@@ -1,16 +1,16 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Algoritmos/Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
+materia: "[[Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
 fecha: "2026-09-08"
 unidad: Grafos
 profesor: Armando Castañeda Rojano
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Grafo bipartito|Grafo bipartito]]"
-  - "[[03_Conceptos/Prueba de bipartición por BFS|Prueba de bipartición por BFS]]"
-  - "[[03_Conceptos/Grafo dirigido|Grafo dirigido]]"
-  - "[[03_Conceptos/Conectividad fuerte|Conectividad fuerte]]"
-  - "[[03_Conceptos/Búsqueda en anchura|Búsqueda en anchura]]"
+  - "[[Grafo bipartito|Grafo bipartito]]"
+  - "[[Prueba de bipartición por BFS|Prueba de bipartición por BFS]]"
+  - "[[Grafo dirigido|Grafo dirigido]]"
+  - "[[Conectividad fuerte|Conectividad fuerte]]"
+  - "[[Búsqueda en anchura|Búsqueda en anchura]]"
 referencias:
   - "[[2026-09-03 ADA - grafos]]"
   - "Kleinberg & Tardos, Algorithm Design, Cap. 3, Secciones 3.4 y 3.5"
@@ -128,7 +128,7 @@ El lema anterior demuestra que los ciclos impares impiden la bipartición. Pero,
 
 ### 3.1 Teorema de caracterización por capas BFS
 
-Sea $G$ un grafo conexo y sean $L_0, L_1, L_2, \dots, L_k$ las capas de distancia generadas por [[03_Conceptos/Búsqueda en anchura|BFS]] a partir de un nodo inicial $s$ ($L_0 = \{s\}$). 
+Sea $G$ un grafo conexo y sean $L_0, L_1, L_2, \dots, L_k$ las capas de distancia generadas por [[Búsqueda en anchura|BFS]] a partir de un nodo inicial $s$ ($L_0 = \{s\}$). 
 
 Recordemos la propiedad fundamental del árbol BFS: para toda arista $\{u, v\} \in E$, los niveles de sus extremos difieren a lo más en $1$ ($|\text{nivel}(u) - \text{nivel}(v)| \le 1$). Por tanto, cada arista de $G$ cae exclusivamente en uno de dos casos:
 - Une vértices en niveles adyacentes ($L_i$ y $L_{i+1}$).
@@ -191,7 +191,7 @@ def probar_biparticion(G):
 
 Experimenta interactivamente con la prueba de 2-colorabilidad por capas de BFS y con el algoritmo de dos recorridos para digrafos.
 
-<iframe src="../../algoritmos/recursos/biparticion-y-conectividad-fuerte.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="biparticion-y-conectividad-fuerte.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Idea central si el laboratorio no carga:**
 1. En la pestaña de Bipartición, el grafo se organiza en columnas que representan las capas $L_0, L_1, L_2$. Si todas las aristas van entre columnas vecinas, el grafo es bipartito. Si aparece una arista vertical entre dos nodos de la misma columna (en rojo), el simulador encuentra su ancestro común más cercano y dibuja el ciclo impar de longitud $1 + 2(j-i)$.
@@ -438,5 +438,5 @@ Demostrar mediante el lema del nodo testigo si es fuertemente conexo tomando $s 
 ## Conexiones
 
 - **Anterior:** [[2026-09-03 ADA - grafos|Clase del 3 de septiembre: Grafos, representaciones, árboles y BFS básico]].
-- **Recurso interactivo de esta clase:** `![[01_Materias/Algoritmos/Recursos/biparticion-y-conectividad-fuerte.html]]`
+- **Recurso interactivo de esta clase:** `![[biparticion-y-conectividad-fuerte.html]]`
 - **Siguiente clase:** [[2026-09-10 ADA - DAGs-y-ordenamiento-topologico|Clase del 10 de septiembre: DAGs y Ordenamiento Topológico]].

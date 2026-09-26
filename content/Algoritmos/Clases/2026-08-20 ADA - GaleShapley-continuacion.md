@@ -1,19 +1,19 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Algoritmos/Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
+materia: "[[Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
 fecha: 2026-08-20
 unidad: Emparejamiento estable
 profesor: Armando Castañeda Rojano
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Algoritmo de Gale-Shapley|Algoritmo de Gale-Shapley]]"
-  - "[[03_Conceptos/Aceptación diferida|Aceptación diferida]]"
-  - "[[03_Conceptos/Invariante de ciclo|Invariante de ciclo]]"
-  - "[[03_Conceptos/Emparejamiento perfecto|Emparejamiento perfecto]]"
-  - "[[03_Conceptos/Emparejamiento estable|Emparejamiento estable]]"
-  - "[[03_Conceptos/Socio válido|Socio válido]]"
-  - "[[03_Conceptos/Óptimo para hospitales|Óptimo para hospitales]]"
-  - "[[03_Conceptos/Pesimista para estudiantes|Pesimista para estudiantes]]"
+  - "[[Algoritmo de Gale-Shapley|Algoritmo de Gale-Shapley]]"
+  - "[[Aceptación diferida|Aceptación diferida]]"
+  - "[[Invariante de ciclo|Invariante de ciclo]]"
+  - "[[Emparejamiento perfecto|Emparejamiento perfecto]]"
+  - "[[Emparejamiento estable|Emparejamiento estable]]"
+  - "[[Socio válido|Socio válido]]"
+  - "[[Óptimo para hospitales|Óptimo para hospitales]]"
+  - "[[Pesimista para estudiantes|Pesimista para estudiantes]]"
 referencias:
   - 01StableMatching.pdf, diapositivas 11–26
   - Kleinberg y Tardos, *Algorithm Design*, sección 1.1
@@ -328,7 +328,7 @@ Una instancia puede tener varias soluciones estables, por ejemplo
 $M_1=\{A\text{–}X,B\text{–}Y,C\text{–}Z\}$ y
 $M_2=\{A\text{–}Y,B\text{–}X,C\text{–}Z\}$.
 
-Un [[03_Conceptos/Socio válido|socio válido]] de $h$ es alguien con quien $h$ aparece en **algún** emparejamiento estable. “Válido” es más fuerte que “aceptable”.
+Un [[Socio válido|socio válido]] de $h$ es alguien con quien $h$ aparece en **algún** emparejamiento estable. “Válido” es más fuerte que “aceptable”.
 
 ```mermaid
 flowchart TB
@@ -478,15 +478,15 @@ La generalización de Gale–Shapley conserva la existencia de una solución est
 
 ## Conceptos relacionados
 
-- [[03_Conceptos/Algoritmo de Gale-Shapley|Algoritmo de Gale–Shapley]]
-- [[03_Conceptos/Aceptación diferida|Aceptación diferida]]
-- [[03_Conceptos/Invariante de ciclo|Invariante de ciclo]]
-- [[03_Conceptos/Emparejamiento perfecto|Emparejamiento perfecto]]
-- [[03_Conceptos/Emparejamiento estable|Emparejamiento estable]]
-- [[03_Conceptos/Socio válido|Socio válido]]
-- [[03_Conceptos/Óptimo para hospitales|Óptimo para hospitales]]
-- [[03_Conceptos/Pesimista para estudiantes|Pesimista para estudiantes]]
-- [[03_Conceptos/Emparejamiento con capacidades|Emparejamiento con capacidades]]
+- [[Algoritmo de Gale-Shapley|Algoritmo de Gale–Shapley]]
+- [[Aceptación diferida|Aceptación diferida]]
+- [[Invariante de ciclo|Invariante de ciclo]]
+- [[Emparejamiento perfecto|Emparejamiento perfecto]]
+- [[Emparejamiento estable|Emparejamiento estable]]
+- [[Socio válido|Socio válido]]
+- [[Óptimo para hospitales|Óptimo para hospitales]]
+- [[Pesimista para estudiantes|Pesimista para estudiantes]]
+- [[Emparejamiento con capacidades|Emparejamiento con capacidades]]
 
 ## Referencias mencionadas
 

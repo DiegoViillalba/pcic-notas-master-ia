@@ -1,15 +1,15 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Modelacion_Matematica/Indice|Modelación Matemática]]"
+materia: "[[Indice|Modelación Matemática]]"
 fecha: 2026-08-10
 unidad: Introducción a la modelación
 profesor: Alicia de la Mora
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Modelo matemático|Modelo matemático]]"
-  - "[[03_Conceptos/Variable y parámetro de un modelo|Variable y parámetro de un modelo]]"
-  - "[[03_Conceptos/Supuesto de modelación|Supuesto de modelación]]"
-  - "[[03_Conceptos/Experimento computacional|Experimento computacional]]"
+  - "[[Modelo matemático|Modelo matemático]]"
+  - "[[Variable y parámetro de un modelo|Variable y parámetro de un modelo]]"
+  - "[[Supuesto de modelación|Supuesto de modelación]]"
+  - "[[Experimento computacional|Experimento computacional]]"
 referencias: []
 tags:
   - clase
@@ -73,10 +73,10 @@ Resolver una ecuación logística una vez es barato. Resolverla para miles de co
 
 ## Conceptos extraídos
 
-- [[03_Conceptos/Modelo matemático|Modelo matemático]]
-- [[03_Conceptos/Variable y parámetro de un modelo|Variable y parámetro de un modelo]]
-- [[03_Conceptos/Supuesto de modelación|Supuesto de modelación]]
-- [[03_Conceptos/Experimento computacional|Experimento computacional]]
+- [[Modelo matemático|Modelo matemático]]
+- [[Variable y parámetro de un modelo|Variable y parámetro de un modelo]]
+- [[Supuesto de modelación|Supuesto de modelación]]
+- [[Experimento computacional|Experimento computacional]]
 
 ## Dudas
 

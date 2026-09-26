@@ -1,16 +1,16 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Modelacion_Matematica/Indice|Modelación Matemática]]"
+materia: "[[Indice|Modelación Matemática]]"
 fecha: 2026-08-17
 unidad: Modelos dinámicos continuos y discretos
 profesor: Alicia de la Mora
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Balance de tasas|Balance de tasas]]"
-  - "[[03_Conceptos/Crecimiento exponencial|Crecimiento exponencial]]"
-  - "[[03_Conceptos/Crecimiento logístico|Crecimiento logístico]]"
-  - "[[03_Conceptos/Ley de enfriamiento de Newton|Ley de enfriamiento de Newton]]"
-  - "[[03_Conceptos/Método de Euler|Método de Euler]]"
+  - "[[Balance de tasas|Balance de tasas]]"
+  - "[[Crecimiento exponencial|Crecimiento exponencial]]"
+  - "[[Crecimiento logístico|Crecimiento logístico]]"
+  - "[[Ley de enfriamiento de Newton|Ley de enfriamiento de Newton]]"
+  - "[[Método de Euler|Método de Euler]]"
 referencias: []
 tags:
   - clase
@@ -31,7 +31,7 @@ Para formular un modelo dinámico conviene seguir cuatro pasos:
 
 1. Definir la variable de estado y sus unidades.
 2. Identificar qué aumenta y qué disminuye esa variable.
-3. Escribir una relación de [[03_Conceptos/Balance de tasas|balance de tasas]].
+3. Escribir una relación de [[Balance de tasas|balance de tasas]].
 4. Especificar la condición inicial y revisar que las unidades sean consistentes.
 
 En tiempo continuo, una tasa de cambio se expresa mediante una derivada:
@@ -100,7 +100,7 @@ $$
 
 ### Enfriamiento de una taza de café
 
-Una taza de café se encuentra inicialmente a $90\,{}^\circ\mathrm C$ en una habitación cuya temperatura permanece en $20\,{}^\circ\mathrm C$. La [[03_Conceptos/Ley de enfriamiento de Newton|ley de enfriamiento de Newton]] supone que la rapidez de cambio es proporcional a la diferencia respecto del ambiente.
+Una taza de café se encuentra inicialmente a $90\,{}^\circ\mathrm C$ en una habitación cuya temperatura permanece en $20\,{}^\circ\mathrm C$. La [[Ley de enfriamiento de Newton|ley de enfriamiento de Newton]] supone que la rapidez de cambio es proporcional a la diferencia respecto del ambiente.
 
 Sean
 
@@ -194,7 +194,7 @@ $$
 y(t_n+h)=y(t_n)+hy'(t_n)+\frac{h^2}{2}y''(\xi_n),
 $$
 
-para algún $\xi_n\in(t_n,t_n+h)$. Al sustituir $y'=f(t,y)$ y descartar los términos de orden $h^2$ se obtiene el [[03_Conceptos/Método de Euler|método de Euler explícito]]:
+para algún $\xi_n\in(t_n,t_n+h)$. Al sustituir $y'=f(t,y)$ y descartar los términos de orden $h^2$ se obtiene el [[Método de Euler|método de Euler explícito]]:
 
 $$
 t_{n+1}=t_n+h,
@@ -361,14 +361,14 @@ Las soluciones de equilibrio $P(t)=0$ y $P(t)=K$ deben considerarse por separado
 
 ## Conceptos extraídos
 
-- [[03_Conceptos/Balance de tasas|Balance de tasas]]
-- [[03_Conceptos/Ley de enfriamiento de Newton|Ley de enfriamiento de Newton]]
-- [[03_Conceptos/Método de Euler|Método de Euler]]
+- [[Balance de tasas|Balance de tasas]]
+- [[Ley de enfriamiento de Newton|Ley de enfriamiento de Newton]]
+- [[Método de Euler|Método de Euler]]
 
 ## Conceptos relacionados actualizados
 
-- [[03_Conceptos/Crecimiento exponencial|Crecimiento exponencial]]
-- [[03_Conceptos/Crecimiento logístico|Crecimiento logístico]]
+- [[Crecimiento exponencial|Crecimiento exponencial]]
+- [[Crecimiento logístico|Crecimiento logístico]]
 
 ## Referencias mencionadas
 

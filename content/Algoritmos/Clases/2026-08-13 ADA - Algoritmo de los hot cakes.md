@@ -1,18 +1,18 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Algoritmos/Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
+materia: "[[Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
 fecha: 2026-08-13
 unidad: Análisis de corrección mediante invariantes
 profesor: Armando Castañeda Rojano
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Ordenamiento de hot cakes|Ordenamiento de hot cakes]]"
-  - "[[03_Conceptos/Volteo de prefijo|Volteo de prefijo]]"
-  - "[[03_Conceptos/Invariante de ciclo|Invariante de ciclo]]"
-  - "[[03_Conceptos/Análisis de mejor y peor caso|Análisis de mejor y peor caso]]"
-  - "[[03_Conceptos/Terminación de un algoritmo|Terminación de un algoritmo]]"
-  - "[[03_Conceptos/Validez de un algoritmo|Validez de un algoritmo]]"
-  - "[[03_Conceptos/Complejidad temporal|Complejidad temporal]]"
+  - "[[Ordenamiento de hot cakes|Ordenamiento de hot cakes]]"
+  - "[[Volteo de prefijo|Volteo de prefijo]]"
+  - "[[Invariante de ciclo|Invariante de ciclo]]"
+  - "[[Análisis de mejor y peor caso|Análisis de mejor y peor caso]]"
+  - "[[Terminación de un algoritmo|Terminación de un algoritmo]]"
+  - "[[Validez de un algoritmo|Validez de un algoritmo]]"
+  - "[[Complejidad temporal|Complejidad temporal]]"
 referencias:
   - El Algoritmo de los Hot Cakes, diapositivas 1–11
 tags:
@@ -27,10 +27,10 @@ tags:
 ## Apuntes rápidos
 
 - La entrada es una pila de hot cakes de tamaños distintos; la meta es dejar el más grande abajo y el más pequeño arriba.
-- La única operación permitida es introducir una pala a cierta profundidad y efectuar un [[03_Conceptos/Volteo de prefijo|volteo de prefijo]].
-- El [[03_Conceptos/Ordenamiento de hot cakes|algoritmo de los hot cakes]] coloca en cada iteración al menos un hot cake adicional en la parte ya ordenada.
-- El análisis separa dos preguntas: [[03_Conceptos/Terminación de un algoritmo|¿termina?]] y [[03_Conceptos/Validez de un algoritmo|¿produce la pila ordenada?]].
-- La afirmación de progreso se expresa mediante un [[03_Conceptos/Invariante de ciclo|invariante]]: si al inicio hay $h$ hot cakes colocados correctamente, al final habrá por lo menos $h+1$.
+- La única operación permitida es introducir una pala a cierta profundidad y efectuar un [[Volteo de prefijo|volteo de prefijo]].
+- El [[Ordenamiento de hot cakes|algoritmo de los hot cakes]] coloca en cada iteración al menos un hot cake adicional en la parte ya ordenada.
+- El análisis separa dos preguntas: [[Terminación de un algoritmo|¿termina?]] y [[Validez de un algoritmo|¿produce la pila ordenada?]].
+- La afirmación de progreso se expresa mediante un [[Invariante de ciclo|invariante]]: si al inicio hay $h$ hot cakes colocados correctamente, al final habrá por lo menos $h+1$.
 
 ## Definiciones y resultados
 
@@ -216,10 +216,10 @@ En los límites de cada iteración, el prefijo ordenado aumenta en un elemento. 
 
 ## Conceptos para extraer
 
-- [[03_Conceptos/Ordenamiento de hot cakes|Ordenamiento de hot cakes]]
-- [[03_Conceptos/Volteo de prefijo|Volteo de prefijo]]
-- [[03_Conceptos/Invariante de ciclo|Invariante de ciclo]]
-- [[03_Conceptos/Análisis de mejor y peor caso|Análisis de mejor y peor caso]]
+- [[Ordenamiento de hot cakes|Ordenamiento de hot cakes]]
+- [[Volteo de prefijo|Volteo de prefijo]]
+- [[Invariante de ciclo|Invariante de ciclo]]
+- [[Análisis de mejor y peor caso|Análisis de mejor y peor caso]]
 
 ## Referencias mencionadas
 

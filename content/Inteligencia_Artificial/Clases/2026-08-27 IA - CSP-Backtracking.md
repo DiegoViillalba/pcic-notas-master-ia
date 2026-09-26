@@ -1,16 +1,16 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Inteligencia_Artificial/Indice|Inteligencia Artificial]]"
+materia: "[[Indice|Inteligencia Artificial]]"
 fecha: 2026-08-27
 unidad: Problemas de satisfacción de restricciones
 profesor: Carlos Hernández
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Problema de satisfacción de restricciones|Problema de satisfacción de restricciones]]"
-  - "[[03_Conceptos/Backtracking|Backtracking]]"
-  - "[[03_Conceptos/Forward checking|Forward checking]]"
-  - "[[03_Conceptos/Consistencia de arcos|Consistencia de arcos]]"
-  - "[[03_Conceptos/Algoritmo AC-3|Algoritmo AC-3]]"
+  - "[[Problema de satisfacción de restricciones|Problema de satisfacción de restricciones]]"
+  - "[[Backtracking|Backtracking]]"
+  - "[[Forward checking|Forward checking]]"
+  - "[[Consistencia de arcos|Consistencia de arcos]]"
+  - "[[Algoritmo AC-3|Algoritmo AC-3]]"
 referencias:
   - "[[AI 5 Problemas de satisfacción de restricciones.pdf|Diapositivas: AI 5 Problemas de satisfacción de restricciones]]"
 tags: [clase, inteligencia-artificial, csp, backtracking, propagacion-de-restricciones]
@@ -80,7 +80,7 @@ Una **asignación parcial** da valores solo a algunas variables. Es **consistent
 
 El siguiente explorador permite modificar asignaciones y observar cuándo aparece un conflicto:
 
-<iframe src="../../inteligencia_artificial/recursos/csp-formulacion.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="csp-formulacion.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 En el mapa, una variable representa cada región y la restricción binaria exige colores distintos entre vecinas. En 4-reinas, una variable por columna elimina de entrada la posibilidad de colocar dos reinas en la misma columna; todavía deben imponerse las restricciones de fila y diagonal.
 
@@ -204,7 +204,7 @@ BACKTRACK(asignación, csp):
     devolver fallo
 ```
 
-<iframe src="../../inteligencia_artificial/recursos/csp-backtracking.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="csp-backtracking.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 El retroceso no significa reiniciar. Solo deshace la decisión más reciente que aún tiene alternativas. Revisar restricciones después de cada decisión evita recorrer hasta el fondo ramas que ya son imposibles.
 
@@ -233,18 +233,18 @@ Su límite es local: solo propaga desde la variable recién asignada hacia sus v
 
 En esta representación hay una variable por fila y su dominio contiene las columnas donde todavía puede colocarse una reina. Cada nueva reina elimina de las filas futuras su columna y sus diagonales; si alguna fila se queda sin opciones, la rama se descarta de inmediato y el algoritmo retrocede.
 
-<iframe src="../../inteligencia_artificial/recursos/csp-forward-checking-n-reinas.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="csp-forward-checking-n-reinas.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 > [!tip] Qué observar
 > Avanza paso a paso y compara el tablero con el árbol. Las casillas descartadas muestran la **poda anticipada**: son decisiones que el algoritmo ya no necesita intentar. Un dominio vacío explica exactamente por qué comienza el *backtracking*.
 
 > [!seealso] Referencias para repasar
-> - [[03_Conceptos/Forward checking|Forward checking]]
-> - [[03_Conceptos/Problema de las ocho reinas|Problema de las N-reinas]]
-> - [[03_Conceptos/Backtracking|Backtracking]] y [[03_Conceptos/Poda del espacio de búsqueda|poda del espacio de búsqueda]]
+> - [[Forward checking|Forward checking]]
+> - [[Problema de las ocho reinas|Problema de las N-reinas]]
+> - [[Backtracking|Backtracking]] y [[Poda del espacio de búsqueda|poda del espacio de búsqueda]]
 > - [CS 188 — Filtering](https://inst.eecs.berkeley.edu/~cs188/textbook/csp/filtering.html)
 > - [[AI 5 Problemas de satisfacción de restricciones.pdf|Diapositivas de CSP]]
-> - [[01_Materias/Inteligencia_Artificial/Recursos/Artificial_inteliigence-A_modern_approach.pdf|Artificial Intelligence: A Modern Approach]], capítulo sobre CSP
+> - [[Artificial_inteliigence-A_modern_approach.pdf|Artificial Intelligence: A Modern Approach]], capítulo sobre CSP
 
 ### Consistencia de arcos
 
@@ -258,9 +258,9 @@ $$
 El valor $y$ es un **soporte** para $x$. Si un $x$ no tiene soporte, se elimina de $D(X)$. La dirección importa: $X\to Y$ puede ser consistente aunque $Y\to X$ no lo sea.
 
 > [!seealso] Desarrollo detallado
-> Antes de estudiar el algoritmo completo, revisa [[03_Conceptos/Consistencia de arcos|Consistencia de arcos]] para fijar las ideas de dirección y soporte.
+> Antes de estudiar el algoritmo completo, revisa [[Consistencia de arcos|Consistencia de arcos]] para fijar las ideas de dirección y soporte.
 
-<iframe src="../../inteligencia_artificial/recursos/csp-consistencia-arcos.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="csp-consistencia-arcos.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ### AC-3 paso a paso
 
@@ -289,7 +289,7 @@ Para dominio máximo $d$ y $e$ arcos, una cota usual de AC-3 es $O(ed^3)$. Reduc
 
 La cadena $X<Y<Z$ muestra por qué un arco debe volver a la cola: reducir $D(Y)$ puede hacer que valores de $D(X)$ pierdan el soporte que tenían cuando $X\to Y$ se revisó por primera vez.
 
-<iframe src="../../inteligencia_artificial/recursos/csp-ac3-propagacion.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="csp-ac3-propagacion.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 > [!tip] Orden de lectura
 > Sigue un valor eliminado de derecha a izquierda: primero cambia $D(Y)$ por la restricción con $Z$ y después ese cambio obliga a revisar de nuevo $X\to Y$.
@@ -298,13 +298,13 @@ La cadena $X<Y<Z$ muestra por qué un arco debe volver a la cola: reducir $D(Y)$
 
 Ahora traslada la misma idea a un subproblema de cuatro regiones. **SA** ya está fijada en azul y cada arista significa «colores distintos». Avanza un paso a la vez: la flecha marca el arco dirigido actual, los puntos muestran los dominios y el registro explica cada poda y reinserción.
 
-<iframe src="../../inteligencia_artificial/recursos/csp-ac3-mapa-australia.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="csp-ac3-mapa-australia.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 > [!tip] Qué observar
 > Distingue siempre $X_i\to X_j$ de $X_j\to X_i$: revisar una dirección solo elimina valores de $D(X_i)$. Si ese dominio cambia, AC-3 vuelve a poner en la cola los arcos de otros vecinos que apuntan hacia $X_i$.
 
 > [!seealso] Para estudiar con detalle
-> Consulta [[03_Conceptos/Algoritmo AC-3|Algoritmo AC-3]], donde se justifican las reinserciones, se explica la complejidad y se reúnen las referencias de Berkeley, Russell–Norvig y Mackworth.
+> Consulta [[Algoritmo AC-3|Algoritmo AC-3]], donde se justifican las reinserciones, se explica la complejidad y se reúnen las referencias de Berkeley, Russell–Norvig y Mackworth.
 
 ### Qué puede ocurrir después de propagar
 
@@ -348,7 +348,7 @@ MRV intenta encontrar pronto el fallo; LCV intenta que la rama elegida sobreviva
 
 La primera pestaña compara tamaños de dominio para elegir una variable con MRV. La segunda mantiene fija la variable $Q$ y compara cuánto poda cada color para elegir un valor con LCV.
 
-<iframe src="../../inteligencia_artificial/recursos/csp-mrv-lcv-fundamentos.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="csp-mrv-lcv-fundamentos.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 > [!important] Regla mental
 > **MRV elige la variable; LCV ordena sus valores.** El filtrado ocurre antes o de forma provisional para medir los dominios que ambas heurísticas utilizan.
@@ -357,18 +357,18 @@ La primera pestaña compara tamaños de dominio para elegir una variable con MRV
 
 Este visualizador resuelve el coloreado del mapa de Australia y muestra simultáneamente el **grafo de restricciones**, el **árbol de búsqueda** y el **registro de decisiones**. Al activar o desactivar MRV y LCV se puede comparar cómo cambia el orden de exploración; los controles permiten reproducir el proceso completo o avanzar paso a paso.
 
-<iframe src="../../inteligencia_artificial/recursos/csp-mrv-lcv.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="csp-mrv-lcv.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 > [!tip] Qué observar
 > **MRV** cambia qué región se asigna a continuación; **LCV** ordena los colores según las opciones que quitan a las vecinas. Reinicia después de cambiar una heurística. En estados simétricos varios colores pueden empatar: ese empate también es un resultado correcto.
 
 > [!seealso] Referencias para repasar
-> - [[03_Conceptos/Heurística MRV|Heurística MRV]]
-> - [[03_Conceptos/Valor menos restrictivo|Valor menos restrictivo (LCV)]]
-> - [[03_Conceptos/Backtracking|Backtracking]]
+> - [[Heurística MRV|Heurística MRV]]
+> - [[Valor menos restrictivo|Valor menos restrictivo (LCV)]]
+> - [[Backtracking|Backtracking]]
 > - [CS 188 — Ordering](https://inst.eecs.berkeley.edu/~cs188/textbook/csp/ordering.html)
 > - [[AI 5 Problemas de satisfacción de restricciones.pdf|Diapositivas de CSP]]
-> - [[01_Materias/Inteligencia_Artificial/Recursos/Artificial_inteliigence-A_modern_approach.pdf|Artificial Intelligence: A Modern Approach]], capítulo sobre CSP
+> - [[Artificial_inteliigence-A_modern_approach.pdf|Artificial Intelligence: A Modern Approach]], capítulo sobre CSP
 
 ## 9. Esquema integrado del solucionador
 
@@ -439,13 +439,13 @@ Un CSP representa explícitamente variables, dominios y restricciones, y busca u
 
 ## Conceptos para extraer
 
-- [[03_Conceptos/Problema de satisfacción de restricciones|Problema de satisfacción de restricciones]]
-- [[03_Conceptos/Backtracking|Backtracking]]
-- [[03_Conceptos/Forward checking|Forward checking]]
-- [[03_Conceptos/Consistencia de arcos|Consistencia de arcos]]
-- [[03_Conceptos/Algoritmo AC-3|Algoritmo AC-3]]
-- [[03_Conceptos/Heurística MRV|Heurística MRV]]
-- [[03_Conceptos/Valor menos restrictivo|Valor menos restrictivo]]
+- [[Problema de satisfacción de restricciones|Problema de satisfacción de restricciones]]
+- [[Backtracking|Backtracking]]
+- [[Forward checking|Forward checking]]
+- [[Consistencia de arcos|Consistencia de arcos]]
+- [[Algoritmo AC-3|Algoritmo AC-3]]
+- [[Heurística MRV|Heurística MRV]]
+- [[Valor menos restrictivo|Valor menos restrictivo]]
 
 ## Referencias mencionadas
 

@@ -1,21 +1,21 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Prog_Avanzada/Indice|Programación Avanzada]]"
+materia: "[[Indice|Programación Avanzada]]"
 fecha: 2026-09-08
 unidad: Programación lógica, resolución y Prolog
 profesor: Gustavo Marquez Flores
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Prolog|Prolog]]"
-  - "[[03_Conceptos/Cláusula de Horn|Cláusula de Horn]]"
-  - "[[03_Conceptos/Resolución de primer orden|Resolución de primer orden]]"
-  - "[[03_Conceptos/Resolución SLD|Resolución SLD]]"
-  - "[[03_Conceptos/Unificación|Unificación]]"
+  - "[[Prolog|Prolog]]"
+  - "[[Cláusula de Horn|Cláusula de Horn]]"
+  - "[[Resolución de primer orden|Resolución de primer orden]]"
+  - "[[Resolución SLD|Resolución SLD]]"
+  - "[[Unificación|Unificación]]"
 referencias:
-  - "[[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-08/regla-y-meta-en-prolog.jpeg|Demostración de regla y meta en Prolog]]"
-  - "[[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-08/ejemplo-resolucion-1.jpg|Ejemplo de resolución 1]]"
-  - "[[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-08/ejemplo-resolucion-2.jpg|Ejemplo de resolución 2]]"
-  - "[[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-08/ejemplo-resolucion-3.jpg|Ejemplo de resolución 3]]"
+  - "[[regla-y-meta-en-prolog.jpeg|Demostración de regla y meta en Prolog]]"
+  - "[[ejemplo-resolucion-1.jpg|Ejemplo de resolución 1]]"
+  - "[[ejemplo-resolucion-2.jpg|Ejemplo de resolución 2]]"
+  - "[[ejemplo-resolucion-3.jpg|Ejemplo de resolución 3]]"
 tags:
   - clase
   - programacion-avanzada
@@ -32,7 +32,7 @@ tags:
 
 ## Idea principal
 
-Un programa lógico describe conocimiento mediante **hechos** y **reglas**. Una consulta se convierte en una lista de **metas pendientes**. Prolog intenta demostrarla seleccionando una meta, unificándola con la cabeza de una regla y sustituyéndola por el cuerpo de esa regla. Este paso operacional no es un truco del lenguaje: es una instancia de la regla lógica de resolución aplicada a [[03_Conceptos/Cláusula de Horn|cláusulas de Horn]].
+Un programa lógico describe conocimiento mediante **hechos** y **reglas**. Una consulta se convierte en una lista de **metas pendientes**. Prolog intenta demostrarla seleccionando una meta, unificándola con la cabeza de una regla y sustituyéndola por el cuerpo de esa regla. Este paso operacional no es un truco del lenguaje: es una instancia de la regla lógica de resolución aplicada a [[Cláusula de Horn|cláusulas de Horn]].
 
 La búsqueda termina de dos maneras:
 
@@ -267,7 +267,7 @@ La otra regla para $R(X)$ produciría la meta $\leftarrow Q(X)$. Como el program
 
 ## 6. Explorador paso a paso
 
-<iframe src="../../prog_avanzada/recursos/resolucion-prolog-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="resolucion-prolog-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 El recurso permite alternar entre la refutación general y la derivación SLD. En ambos casos se elimina un par de literales complementarios; la diferencia es que SLD mantiene una **meta central** y siempre resuelve contra una cláusula del programa, lo que reduce drásticamente el espacio de búsqueda.
 
@@ -316,8 +316,8 @@ Una regla de Prolog $A\leftarrow B_1,\ldots,B_m$ es la cláusula de Horn $A\vee\
 
 ## Fuentes de la clase
 
-- [[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-08/regla-y-meta-en-prolog.jpeg|Demostración manuscrita: regla y meta en Prolog]].
-- [[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-08/ejemplo-resolucion-1.jpg|Ejemplo de refutación y esquema de búsqueda]].
-- [[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-08/ejemplo-resolucion-2.jpg|Programa clausal y meta para Prolog]].
-- [[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-08/ejemplo-resolucion-3.jpg|Refutación y búsqueda restringida en Prolog]].
+- [[regla-y-meta-en-prolog.jpeg|Demostración manuscrita: regla y meta en Prolog]].
+- [[ejemplo-resolucion-1.jpg|Ejemplo de refutación y esquema de búsqueda]].
+- [[ejemplo-resolucion-2.jpg|Programa clausal y meta para Prolog]].
+- [[ejemplo-resolucion-3.jpg|Refutación y búsqueda restringida en Prolog]].
 

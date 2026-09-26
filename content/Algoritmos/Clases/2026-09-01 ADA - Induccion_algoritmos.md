@@ -1,6 +1,6 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Algoritmos/Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
+materia: "[[Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
 fecha: "2026-09-01"
 unidad: Inducción matemática e invariantes de algoritmos
 profesor:
@@ -28,7 +28,7 @@ tags: [clase, algoritmos, induccion, invariantes, correccion]
 ![[induccion-algoritmos.pdf]]
 
 
-**Fuente:** [[01_Materias/Algoritmos/Recursos/induccion-algoritmos.pdf|Diapositivas completas (33 páginas)]]. La nota integra las revelaciones sucesivas de las diapositivas en explicaciones continuas. Los ejemplos adicionales, ejercicios y aclaraciones se añaden como apoyo de estudio.
+**Fuente:** [[induccion-algoritmos.pdf|Diapositivas completas (33 páginas)]]. La nota integra las revelaciones sucesivas de las diapositivas en explicaciones continuas. Los ejemplos adicionales, ejercicios y aclaraciones se añaden como apoyo de estudio.
 
 ## Mapa de la clase
 
@@ -344,7 +344,7 @@ $$A=[-20,10,20,30,35,40,60,70],\qquad T=60.$$
 
 #### Explorador paso a paso
 
-<iframe src="../../algoritmos/recursos/induccion-dos-punteros.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="induccion-dos-punteros.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 El intervalo activo conserva todas las soluciones posibles. Cada paso que no encuentra el objetivo elimina un extremo y reduce `hi − lo` en uno. El ejemplo sin solución permite observar la salida cuando ambos punteros coinciden.
 

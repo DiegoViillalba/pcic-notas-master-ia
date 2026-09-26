@@ -1,17 +1,17 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Algoritmos/Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
+materia: "[[Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
 fecha: 2026-08-25
 unidad: Análisis de algoritmos y notación asintótica
 profesor: Armando Castañeda Rojano
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Complejidad temporal|Complejidad temporal]]"
-  - "[[03_Conceptos/Complejidad espacial|Complejidad espacial]]"
-  - "[[03_Conceptos/Eficiencia algorítmica|Eficiencia algorítmica]]"
-  - "[[03_Conceptos/Tiempo polinomial|Tiempo polinomial]]"
-  - "[[03_Conceptos/Análisis de mejor y peor caso|Análisis de mejor y peor caso]]"
-  - "[[03_Conceptos/Máquina de Turing|Máquina de Turing]]"
+  - "[[Complejidad temporal|Complejidad temporal]]"
+  - "[[Complejidad espacial|Complejidad espacial]]"
+  - "[[Eficiencia algorítmica|Eficiencia algorítmica]]"
+  - "[[Tiempo polinomial|Tiempo polinomial]]"
+  - "[[Análisis de mejor y peor caso|Análisis de mejor y peor caso]]"
+  - "[[Máquina de Turing|Máquina de Turing]]"
 referencias:
   - 02AlgorithmAnalysis.pdf, diapositivas 1–24
   - Kleinberg y Tardos, Algorithm Design, capítulo 2
@@ -45,7 +45,7 @@ flowchart TB
 
 El análisis no empieza adivinando una letra $O$. Se avanza en orden: definir qué crece, decidir qué operaciones cuestan una unidad, especificar qué caso se estudia, contar y solo entonces simplificar.
 
-<iframe src="../../algoritmos/recursos/modelo-coste-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="modelo-coste-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ---
 
@@ -211,7 +211,7 @@ $$
 
 En el ejemplo $f(n)=32n^2+17n+1$, la curva queda por debajo de $50n^2$ y por encima de $32n^2$ para $n\geq1$. Cambia de vista para observar el techo, el piso y su combinación.
 
-<iframe src="../../algoritmos/recursos/cotas-asintoticas-interactivas.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="cotas-asintoticas-interactivas.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ### Ejemplo completo con constantes explícitas
 

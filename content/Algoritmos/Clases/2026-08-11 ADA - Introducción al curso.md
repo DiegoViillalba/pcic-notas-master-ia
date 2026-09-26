@@ -1,28 +1,28 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Algoritmos/Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
+materia: "[[Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
 fecha: 2026-08-11
 unidad: Introducción al análisis y diseño de algoritmos
 profesor: Armando Castañeda Rojano
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Algoritmo|Algoritmo]]"
-  - "[[03_Conceptos/Terminación de un algoritmo|Terminación de un algoritmo]]"
-  - "[[03_Conceptos/Validez de un algoritmo|Validez de un algoritmo]]"
-  - "[[03_Conceptos/Complejidad temporal|Complejidad temporal]]"
-  - "[[03_Conceptos/Complejidad espacial|Complejidad espacial]]"
-  - "[[03_Conceptos/Eficiencia algorítmica|Eficiencia algorítmica]]"
-  - "[[03_Conceptos/Tiempo polinomial|Tiempo polinomial]]"
-  - "[[03_Conceptos/Búsqueda lineal|Búsqueda lineal]]"
-  - "[[03_Conceptos/Paradigma de diseño de algoritmos|Paradigma de diseño de algoritmos]]"
-  - "[[03_Conceptos/Algoritmo voraz|Algoritmo voraz]]"
-  - "[[03_Conceptos/Divide y vencerás|Divide y vencerás]]"
-  - "[[03_Conceptos/Programación dinámica|Programación dinámica]]"
-  - "[[03_Conceptos/Algoritmo aleatorio|Algoritmo aleatorio]]"
-  - "[[03_Conceptos/Satisfacibilidad de circuitos|Satisfacibilidad de circuitos]]"
-  - "[[03_Conceptos/P versus NP|P versus NP]]"
-  - "[[03_Conceptos/Máquina de Turing|Máquina de Turing]]"
-  - "[[03_Conceptos/Problema de la parada|Problema de la parada]]"
+  - "[[Algoritmo|Algoritmo]]"
+  - "[[Terminación de un algoritmo|Terminación de un algoritmo]]"
+  - "[[Validez de un algoritmo|Validez de un algoritmo]]"
+  - "[[Complejidad temporal|Complejidad temporal]]"
+  - "[[Complejidad espacial|Complejidad espacial]]"
+  - "[[Eficiencia algorítmica|Eficiencia algorítmica]]"
+  - "[[Tiempo polinomial|Tiempo polinomial]]"
+  - "[[Búsqueda lineal|Búsqueda lineal]]"
+  - "[[Paradigma de diseño de algoritmos|Paradigma de diseño de algoritmos]]"
+  - "[[Algoritmo voraz|Algoritmo voraz]]"
+  - "[[Divide y vencerás|Divide y vencerás]]"
+  - "[[Programación dinámica|Programación dinámica]]"
+  - "[[Algoritmo aleatorio|Algoritmo aleatorio]]"
+  - "[[Satisfacibilidad de circuitos|Satisfacibilidad de circuitos]]"
+  - "[[P versus NP|P versus NP]]"
+  - "[[Máquina de Turing|Máquina de Turing]]"
+  - "[[Problema de la parada|Problema de la parada]]"
 referencias:
   - Presentación introductoria del curso, diapositivas 1–38
 tags:
@@ -36,7 +36,7 @@ tags:
 
 ## Apuntes rápidos
 
-- Un [[03_Conceptos/Algoritmo|algoritmo]] es una secuencia finita y bien definida de instrucciones para solucionar un problema; se puede pensar como una receta especificada con precisión.
+- Un [[Algoritmo|algoritmo]] es una secuencia finita y bien definida de instrucciones para solucionar un problema; se puede pensar como una receta especificada con precisión.
 - La algoritmia es un pilar de la computación y tiene aplicaciones en muchas áreas del conocimiento.
 - El objetivo del curso no es memorizar todos los algoritmos, sino aprender técnicas generales para analizarlos y diseñarlos.
 - Que un algoritmo produzca la respuesta correcta no garantiza que sea útil: también importa la cantidad de tiempo y memoria que requiere.
@@ -71,18 +71,18 @@ Busca(A, n, x):
 
 ## Diseño de algoritmos
 
-No es posible aprender todos los algoritmos, pero sí estudiar [[03_Conceptos/Paradigma de diseño de algoritmos|paradigmas de diseño]] reutilizables:
+No es posible aprender todos los algoritmos, pero sí estudiar [[Paradigma de diseño de algoritmos|paradigmas de diseño]] reutilizables:
 
-- [[03_Conceptos/Algoritmo voraz|Algoritmos voraces]].
-- [[03_Conceptos/Divide y vencerás|Divide y vencerás]].
-- [[03_Conceptos/Programación dinámica|Programación dinámica]].
-- [[03_Conceptos/Algoritmo aleatorio|Algoritmos aleatorios]].
+- [[Algoritmo voraz|Algoritmos voraces]].
+- [[Divide y vencerás|Divide y vencerás]].
+- [[Programación dinámica|Programación dinámica]].
+- [[Algoritmo aleatorio|Algoritmos aleatorios]].
 
 Estas técnicas funcionan como herramientas generales para resolver problemas en distintos ámbitos.
 
 ## Eficiencia y dificultad
 
-En el curso se usará, a grandes rasgos, [[03_Conceptos/Tiempo polinomial|tiempo polinomial]] como criterio de [[03_Conceptos/Eficiencia algorítmica|eficiencia]]. La búsqueda en un arreglo es eficiente porque su tiempo es lineal.
+En el curso se usará, a grandes rasgos, [[Tiempo polinomial|tiempo polinomial]] como criterio de [[Eficiencia algorítmica|eficiencia]]. La búsqueda en un arreglo es eficiente porque su tiempo es lineal.
 
 ### Ruta más corta por búsqueda exhaustiva
 
@@ -90,12 +90,12 @@ El algoritmo presentado enumera secuencias de ciudades, conserva las que forman 
 
 ### Satisfacibilidad de circuitos
 
-El procedimiento exhaustivo prueba hasta $2^n$ asignaciones de entrada y acepta cuando alguna hace verdadera la salida del circuito. Para $n=256$, el número de asignaciones es aproximadamente $1.16\times 10^{77}$. No se conoce un algoritmo de tiempo polinomial para este problema; esta dificultad conduce a la pregunta [[03_Conceptos/P versus NP|P = NP]].
+El procedimiento exhaustivo prueba hasta $2^n$ asignaciones de entrada y acepta cuando alguna hace verdadera la salida del circuito. Para $n=256$, el número de asignaciones es aproximadamente $1.16\times 10^{77}$. No se conoce un algoritmo de tiempo polinomial para este problema; esta dificultad conduce a la pregunta [[P versus NP|P = NP]].
 
 ## Límites de la computación
 
 - Hay problemas para los que no existen soluciones eficientes en el modelo considerado; la presentación menciona ajedrez y Go como ejemplos de enorme dificultad.
-- Hay problemas que no pueden resolverse algorítmicamente en general, como el [[03_Conceptos/Problema de la parada|problema de la parada]].
+- Hay problemas que no pueden resolverse algorítmicamente en general, como el [[Problema de la parada|problema de la parada]].
 - Ante estas limitaciones puede ser necesario aceptar soluciones aproximadas, parciales o probabilísticas.
 
 ## Aclaraciones después de clase
@@ -116,23 +116,23 @@ El procedimiento exhaustivo prueba hasta $2^n$ asignaciones de entrada y acepta 
 
 ## Conceptos para extraer
 
-- [[03_Conceptos/Algoritmo|Algoritmo]]
-- [[03_Conceptos/Terminación de un algoritmo|Terminación de un algoritmo]]
-- [[03_Conceptos/Validez de un algoritmo|Validez de un algoritmo]]
-- [[03_Conceptos/Complejidad temporal|Complejidad temporal]]
-- [[03_Conceptos/Complejidad espacial|Complejidad espacial]]
-- [[03_Conceptos/Eficiencia algorítmica|Eficiencia algorítmica]]
-- [[03_Conceptos/Tiempo polinomial|Tiempo polinomial]]
-- [[03_Conceptos/Búsqueda lineal|Búsqueda lineal]]
-- [[03_Conceptos/Paradigma de diseño de algoritmos|Paradigma de diseño de algoritmos]]
-- [[03_Conceptos/Algoritmo voraz|Algoritmo voraz]]
-- [[03_Conceptos/Divide y vencerás|Divide y vencerás]]
-- [[03_Conceptos/Programación dinámica|Programación dinámica]]
-- [[03_Conceptos/Algoritmo aleatorio|Algoritmo aleatorio]]
-- [[03_Conceptos/Satisfacibilidad de circuitos|Satisfacibilidad de circuitos]]
-- [[03_Conceptos/P versus NP|P versus NP]]
-- [[03_Conceptos/Máquina de Turing|Máquina de Turing]]
-- [[03_Conceptos/Problema de la parada|Problema de la parada]]
+- [[Algoritmo|Algoritmo]]
+- [[Terminación de un algoritmo|Terminación de un algoritmo]]
+- [[Validez de un algoritmo|Validez de un algoritmo]]
+- [[Complejidad temporal|Complejidad temporal]]
+- [[Complejidad espacial|Complejidad espacial]]
+- [[Eficiencia algorítmica|Eficiencia algorítmica]]
+- [[Tiempo polinomial|Tiempo polinomial]]
+- [[Búsqueda lineal|Búsqueda lineal]]
+- [[Paradigma de diseño de algoritmos|Paradigma de diseño de algoritmos]]
+- [[Algoritmo voraz|Algoritmo voraz]]
+- [[Divide y vencerás|Divide y vencerás]]
+- [[Programación dinámica|Programación dinámica]]
+- [[Algoritmo aleatorio|Algoritmo aleatorio]]
+- [[Satisfacibilidad de circuitos|Satisfacibilidad de circuitos]]
+- [[P versus NP|P versus NP]]
+- [[Máquina de Turing|Máquina de Turing]]
+- [[Problema de la parada|Problema de la parada]]
 
 ## Referencias mencionadas
 

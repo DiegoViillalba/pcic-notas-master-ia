@@ -1,20 +1,20 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Algoritmos/Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
+materia: "[[Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
 fecha: 2026-08-18
 unidad: Emparejamiento estable
 profesor: Armando Castañeda Rojano
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Emparejamiento estable|Emparejamiento estable]]"
-  - "[[03_Conceptos/Emparejamiento perfecto|Emparejamiento perfecto]]"
-  - "[[03_Conceptos/Par inestable|Par inestable]]"
-  - "[[03_Conceptos/Algoritmo de Gale-Shapley|Algoritmo de Gale-Shapley]]"
-  - "[[03_Conceptos/Aceptación diferida|Aceptación diferida]]"
-  - "[[03_Conceptos/Socio válido|Socio válido]]"
-  - "[[03_Conceptos/Óptimo para hospitales|Óptimo para hospitales]]"
-  - "[[03_Conceptos/Pesimista para estudiantes|Pesimista para estudiantes]]"
-  - "[[03_Conceptos/Emparejamiento con capacidades|Emparejamiento con capacidades]]"
+  - "[[Emparejamiento estable|Emparejamiento estable]]"
+  - "[[Emparejamiento perfecto|Emparejamiento perfecto]]"
+  - "[[Par inestable|Par inestable]]"
+  - "[[Algoritmo de Gale-Shapley|Algoritmo de Gale-Shapley]]"
+  - "[[Aceptación diferida|Aceptación diferida]]"
+  - "[[Socio válido|Socio válido]]"
+  - "[[Óptimo para hospitales|Óptimo para hospitales]]"
+  - "[[Pesimista para estudiantes|Pesimista para estudiantes]]"
+  - "[[Emparejamiento con capacidades|Emparejamiento con capacidades]]"
 referencias:
   - 01StableMatching.pdf, diapositivas 1–31
   - Kleinberg y Tardos, *Algorithm Design*, sección 1.1
@@ -27,9 +27,9 @@ tags: [clase, algoritmos]
 
 ## Apuntes rápidos
 
-- El problema ya no es ordenar una estructura, sino producir una asignación que sea [[03_Conceptos/Emparejamiento estable|estable]].
+- El problema ya no es ordenar una estructura, sino producir una asignación que sea [[Emparejamiento estable|estable]].
 - El modelo inicial tiene $n$ hospitales, $n$ estudiantes, una plaza por hospital y preferencias estrictas y completas.
-- El [[03_Conceptos/Algoritmo de Gale-Shapley|algoritmo de Gale–Shapley]] siempre termina y devuelve un emparejamiento perfecto y estable bajo esos supuestos.
+- El [[Algoritmo de Gale-Shapley|algoritmo de Gale–Shapley]] siempre termina y devuelve un emparejamiento perfecto y estable bajo esos supuestos.
 - Si proponen los hospitales, la solución favorece a los hospitales entre todas las soluciones estables; si proponen los estudiantes, se invierte ese efecto.
 
 ## Desarrollo incremental de las diapositivas
@@ -44,9 +44,9 @@ Cada hospital ordena a los estudiantes de más a menos preferido; cada estudiant
 
 ### 2. Emparejamiento perfecto y estabilidad (diapositivas 5–8)
 
-Un [[03_Conceptos/Emparejamiento perfecto|emparejamiento]] $M$ es un conjunto de pares $(h,s)$ en que ningún hospital ni estudiante aparece en más de un par. Es **perfecto** cuando usa a las $n$ personas de cada lado, así que $|M|=n$.
+Un [[Emparejamiento perfecto|emparejamiento]] $M$ es un conjunto de pares $(h,s)$ en que ningún hospital ni estudiante aparece en más de un par. Es **perfecto** cuando usa a las $n$ personas de cada lado, así que $|M|=n$.
 
-Para un par $(h,s)\notin M$, sea $M(h)$ el estudiante asignado a $h$ y $M(s)$ el hospital asignado a $s$. El par es [[03_Conceptos/Par inestable|inestable]] si:
+Para un par $(h,s)\notin M$, sea $M(h)$ el estudiante asignado a $h$ y $M(s)$ el hospital asignado a $s$. El par es [[Par inestable|inestable]] si:
 
 $$s \succ_h M(h)\quad\text{y}\quad h \succ_s M(s).$$
 
@@ -60,7 +60,7 @@ Las preferencias no garantizan por sí solas que exista una asignación estable.
 
 ### 4. Gale–Shapley: aceptación diferida (diapositiva 11)
 
-Los hospitales proponen en orden de preferencia y los estudiantes conservan provisionalmente la mejor oferta vista. Como una aceptación puede cambiar después, se llama [[03_Conceptos/Aceptación diferida|aceptación diferida]].
+Los hospitales proponen en orden de preferencia y los estudiantes conservan provisionalmente la mejor oferta vista. Como una aceptación puede cambiar después, se llama [[Aceptación diferida|aceptación diferida]].
 
 ```text
 M ← ∅
@@ -111,15 +111,15 @@ En ambos casos falla una condición del par inestable. Así, $M^*$ es estable. E
 
 ### 9. Múltiples soluciones estables y socios válidos (diapositivas 16–20)
 
-Una instancia puede tener varios resultados estables. En el ejemplo, $\{A\text{–}X,B\text{–}Y,C\text{–}Z\}$ y $\{A\text{–}Y,B\text{–}X,C\text{–}Z\}$ son estables. Un [[03_Conceptos/Socio válido|socio válido]] es alguien con quien aparece en al menos un emparejamiento estable. Por ejemplo, $X$ y $Y$ son socios válidos de $A$ y $B$, pero $Z$ es el único socio válido de $C$.
+Una instancia puede tener varios resultados estables. En el ejemplo, $\{A\text{–}X,B\text{–}Y,C\text{–}Z\}$ y $\{A\text{–}Y,B\text{–}X,C\text{–}Z\}$ son estables. Un [[Socio válido|socio válido]] es alguien con quien aparece en al menos un emparejamiento estable. Por ejemplo, $X$ y $Y$ son socios válidos de $A$ y $B$, pero $Z$ es el único socio válido de $C$.
 
 La pregunta deja de ser solo «¿existe solución?» y pasa a ser «¿qué solución estable devuelve el mecanismo y a quién beneficia?».
 
 ### 10. Optimalidad para quien propone (diapositivas 21–24)
 
-Cuando proponen hospitales, Gale–Shapley devuelve el [[03_Conceptos/Óptimo para hospitales|emparejamiento óptimo para hospitales]]: cada hospital recibe su mejor socio válido. El argumento formal toma la primera vez que un socio válido rechaza a un hospital; ese rechazo permite construir un par inestable en el supuesto emparejamiento estable donde eran pareja, contradicción.
+Cuando proponen hospitales, Gale–Shapley devuelve el [[Óptimo para hospitales|emparejamiento óptimo para hospitales]]: cada hospital recibe su mejor socio válido. El argumento formal toma la primera vez que un socio válido rechaza a un hospital; ese rechazo permite construir un par inestable en el supuesto emparejamiento estable donde eran pareja, contradicción.
 
-La contraparte es que la salida es [[03_Conceptos/Pesimista para estudiantes|pesimista para estudiantes]]: cada estudiante recibe su peor socio válido. «Peor» es solo entre resultados estables; no significa que la asignación sea incorrecta. El lado que propone determina el sesgo: si proponen estudiantes, ellas obtienen su mejor socio válido. Con hospitales proponentes, informar preferencias reales es estrategia dominante para hospitales; para estudiantes no lo es en general.
+La contraparte es que la salida es [[Pesimista para estudiantes|pesimista para estudiantes]]: cada estudiante recibe su peor socio válido. «Peor» es solo entre resultados estables; no significa que la asignación sea incorrecta. El lado que propone determina el sesgo: si proponen estudiantes, ellas obtienen su mejor socio válido. Con hospitales proponentes, informar preferencias reales es estrategia dominante para hospitales; para estudiantes no lo es en general.
 
 ### 11. Extensiones y límites (diapositiva 26)
 
@@ -150,15 +150,15 @@ Restricciones adicionales —por ejemplo, parejas que quieren coordinar dos plaz
 
 ## Conceptos para extraer
 
-- [[03_Conceptos/Emparejamiento estable|Emparejamiento estable]]
-- [[03_Conceptos/Emparejamiento perfecto|Emparejamiento perfecto]]
-- [[03_Conceptos/Par inestable|Par inestable]]
-- [[03_Conceptos/Algoritmo de Gale-Shapley|Algoritmo de Gale–Shapley]]
-- [[03_Conceptos/Aceptación diferida|Aceptación diferida]]
-- [[03_Conceptos/Socio válido|Socio válido]]
-- [[03_Conceptos/Óptimo para hospitales|Óptimo para hospitales]]
-- [[03_Conceptos/Pesimista para estudiantes|Pesimista para estudiantes]]
-- [[03_Conceptos/Emparejamiento con capacidades|Emparejamiento con capacidades]]
+- [[Emparejamiento estable|Emparejamiento estable]]
+- [[Emparejamiento perfecto|Emparejamiento perfecto]]
+- [[Par inestable|Par inestable]]
+- [[Algoritmo de Gale-Shapley|Algoritmo de Gale–Shapley]]
+- [[Aceptación diferida|Aceptación diferida]]
+- [[Socio válido|Socio válido]]
+- [[Óptimo para hospitales|Óptimo para hospitales]]
+- [[Pesimista para estudiantes|Pesimista para estudiantes]]
+- [[Emparejamiento con capacidades|Emparejamiento con capacidades]]
 
 ## Resumen después de clase
 

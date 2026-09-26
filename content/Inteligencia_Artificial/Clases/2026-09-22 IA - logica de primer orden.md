@@ -1,24 +1,24 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Inteligencia_Artificial/Indice|Inteligencia Artificial]]"
+materia: "[[Indice|Inteligencia Artificial]]"
 fecha: "2026-09-22"
 unidad: Lógica, representación y aplicaciones
 profesor: Carlos Hernández
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Lógica de primer orden|Lógica de primer orden]]"
-  - "[[03_Conceptos/Forma normal conjuntiva en lógica de primer orden|Forma normal conjuntiva en lógica de primer orden]]"
-  - "[[03_Conceptos/Skolemización|Skolemización]]"
-  - "[[03_Conceptos/Estandarización aparte de variables|Estandarización aparte de variables]]"
-  - "[[03_Conceptos/Sustitución lógica|Sustitución lógica]]"
-  - "[[03_Conceptos/Unificación|Unificación]]"
-  - "[[03_Conceptos/Resolución de primer orden|Resolución de primer orden]]"
-  - "[[03_Conceptos/Cláusula de Horn|Cláusula de Horn]]"
-  - "[[03_Conceptos/Resolución SLD|Resolución SLD]]"
-  - "[[03_Conceptos/Prolog|Prolog]]"
+  - "[[Lógica de primer orden|Lógica de primer orden]]"
+  - "[[Forma normal conjuntiva en lógica de primer orden|Forma normal conjuntiva en lógica de primer orden]]"
+  - "[[Skolemización|Skolemización]]"
+  - "[[Estandarización aparte de variables|Estandarización aparte de variables]]"
+  - "[[Sustitución lógica|Sustitución lógica]]"
+  - "[[Unificación|Unificación]]"
+  - "[[Resolución de primer orden|Resolución de primer orden]]"
+  - "[[Cláusula de Horn|Cláusula de Horn]]"
+  - "[[Resolución SLD|Resolución SLD]]"
+  - "[[Prolog|Prolog]]"
 referencias:
   - "[[2026-09-17 IA - Logica proposicional]]"
-  - "[[01_Materias/Inteligencia_Artificial/Recursos/AI 12 Inferencia agentes lógicos.pdf|Diapositivas: inferencia en lógica de primer orden]]"
+  - "[[AI 12 Inferencia agentes lógicos.pdf|Diapositivas: inferencia en lógica de primer orden]]"
 tags:
   - clase
   - inteligencia-artificial
@@ -32,17 +32,17 @@ tags:
 
 # Clase 14 · Inferencia en lógica de primer orden
 
-![[01_Materias/Inteligencia_Artificial/Recursos/AI 12 Inferencia agentes lógicos.pdf]]
+![[AI 12 Inferencia agentes lógicos.pdf]]
 
 > [!summary] Pregunta central
-> ¿Cómo puede un agente demostrar una consecuencia cuando su conocimiento contiene objetos, relaciones, variables y cuantificadores? La estrategia de la clase es transformar la base a cláusulas, representar los testigos existenciales mediante [[03_Conceptos/Skolemización|símbolos de Skolem]] y aplicar [[03_Conceptos/Resolución de primer orden|resolución]] usando [[03_Conceptos/Unificación|unificación]].
+> ¿Cómo puede un agente demostrar una consecuencia cuando su conocimiento contiene objetos, relaciones, variables y cuantificadores? La estrategia de la clase es transformar la base a cláusulas, representar los testigos existenciales mediante [[Skolemización|símbolos de Skolem]] y aplicar [[Resolución de primer orden|resolución]] usando [[Unificación|unificación]].
 
 > [!note] Numeración del material
 > La presentación se titula «Clase 14», aunque el calendario del curso registra el 22 de septiembre como la sesión 13. Este apunte conserva la fecha real y sigue, una por una, las 19 diapositivas del PDF.
 
 ## Antes de comenzar: cuatro ideas mínimas
 
-La [[03_Conceptos/Lógica de primer orden|lógica de primer orden]] representa objetos y relaciones mediante **términos** y **predicados**:
+La [[Lógica de primer orden|lógica de primer orden]] representa objetos y relaciones mediante **términos** y **predicados**:
 
 - Una constante nombra un objeto: $Sócrates$, $Jack$, $Tuna$.
 - Una variable puede representar cualquier objeto del dominio: $x$, $y$, $z$.
@@ -113,7 +113,7 @@ flowchart LR
   V -->|punto fijo o límite| S["La búsqueda no obtuvo una prueba"]
 ```
 
-La [[03_Conceptos/Forma normal conjuntiva en lógica de primer orden|FNC]] sirve como interfaz común: aunque las fórmulas originales tengan implicaciones y cuantificadores, el motor termina trabajando con conjuntos de cláusulas.
+La [[Forma normal conjuntiva en lógica de primer orden|FNC]] sirve como interfaz común: aunque las fórmulas originales tengan implicaciones y cuantificadores, el motor termina trabajando con conjuntos de cláusulas.
 
 > [!warning] Ausencia de prueba no es prueba de ausencia
 > Si una búsqueda no obtiene $\square$, no siempre puede concluirse $KB\not\models\alpha$. La inferencia general de primer orden es semidecidible: una consecuencia verdadera tiene una prueba finita, pero una búsqueda puede no terminar cuando la consulta no se sigue.
@@ -132,11 +132,11 @@ se interpreta como:
 
 $$\forall x\,[\neg Humano(x)\vee Mortal(x)].$$
 
-La variable es universal **dentro de su cláusula**. Antes de combinar cláusulas distintas se aplica [[03_Conceptos/Estandarización aparte de variables|estandarización aparte]] para que dos variables llamadas $x$ no se confundan accidentalmente.
+La variable es universal **dentro de su cláusula**. Antes de combinar cláusulas distintas se aplica [[Estandarización aparte de variables|estandarización aparte]] para que dos variables llamadas $x$ no se confundan accidentalmente.
 
 ### Testigos para los existenciales
 
-Un cuantificador existencial afirma que hay algún objeto, pero no dice cuál. La [[03_Conceptos/Skolemización|skolemización]] introduce un símbolo nuevo para representar ese testigo:
+Un cuantificador existencial afirma que hay algún objeto, pero no dice cuál. La [[Skolemización|skolemización]] introduce un símbolo nuevo para representar ese testigo:
 
 | Fórmula | Símbolo introducido | Motivo |
 |---|---|---|
@@ -274,7 +274,7 @@ $$
 El procedimiento tiene tres operaciones:
 
 1. encontrar los literales complementarios;
-2. calcular una [[03_Conceptos/Sustitución lógica|sustitución]] que iguale sus átomos;
+2. calcular una [[Sustitución lógica|sustitución]] que iguale sus átomos;
 3. eliminar ese par y aplicar la sustitución a **todo** lo restante.
 
 ### Ejemplo de la diapositiva
@@ -508,7 +508,7 @@ $$KB\models Kills(Curiosity,Tuna).$$
 
 Avanza por cada resolvente para ver sus padres, la sustitución y la interpretación informal.
 
-<iframe src="../../inteligencia_artificial/recursos/resolucion-primer-orden-tuna.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="resolucion-primer-orden-tuna.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Si no carga:** sigue las filas $R_1$–$R_7$. La rama izquierda termina en $\neg Loves(y,Jack)$ y la derecha en $Loves(G(Jack),Jack)$; al usar $y=G(Jack)$ se obtiene $\square$.
 
@@ -516,7 +516,7 @@ Avanza por cada resolvente para ver sus padres, la sustitución y la interpretac
 
 ## Diapositiva 16 · Prolog como resolución restringida
 
-[[03_Conceptos/Prolog|Prolog]] representa conocimiento mediante [[03_Conceptos/Cláusula de Horn|cláusulas definidas]] y ejecuta consultas mediante una forma operacional de [[03_Conceptos/Resolución SLD|resolución SLD]].
+[[Prolog|Prolog]] representa conocimiento mediante [[Cláusula de Horn|cláusulas definidas]] y ejecuta consultas mediante una forma operacional de [[Resolución SLD|resolución SLD]].
 
 ```prolog
 % Base de conocimiento
@@ -645,22 +645,22 @@ La conexión no consiste en desechar la lógica: los agentes probabilísticos ta
 
 | Tema | Referencia |
 |---|---|
-| Material principal | Carlos Hernández, *Clase 14: inferencia en lógica de primer orden*, diapositivas 1–19: [[01_Materias/Inteligencia_Artificial/Recursos/AI 12 Inferencia agentes lógicos.pdf|PDF de la clase]]. |
-| Sintaxis y semántica de primer orden | Russell, S. J. y Norvig, P. (2020), *Artificial Intelligence: A Modern Approach*, 4.ª ed., cap. 8. Disponible en [[01_Materias/Inteligencia_Artificial/Recursos/Artificial_inteliigence-A_modern_approach.pdf|los recursos del curso]] y en el [sitio oficial de AIMA](https://aima.cs.berkeley.edu/). |
-| Unificación | Russell y Norvig, cap. 9, §9.2; [[03_Conceptos/Unificación|nota atómica]]. El [capítulo 9 oficial](https://aima.cs.berkeley.edu/4th-ed/pdfs/newchap09.pdf) desarrolla unificación, encadenamiento y resolución. |
+| Material principal | Carlos Hernández, *Clase 14: inferencia en lógica de primer orden*, diapositivas 1–19: [[AI 12 Inferencia agentes lógicos.pdf|PDF de la clase]]. |
+| Sintaxis y semántica de primer orden | Russell, S. J. y Norvig, P. (2020), *Artificial Intelligence: A Modern Approach*, 4.ª ed., cap. 8. Disponible en [[Artificial_inteliigence-A_modern_approach.pdf|los recursos del curso]] y en el [sitio oficial de AIMA](https://aima.cs.berkeley.edu/). |
+| Unificación | Russell y Norvig, cap. 9, §9.2; [[Unificación|nota atómica]]. El [capítulo 9 oficial](https://aima.cs.berkeley.edu/4th-ed/pdfs/newchap09.pdf) desarrolla unificación, encadenamiento y resolución. |
 | Resolución y forma clausal | Russell y Norvig, cap. 9, §9.5; Genesereth, *Introduction to Logic*, [capítulo interactivo sobre resolución](https://logic.stanford.edu/intrologic/extras/resolution.html). |
 | Variables, sustitución y normalización | Enderton, H. B. (2001), *A Mathematical Introduction to Logic*, 2.ª ed., caps. 2–3. |
 | Prolog, Horn y SLD | SWI-Prolog, [glosario de términos](https://www.swi-prolog.org/pldoc/man?section=glossary) y [ejecución de consultas](https://www.swi-prolog.org/pldoc/man?section=execquery). |
 
 ## Notas atómicas relacionadas
 
-- [[03_Conceptos/Lógica de primer orden|Lógica de primer orden]]
-- [[03_Conceptos/Forma normal conjuntiva en lógica de primer orden|Forma normal conjuntiva en lógica de primer orden]]
-- [[03_Conceptos/Estandarización aparte de variables|Estandarización aparte de variables]]
-- [[03_Conceptos/Skolemización|Skolemización]]
-- [[03_Conceptos/Sustitución lógica|Sustitución lógica]]
-- [[03_Conceptos/Unificación|Unificación]]
-- [[03_Conceptos/Resolución de primer orden|Resolución de primer orden]]
-- [[03_Conceptos/Cláusula de Horn|Cláusula de Horn]]
-- [[03_Conceptos/Resolución SLD|Resolución SLD]]
-- [[03_Conceptos/Prolog|Prolog]]
+- [[Lógica de primer orden|Lógica de primer orden]]
+- [[Forma normal conjuntiva en lógica de primer orden|Forma normal conjuntiva en lógica de primer orden]]
+- [[Estandarización aparte de variables|Estandarización aparte de variables]]
+- [[Skolemización|Skolemización]]
+- [[Sustitución lógica|Sustitución lógica]]
+- [[Unificación|Unificación]]
+- [[Resolución de primer orden|Resolución de primer orden]]
+- [[Cláusula de Horn|Cláusula de Horn]]
+- [[Resolución SLD|Resolución SLD]]
+- [[Prolog|Prolog]]

@@ -1,23 +1,23 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Prog_Avanzada/Indice|Programación Avanzada]]"
+materia: "[[Indice|Programación Avanzada]]"
 fecha: 2026-09-10
 unidad: "Programación lógica en Prolog: hechos, unificación, backtracking y corte"
 profesor: Gustavo Marquez Flores
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Prolog|Prolog]]"
-  - "[[03_Conceptos/Unificación|Unificación]]"
-  - "[[03_Conceptos/Backtracking en Prolog|Backtracking en Prolog]]"
-  - "[[03_Conceptos/Corte (cut) en Prolog|Corte (cut) en Prolog]]"
-  - "[[03_Conceptos/Negación como falla|Negación como falla]]"
-  - "[[03_Conceptos/Cláusula de Horn|Cláusula de Horn]]"
+  - "[[Prolog|Prolog]]"
+  - "[[Unificación|Unificación]]"
+  - "[[Backtracking en Prolog|Backtracking en Prolog]]"
+  - "[[Corte (cut) en Prolog|Corte (cut) en Prolog]]"
+  - "[[Negación como falla|Negación como falla]]"
+  - "[[Cláusula de Horn|Cláusula de Horn]]"
 referencias:
-  - "[[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 9.pdf|Programación Avanzada Notas 9]]"
-  - "[[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-10/console-gusta-atomos.png|Consola: consultas con átomos]]"
-  - "[[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-10/console-gusta-variables.png|Consola: consultas con variables]]"
-  - "[[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-10/console-mayusculas-variables.png|Consola: mayúsculas como variables]]"
-  - "[[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-10/console-recibe-error-sintaxis.png|Consola: error de sintaxis con espacio]]"
+  - "[[Programación Avanzada Notas 9.pdf|Programación Avanzada Notas 9]]"
+  - "[[console-gusta-atomos.png|Consola: consultas con átomos]]"
+  - "[[console-gusta-variables.png|Consola: consultas con variables]]"
+  - "[[console-mayusculas-variables.png|Consola: mayúsculas como variables]]"
+  - "[[console-recibe-error-sintaxis.png|Consola: error de sintaxis con espacio]]"
 tags:
   - clase
   - programacion-avanzada
@@ -28,7 +28,7 @@ tags:
   - corte
 ---
 
-![[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 9.pdf]]
+![[Programación Avanzada Notas 9.pdf]]
 
 # Hechos, unificación, backtracking y corte en Prolog
 
@@ -94,7 +94,7 @@ n :- c, ( \+ a; \+ e ), d.
 o :- c, \+ a, d.
 ~~~
 
-Esto conecta directamente con la notación de la clase pasada: cada hecho como `a.` es una cláusula de Horn sin cuerpo (`a ← true`), y cada regla `A :- B1, ..., Bn.` es `A ← B1 ∧ ... ∧ Bn`. `,` es **conjunción**, `;` es **disyunción**, y `\+` es [[03_Conceptos/Negación como falla|negación como falla]] (tiene éxito si el programa **no puede demostrar** su argumento).
+Esto conecta directamente con la notación de la clase pasada: cada hecho como `a.` es una cláusula de Horn sin cuerpo (`a ← true`), y cada regla `A :- B1, ..., Bn.` es `A ← B1 ∧ ... ∧ Bn`. `,` es **conjunción**, `;` es **disyunción**, y `\+` es [[Negación como falla|negación como falla]] (tiene éxito si el programa **no puede demostrar** su argumento).
 
 ### 2.1. Trazar cada regla a mano
 
@@ -149,19 +149,19 @@ recibe( X, beso ) :- dar( juan, beso, X ).
 | `gusta( maria, X ).` | átomo con variable, tres hechos posibles | `X = helado ; X = leer ; X = cine.` |
 | `gusta( Y, X ).` | variable con variable, en ambas posiciones | tres soluciones, una por hecho |
 
-![[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-10/console-gusta-atomos.png]]
+![[console-gusta-atomos.png]]
 
 ### 4.1. Pedir más soluciones con `;`
 
 Cada vez que se escribe `;` después de una respuesta, Prolog **retrocede** (backtracking) hasta el último hecho que aún no había probado y vuelve a unificar. Esto es exactamente enumerar, uno por uno, todos los puntos de elección que quedaron abiertos:
 
-![[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-10/console-gusta-variables.png]]
+![[console-gusta-variables.png]]
 
 ### 4.2. La trampa de las mayúsculas
 
 En Prolog, **cualquier identificador que empiece con mayúscula es una variable**, sin importar qué palabra sea. `Maria` y `maria` son símbolos completamente distintos: el primero es una variable libre, el segundo es la constante (átomo) definida en los hechos.
 
-![[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-10/console-mayusculas-variables.png]]
+![[console-mayusculas-variables.png]]
 
 > [!warning] `gusta( maria, Maria )` no pregunta "¿a María le gusta ella misma?"
 > `Maria` (con mayúscula) es una variable nueva, sin relación con el átomo `maria` del primer argumento. La consulta simplemente pregunta "¿qué cosas le gustan a maria?", y por eso da las mismas tres respuestas que `gusta(maria, X)`, solo que la variable se llama distinto.
@@ -173,7 +173,7 @@ En Prolog, **cualquier identificador que empiece con mayúscula es una variable*
 ERROR: Syntax error: Operator expected
 ~~~
 
-![[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-10/console-recibe-error-sintaxis.png]]
+![[console-recibe-error-sintaxis.png]]
 
 En Prolog **no puede haber un espacio entre el nombre del predicado y el paréntesis de apertura**. `recibe( X, beso )` es una llamada al predicado `recibe/2`; `recibe ( X, beso )` es, sintácticamente, otra cosa (el analizador espera un operador después del átomo `recibe`), y por eso truena. Es uno de los errores más comunes al empezar con Prolog.
 
@@ -181,7 +181,7 @@ En Prolog **no puede haber un espacio entre el nombre del predicado y el parént
 
 ## 5. Simulador interactivo: consola y corte
 
-<iframe src="../../prog_avanzada/recursos/prolog-unificacion-simulador.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="prolog-unificacion-simulador.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 Usa los chips para lanzar cualquiera de las consultas de las secciones 4.1–4.3 (incluyendo el error de sintaxis) y pulsa «Siguiente solución ( ; )» para reproducir el backtracking exactamente como en la consola real. Más abajo, el segundo panel deja alternar entre "sin corte" y "con corte" para ver qué rama del árbol de búsqueda queda podada.
 
@@ -322,9 +322,9 @@ Las láminas 168–170 ya anuncian lo que sigue en el curso, aunque todavía no 
 
 ## Conceptos atómicos
 
-- [[03_Conceptos/Backtracking en Prolog|Backtracking en Prolog]]
-- [[03_Conceptos/Corte (cut) en Prolog|Corte (cut) en Prolog]]
-- [[03_Conceptos/Negación como falla|Negación como falla]]
+- [[Backtracking en Prolog|Backtracking en Prolog]]
+- [[Corte (cut) en Prolog|Corte (cut) en Prolog]]
+- [[Negación como falla|Negación como falla]]
 
 ## Dudas para revisar
 
@@ -338,7 +338,7 @@ Un programa Prolog concreto no es más que una lista de cláusulas de Horn escri
 
 ## Referencia
 
-- [[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 9.pdf|Programación Avanzada Notas 9]], diapositivas 1–7 (láminas 164–170).
+- [[Programación Avanzada Notas 9.pdf|Programación Avanzada Notas 9]], diapositivas 1–7 (láminas 164–170).
 - Código fuente: `Proposiciones.pl`, `DaRegalo.pl`, `MariaGusta.pl`, `EjemplosProlog.pl` (carpeta `Primera Parte`).
-- Capturas de consola: *Unificación y Sustitución.docx* — [[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-10/console-gusta-atomos.png|consultas con átomos]], [[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-10/console-gusta-variables.png|consultas con variables]], [[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-10/console-mayusculas-variables.png|mayúsculas como variables]], [[01_Materias/Prog_Avanzada/Recursos/Fuentes-2026-09-10/console-recibe-error-sintaxis.png|error de sintaxis]].
-- Clase previa: [[01_Materias/Prog_Avanzada/Clases/2026-09-08 ProgAv - Resolucion y metas en Prolog|Resolución, reglas y metas en Prolog]].
+- Capturas de consola: *Unificación y Sustitución.docx* — [[console-gusta-atomos.png|consultas con átomos]], [[console-gusta-variables.png|consultas con variables]], [[console-mayusculas-variables.png|mayúsculas como variables]], [[console-recibe-error-sintaxis.png|error de sintaxis]].
+- Clase previa: [[2026-09-08 ProgAv - Resolucion y metas en Prolog|Resolución, reglas y metas en Prolog]].

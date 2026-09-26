@@ -1,27 +1,27 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Inteligencia_Artificial/Indice|Inteligencia Artificial]]"
+materia: "[[Indice|Inteligencia Artificial]]"
 fecha: 2026-08-13
 unidad: Fundamentos y resolución de problemas
 profesor: Carlos Hernández
 estado:
   - procesada
 conceptos:
-  - "[[03_Conceptos/Agente racional|Agente racional]]"
-  - "[[03_Conceptos/Entorno de tarea|Entorno de tarea]]"
-  - "[[03_Conceptos/Agente por reflejo|Agente por reflejo]]"
-  - "[[03_Conceptos/Agente planificador|Agente planificador]]"
-  - "[[03_Conceptos/Formulación de un problema de búsqueda|Formulación de un problema de búsqueda]]"
-  - "[[03_Conceptos/Espacio de estados|Espacio de estados]]"
-  - "[[03_Conceptos/Función sucesor|Función sucesor]]"
-  - "[[03_Conceptos/Prueba de meta|Prueba de meta]]"
-  - "[[03_Conceptos/Grafo de espacio de estados|Grafo de espacio de estados]]"
-  - "[[03_Conceptos/Árbol de búsqueda|Árbol de búsqueda]]"
-  - "[[03_Conceptos/Nodo de búsqueda|Nodo de búsqueda]]"
-  - "[[03_Conceptos/Factor de ramificación|Factor de ramificación]]"
-  - "[[03_Conceptos/Profundidad máxima de un árbol de búsqueda|Profundidad máxima de un árbol de búsqueda]]"
+  - "[[Agente racional|Agente racional]]"
+  - "[[Entorno de tarea|Entorno de tarea]]"
+  - "[[Agente por reflejo|Agente por reflejo]]"
+  - "[[Agente planificador|Agente planificador]]"
+  - "[[Formulación de un problema de búsqueda|Formulación de un problema de búsqueda]]"
+  - "[[Espacio de estados|Espacio de estados]]"
+  - "[[Función sucesor|Función sucesor]]"
+  - "[[Prueba de meta|Prueba de meta]]"
+  - "[[Grafo de espacio de estados|Grafo de espacio de estados]]"
+  - "[[Árbol de búsqueda|Árbol de búsqueda]]"
+  - "[[Nodo de búsqueda|Nodo de búsqueda]]"
+  - "[[Factor de ramificación|Factor de ramificación]]"
+  - "[[Profundidad máxima de un árbol de búsqueda|Profundidad máxima de un árbol de búsqueda]]"
 referencias:
-  - "[[01_Materias/Inteligencia_Artificial/Recursos/AI 2 Agentes Inteligentes.pdf|AI 2 Agentes Inteligentes]]"
+  - "[[AI 2 Agentes Inteligentes.pdf|AI 2 Agentes Inteligentes]]"
 tags:
   - clase
   - inteligencia-artificial
@@ -38,10 +38,10 @@ tags:
 
 ## Apuntes rápidos
 
-- Un agente percibe y actúa; un [[03_Conceptos/Agente racional|agente racional]] elige la acción que maximiza su utilidad esperada.
+- Un agente percibe y actúa; un [[Agente racional|agente racional]] elige la acción que maximiza su utilidad esperada.
 - La percepción, el ambiente y el espacio de acciones condicionan la técnica con la que se seleccionan acciones racionales.
 - El curso busca enseñar a reconocer cuándo un problema nuevo puede resolverse mediante una técnica de IA existente.
-- Se contrastaron los [[03_Conceptos/Agente por reflejo|agentes por reflejo]] con los [[03_Conceptos/Agente planificador|agentes que planean]].
+- Se contrastaron los [[Agente por reflejo|agentes por reflejo]] con los [[Agente planificador|agentes que planean]].
 - Se presentaron cuatro familias de técnicas de IA: búsqueda, lógica, probabilidad y aprendizaje.
 - Los problemas se agruparon en decisión, búsqueda y optimización; la diapositiva no desarrolló todavía sus diferencias.
 
@@ -51,7 +51,7 @@ tags:
 
 Un agente es una entidad que percibe y actúa. Es racional cuando selecciona una acción dirigida a maximizar su utilidad esperada.
 
-Para describir su [[03_Conceptos/Entorno de tarea|entorno de tarea]] se usaron cuatro componentes:
+Para describir su [[Entorno de tarea|entorno de tarea]] se usaron cuatro componentes:
 
 | Componente | Pregunta | Ejemplo: conductor de taxi |
 |---|---|---|
@@ -80,32 +80,32 @@ También se propusieron como ejercicios un sistema de diagnóstico médico, un a
 
 ### Formulación de un problema de búsqueda
 
-Una [[03_Conceptos/Formulación de un problema de búsqueda|formulación de búsqueda]] presentada en clase contiene:
+Una [[Formulación de un problema de búsqueda|formulación de búsqueda]] presentada en clase contiene:
 
 | Componente                                                          | Función |                                                                   |
 | ------------------------------------------------------------------- | ------- | ----------------------------------------------------------------- |
-| [[03_Conceptos/Espacio de estadosEspacio de estados]] o de búsqueda |         | Delimita las configuraciones consideradas.                        |
-| [[03_Conceptos/Función sucesorFunción sucesor]]                     |         | Indica las acciones posibles, los estados resultantes y su costo. |
+| [[Espacio de estadosEspacio de estados]] o de búsqueda |         | Delimita las configuraciones consideradas.                        |
+| [[Función sucesorFunción sucesor]]                     |         | Indica las acciones posibles, los estados resultantes y su costo. |
 | Estado inicial Fija desde qué estado comienza el problema.          |         |                                                                   |
-| [[03_Conceptos/Prueba de metaPrueba de meta]]                       |         | Decide si un estado satisface el objetivo.                        |
+| [[Prueba de metaPrueba de meta]]                       |         | Decide si un estado satisface el objetivo.                        |
 
 ### Árbol de búsqueda
 
-En un [[03_Conceptos/Árbol de búsqueda|árbol de búsqueda]]:
+En un [[Árbol de búsqueda|árbol de búsqueda]]:
 
 - el estado inicial ocupa la raíz;
 - los hijos corresponden a sucesores;
-- cada [[03_Conceptos/Nodo de búsqueda|nodo]] muestra un estado, pero representa además el plan que permitió alcanzarlo;
+- cada [[Nodo de búsqueda|nodo]] muestra un estado, pero representa además el plan que permitió alcanzarlo;
 - las soluciones pueden aparecer en distintas partes del árbol;
 - rara vez es posible construir el árbol completo.
 
-Se introdujeron dos parámetros: $b$ es el [[03_Conceptos/Factor de ramificación|factor de ramificación]] y $m$ la [[03_Conceptos/Profundidad máxima de un árbol de búsqueda|profundidad máxima]].
+Se introdujeron dos parámetros: $b$ es el [[Factor de ramificación|factor de ramificación]] y $m$ la [[Profundidad máxima de un árbol de búsqueda|profundidad máxima]].
 
 #### La frontera del árbol
 
 La **frontera** es el conjunto de nodos que la búsqueda **ya descubrió, pero todavía no ha examinado**. Funciona como una lista de pendientes: se elige un nodo de la frontera, se examina, se retira y se agregan sus hijos.
 
-<iframe src="../../inteligencia_artificial/recursos/frontera-arbol.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="frontera-arbol.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 > [!tip] Idea clave
 > La frontera no es una parte fija del árbol. Va cambiando durante la búsqueda y marca la separación entre lo ya explorado y lo que todavía está pendiente.
@@ -113,7 +113,7 @@ La **frontera** es el conjunto de nodos que la búsqueda **ya descubrió, pero t
 ### Grafo de estados frente a árbol de búsqueda
 
 
-Un [[03_Conceptos/Grafo de espacio de estados|grafo de espacio de estados]] representa cada estado y las transiciones posibles. El árbol representa planes generados desde un estado inicial. Por ello, un mismo estado del grafo puede aparecer en varios nodos del árbol; además, un ciclo del grafo puede generar ramas sin fin si se vuelve a visitar el mismo estado.
+Un [[Grafo de espacio de estados|grafo de espacio de estados]] representa cada estado y las transiciones posibles. El árbol representa planes generados desde un estado inicial. Por ello, un mismo estado del grafo puede aparecer en varios nodos del árbol; además, un ciclo del grafo puede generar ramas sin fin si se vuelve a visitar el mismo estado.
 
 ```mermaid
 flowchart LR
@@ -285,23 +285,23 @@ La diapositiva 20 confirma exactamente el grafo que ya trabajamos: $S \to a$, $S
 
 ## Conceptos para extraer
 
-- [[03_Conceptos/Agente racional|Agente racional]]
-- [[03_Conceptos/Entorno de tarea|Entorno de tarea]]
-- [[03_Conceptos/Agente por reflejo|Agente por reflejo]]
-- [[03_Conceptos/Agente planificador|Agente planificador]]
-- [[03_Conceptos/Formulación de un problema de búsqueda|Formulación de un problema de búsqueda]]
-- [[03_Conceptos/Espacio de estados|Espacio de estados]]
-- [[03_Conceptos/Función sucesor|Función sucesor]]
-- [[03_Conceptos/Prueba de meta|Prueba de meta]]
-- [[03_Conceptos/Grafo de espacio de estados|Grafo de espacio de estados]]
-- [[03_Conceptos/Árbol de búsqueda|Árbol de búsqueda]]
-- [[03_Conceptos/Nodo de búsqueda|Nodo de búsqueda]]
-- [[03_Conceptos/Factor de ramificación|Factor de ramificación]]
-- [[03_Conceptos/Profundidad máxima de un árbol de búsqueda|Profundidad máxima de un árbol de búsqueda]]
+- [[Agente racional|Agente racional]]
+- [[Entorno de tarea|Entorno de tarea]]
+- [[Agente por reflejo|Agente por reflejo]]
+- [[Agente planificador|Agente planificador]]
+- [[Formulación de un problema de búsqueda|Formulación de un problema de búsqueda]]
+- [[Espacio de estados|Espacio de estados]]
+- [[Función sucesor|Función sucesor]]
+- [[Prueba de meta|Prueba de meta]]
+- [[Grafo de espacio de estados|Grafo de espacio de estados]]
+- [[Árbol de búsqueda|Árbol de búsqueda]]
+- [[Nodo de búsqueda|Nodo de búsqueda]]
+- [[Factor de ramificación|Factor de ramificación]]
+- [[Profundidad máxima de un árbol de búsqueda|Profundidad máxima de un árbol de búsqueda]]
 
 ## Referencias mencionadas
 
-- [[01_Materias/Inteligencia_Artificial/Recursos/AI 2 Agentes Inteligentes.pdf|AI 2 Agentes Inteligentes]], presentación de Carlos Hernández, 21 diapositivas.
+- [[AI 2 Agentes Inteligentes.pdf|AI 2 Agentes Inteligentes]], presentación de Carlos Hernández, 21 diapositivas.
 
 ## Resumen después de clase
 

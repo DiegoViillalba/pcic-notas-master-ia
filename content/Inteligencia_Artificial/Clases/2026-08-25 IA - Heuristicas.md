@@ -1,14 +1,14 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Inteligencia_Artificial/Indice|Inteligencia Artificial]]"
+materia: "[[Indice|Inteligencia Artificial]]"
 fecha: 2026-08-25
 unidad: Búsqueda informada
 profesor: Carlos Hernández
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Algoritmo A estrella|Algoritmo A estrella]]"
-  - "[[03_Conceptos/Heurística|Heurística]]"
-  - "[[03_Conceptos/Búsqueda en árbol y búsqueda en grafo|Búsqueda en árbol y búsqueda en grafo]]"
+  - "[[Algoritmo A estrella|Algoritmo A estrella]]"
+  - "[[Heurística|Heurística]]"
+  - "[[Búsqueda en árbol y búsqueda en grafo|Búsqueda en árbol y búsqueda en grafo]]"
 referencias:
   - "[[AI 4 Búsqueda con información.pdf|Diapositivas: AI 4 Búsqueda con información]]"
 tags: [clase, inteligencia-artificial, busqueda-informada, a-estrella, heuristicas]
@@ -105,7 +105,7 @@ Hay dos rutas:
 
 Alterna entre la heurística original de la diapositiva y una heurística admisible. Con **Siguiente** puedes observar cómo cambian $g$, $h$, $f$ y el orden de la frontera hasta que se extrae una meta. La explicación estática de la corrida permanece debajo por si el recurso no puede cargarse.
 
-<iframe src="../../inteligencia_artificial/recursos/a-estrella-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="a-estrella-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ### Corrida paso a paso
 
@@ -298,7 +298,7 @@ flowchart LR
 
 Compara tres ejecuciones sobre el mismo grafo: heurística inconsistente sin reaperturas, la misma heurística permitiendo reabrir estados y la corrección consistente $h(A)=2$. El panel conserva en cada paso la frontera, los estados cerrados y la desigualdad problemática del arco $A\to C$.
 
-<iframe src="../../inteligencia_artificial/recursos/a-estrella-consistencia-reaperturas.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="a-estrella-consistencia-reaperturas.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 La heurística es admisible:
 
@@ -570,7 +570,7 @@ Un estado es un tablero parcial. Una acción elige una celda vacía y le asigna 
 
 El ejemplo usa un pequeño grafo de restricciones en vez de un Sudoku completo para que cada decisión sea visible. El mecanismo es el mismo: asignar el primer candidato, propagar restricciones, detectar un dominio vacío, deshacer decisiones y continuar con la siguiente alternativa.
 
-<iframe src="../../inteligencia_artificial/recursos/csp-backtracking.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="csp-backtracking.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ```mermaid
 flowchart TB

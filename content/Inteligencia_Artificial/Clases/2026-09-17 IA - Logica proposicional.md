@@ -1,18 +1,18 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Inteligencia_Artificial/Indice|Inteligencia Artificial]]"
+materia: "[[Indice|Inteligencia Artificial]]"
 fecha: "2026-09-17"
 unidad: Lógica, representación y aplicaciones
 profesor: Carlos Hernández
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Base de conocimiento|Base de conocimiento]]"
-  - "[[03_Conceptos/Modelo en lógica proposicional|Modelo en lógica proposicional]]"
-  - "[[03_Conceptos/Vinculación lógica|Vinculación lógica]]"
-  - "[[03_Conceptos/Satisfacibilidad proposicional|Satisfacibilidad proposicional]]"
+  - "[[Base de conocimiento|Base de conocimiento]]"
+  - "[[Modelo en lógica proposicional|Modelo en lógica proposicional]]"
+  - "[[Vinculación lógica|Vinculación lógica]]"
+  - "[[Satisfacibilidad proposicional|Satisfacibilidad proposicional]]"
 referencias:
   - "[[2026-09-10 IA - Agentes logicos]]"
-  - "[[01_Materias/Inteligencia_Artificial/Recursos/AI 10 Lógica proposicional.pdf|Diapositivas de la clase 10]]"
+  - "[[AI 10 Lógica proposicional.pdf|Diapositivas de la clase 10]]"
 tags:
   - clase
   - inteligencia-artificial
@@ -25,7 +25,7 @@ tags:
 
 # Clase 10 · De lo que sabemos a lo que podemos demostrar
 
-![[01_Materias/Inteligencia_Artificial/Recursos/AI 10 Lógica proposicional.pdf]]
+![[AI 10 Lógica proposicional.pdf]]
 
 > [!summary] Pregunta de la clase
 > Si una base de conocimiento contiene reglas y hechos, ¿cómo obtenemos consecuencias nuevas sin revisar manualmente todos los mundos posibles? La ruta de hoy va de **modelos y satisfacibilidad** a **reglas de inferencia**, **encadenamiento hacia adelante**, **cláusulas de Horn**, **resolución** y **forma normal conjuntiva (FNC/CNF)**. La última parte muestra qué le falta a la lógica proposicional para hablar de objetos y de «todos» o «existe».
@@ -80,7 +80,7 @@ $$KB\models f\quad\Longleftrightarrow\quad KB\land\neg f\text{ es insatisfactibl
 
 En el laboratorio de la clase previa puedes alternar valores y observar qué mundos sobreviven al agregar fórmulas. Úsalo para comprobar por qué «no sé» significa que sobreviven tanto un mundo con $f$ como otro con $\neg f$.
 
-<iframe src="../../inteligencia_artificial/recursos/modelos-entailment-satisfaccion.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="modelos-entailment-satisfaccion.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Si no carga:** imagina $KB=\{R\vee M\}$. Hay modelos con $R$ verdadero y modelos con $R$ falso; por tanto la base no vincula ni $R$ ni $\neg R$.
 
@@ -120,7 +120,7 @@ Con $R$, $R\to M$ y $M\to S$, el rastro es $\{R\}\to\{R,M\}\to\{R,M,S\}$. Si sol
 
 Activa o desactiva los hechos iniciales. Después avanza una regla a la vez y observa qué premisas faltan, qué hecho aparece y cómo se forma su justificación. Prueba especialmente el caso donde falta `Día laboral`: `Tráfico` ya no sale de `Mojado` solo.
 
-<iframe src="../../inteligencia_artificial/recursos/logica-horn-encadenamiento.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="logica-horn-encadenamiento.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Si no carga:** con $R$ y $D$ (día laboral), $R\to M$, $M\to S$ y $M\land D\to T$ obtenemos $M$, luego $S$ y $T$. Sin $D$, $T$ queda sin demostrar; esto **no** equivale a demostrar $\neg T$.
 
@@ -172,7 +172,7 @@ Como $KB\land\neg C$ conduce a $\square$, no tiene modelos y $KB\models C$. Obse
 
 Selecciona dos cláusulas con literales complementarios y el átomo que cancelarás. El laboratorio forma el resolvente, descarta tautologías y muestra cuándo aparece la cláusula vacía. El botón de pista propone un paso válido, pero puedes explorar otras parejas.
 
-<iframe src="../../inteligencia_artificial/recursos/logica-resolucion-laboratorio.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="logica-resolucion-laboratorio.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Si no carga:** sigue las filas 1–7 de la tabla. Cada paso cancela un par complementario; obtener $\square$ significa que la hipótesis $\neg C$ era imposible junto con $KB$.
 

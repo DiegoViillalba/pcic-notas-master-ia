@@ -1,19 +1,19 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Prog_Avanzada/Indice|Programación Avanzada]]"
+materia: "[[Indice|Programación Avanzada]]"
 fecha: 2026-09-01
 unidad: Verificación de condicionales y ciclos mediante inducción
 profesor: Gustavo Marquez Flores
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Terna de Hoare|Terna de Hoare]]"
-  - "[[03_Conceptos/Regla condicional de Hoare|Regla condicional de Hoare]]"
-  - "[[03_Conceptos/Regla de consecuencia de Hoare|Regla de consecuencia de Hoare]]"
-  - "[[03_Conceptos/Inducción matemática aplicada a ciclos|Inducción matemática aplicada a ciclos]]"
-  - "[[03_Conceptos/Invariante de ciclo|Invariante de ciclo]]"
-  - "[[03_Conceptos/Corrección parcial y corrección total|Corrección parcial y corrección total]]"
+  - "[[Terna de Hoare|Terna de Hoare]]"
+  - "[[Regla condicional de Hoare|Regla condicional de Hoare]]"
+  - "[[Regla de consecuencia de Hoare|Regla de consecuencia de Hoare]]"
+  - "[[Inducción matemática aplicada a ciclos|Inducción matemática aplicada a ciclos]]"
+  - "[[Invariante de ciclo|Invariante de ciclo]]"
+  - "[[Corrección parcial y corrección total|Corrección parcial y corrección total]]"
 referencias:
-  - "[[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 6.pdf|Programación Avanzada Notas 6]]"
+  - "[[Programación Avanzada Notas 6.pdf|Programación Avanzada Notas 6]]"
 tags:
   - clase
   - programacion-avanzada
@@ -23,7 +23,7 @@ tags:
   - invariantes
   - ciclos
 ---
-![[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 6.pdf]]
+![[Programación Avanzada Notas 6.pdf]]
 
 # Verificación de condicionales y ciclos por inducción
 
@@ -49,7 +49,7 @@ flowchart LR
     VAR --> TERM["Terminación"]
 ~~~
 
-La primera parte completa la verificación de condicionales con **else**. La segunda introduce la [[03_Conceptos/Inducción matemática aplicada a ciclos|inducción matemática]] como herramienta para demostrar que una relación entre variables sigue siendo cierta después de \(0,1,2,\ldots\) iteraciones. Esa relación persistente es el [[03_Conceptos/Invariante de ciclo|invariante del ciclo]]. *(Diap. 1–17; láminas 101–117.)*
+La primera parte completa la verificación de condicionales con **else**. La segunda introduce la [[Inducción matemática aplicada a ciclos|inducción matemática]] como herramienta para demostrar que una relación entre variables sigue siendo cierta después de \(0,1,2,\ldots\) iteraciones. Esa relación persistente es el [[Invariante de ciclo|invariante del ciclo]]. *(Diap. 1–17; láminas 101–117.)*
 
 ---
 
@@ -338,7 +338,7 @@ Esta igualdad es el invariante.
 
 ### Explorador de los dos ciclos
 
-<iframe src="../../prog_avanzada/recursos/invariantes-ciclos-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="invariantes-ciclos-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 El explorador muestra el estado después de cada iteración. Los valores cambian, pero la igualdad resaltada se conserva. En el primer algoritmo, \(D\) cuenta las sumas ya realizadas; en el segundo, \(M\) cuenta los factores que aún faltan.
 
@@ -682,14 +682,14 @@ hay que demostrar:
 2. **Preservación:** \(\{I\land B\}C\{I\}\).
 3. **Salida útil:** \(I\land\neg B\Rightarrow Q\).
 
-![[01_Materias/Prog_Avanzada/Recursos/AllLectures-Hoare/slide-67.png]]
+![[slide-67.png]]
 
 Para corrección total se agregan dos obligaciones sobre una variante entera \(E\):
 
 4. \(I\land B\Rightarrow E\ge0\).
 5. Una vuelta del cuerpo reduce \(E\) estrictamente.
 
-![[01_Materias/Prog_Avanzada/Recursos/AllLectures-Hoare/slide-85.png]]
+![[slide-85.png]]
 
 ### Ejemplo paso a paso: sumar de 1 a \(n\)
 
@@ -718,7 +718,7 @@ I:\ s=\frac{i(i+1)}2\land0\le i\le n,
 
 Con esto quedan demostradas corrección parcial **y** terminación.
 
-<iframe src="../../prog_avanzada/recursos/alllectures-hoare/hoare-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="hoare-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ## 14. Referencia diapositiva por diapositiva
 
@@ -733,14 +733,14 @@ Con esto quedan demostradas corrección parcial **y** terminación.
 
 ## Conceptos atómicos
 
-- [[03_Conceptos/Regla condicional de Hoare|Regla condicional de Hoare]]
-- [[03_Conceptos/Inducción matemática aplicada a ciclos|Inducción matemática aplicada a ciclos]]
-- [[03_Conceptos/Invariante de ciclo|Invariante de ciclo]]
-- [[03_Conceptos/Corrección parcial y corrección total|Corrección parcial y corrección total]]
+- [[Regla condicional de Hoare|Regla condicional de Hoare]]
+- [[Inducción matemática aplicada a ciclos|Inducción matemática aplicada a ciclos]]
+- [[Invariante de ciclo|Invariante de ciclo]]
+- [[Corrección parcial y corrección total|Corrección parcial y corrección total]]
 
 ## Dudas para revisar
 
-- [ ] ¿Cuál es la regla formal de Hoare para **while** y cómo se deriva de estas tres obligaciones?
+- [x] ¿Cuál es la regla formal de Hoare para **while** y cómo se deriva de estas tres obligaciones? Véanse §13 y [[Condición de verificación|Condición de verificación]].
 - [ ] ¿Qué convención adopta el curso para \(0^0\) cuando el exponente inicial es cero?
 - [ ] ¿Cómo cambia el invariante de potencia rápida cuando el exponente se divide entre dos?
 
@@ -750,5 +750,5 @@ Un condicional se verifica demostrando una postcondición común en las ramas \(
 
 ## Referencia
 
-- [[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 6.pdf|Programación Avanzada Notas 6]], diapositivas 1–17 (láminas 101–117).
+- [[Programación Avanzada Notas 6.pdf|Programación Avanzada Notas 6]], diapositivas 1–17 (láminas 101–117).
 - `/Users/diegovillalba/Downloads/AllLectures.pdf`, páginas PDF 28–35 y 47–91 (regla de `while`, invención de invariantes, condiciones de verificación y corrección total).

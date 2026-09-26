@@ -1,15 +1,15 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Algoritmos/Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
+materia: "[[Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
 fecha: "2026-09-10"
 unidad: Grafos
 profesor: Armando Castañeda Rojano
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Grafo dirigido acíclico|Grafo dirigido acíclico]]"
-  - "[[03_Conceptos/Ordenamiento topológico|Ordenamiento topológico]]"
-  - "[[03_Conceptos/Algoritmo de ordenamiento topológico|Algoritmo de ordenamiento topológico]]"
-  - "[[03_Conceptos/Grafo dirigido|Grafo dirigido]]"
+  - "[[Grafo dirigido acíclico|Grafo dirigido acíclico]]"
+  - "[[Ordenamiento topológico|Ordenamiento topológico]]"
+  - "[[Algoritmo de ordenamiento topológico|Algoritmo de ordenamiento topológico]]"
+  - "[[Grafo dirigido|Grafo dirigido]]"
 referencias:
   - "[[2026-09-08 ADA - biparticion-y-grafos-dirigidos]]"
   - "Kleinberg & Tardos, Algorithm Design, Cap. 3, Sección 3.6"
@@ -318,7 +318,7 @@ End Topo-Rec
 
 Ejecuta paso a paso el algoritmo de Kahn sobre el grafo canónico hexagonal de 7 nodos, visualiza la cola $S$, el vector dinámico `in-degree` y el orden lineal resultante, o inyecta un ciclo para observar la detección de `NO-DAG`.
 
-<iframe src="../../algoritmos/recursos/ordenamiento-topologico-interactivo.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="ordenamiento-topologico-interactivo.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Idea central si el laboratorio no carga:** El algoritmo inicia calculando el grado de entrada de cada nodo. Los nodos con grado cero ($v_1$ y $v_2$) entran a la cola $S$. En cada paso se extrae un nodo, se añade a la lista $L$ y se decrementa el grado de sus vecinos salientes. Cuando el grado de un vecino llega a cero, entra a la cola. Al finalizar, si se procesaron los 7 nodos, la lista $L$ representa un ordenamiento topológico válido. Si se inyecta una arista cíclica ($v_7 \to v_1$), la cola se vacía con $|L| < 7$, reportando `NO-DAG`.
 
@@ -447,5 +447,5 @@ $$E = \{(A, B), (A, C), (B, D), (C, D), (D, E)\}$$
 ## Conexiones
 
 - **Anterior:** [[2026-09-08 ADA - biparticion-y-grafos-dirigidos|Clase del 8 de septiembre: Bipartición, 2-colorabilidad y conectividad en grafos dirigidos]].
-- **Recurso interactivo de esta clase:** `![[01_Materias/Algoritmos/Recursos/ordenamiento-topologico-interactivo.html]]`
+- **Recurso interactivo de esta clase:** `![[ordenamiento-topologico-interactivo.html]]`
 - **Siguiente clase:** [[2026-09-17 ADA - toposort-dfs-y-componentes-fuertemente-conexas|Clase del 17 de septiembre: TopoSort con DFS, componentes fuertemente conexas y gráfica de condensación (G_cc)]].

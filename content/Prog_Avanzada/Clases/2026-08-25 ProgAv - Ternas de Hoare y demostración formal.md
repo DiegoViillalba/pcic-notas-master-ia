@@ -1,23 +1,23 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Prog_Avanzada/Indice|Programación Avanzada]]"
+materia: "[[Indice|Programación Avanzada]]"
 fecha: 2026-08-25
 unidad: Demostración formal de programas
 profesor: Gustavo Marquez Flores
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Verificación formal de programas|Verificación formal de programas]]"
-  - "[[03_Conceptos/Aserción de programa|Aserción de programa]]"
-  - "[[03_Conceptos/Estado de programa|Estado de programa]]"
-  - "[[03_Conceptos/Terna de Hoare|Terna de Hoare]]"
-  - "[[03_Conceptos/Corrección parcial y corrección total|Corrección parcial y corrección total]]"
-  - "[[03_Conceptos/Fortaleza lógica de una aserción|Fortaleza lógica de una aserción]]"
-  - "[[03_Conceptos/Regla de consecuencia de Hoare|Regla de consecuencia de Hoare]]"
-  - "[[03_Conceptos/Reglas de conjunción y disyunción de Hoare|Reglas de conjunción y disyunción de Hoare]]"
-  - "[[03_Conceptos/Precondición más débil|Precondición más débil]]"
-  - "[[03_Conceptos/Axioma de asignación de Hoare|Axioma de asignación de Hoare]]"
+  - "[[Verificación formal de programas|Verificación formal de programas]]"
+  - "[[Aserción de programa|Aserción de programa]]"
+  - "[[Estado de programa|Estado de programa]]"
+  - "[[Terna de Hoare|Terna de Hoare]]"
+  - "[[Corrección parcial y corrección total|Corrección parcial y corrección total]]"
+  - "[[Fortaleza lógica de una aserción|Fortaleza lógica de una aserción]]"
+  - "[[Regla de consecuencia de Hoare|Regla de consecuencia de Hoare]]"
+  - "[[Reglas de conjunción y disyunción de Hoare|Reglas de conjunción y disyunción de Hoare]]"
+  - "[[Precondición más débil|Precondición más débil]]"
+  - "[[Axioma de asignación de Hoare|Axioma de asignación de Hoare]]"
 referencias:
-  - "[[01_Materias/Prog_Avanzada/Recursos/Clase4/Programación Avanzada Notas 4 2027.pdf|Programación Avanzada Notas 4 2027]]"
+  - "[[Programación Avanzada Notas 4 2027.pdf|Programación Avanzada Notas 4 2027]]"
 tags:
   - clase
   - programacion-avanzada
@@ -25,8 +25,12 @@ tags:
   - logica-de-hoare
   - ternas-de-hoare
 ---
-![[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 4 2027.pdf]]
+![[Programación Avanzada Notas 4 2027.pdf]]
 # Ternas de Hoare y demostración formal
+
+Recursos útiles:
+- https://www.cl.cam.ac.uk/archive/mjcg/HoareLogic/Lectures/AllLectures.pdf
+
 
 ## Pregunta central
 
@@ -52,7 +56,7 @@ flowchart TB
     ASIG --> WP[Verificación hacia atrás]
 ```
 
-La clase introduce la [[03_Conceptos/Verificación formal de programas|verificación formal]] mediante [[03_Conceptos/Terna de Hoare|ternas de Hoare]]. El punto central es separar tres piezas: qué estados iniciales son válidos, qué código se ejecuta y qué estados finales se aceptan. Después se estudian reglas para transformar especificaciones y, finalmente, la regla de asignación que permite razonar desde la salida deseada hacia la entrada necesaria. *(Diap. 1–27; láminas 55–81.)*
+La clase introduce la [[Verificación formal de programas|verificación formal]] mediante [[Terna de Hoare|ternas de Hoare]]. El punto central es separar tres piezas: qué estados iniciales son válidos, qué código se ejecuta y qué estados finales se aceptan. Después se estudian reglas para transformar especificaciones y, finalmente, la regla de asignación que permite razonar desde la salida deseada hacia la entrada necesaria. *(Diap. 1–27; láminas 55–81.)*
 
 ---
 
@@ -95,7 +99,7 @@ raiz(n):
 
 ## 2. Aserciones, precondiciones, postcondiciones y estados
 
-Una [[03_Conceptos/Aserción de programa|aserción]] es una fórmula lógica sobre las variables del programa. Puede aparecer antes de un fragmento como **precondición** $P$ o después como **postcondición** $Q$. Las reglas de inferencia parten de aserciones conocidas y obtienen otras aserciones válidas. *(Diap. 3–4.)*
+Una [[Aserción de programa|aserción]] es una fórmula lógica sobre las variables del programa. Puede aparecer antes de un fragmento como **precondición** $P$ o después como **postcondición** $Q$. Las reglas de inferencia parten de aserciones conocidas y obtienen otras aserciones válidas. *(Diap. 3–4.)*
 
 Ejemplos:
 
@@ -105,7 +109,7 @@ x=3\land y\le z\land z>4,
 \qquad a=b\land i\ge j.
 $$
 
-Un [[03_Conceptos/Estado de programa|estado]] es una asignación de valores a todas las variables relevantes. Se escribe $s\models P$ cuando el estado $s$ satisface la aserción $P$. El código transforma un estado inicial en uno final; la concatenación $C_1;C_2$ ejecuta primero $C_1$ y luego $C_2$. *(Diap. 5 y 7.)*
+Un [[Estado de programa|estado]] es una asignación de valores a todas las variables relevantes. Se escribe $s\models P$ cuando el estado $s$ satisface la aserción $P$. El código transforma un estado inicial en uno final; la concatenación $C_1;C_2$ ejecuta primero $C_1$ y luego $C_2$. *(Diap. 5 y 7.)*
 
 Ejemplos de satisfacción:
 
@@ -172,7 +176,7 @@ $$
 
 ### Corrección parcial y total
 
-La [[03_Conceptos/Corrección parcial y corrección total|corrección parcial]] afirma que, **si el programa termina**, su resultado cumple $Q$. La corrección total añade una demostración de que el programa termina para todas las entradas permitidas por $P$. *(Diap. 10–11.)*
+La [[Corrección parcial y corrección total|corrección parcial]] afirma que, **si el programa termina**, su resultado cumple $Q$. La corrección total añade una demostración de que el programa termina para todas las entradas permitidas por $P$. *(Diap. 10–11.)*
 
 $$
 \text{corrección total}
@@ -259,7 +263,7 @@ Que $A\Rightarrow B$ no obliga a que $B\Rightarrow A$. Por ejemplo, $y=4\Rightar
 
 ## 5. Regla de consecuencia
 
-La [[03_Conceptos/Regla de consecuencia de Hoare|regla de consecuencia]] permite reforzar la precondición o debilitar la postcondición sin cambiar el código. *(Diap. 16–19.)*
+La [[Regla de consecuencia de Hoare|regla de consecuencia]] permite reforzar la precondición o debilitar la postcondición sin cambiar el código. *(Diap. 16–19.)*
 
 ### Fortalecimiento de la precondición
 
@@ -391,7 +395,7 @@ $$
 \boxed{\{Q[E/V]\}\ V:=E\ \{Q\}}.
 $$
 
-$Q[E/V]$ se lee “$Q$ con $E$ sustituido por $V$”. Es la [[03_Conceptos/Precondición más débil|precondición más débil]] que garantiza $Q$ para esa asignación. *(Diap. 24–25.)*
+$Q[E/V]$ se lee “$Q$ con $E$ sustituido por $V$”. Es la [[Precondición más débil|precondición más débil]] que garantiza $Q$ para esa asignación. *(Diap. 24–25.)*
 
 #### Ejemplo 1: `k := 4*a`
 
@@ -550,32 +554,32 @@ Toma \(P\equiv x=0\), \(V=x\) y \(E=1\):
 3. Por tanto, la regla propuesta no puede ser correcta.
 4. La regla válida parte de la meta \(Q\) y calcula \(Q[E/V]\) **antes** de la asignación.
 
-![[01_Materias/Prog_Avanzada/Recursos/AllLectures-Hoare/slide-16.png]]
+![[slide-16.png]]
 
 > [!example] Práctica inmediata
 > Para \(z:=3x-2\) y meta \(z>7\), sustituye \(z\): \(3x-2>7\), luego \(x>3\). Comprueba con \(x=4\) y con el valor frontera \(x=3\).
 
-Continúa con ejercicios graduados en [[01_Materias/Prog_Avanzada/Guía paso a paso - Lógica de Hoare#8. Ejercicios graduados|la guía paso a paso]].
+Continúa con ejercicios graduados en [[Guía paso a paso - Lógica de Hoare#8. Ejercicios graduados|la guía paso a paso]].
 
-<iframe src="../../prog_avanzada/recursos/alllectures-hoare/hoare-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="hoare-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ## Conceptos atómicos
 
-- [[03_Conceptos/Verificación formal de programas|Verificación formal de programas]]
-- [[03_Conceptos/Aserción de programa|Aserción de programa]]
-- [[03_Conceptos/Estado de programa|Estado de programa]]
-- [[03_Conceptos/Terna de Hoare|Terna de Hoare]]
-- [[03_Conceptos/Corrección parcial y corrección total|Corrección parcial y corrección total]]
-- [[03_Conceptos/Fortaleza lógica de una aserción|Fortaleza lógica de una aserción]]
-- [[03_Conceptos/Regla de consecuencia de Hoare|Regla de consecuencia de Hoare]]
-- [[03_Conceptos/Reglas de conjunción y disyunción de Hoare|Reglas de conjunción y disyunción de Hoare]]
-- [[03_Conceptos/Precondición más débil|Precondición más débil]]
-- [[03_Conceptos/Axioma de asignación de Hoare|Axioma de asignación de Hoare]]
+- [[Verificación formal de programas|Verificación formal de programas]]
+- [[Aserción de programa|Aserción de programa]]
+- [[Estado de programa|Estado de programa]]
+- [[Terna de Hoare|Terna de Hoare]]
+- [[Corrección parcial y corrección total|Corrección parcial y corrección total]]
+- [[Fortaleza lógica de una aserción|Fortaleza lógica de una aserción]]
+- [[Regla de consecuencia de Hoare|Regla de consecuencia de Hoare]]
+- [[Reglas de conjunción y disyunción de Hoare|Reglas de conjunción y disyunción de Hoare]]
+- [[Precondición más débil|Precondición más débil]]
+- [[Axioma de asignación de Hoare|Axioma de asignación de Hoare]]
 
 ## Dudas para revisar
 
-- [ ] ¿Qué reglas de Hoare se usarán después para condicionales y ciclos?
-- [ ] ¿Cómo se construye un invariante de ciclo y una función variante para demostrar terminación?
+- [x] ¿Qué reglas de Hoare se usarán después para condicionales y ciclos? Véanse [[Guía paso a paso - Lógica de Hoare#4. Condicionales demostrar todos los caminos|condicionales]] y [[Guía paso a paso - Lógica de Hoare#5. Ciclos invariante salida y variante|ciclos]].
+- [x] ¿Cómo se construye un invariante de ciclo y una función variante para demostrar terminación? Véase [[Función variante|Función variante]].
 - [ ] ¿El curso empleará $\{\}$ o $\top$ para la aserción verdadera en ejercicios futuros?
 
 ## Resumen después de clase
@@ -584,5 +588,5 @@ Una terna de Hoare relaciona una precondición, un fragmento de código y una po
 
 ## Referencia
 
-- [[01_Materias/Prog_Avanzada/Recursos/Clase4/Programación Avanzada Notas 4 2027.pdf|Programación Avanzada Notas 4 2027]], diapositivas 1–27 (láminas 55–81).
-- `/Users/diegovillalba/Downloads/AllLectures.pdf`, páginas PDF 4–23; capturas en [[01_Materias/Prog_Avanzada/Recursos/AllLectures-Hoare/slide-15.png|axioma de asignación]] y [[01_Materias/Prog_Avanzada/Recursos/AllLectures-Hoare/slide-16.png|falacia hacia atrás]].
+- [[Programación Avanzada Notas 4 2027.pdf|Programación Avanzada Notas 4 2027]], diapositivas 1–27 (láminas 55–81).
+- `/Users/diegovillalba/Downloads/AllLectures.pdf`, páginas PDF 4–23; capturas en [[slide-15.png|axioma de asignación]] y [[slide-16.png|falacia hacia atrás]].

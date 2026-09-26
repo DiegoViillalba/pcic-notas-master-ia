@@ -1,20 +1,20 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Prog_Avanzada/Indice|Programación Avanzada]]"
+materia: "[[Indice|Programación Avanzada]]"
 fecha: 2026-08-20
 unidad: Backtracking y solución por patrones
 profesor: Gustavo Marquez Flores
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Backtracking|Backtracking]]"
-  - "[[03_Conceptos/Problema de las ocho reinas|Problema de las ocho reinas]]"
-  - "[[03_Conceptos/Poda del espacio de búsqueda|Poda del espacio de búsqueda]]"
-  - "[[03_Conceptos/Cuadro mágico|Cuadro mágico]]"
-  - "[[03_Conceptos/Construcción por patrones|Construcción por patrones]]"
+  - "[[Backtracking|Backtracking]]"
+  - "[[Problema de las ocho reinas|Problema de las ocho reinas]]"
+  - "[[Poda del espacio de búsqueda|Poda del espacio de búsqueda]]"
+  - "[[Cuadro mágico|Cuadro mágico]]"
+  - "[[Construcción por patrones|Construcción por patrones]]"
 referencias:
-  - "[[01_Materias/Prog_Avanzada/Recursos/Clase3/Programación Avanzada Notas 3.pdf|Programación Avanzada Notas 3]]"
-  - "[[01_Materias/Prog_Avanzada/Recursos/Clase3/Cuadros mágicos.pdf|Cuadros mágicos]]"
-  - "[[01_Materias/Prog_Avanzada/Recursos/Clase3/Ocho reinas.c|Ocho reinas.c]]"
+  - "[[Programación Avanzada Notas 3.pdf|Programación Avanzada Notas 3]]"
+  - "[[Cuadros mágicos.pdf|Cuadros mágicos]]"
+  - "[[Ocho reinas.c|Ocho reinas.c]]"
 tags:
   - clase
   - programacion-avanzada
@@ -22,7 +22,7 @@ tags:
   - ocho-reinas
   - cuadros-magicos
 ---
-![[01_Materias/Prog_Avanzada/Recursos/Programación Avanzada Notas 3.pdf]]
+![[Programación Avanzada Notas 3.pdf]]
 # Ocho reinas y cuadros mágicos
 
 ## Pregunta central
@@ -46,7 +46,7 @@ flowchart TB
     M2 --> O[Orden impar o doblemente par]
 ```
 
-La clase continúa [[03_Conceptos/Backtracking|backtracking]], visto en la sesión anterior, y lo aterriza en dos problemas. En ambos se construye una solución parcial colocando una pieza o un número. La diferencia importante es que las ocho reinas se resuelven naturalmente explorando un árbol con poda, mientras que ciertos cuadros mágicos admiten patrones que producen una solución directamente.
+La clase continúa [[Backtracking|backtracking]], visto en la sesión anterior, y lo aterriza en dos problemas. En ambos se construye una solución parcial colocando una pieza o un número. La diferencia importante es que las ocho reinas se resuelven naturalmente explorando un árbol con poda, mientras que ciertos cuadros mágicos admiten patrones que producen una solución directamente.
 
 ---
 
@@ -89,7 +89,7 @@ buscar(estado, nivel):
 ```
 
 > [!important]
-> La validez se comprueba sobre la **solución parcial**, no solo al final. Rechazar temprano una rama imposible es la [[03_Conceptos/Poda del espacio de búsqueda|poda del espacio de búsqueda]].
+> La validez se comprueba sobre la **solución parcial**, no solo al final. Rechazar temprano una rama imposible es la [[Poda del espacio de búsqueda|poda del espacio de búsqueda]].
 
 ---
 
@@ -295,7 +295,7 @@ La estrategia de una reina por fila parte de hasta $8^8$ asignaciones, pero la r
 
 ### Definición
 
-Un [[03_Conceptos/Cuadro mágico|cuadro mágico]] normal de orden $n$ coloca una vez cada entero de $1$ a $n^2$ en una matriz $n\times n$, de modo que todas las filas, columnas y las dos diagonales principales sumen lo mismo.
+Un [[Cuadro mágico|cuadro mágico]] normal de orden $n$ coloca una vez cada entero de $1$ a $n^2$ en una matriz $n\times n$, de modo que todas las filas, columnas y las dos diagonales principales sumen lo mismo.
 
 La constante mágica se deduce sin buscar:
 
@@ -348,7 +348,7 @@ Para orden 3 existe una solución fundamental, cuyas rotaciones y reflexiones pr
 
 ## 4. Solución por patrones
 
-La [[03_Conceptos/Construcción por patrones|construcción por patrones]] observa soluciones conocidas, identifica una regla y la replica. No enumera candidatos: genera directamente un cuadro válido. Por eso puede construir órdenes mayores con mucha más rapidez que backtracking.
+La [[Construcción por patrones|construcción por patrones]] observa soluciones conocidas, identifica una regla y la replica. No enumera candidatos: genera directamente un cuadro válido. Por eso puede construir órdenes mayores con mucha más rapidez que backtracking.
 
 ```mermaid
 flowchart LR
@@ -468,17 +468,17 @@ flowchart TD
 
 ## Conceptos atómicos
 
-- [[03_Conceptos/Backtracking|Backtracking]]
-- [[03_Conceptos/Problema de las ocho reinas|Problema de las ocho reinas]]
-- [[03_Conceptos/Poda del espacio de búsqueda|Poda del espacio de búsqueda]]
-- [[03_Conceptos/Cuadro mágico|Cuadro mágico]]
-- [[03_Conceptos/Construcción por patrones|Construcción por patrones]]
+- [[Backtracking|Backtracking]]
+- [[Problema de las ocho reinas|Problema de las ocho reinas]]
+- [[Poda del espacio de búsqueda|Poda del espacio de búsqueda]]
+- [[Cuadro mágico|Cuadro mágico]]
+- [[Construcción por patrones|Construcción por patrones]]
 
 ## Material de la clase
 
 - ![[Programación Avanzada Notas 3.pdf]]
 - ![[Cuadros mágicos.pdf]]
-- [[01_Materias/Prog_Avanzada/Recursos/Clase3/Ocho reinas.c|Código de ocho reinas]]
+- [[Ocho reinas.c|Código de ocho reinas]]
 - ![[Eight-queens-animation.gif]]
 - ![[Cuadro Mágico 9x9.jpg]]
 

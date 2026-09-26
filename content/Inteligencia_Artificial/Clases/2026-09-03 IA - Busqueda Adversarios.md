@@ -1,6 +1,6 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Inteligencia_Artificial/Indice|Inteligencia Artificial]]"
+materia: "[[Indice|Inteligencia Artificial]]"
 fecha: "2026-09-03"
 unidad: Búsqueda con adversarios
 profesor: Carlos Hernández
@@ -190,7 +190,7 @@ La operación de la raíz depende de **quién mueve en el estado que se está an
 
 El laboratorio reproduce el árbol de la diapositiva 17. Cambia quién controla la raíz y avanza una operación a la vez.
 
-<iframe src="../../inteligencia_artificial/recursos/minimax-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="minimax-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Idea central aunque el laboratorio no cargue:** con raíz MAX se propagan $3,2,2$ y se elige 3; con raíz MIN se propagan $12,6,14$ y se elige 6.
 
@@ -310,7 +310,7 @@ Se recorre de izquierda a derecha. La raíz es MAX; debajo hay MIN y después MA
 
 Se visitan 5 de 8 hojas: $10,6,100,1,2$. Se podan 8, 20 y 4. Recorrer en otro orden puede reducir la cantidad de cortes, pero nunca cambia el valor minimax.
 
-<iframe src="../../inteligencia_artificial/recursos/alfa-beta-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="alfa-beta-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Idea central aunque el laboratorio no cargue:** una poda aparece cuando el valor parcial de una rama ya es peor que una alternativa disponible para un ancestro. El HTML permite comparar el orden izquierda→derecha, que visita 5 hojas, con derecha→izquierda, que visita las 8 en este árbol.
 
@@ -412,7 +412,7 @@ El valor positivo favorece a MAX según este modelo; no garantiza que la posici�
 
 El laboratorio permite cambiar los pesos, las cantidades de piezas y el horizonte. También muestra cómo $b^m$ crece con un solo nivel adicional.
 
-<iframe src="../../inteligencia_artificial/recursos/evaluacion-juegos-laboratorio.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="evaluacion-juegos-laboratorio.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Idea central aunque el laboratorio no cargue:** evaluar más profundo reduce la dependencia de la estimación, pero el número de hojas crece exponencialmente. Alfa–beta compra profundidad adicional sin alterar minimax; `Eval` compra una decisión aproximada cuando ni siquiera esa profundidad es suficiente.
 
@@ -471,7 +471,7 @@ La búsqueda con adversarios devuelve una estrategia porque cada jugador control
 
 ## Referencias
 
-- Carlos Hernández, *AI 7 Búsqueda con adversarios*, diapositivas de clase, 2026, PDF proporcionado: [archivo original](</Users/diegovillalba/Downloads/AI 7 Búsqueda con adversarios.pdf>).
+- Carlos Hernández, *AI 7 Búsqueda con adversarios*, diapositivas de clase, 2026, PDF proporcionado: [archivo original](</Users/diegovillalba/Downloads/AI 7 Búsqueda con adversarios.pdf>).
 - UC Berkeley CS 188, [Introduction to Artificial Intelligence — Textbook](https://inst.eecs.berkeley.edu/~cs188/textbook/), consultado el 2026-09-07.
 - UC Berkeley CS 188, [§3.1 Games](https://inst.eecs.berkeley.edu/~cs188/textbook/games/games.html), formulación de juegos y estrategia.
 - UC Berkeley CS 188, [§3.2 Minimax](https://inst.eecs.berkeley.edu/~cs188/textbook/games/minimax.html), minimax, poda alfa–beta y funciones de evaluación.

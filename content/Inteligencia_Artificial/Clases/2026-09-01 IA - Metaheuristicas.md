@@ -1,6 +1,6 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Inteligencia_Artificial/Indice|Inteligencia Artificial]]"
+materia: "[[Indice|Inteligencia Artificial]]"
 fecha: "2026-09-01"
 unidad: Búsqueda local y metaheurísticas
 profesor:
@@ -301,7 +301,7 @@ Con T alta respecto a $|\Delta|$, se aceptan muchos empeoramientos; la búsqueda
 
 Selecciona algoritmo y estado inicial; avanza un movimiento a la vez. El laboratorio usa A–F, el ejemplo discreto de esta nota. En recocido muestra propuesta, probabilidad y sorteo; en tabú muestra la memoria. Cambiar los parámetros reinicia la ejecución.
 
-<iframe src="../../inteligencia_artificial/recursos/busqueda-local-laboratorio.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="busqueda-local-laboratorio.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 **Idea que debes observar:** desde A, hill climbing se detiene en B; tabú puede atravesar C aunque sea peor; recocido puede aceptar o rechazar esa bajada según T y el sorteo. El récord se conserva aunque el estado actual empeore.
 
@@ -605,7 +605,7 @@ flowchart TD
 | 22 | No free lunch | §14 |
 | 23 | Siguiente tema: búsqueda con adversarios | Cierre |
 
-- **Fuente de clase:** [[01_Materias/Inteligencia_Artificial/Recursos/AI 6 Metaheuristicas.pdf|AI 6 Metaheurísticas]].
+- **Fuente de clase:** [[AI 6 Metaheuristicas.pdf|AI 6 Metaheurísticas]].
 - **Consulta complementaria disponible en el vault:** [[Artificial_inteliigence-A_modern_approach.pdf|Artificial Intelligence: A Modern Approach]], §4.1 para búsqueda local, recocido y evolutivos; §13.4.2 para cadenas de Markov.
 - **Precisión complementaria:** [David H. Wolpert, What is important about the No Free Lunch theorems?](https://arxiv.org/abs/2007.10928).
 

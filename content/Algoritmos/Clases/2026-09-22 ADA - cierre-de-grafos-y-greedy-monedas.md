@@ -1,16 +1,16 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Algoritmos/Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
+materia: "[[Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
 fecha: "2026-09-22"
 unidad: Grafos y algoritmos voraces
 profesor: Armando Castañeda Rojano
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Búsqueda en anchura|Búsqueda en anchura (BFS)]]"
-  - "[[03_Conceptos/Búsqueda en profundidad|Búsqueda en profundidad (DFS)]]"
-  - "[[03_Conceptos/Conectividad fuerte|Conectividad fuerte]]"
-  - "[[03_Conceptos/Gráfica de componentes conexas|Gráfica de componentes fuertemente conexas]]"
-  - "[[03_Conceptos/Algoritmo voraz|Algoritmo voraz]]"
+  - "[[Búsqueda en anchura|Búsqueda en anchura (BFS)]]"
+  - "[[Búsqueda en profundidad|Búsqueda en profundidad (DFS)]]"
+  - "[[Conectividad fuerte|Conectividad fuerte]]"
+  - "[[Gráfica de componentes conexas|Gráfica de componentes fuertemente conexas]]"
+  - "[[Algoritmo voraz|Algoritmo voraz]]"
   - Cambio de monedas
 referencias:
   - "[[2026-09-17 ADA - toposort-dfs-y-componentes-fuertemente-conexas]]"
@@ -233,7 +233,7 @@ Este lema explica por qué una gráfica conexa con más de $|V|-1$ aristas no pu
 
 El laboratorio permite comparar la prueba de conectividad fuerte con dos BFS, seguir las fases de Kosaraju y experimentar con sistemas de monedas donde la regla voraz acierta o falla.
 
-<iframe src="../../algoritmos/recursos/bfs-kosaraju-y-cambio-monedas.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="bfs-kosaraju-y-cambio-monedas.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 > [!note] Si el recurso no carga
 > - **Dos BFS:** el recorrido en $G$ verifica $s\rightsquigarrow v$ para todo $v$; el recorrido en $G^T$ verifica $v\rightsquigarrow s$.
@@ -244,7 +244,7 @@ El laboratorio permite comparar la prueba de conectividad fuerte con dos BFS, se
 
 ## 7. Inicio de algoritmos voraces
 
-Un [[03_Conceptos/Algoritmo voraz|algoritmo voraz]] construye una solución mediante una secuencia de elecciones **localmente mejores** y no reconsidera decisiones anteriores.
+Un [[Algoritmo voraz|algoritmo voraz]] construye una solución mediante una secuencia de elecciones **localmente mejores** y no reconsidera decisiones anteriores.
 
 El esquema general es:
 
@@ -433,7 +433,7 @@ Después de fijar esa moneda, queda la subinstancia $x-c_k$. Por hipótesis indu
 
 - **Clase anterior:** [[2026-09-17 ADA - toposort-dfs-y-componentes-fuertemente-conexas|TopoSort con DFS, SCC y condensación]].
 - **Antecedente de BFS:** [[2026-09-08 ADA - biparticion-y-grafos-dirigidos|Bipartición y conectividad en grafos dirigidos]].
-- **Recurso interactivo:** [[01_Materias/Algoritmos/Recursos/bfs-kosaraju-y-cambio-monedas.html|Dos BFS, Kosaraju y cambio de monedas]].
+- **Recurso interactivo:** [[bfs-kosaraju-y-cambio-monedas.html|Dos BFS, Kosaraju y cambio de monedas]].
 - **Siguiente bloque de la presentación:** selección de intervalos por tiempo de finalización más temprano.
 
 ## Bibliografía

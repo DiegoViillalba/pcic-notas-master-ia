@@ -1,17 +1,17 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Algoritmos/Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
+materia: "[[Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
 fecha: "2026-09-17"
 unidad: Grafos
 profesor: Armando Castañeda Rojano
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Ordenamiento topológico|Ordenamiento topológico]]"
-  - "[[03_Conceptos/Algoritmo de ordenamiento topológico|Algoritmo de ordenamiento topológico]]"
-  - "[[03_Conceptos/Búsqueda en profundidad|Búsqueda en profundidad]]"
-  - "[[03_Conceptos/Conectividad fuerte|Conectividad fuerte]]"
-  - "[[03_Conceptos/Gráfica de componentes conexas|Gráfica de componentes conexas]]"
-  - "[[03_Conceptos/Grafo dirigido acíclico|Grafo dirigido acíclico]]"
+  - "[[Ordenamiento topológico|Ordenamiento topológico]]"
+  - "[[Algoritmo de ordenamiento topológico|Algoritmo de ordenamiento topológico]]"
+  - "[[Búsqueda en profundidad|Búsqueda en profundidad]]"
+  - "[[Conectividad fuerte|Conectividad fuerte]]"
+  - "[[Gráfica de componentes conexas|Gráfica de componentes conexas]]"
+  - "[[Grafo dirigido acíclico|Grafo dirigido acíclico]]"
 referencias:
   - "[[2026-09-10 ADA - DAGs-y-ordenamiento-topologico]]"
   - "Kleinberg & Tardos, Algorithm Design, Cap. 3, Secciones 3.5 y 3.6"
@@ -395,7 +395,7 @@ $$C_1 \longrightarrow C_2 \longrightarrow C_4 \longrightarrow C_3$$
 
 El siguiente simulador permite ejecutar paso a paso el algoritmo `TopoSort-DFS` sobre un DAG observando la pila de recursión, los tiempos $u.d$ / $u.f$ y la clasificación de los 3 casos de aristas en tiempo real, así como alternar a la pestaña de componentes fuertemente conexas para visualizar la condensación del grafo de 13 nodos en $G_{cc}$.
 
-<iframe src="../../algoritmos/recursos/toposort-dfs-y-componentes-fuertes.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="toposort-dfs-y-componentes-fuertes.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 > [!note] Idea central si el laboratorio no carga
 > - **En TopoSort-DFS:** El simulador muestra cómo los nodos descubiertos pasan a **gris** y entran a la pila. Al topar con un nodo sin aristas no visitadas, pasa a **negro** y se le asigna su tiempo de finalización $f$, insertándose al frente de $L$. Si se selecciona el modo con ciclo, se visualiza el **Caso 1** (arista hacia atrás a nodo gris), demostrando por qué no puede existir en un DAG.
@@ -526,6 +526,6 @@ Determinar las SCCs, construir $G_{cc}$ y verificar que $G_{cc}$ es un DAG.
 ## Conexiones
 
 - **Anterior:** [[2026-09-10 ADA - DAGs-y-ordenamiento-topologico|Clase del 10 de septiembre: DAGs, restricciones de precedencia y algoritmo de Kahn]].
-- **Recurso interactivo de esta clase:** `![[01_Materias/Algoritmos/Recursos/toposort-dfs-y-componentes-fuertes.html]]`
-- **Concepto atómico relacionado:** [[03_Conceptos/Gráfica de componentes conexas|Gráfica de componentes conexas ($G_{cc}$)]].
+- **Recurso interactivo de esta clase:** `![[toposort-dfs-y-componentes-fuertes.html]]`
+- **Concepto atómico relacionado:** [[Gráfica de componentes conexas|Gráfica de componentes conexas ($G_{cc}$)]].
 - **Siguiente tema:** Algoritmos voraces (*Greedy Algorithms*): Selección de intervalos y caminos más cortos con Dijkstra.

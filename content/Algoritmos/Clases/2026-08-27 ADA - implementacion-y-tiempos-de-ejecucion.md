@@ -1,16 +1,16 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Algoritmos/Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
+materia: "[[Indice Analisis y diseño de algoritmos|Análisis y Diseño de Algoritmos]]"
 fecha: 2026-08-27
 unidad: Implementación eficiente y familias de tiempos de ejecución
 profesor: Armando Castañeda Rojano
 estado: procesada
 conceptos:
-  - "[[03_Conceptos/Algoritmo de Gale-Shapley|Algoritmo de Gale–Shapley]]"
-  - "[[03_Conceptos/Complejidad temporal|Complejidad temporal]]"
-  - "[[03_Conceptos/Eficiencia algorítmica|Eficiencia algorítmica]]"
-  - "[[03_Conceptos/Tiempo polinomial|Tiempo polinomial]]"
-  - "[[03_Conceptos/Invariante de ciclo|Invariante de ciclo]]"
+  - "[[Algoritmo de Gale-Shapley|Algoritmo de Gale–Shapley]]"
+  - "[[Complejidad temporal|Complejidad temporal]]"
+  - "[[Eficiencia algorítmica|Eficiencia algorítmica]]"
+  - "[[Tiempo polinomial|Tiempo polinomial]]"
+  - "[[Invariante de ciclo|Invariante de ciclo]]"
 referencias:
   - 02AlgorithmAnalysis.pdf, diapositivas 25–49
   - Kleinberg y Tardos, Algorithm Design, capítulo 2
@@ -143,7 +143,7 @@ Por ejemplo, `rank[4] = 5 < rank[6] = 7`, así que la estudiante prefiere el hos
 
 ### La cuenta completa, paso a paso
 
-<iframe src="../../algoritmos/recursos/gale-shapley-coste-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="gale-shapley-coste-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 | Necesidad | Representación | Costo |
 |---|---|---:|
@@ -181,7 +181,7 @@ $$
 
 Mueve $n$ para observar por qué las familias polinomiales y las exponenciales terminan separándose enormemente. Selecciona una fila para ver el patrón algorítmico que produce ese crecimiento.
 
-<iframe src="../../algoritmos/recursos/familias-complejidad-interactivas.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="familias-complejidad-interactivas.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 | Orden | Ejemplo de las diapositivas | Patrón principal |
 |---:|---|---|
@@ -517,4 +517,4 @@ La eficiencia de una implementación depende tanto del algoritmo como de la repr
 
 - Kevin Wayne, *Algorithm Analysis*, diapositivas 25–49, actualización del 16 de diciembre de 2021.
 - Jon Kleinberg y Éva Tardos, *Algorithm Design*, capítulo 2.
-- Conexión previa: [[01_Materias/Algoritmos/Clases/2026-08-20 ADA - GaleShapley-continuacion|Gale–Shapley: corrección y optimalidad]].
+- Conexión previa: [[2026-08-20 ADA - GaleShapley-continuacion|Gale–Shapley: corrección y optimalidad]].

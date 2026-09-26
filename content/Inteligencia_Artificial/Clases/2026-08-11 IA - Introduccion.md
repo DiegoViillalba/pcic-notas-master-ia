@@ -1,23 +1,23 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Inteligencia_Artificial/Indice|Inteligencia Artificial]]"
+materia: "[[Indice|Inteligencia Artificial]]"
 fecha: 2026-08-11
 unidad: Introducción y agentes racionales
 profesor: Carlos Hernández
 estado:
   - procesada
 conceptos:
-  - "[[03_Conceptos/Máquina de Turing|Máquina de Turing]]"
-  - "[[03_Conceptos/Problema de la parada|Problema de la parada]]"
-  - "[[03_Conceptos/Prueba de Turing|Prueba de Turing]]"
-  - "[[03_Conceptos/Habitación china|Habitación china]]"
-  - "[[03_Conceptos/IA fuerte e IA débil|IA fuerte e IA débil]]"
-  - "[[03_Conceptos/Agente racional|Agente racional]]"
-  - "[[03_Conceptos/Utilidad esperada|Utilidad esperada]]"
-  - "[[03_Conceptos/Entorno de tarea|Entorno de tarea]]"
+  - "[[Máquina de Turing|Máquina de Turing]]"
+  - "[[Problema de la parada|Problema de la parada]]"
+  - "[[Prueba de Turing|Prueba de Turing]]"
+  - "[[Habitación china|Habitación china]]"
+  - "[[IA fuerte e IA débil|IA fuerte e IA débil]]"
+  - "[[Agente racional|Agente racional]]"
+  - "[[Utilidad esperada|Utilidad esperada]]"
+  - "[[Entorno de tarea|Entorno de tarea]]"
 referencias:
-  - "[[02_Literatura/Libros/Artificial_inteliigence-A_modern_approach|Artificial Intelligence: A Modern Approach]]"
-  - "[[01_Materias/Inteligencia_Artificial/Recursos/AI 2 Agentes Inteligentes.pdf|AI 2 Agentes Inteligentes]]"
+  - "[[Artificial_inteliigence-A_modern_approach|Artificial Intelligence: A Modern Approach]]"
+  - "[[AI 2 Agentes Inteligentes.pdf|AI 2 Agentes Inteligentes]]"
 tags:
   - clase
   - inteligencia-artificial
@@ -43,9 +43,9 @@ Una lectura útil para el curso es la siguiente:
 
 ## Computabilidad y máquinas
 
-Alan Turing formalizó la noción de computación mediante la [[03_Conceptos/Máquina de Turing|máquina de Turing]], un modelo matemático que permite precisar qué entendemos por un procedimiento algorítmico. Esta idea también permite hablar de los límites del cómputo.
+Alan Turing formalizó la noción de computación mediante la [[Máquina de Turing|máquina de Turing]], un modelo matemático que permite precisar qué entendemos por un procedimiento algorítmico. Esta idea también permite hablar de los límites del cómputo.
 
-El [[03_Conceptos/Problema de la parada|problema de la parada]] muestra uno de esos límites: no existe un algoritmo general que determine correctamente, para cualquier programa y cualquier entrada, si la ejecución terminará o continuará para siempre. Esto no significa que nunca podamos analizar un programa particular; significa que no puede existir un detector universal, automático y siempre correcto.
+El [[Problema de la parada|problema de la parada]] muestra uno de esos límites: no existe un algoritmo general que determine correctamente, para cualquier programa y cualquier entrada, si la ejecución terminará o continuará para siempre. Esto no significa que nunca podamos analizar un programa particular; significa que no puede existir un detector universal, automático y siempre correcto.
 
 ## Cuatro enfoques de la inteligencia artificial
 
@@ -54,9 +54,9 @@ Se presentaron dos ejes: **pensamiento frente a comportamiento** y **semejanza h
 | Enfoque | Pregunta guía | Método principal |
 |---|---|---|
 | Pensar como humanos | ¿El sistema reproduce procesos mentales humanos? | Modelado cognitivo, psicología y observación experimental |
-| Actuar como humanos | ¿Su comportamiento es indistinguible del humano? | [[03_Conceptos/Prueba de Turing|Prueba de Turing]] |
+| Actuar como humanos | ¿Su comportamiento es indistinguible del humano? | [[Prueba de Turing|Prueba de Turing]] |
 | Pensar racionalmente | ¿Obtiene conclusiones correctas a partir de lo que sabe? | Lógica y leyes del pensamiento |
-| Actuar racionalmente | ¿Elige la mejor acción posible según la información disponible? | Diseño de [[03_Conceptos/Agente racional|agentes racionales]] |
+| Actuar racionalmente | ¿Elige la mejor acción posible según la información disponible? | Diseño de [[Agente racional|agentes racionales]] |
 
 Pensar racionalmente no garantiza por sí solo actuar bien: una inferencia puede ser correcta y, aun así, llegar demasiado tarde o no considerar la incertidumbre. Por eso el curso adopta principalmente el enfoque de **actuar racionalmente**, que permite evaluar decisiones y resultados sin exigir que la máquina imite la mente humana.
 
@@ -64,19 +64,19 @@ Pensar racionalmente no garantiza por sí solo actuar bien: una inferencia puede
 
 ### Prueba de Turing
 
-La [[03_Conceptos/Prueba de Turing|prueba de Turing]] fue propuesta como una manera operativa de evitar la vaguedad de la pregunta «¿puede pensar una máquina?». Un juez conversa por escrito con dos participantes ocultos, una persona y una máquina. Si, a partir de las respuestas, no puede distinguir de forma fiable cuál es la máquina, se considera que esta ha superado la prueba.
+La [[Prueba de Turing|prueba de Turing]] fue propuesta como una manera operativa de evitar la vaguedad de la pregunta «¿puede pensar una máquina?». Un juez conversa por escrito con dos participantes ocultos, una persona y una máquina. Si, a partir de las respuestas, no puede distinguir de forma fiable cuál es la máquina, se considera que esta ha superado la prueba.
 
 La prueba evalúa **comportamiento lingüístico indistinguible**, no demuestra directamente conciencia o comprensión. Para superarla, un sistema necesitaría al menos procesamiento de lenguaje natural, representación del conocimiento, razonamiento automático y aprendizaje. La prueba total de Turing añadiría percepción y acción en el mundo mediante visión computacional y robótica.
 
 ### Habitación china
 
-En el argumento de la [[03_Conceptos/Habitación china|habitación china]], una persona que no entiende chino recibe símbolos y utiliza un libro de reglas para producir respuestas correctas en ese idioma. Desde fuera, su comportamiento puede parecer equivalente al de alguien que sí comprende chino; desde dentro, la persona solo manipula símbolos de acuerdo con reglas.
+En el argumento de la [[Habitación china|habitación china]], una persona que no entiende chino recibe símbolos y utiliza un libro de reglas para producir respuestas correctas en ese idioma. Desde fuera, su comportamiento puede parecer equivalente al de alguien que sí comprende chino; desde dentro, la persona solo manipula símbolos de acuerdo con reglas.
 
 La conclusión propuesta por John Searle es que ejecutar correctamente un programa no basta para demostrar comprensión: la sintaxis, por sí sola, no garantiza semántica. El argumento cuestiona la idea de que pasar una prueba conductual sea suficiente para atribuir una mente a la máquina. No es una demostración aceptada de manera universal; existen objeciones, como la réplica de que la comprensión podría pertenecer al sistema completo y no a una de sus partes.
 
 ### IA fuerte e IA débil
 
-La distinción entre [[03_Conceptos/IA fuerte e IA débil|IA fuerte e IA débil]] responde a una pregunta filosófica:
+La distinción entre [[IA fuerte e IA débil|IA fuerte e IA débil]] responde a una pregunta filosófica:
 
 - **IA fuerte:** sostiene que una máquina adecuadamente construida podría tener comprensión o estados mentales propios.
 - **IA débil:** utiliza la computadora para simular o ejecutar capacidades inteligentes sin afirmar que posee conciencia o comprensión real.
@@ -85,7 +85,7 @@ La distinción entre [[03_Conceptos/IA fuerte e IA débil|IA fuerte e IA débil]
 
 ## Enfoque del curso: actuar racionalmente
 
-Un [[03_Conceptos/Agente racional|agente racional]] es una entidad que percibe un ambiente y actúa sobre él. Para cada secuencia de percepciones, elige la acción que espera que maximice su indicador de desempeño, considerando la evidencia disponible y el conocimiento que posee.
+Un [[Agente racional|agente racional]] es una entidad que percibe un ambiente y actúa sobre él. Para cada secuencia de percepciones, elige la acción que espera que maximice su indicador de desempeño, considerando la evidencia disponible y el conocimiento que posee.
 
 Esto aclara la diferencia entre un agente **inteligente** y uno **racional**:
 
@@ -94,7 +94,7 @@ Esto aclara la diferencia entre un agente **inteligente** y uno **racional**:
 
 Un agente racional no es omnisciente ni tiene que acertar siempre. Puede tomar una decisión razonable y obtener un mal resultado debido a información incompleta o a un ambiente incierto. La racionalidad se juzga por la decisión disponible en ese momento, no por conocer el futuro.
 
-Cuando los resultados son inciertos, una forma de elegir es maximizar la [[03_Conceptos/Utilidad esperada|utilidad esperada]]. Si una acción $a$ puede producir resultados $s$, la idea general es
+Cuando los resultados son inciertos, una forma de elegir es maximizar la [[Utilidad esperada|utilidad esperada]]. Si una acción $a$ puede producir resultados $s$, la idea general es
 
 $$
 EU(a)=\sum_s P(s\mid a,I)\,U(s),
@@ -104,7 +104,7 @@ donde $I$ es la información disponible, $P(s\mid a,I)$ es la probabilidad del r
 
 ## Entorno de tarea
 
-El diseño de un agente depende del [[03_Conceptos/Entorno de tarea|entorno de tarea]]. Este se especifica mediante el indicador de desempeño, el ambiente, los actuadores y los sensores. Además, puede caracterizarse con los siguientes contrastes:
+El diseño de un agente depende del [[Entorno de tarea|entorno de tarea]]. Este se especifica mediante el indicador de desempeño, el ambiente, los actuadores y los sensores. Además, puede caracterizarse con los siguientes contrastes:
 
 | Propiedad | Distinción |
 |---|---|
@@ -134,16 +134,16 @@ Pensemos en un taxi autónomo. Percibe el camino mediante cámaras, GPS y otros 
 
 ## Relaciones
 
-- La [[03_Conceptos/Prueba de Turing|prueba de Turing]] representa el enfoque de actuar como humanos y es cuestionada, desde la comprensión, por la [[03_Conceptos/Habitación china|habitación china]].
-- La [[03_Conceptos/IA fuerte e IA débil|distinción entre IA fuerte e IA débil]] separa el desempeño observable de la afirmación de que existe una mente.
-- El [[03_Conceptos/Problema de la parada|problema de la parada]] conecta la IA con los límites de la [[03_Conceptos/Máquina de Turing|computabilidad]].
-- El [[03_Conceptos/Entorno de tarea|entorno de tarea]] determina qué necesita percibir y hacer un [[03_Conceptos/Agente racional|agente racional]].
-- La [[03_Conceptos/Utilidad esperada|utilidad esperada]] permite comparar acciones cuando sus resultados son inciertos.
+- La [[Prueba de Turing|prueba de Turing]] representa el enfoque de actuar como humanos y es cuestionada, desde la comprensión, por la [[Habitación china|habitación china]].
+- La [[IA fuerte e IA débil|distinción entre IA fuerte e IA débil]] separa el desempeño observable de la afirmación de que existe una mente.
+- El [[Problema de la parada|problema de la parada]] conecta la IA con los límites de la [[Máquina de Turing|computabilidad]].
+- El [[Entorno de tarea|entorno de tarea]] determina qué necesita percibir y hacer un [[Agente racional|agente racional]].
+- La [[Utilidad esperada|utilidad esperada]] permite comparar acciones cuando sus resultados son inciertos.
 
 ## Referencias
 
-- Russell, Stuart J. y Norvig, Peter. *Artificial Intelligence: A Modern Approach*, 4.ª ed., capítulos 1 y 2. Copia local: [[02_Literatura/Libros/Artificial_inteliigence-A_modern_approach|Artificial Intelligence: A Modern Approach]].
-- [[01_Materias/Inteligencia_Artificial/Recursos/AI 2 Agentes Inteligentes.pdf|AI 2 Agentes Inteligentes]], presentación de Carlos Hernández, diapositivas 4–5.
+- Russell, Stuart J. y Norvig, Peter. *Artificial Intelligence: A Modern Approach*, 4.ª ed., capítulos 1 y 2. Copia local: [[Artificial_inteliigence-A_modern_approach|Artificial Intelligence: A Modern Approach]].
+- [[AI 2 Agentes Inteligentes.pdf|AI 2 Agentes Inteligentes]], presentación de Carlos Hernández, diapositivas 4–5.
 - Turing, Alan M. (1950). “Computing Machinery and Intelligence”. *Mind*, 59(236), 433–460.
 - Searle, John R. (1980). “Minds, Brains, and Programs”. *Behavioral and Brain Sciences*, 3(3), 417–457. DOI: 10.1017/S0140525X00005756.
 

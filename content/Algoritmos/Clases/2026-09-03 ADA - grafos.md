@@ -249,7 +249,7 @@ Un grafo **disperso** tiene pocas aristas frente a las $n(n-1)/2$ posibles; las 
 
 Avanza primero por las once aristas y después por cada vértice. Compara las aristas resaltadas, la fila de la matriz y la lista de vecinos. La idea central es que **la matriz reserva ausencias; las listas enumeran presencias**.
 
-<iframe src="../../algoritmos/recursos/grafos-paso-a-paso/01-representaciones.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="01-representaciones.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ## 3. Caminos, conectividad y ciclos
 
@@ -315,7 +315,7 @@ Tiene cinco aristas, comienza y termina en 1, y no repite ningún otro vértice.
 
 Recorre un camino simple y después cierra el ciclo de la diapositiva. Los últimos pasos muestran dos errores: saltar entre no vecinos y reutilizar la misma arista de ida y vuelta.
 
-<iframe src="../../algoritmos/recursos/grafos-paso-a-paso/02-caminos-ciclos.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="02-caminos-ciclos.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ## 4. Árboles: conectar sin ciclos
 
@@ -727,7 +727,7 @@ Las diapositivas ilustran árboles con una filogenia y con la jerarquía de cont
 
 Compara las raíces 1, 2 y 7 en la tabla. Después agrega una arista y elimina otra en escenas separadas: observa por qué aparecen un ciclo o una desconexión.
 
-<iframe src="../../algoritmos/recursos/grafos-paso-a-paso/03-arboles.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="03-arboles.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ## 5. Dos preguntas distintas: alcanzar y llegar con menos saltos
 
@@ -868,7 +868,7 @@ Usa “Siguiente” para ver una sola operación, o el selector para saltar a un
 
 La idea central es que **descubrir un vértice una sola vez no impide examinar todas las conexiones que llegan a él**.
 
-<iframe src="../../algoritmos/recursos/grafos-paso-a-paso/04-bfs.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="04-bfs.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ### 6.6 Por qué las capas son distancias mínimas
 
@@ -968,7 +968,7 @@ Para obtener **todas** las componentes, recorremos los vértices y lanzamos una 
 
 Cada escena agrega un vértice a través de una arista que cruza de dentro hacia fuera. Al agotarse esas aristas, hemos completado una componente. Las escenas siguientes comienzan búsquedas nuevas en los otros grupos.
 
-<iframe src="../../algoritmos/recursos/grafos-paso-a-paso/05-componentes.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="05-componentes.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ## 8. Flood fill: una imagen también puede ser un grafo
 
@@ -1014,7 +1014,7 @@ Si la mancha tiene $k$ píxeles y cada uno tiene como máximo cuatro vecinos, pr
 
 Los nodos representan píxeles del color original y las líneas su vecindad horizontal o vertical. Se marca y procesa la mancha conectada al nodo 1; los nodos 9, 10 y 11 quedan separados aunque su color original sea el mismo. Es una cuadrícula didáctica añadida, no una copia de la imagen de las diapositivas.
 
-<iframe src="../../algoritmos/recursos/grafos-paso-a-paso/06-flood-fill.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+<iframe src="06-flood-fill.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ## 9. Comprobación de comprensión
 
@@ -1060,7 +1060,7 @@ Un grafo representa objetos mediante vértices y relaciones mediante aristas; su
 
 ## Referencias y correspondencia con las diapositivas
 
-Fuente: **Kevin Wayne, “3. Graphs”**, diapositivas de *Algorithm Design* de Kleinberg y Tardos; el archivo indica actualización del 1 de abril de 2019. Copia local: [[01_Materias/Algoritmos/Recursos/03Graphs.pdf|03Graphs.pdf]].
+Fuente: **Kevin Wayne, “3. Graphs”**, diapositivas de *Algorithm Design* de Kleinberg y Tardos; el archivo indica actualización del 1 de abril de 2019. Copia local: [[03Graphs.pdf|03Graphs.pdf]].
 
 | Diapositivas | Contenido incorporado |
 |---|---|

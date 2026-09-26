@@ -1,19 +1,19 @@
 ---
 tipo: clase
-materia: "[[01_Materias/Modelacion_Matematica/Indice|Modelación Matemática]]"
+materia: "[[Indice|Modelación Matemática]]"
 fecha: 2026-08-12
 unidad: Ciclo de modelación y tipos de modelos
 profesor: Alicia de la Mora
 estado:
   - procesada
 conceptos:
-  - "[[03_Conceptos/Ciclo de modelación|Ciclo de modelación]]"
-  - "[[03_Conceptos/Pregunta modelable|Pregunta modelable]]"
-  - "[[03_Conceptos/Crecimiento exponencial|Crecimiento exponencial]]"
-  - "[[03_Conceptos/Crecimiento logístico|Crecimiento logístico]]"
-  - "[[03_Conceptos/Solución analítica y solución numérica|Solución analítica y solución numérica]]"
-  - "[[03_Conceptos/Validación de un modelo|Validación de un modelo]]"
-  - "[[03_Conceptos/Clasificación de modelos matemáticos|Clasificación de modelos matemáticos]]"
+  - "[[Ciclo de modelación|Ciclo de modelación]]"
+  - "[[Pregunta modelable|Pregunta modelable]]"
+  - "[[Crecimiento exponencial|Crecimiento exponencial]]"
+  - "[[Crecimiento logístico|Crecimiento logístico]]"
+  - "[[Solución analítica y solución numérica|Solución analítica y solución numérica]]"
+  - "[[Validación de un modelo|Validación de un modelo]]"
+  - "[[Clasificación de modelos matemáticos|Clasificación de modelos matemáticos]]"
 referencias: []
 tags:
   - clase
@@ -46,12 +46,12 @@ $$
 \frac{dP}{dt}=kP,
 $$
 
-donde $k$ es una constante de proporcionalidad. Este modelo produce [[03_Conceptos/Crecimiento exponencial|crecimiento exponencial]] y puede resolverse mediante separación de variables.
+donde $k$ es una constante de proporcionalidad. Este modelo produce [[Crecimiento exponencial|crecimiento exponencial]] y puede resolverse mediante separación de variables.
 
 > [!important]
 > El comportamiento del modelo depende de sus supuestos. En este caso se supone una tasa de crecimiento constante y no se incorporan límites de recursos.
 
-Una alternativa que introduce una capacidad de carga es el modelo de [[03_Conceptos/Crecimiento logístico|crecimiento logístico]]:
+Una alternativa que introduce una capacidad de carga es el modelo de [[Crecimiento logístico|crecimiento logístico]]:
 
 $$
 \frac{dP}{dt}=rP\left(1-\frac{P}{K}\right),
@@ -59,7 +59,7 @@ $$
 
 donde $r$ es la tasa de crecimiento y $K$ la capacidad de carga.
 
-Resolver este modelo una sola vez puede ser barato. Resolverlo para miles de combinaciones de parámetros puede convertirse en un [[03_Conceptos/Experimento computacional|experimento computacional]] costoso.
+Resolver este modelo una sola vez puede ser barato. Resolverlo para miles de combinaciones de parámetros puede convertirse en un [[Experimento computacional|experimento computacional]] costoso.
 
 > [!note]
 > Un modelo es adecuado cuando responde la pregunta dentro del contexto para el que fue formulado.
@@ -78,7 +78,7 @@ flowchart LR
 
 ### 1. Plantear el problema
 
-Una [[03_Conceptos/Pregunta modelable|pregunta modelable]] debe ser específica. Ejemplos:
+Una [[Pregunta modelable|pregunta modelable]] debe ser específica. Ejemplos:
 
 - ¿Cuántos contagios esperamos en 30 días?
 - ¿Qué ocurre si reducimos la tasa de contagio en 20 %?
@@ -185,7 +185,7 @@ La respuesta no puede decidirse mirando únicamente la gráfica. Conviene revisa
 
 ### 6. Validar
 
-[[03_Conceptos/Validación de un modelo|Validar un modelo]] implica contrastarlo con:
+[[Validación de un modelo|Validar un modelo]] implica contrastarlo con:
 
 - datos observados;
 - conocimiento físico, biológico o social previo;
@@ -334,18 +334,18 @@ La validación debe incluir también comprobaciones cualitativas: unidades consi
 
 ## Conceptos extraídos
 
-- [[03_Conceptos/Ciclo de modelación|Ciclo de modelación]]
-- [[03_Conceptos/Pregunta modelable|Pregunta modelable]]
-- [[03_Conceptos/Crecimiento exponencial|Crecimiento exponencial]]
-- [[03_Conceptos/Crecimiento logístico|Crecimiento logístico]]
-- [[03_Conceptos/Solución analítica y solución numérica|Solución analítica y solución numérica]]
-- [[03_Conceptos/Validación de un modelo|Validación de un modelo]]
-- [[03_Conceptos/Clasificación de modelos matemáticos|Clasificación de modelos matemáticos]]
+- [[Ciclo de modelación|Ciclo de modelación]]
+- [[Pregunta modelable|Pregunta modelable]]
+- [[Crecimiento exponencial|Crecimiento exponencial]]
+- [[Crecimiento logístico|Crecimiento logístico]]
+- [[Solución analítica y solución numérica|Solución analítica y solución numérica]]
+- [[Validación de un modelo|Validación de un modelo]]
+- [[Clasificación de modelos matemáticos|Clasificación de modelos matemáticos]]
 
 ## Referencias mencionadas
 
 - No se registró bibliografía externa durante la clase; las formulaciones se reconstruyeron a partir de los apuntes.
-- La formulación del crecimiento exponencial y el análisis del error numérico se conectan con [[01_Materias/Modelacion_Matematica/Clases/2026-08-17 ModMat - Modelos de cambio y método de Euler|Modelos de cambio y método de Euler]].
+- La formulación del crecimiento exponencial y el análisis del error numérico se conectan con [[2026-08-17 ModMat - Modelos de cambio y método de Euler|Modelos de cambio y método de Euler]].
 
 ## Resumen después de clase
 
