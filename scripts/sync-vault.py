@@ -13,7 +13,9 @@ Qué hace, en orden:
      Clases/ se aplana directo a la raíz de la materia (content/<Materia>/,
      sin subcarpeta) para que en el explorador y la tabla de contenidos las
      clases aparezcan de inmediato al abrir la materia. Recursos/ se
-     mantiene como subcarpeta aparte.
+     mantiene como subcarpeta aparte. También copia 03_Conceptos/ del vault
+     a content/Conceptos/, porque muchas notas de clase enlazan a esos
+     conceptos atómicos y sin ellos publicados esos wikilinks quedan rotos.
   2. Limpia basura (.DS_Store, *.log, *.aux, *.out) en el contenido copiado.
   3. Normaliza nombres de archivo y texto de notas a NFC (evita que archivos
      con acentos en forma NFD, comunes en iCloud Drive, dejen de resolverse).
@@ -48,9 +50,11 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CONTENT_DIR = REPO_ROOT / "content"
 
-VAULT_MATERIAS_DIR = Path(
-    "/Users/diegovillalba/Library/Mobile Documents/iCloud~md~obsidian/Documents/PCIC_Vault/01_Materias"
+VAULT_ROOT = Path(
+    "/Users/diegovillalba/Library/Mobile Documents/iCloud~md~obsidian/Documents/PCIC_Vault"
 )
+VAULT_MATERIAS_DIR = VAULT_ROOT / "01_Materias"
+VAULT_CONCEPTOS_DIR = VAULT_ROOT / "03_Conceptos"
 
 # Nombre de carpeta en el vault -> nombre de carpeta en content/ (idénticos hoy,
 # pero se deja explícito por si un día divergen).
@@ -111,9 +115,35 @@ def copy_from_vault(dry_run: bool) -> None:
             for md in vault_clases.glob("*.md"):
                 shutil.copy2(md, dest_materia / md.name)
 
+        # Notas sueltas en la raíz de la materia (guías de estudio, etc.), salvo
+        # "Indice*" — esas mezclan temario/evaluación/contacto del profesor y
+        # tracking de tareas, contenido privado que no se publica.
+        for md in vault_materia.glob("*.md"):
+            if md.name.lower().startswith("indice"):
+                continue
+            shutil.copy2(md, dest_materia / md.name)
+
         vault_recursos = vault_materia / "Recursos"
         if vault_recursos.is_dir():
             shutil.copytree(vault_recursos, dest_materia / "Recursos")
+
+
+def copy_conceptos(dry_run: bool) -> None:
+    """Copia 03_Conceptos/ del vault a content/Conceptos/. Muchas notas de
+    clase enlazan a estos conceptos atómicos; sin ellos publicados esos
+    wikilinks quedan rotos."""
+    if not VAULT_CONCEPTOS_DIR.is_dir():
+        log("[aviso] 03_Conceptos no existe en el vault, se omite")
+        return
+
+    log("Copiando Conceptos")
+    if dry_run:
+        return
+
+    dest = CONTENT_DIR / "Conceptos"
+    if dest.exists():
+        shutil.rmtree(dest)
+    shutil.copytree(VAULT_CONCEPTOS_DIR, dest)
 
 
 def clean_junk(dry_run: bool) -> None:
@@ -186,6 +216,11 @@ def fix_wikilink_paths(dry_run: bool) -> None:
     if dry_run:
         return
 
+    # Nombres (sin extensión) de los recursos .htm ya renombrados, para poder
+    # completar la extensión en links tipo [[expectimax-paso-a-paso]] que en
+    # el vault original apuntaban al archivo sin extensión.
+    htm_stems = {p.stem.lower() for p in CONTENT_DIR.rglob("*.htm")}
+
     total = 0
     for md in CONTENT_DIR.rglob("*.md"):
         text = md.read_text(encoding="utf-8")
@@ -194,9 +229,19 @@ def fix_wikilink_paths(dry_run: bool) -> None:
             nonlocal total
             bang, target, anchor, alias = m.groups()
             target = target.strip()
-            if "/" not in target:
+            basename = target.rsplit("/", 1)[-1] if "/" in target else target
+            changed = "/" in target
+            # Los .html de Recursos ya se renombraron a .htm (ver
+            # fix_html_embeds); un [[link|alias]] normal (sin "!") que todavía
+            # apunte a ".html" quedaría roto si no se actualiza aquí también.
+            if basename.lower().endswith(".html"):
+                basename = basename[: -len(".html")] + ".htm"
+                changed = True
+            elif "." not in basename and basename.lower() in htm_stems:
+                basename = basename + ".htm"
+                changed = True
+            if not changed:
                 return m.group(0)
-            basename = target.rsplit("/", 1)[-1]
             total += 1
             return f"{bang}[[{basename}{anchor}{alias or ''}]]"
 
@@ -299,6 +344,7 @@ def main() -> None:
     args = parser.parse_args()
 
     copy_from_vault(args.dry_run)
+    copy_conceptos(args.dry_run)
     clean_junk(args.dry_run)
     normalize_unicode(args.dry_run)
     fix_html_embeds(args.dry_run)

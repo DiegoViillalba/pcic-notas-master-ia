@@ -6,10 +6,10 @@ Publicado en <https://diego-villalba.com/pcic-notas-master-ia/>.
 
 ## Alcance del contenido
 
-Se publican únicamente las carpetas `Clases/` y `Recursos/` de cada materia. Quedan fuera intencionalmente:
+Se publican las carpetas `Clases/` y `Recursos/` de cada materia, más `03_Conceptos/` (conceptos atómicos que las clases enlazan constantemente — sin ellos, buena parte de los wikilinks quedarían rotos). Quedan fuera intencionalmente:
 
 - `Tareas/` — entregas y trabajo en progreso, de carácter privado.
-- Notas de literatura, conceptos, plantillas y administración del vault — material interno de estudio, no pensado para publicarse.
+- Literatura, plantillas y administración del vault — material interno de estudio, no pensado para publicarse.
 
 ## Desarrollo local
 
@@ -20,4 +20,4 @@ npx quartz build --serve
 
 ## Actualizar el contenido
 
-Este repo es independiente del vault de Obsidian. Para publicar notas nuevas, copia las carpetas `Clases/` y `Recursos/` actualizadas de la materia correspondiente a `content/<Materia>/`, actualiza `content/index.md` si agregaste clases nuevas, haz commit y push a `main`; el deploy a GitHub Pages es automático (ver `.github/workflows/deploy.yml`).
+Este repo es independiente del vault de Obsidian. La forma normal de actualizarlo es correr `python3 scripts/sync-vault.py`, que copia el contenido vigente desde el vault, corrige incrustaciones/enlaces y publica. Ver el docstring de ese script para el detalle de cada paso, o `scripts/sync-vault.py --help`.

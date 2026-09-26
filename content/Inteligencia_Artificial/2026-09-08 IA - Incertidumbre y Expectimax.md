@@ -809,6 +809,6 @@ No son intercambiables sin reformular el problema. A* necesita costos y heuríst
 ## Conexiones
 
 - Anterior: [[2026-09-03 IA - Busqueda Adversarios|Búsqueda con adversarios: minimax y alfa–beta]].
-- Recursos interactivos: [[expectimax-paso-a-paso]], [[maxn-tuplas-paso-a-paso]] y [[utilidad-esperada-loterias]].
+- Recursos interactivos: [[expectimax-paso-a-paso.htm]], [[maxn-tuplas-paso-a-paso.htm]] y [[utilidad-esperada-loterias.htm]].
 - Siguiente tema anunciado: agentes lógicos.
 

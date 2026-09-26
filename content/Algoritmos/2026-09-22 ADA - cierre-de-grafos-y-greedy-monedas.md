@@ -433,7 +433,7 @@ Después de fijar esa moneda, queda la subinstancia $x-c_k$. Por hipótesis indu
 
 - **Clase anterior:** [[2026-09-17 ADA - toposort-dfs-y-componentes-fuertemente-conexas|TopoSort con DFS, SCC y condensación]].
 - **Antecedente de BFS:** [[2026-09-08 ADA - biparticion-y-grafos-dirigidos|Bipartición y conectividad en grafos dirigidos]].
-- **Recurso interactivo:** [[bfs-kosaraju-y-cambio-monedas.html|Dos BFS, Kosaraju y cambio de monedas]].
+- **Recurso interactivo:** [[bfs-kosaraju-y-cambio-monedas.htm|Dos BFS, Kosaraju y cambio de monedas]].
 - **Siguiente bloque de la presentación:** selección de intervalos por tiempo de finalización más temprano.
 
 ## Bibliografía

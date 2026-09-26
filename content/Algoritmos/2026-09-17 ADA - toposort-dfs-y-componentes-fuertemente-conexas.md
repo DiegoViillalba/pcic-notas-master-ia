@@ -526,6 +526,6 @@ Determinar las SCCs, construir $G_{cc}$ y verificar que $G_{cc}$ es un DAG.
 ## Conexiones
 
 - **Anterior:** [[2026-09-10 ADA - DAGs-y-ordenamiento-topologico|Clase del 10 de septiembre: DAGs, restricciones de precedencia y algoritmo de Kahn]].
-- **Recurso interactivo de esta clase:** `![[toposort-dfs-y-componentes-fuertes.html]]`
+- **Recurso interactivo de esta clase:** `![[toposort-dfs-y-componentes-fuertes.htm]]`
 - **Concepto atómico relacionado:** [[Gráfica de componentes conexas|Gráfica de componentes conexas ($G_{cc}$)]].
 - **Siguiente tema:** Algoritmos voraces (*Greedy Algorithms*): Selección de intervalos y caminos más cortos con Dijkstra.

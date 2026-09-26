@@ -447,5 +447,5 @@ $$E = \{(A, B), (A, C), (B, D), (C, D), (D, E)\}$$
 ## Conexiones
 
 - **Anterior:** [[2026-09-08 ADA - biparticion-y-grafos-dirigidos|Clase del 8 de septiembre: Bipartición, 2-colorabilidad y conectividad en grafos dirigidos]].
-- **Recurso interactivo de esta clase:** `![[ordenamiento-topologico-interactivo.html]]`
+- **Recurso interactivo de esta clase:** `![[ordenamiento-topologico-interactivo.htm]]`
 - **Siguiente clase:** [[2026-09-17 ADA - toposort-dfs-y-componentes-fuertemente-conexas|Clase del 17 de septiembre: TopoSort con DFS, componentes fuertemente conexas y gráfica de condensación (G_cc)]].

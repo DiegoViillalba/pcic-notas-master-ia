@@ -438,5 +438,5 @@ Demostrar mediante el lema del nodo testigo si es fuertemente conexo tomando $s 
 ## Conexiones
 
 - **Anterior:** [[2026-09-03 ADA - grafos|Clase del 3 de septiembre: Grafos, representaciones, árboles y BFS básico]].
-- **Recurso interactivo de esta clase:** `![[biparticion-y-conectividad-fuerte.html]]`
+- **Recurso interactivo de esta clase:** `![[biparticion-y-conectividad-fuerte.htm]]`
 - **Siguiente clase:** [[2026-09-10 ADA - DAGs-y-ordenamiento-topologico|Clase del 10 de septiembre: DAGs y Ordenamiento Topológico]].

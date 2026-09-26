@@ -16,6 +16,10 @@ La motivación para publicarlos es simple: si a alguien más le resultan útiles
 - [Inteligencia Artificial](Inteligencia_Artificial/)
 - [Modelación Matemática](Modelacion_Matematica/)
 - [Programación Avanzada](Prog_Avanzada/)
-- [Seminario de Orientación](Seminario_Orientacion/)
+- Seminario de Orientación _(sin apuntes publicados todavía)_
 
-Cada materia tiene sus notas de clase (`Clases/`) y material de apoyo como diapositivas y laboratorios interactivos (`Recursos/`).
+Cada materia tiene sus notas de clase y material de apoyo como diapositivas y laboratorios interactivos (`Recursos/`).
+
+## Conceptos atómicos
+
+Además de las notas de clase, publico [Conceptos](Conceptos/): definiciones breves de términos individuales (un concepto por nota) que las clases enlazan constantemente. Sin ellos publicados, buena parte de los wikilinks de las clases apuntarían a páginas inexistentes.

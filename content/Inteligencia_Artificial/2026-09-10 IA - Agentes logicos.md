@@ -640,6 +640,6 @@ Construir el espacio de modelos para $P$ y $Q$ ($2^2 = 4$ modelos) y encontrar $
 - **Anterior:** [[2026-09-08 IA - Incertidumbre y Expectimax|Clase 8: Incertidumbre, Expectimax y utilidad esperada]].
 - **Conexión algorítmica:** [[2026-08-27 IA - CSP-Backtracking|Clase 5: CSP, Backtracking y AC-3]] (SAT es un CSP binario).
 - **Recursos interactivos creados en esta clase:**
-  - `![[mundo-wumpus-inferencia.html]]`
-  - `![[modelos-entailment-satisfaccion.html]]`
+  - `![[mundo-wumpus-inferencia.htm]]`
+  - `![[modelos-entailment-satisfaccion.htm]]`
 - **Siguiente tema:** Clase 10: Cláusulas de Horn, encadenamiento hacia adelante/atrás y el principio de Resolución.

@@ -4,10 +4,11 @@
 // put your custom CSS here!
 
 // Página más ancha: el layout base limita todo el bloque (sidebars + centro)
-// a "desktop breakpoint + 300px". Le sumamos ~350px extra, que van a parar
-// casi por completo a la columna central (las sidebars son de ancho fijo).
+// a "desktop breakpoint + 300px". Le sumamos 1350px extra (650 + 700 más),
+// que van a parar casi por completo a la columna central (las sidebars son
+// de ancho fijo).
 .page {
-  max-width: calc(#{map.get($breakpoints, desktop)} + 650px);
+  max-width: calc(#{map.get($breakpoints, desktop)} + 1350px);
 }
 
 // Un punto más de tamaño de fuente en el cuerpo del artículo.
@@ -22,4 +23,15 @@
 // para otras cosas, como resaltar coincidencias de búsqueda).
 a.internal {
   background-color: rgba(62, 147, 216, 0.18) !important;
+}
+
+// El tema abecedarium fuerza font-family: var(--font-text) (la fuente de
+// texto normal, sans-serif) sobre .katex-html, pisando la tipografía propia
+// de KaTeX (KaTeX_Main/KaTeX_Math), que es la que da el look "estándar" de
+// Obsidian: símbolos más finos y con la forma correcta. Quitamos el forzado
+// para que .katex-html vuelva a heredar la font-family de .katex (definida
+// por katex.min.css), en vez de imponer "unset" a ciegas.
+.katex > .katex-html,
+.katex-display > .katex > .katex-html {
+  font-family: unset !important;
 }
