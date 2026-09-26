@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forward Checking en N-Reinas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --app-bg: var(--obsidian-bg, #f8fafc);
+            --app-fg: var(--obsidian-text, #1e293b);
+            --app-muted: var(--obsidian-text-muted, #64748b);
+            --panel-bg: var(--obsidian-bg-2, #ffffff);
+            --panel-border: var(--obsidian-border, #e2e8f0);
+            --log-bg: #f8fafc;
+            --tree-bg: #f8fafc;
+        }
+        #logPanel {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+        }
+        #logPanel::-webkit-scrollbar { width: 8px; }
+        #logPanel::-webkit-scrollbar-track { background: #f1f5f9; }
+        #logPanel::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+        canvas { display: block; }
+
+        .log-item {
+            padding: 9px 12px;
+            border-radius: 6px;
+            border-left-width: 4px;
+            font-size: 13px;
+            line-height: 1.45;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: background-color .15s ease;
+        }
+        .log-info {
+            background: #ffffff;
+            border-color: #3b82f6;
+            color: #1e3a8a;
+        }
+        .log-success {
+            background: #f0fdf4;
+            border-color: #22c55e;
+            color: #166534;
+            font-weight: 600;
+        }
+        .log-error {
+            background: #fff7ed;
+            border-color: #ea580c;
+            color: #9a3412;
+            font-weight: 600;
+        }
+        .log-skip {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #161820 !important;
+                color: #e2e8f0 !important;
+            }
+            header {
+                background-color: #1e222d !important;
+                border-bottom: 1px solid #2f3646 !important;
+            }
+            header h1 { color: #f8fafc !important; }
+            header p { color: #94a3b8 !important; }
+            .bg-white { background-color: #1e222d !important; border-color: #2f3646 !important; }
+            .bg-slate-50 { background-color: #141720 !important; }
+            .bg-slate-100 { background-color: #262b39 !important; }
+            .text-slate-700 { color: #e2e8f0 !important; }
+            .text-slate-800 { color: #f8fafc !important; }
+            .text-slate-600 { color: #cbd5e1 !important; }
+            .text-slate-500 { color: #94a3b8 !important; }
+            .border-slate-200 { border-color: #2f3646 !important; }
+            .border-slate-300 { border-color: #40485a !important; }
+            select {
+                background-color: #262b39 !important;
+                color: #f8fafc !important;
+                border-color: #40485a !important;
+            }
+            #btnStep {
+                background-color: #1e3a5f !important;
+                color: #93c5fd !important;
+            }
+            #btnStep:hover { background-color: #254b7c !important; }
+            #btnReset {
+                background-color: #262b39 !important;
+                color: #e2e8f0 !important;
+            }
+            #btnReset:hover { background-color: #313749 !important; }
+            #logPanel {
+                background-color: #141720 !important;
+                border-color: #2f3646 !important;
+                scrollbar-color: #475569 #141720;
+            }
+            #logPanel::-webkit-scrollbar-track { background: #141720; }
+            #logPanel::-webkit-scrollbar-thumb { background-color: #475569; }
+            #treeContainer {
+                background-color: #141720 !important;
+                border-color: #2f3646 !important;
+            }
+            #boardContainer {
+                border-color: #475569 !important;
+            }
+            .log-info {
+                background: #1a2436 !important;
+                border-color: #60a5fa !important;
+                color: #dbeafe !important;
+            }
+            .log-success {
+                background: #143521 !important;
+                border-color: #4ade80 !important;
+                color: #dcfce7 !important;
+            }
+            .log-error {
+                background: #381d14 !important;
+                border-color: #fb923c !important;
+                color: #ffedd5 !important;
+            }
+            .log-skip {
+                background: #191c26 !important;
+                border-color: #475569 !important;
+                color: #94a3b8 !important;
+            }
+        }
+        :root[style*="color-scheme: dark"],
+        :root[style*="--obsidian-color-scheme: dark"] {
+            body {
+                background-color: var(--obsidian-bg, #161820) !important;
+                color: var(--obsidian-text, #e2e8f0) !important;
+            }
+            header {
+                background-color: var(--obsidian-bg-2, #1e222d) !important;
+                border-bottom: 1px solid var(--obsidian-border, #2f3646) !important;
+            }
+            header h1 { color: var(--obsidian-text, #f8fafc) !important; }
+            header p { color: var(--obsidian-text-muted, #94a3b8) !important; }
+            .bg-white { background-color: var(--obsidian-bg-2, #1e222d) !important; border-color: var(--obsidian-border, #2f3646) !important; }
+            .bg-slate-50 { background-color: #141720 !important; }
+            .bg-slate-100 { background-color: #262b39 !important; }
+            .text-slate-700 { color: #e2e8f0 !important; }
+            .text-slate-800 { color: #f8fafc !important; }
+            .text-slate-600 { color: #cbd5e1 !important; }
+            .text-slate-500 { color: #94a3b8 !important; }
+            .border-slate-200 { border-color: var(--obsidian-border, #2f3646) !important; }
+            .border-slate-300 { border-color: #40485a !important; }
+            select {
+                background-color: #262b39 !important;
+                color: #f8fafc !important;
+                border-color: #40485a !important;
+            }
+            #btnStep {
+                background-color: #1e3a5f !important;
+                color: #93c5fd !important;
+            }
+            #btnStep:hover { background-color: #254b7c !important; }
+            #btnReset {
+                background-color: #262b39 !important;
+                color: #e2e8f0 !important;
+            }
+            #btnReset:hover { background-color: #313749 !important; }
+            #logPanel {
+                background-color: #141720 !important;
+                border-color: var(--obsidian-border, #2f3646) !important;
+            }
+            #treeContainer {
+                background-color: #141720 !important;
+                border-color: var(--obsidian-border, #2f3646) !important;
+            }
+            #boardContainer {
+                border-color: #475569 !important;
+            }
+            .log-info {
+                background: #1a2436 !important;
+                border-color: #60a5fa !important;
+                color: #dbeafe !important;
+            }
+            .log-success {
+                background: #143521 !important;
+                border-color: #4ade80 !important;
+                color: #dcfce7 !important;
+            }
+            .log-error {
+                background: #381d14 !important;
+                border-color: #fb923c !important;
+                color: #ffedd5 !important;
+            }
+            .log-skip {
+                background: #191c26 !important;
+                border-color: #475569 !important;
+                color: #94a3b8 !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex flex-col font-sans overflow-hidden">
+
+    <header class="bg-white shadow-sm p-4 flex flex-wrap justify-between items-center z-10">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-700">Forward Checking (CSP) - N-Reinas</h1>
+            <p class="text-sm text-slate-500">Visualización interactiva del algoritmo de satisfacción de restricciones con comprobación hacia adelante.</p>
+        </div>
+        <div class="flex items-center gap-4 mt-2 sm:mt-0">
+            <div class="flex items-center gap-2 bg-slate-100 p-2 rounded-lg">
+                <label for="nSelect" class="text-sm font-semibold">Tamaño (N):</label>
+                <select id="nSelect" class="bg-white border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none">
+                    <option value="4">4 Reinas</option>
+                    <option value="5" selected>5 Reinas</option>
+                    <option value="6">6 Reinas</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-100 p-2 rounded-lg">
+                <label for="speedSelect" class="text-sm font-semibold">Velocidad:</label>
+                <select id="speedSelect" class="bg-white border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none">
+                    <option value="800">Lenta</option>
+                    <option value="300" selected>Media</option>
+                    <option value="50">Rápida</option>
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button id="btnStep" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-2 rounded font-semibold transition-colors">
+                    Paso a paso ⏭
+                </button>
+                <button id="btnPlayPause" class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded font-semibold shadow transition-colors w-32">
+                    ▶ Reproducir
+                </button>
+                <button id="btnReset" class="bg-slate-200 text-slate-700 hover:bg-slate-300 px-4 py-2 rounded font-semibold transition-colors">
+                    ↻ Reiniciar
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col lg:flex-row gap-4 p-4 overflow-hidden h-full">
+        <!-- Panel Izquierdo: Tablero y Logs -->
+        <div class="w-full lg:w-1/3 flex flex-col gap-4 h-full">
+            
+            <!-- Tablero -->
+            <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center justify-center shrink-0">
+                <h2 class="text-lg font-bold mb-2 w-full text-center">Tablero y Dominios</h2>
+                <div class="relative w-full max-w-[350px] aspect-square rounded overflow-hidden border-2 border-slate-800" id="boardContainer">
+                    <canvas id="boardCanvas"></canvas>
+                </div>
+                <div class="mt-4 flex flex-wrap gap-2 justify-center text-xs text-slate-600">
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-400 opacity-60 inline-block border border-red-500"></span> Descartado por FC</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-200 inline-block border border-green-500"></span> Dominio Válido</span>
+                </div>
+            </div>
+
+            <!-- Registro de Eventos -->
+            <div class="bg-white rounded-xl shadow p-4 flex-1 flex flex-col min-h-0">
+                <h2 class="text-lg font-bold mb-2">Registro de Búsqueda</h2>
+                <div id="logPanel" class="flex-1 overflow-y-auto space-y-2 text-sm bg-slate-50 p-3 rounded border border-slate-200">
+                    <!-- Los logs aparecerán aquí -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Derecho: Árbol de Búsqueda -->
+        <div class="w-full lg:w-2/3 bg-white rounded-xl shadow p-4 flex flex-col h-full relative">
+            <h2 class="text-lg font-bold mb-2">Grafo de Búsqueda (Árbol)</h2>
+            <div class="flex-1 w-full h-full relative overflow-hidden bg-slate-50 rounded border border-slate-200" id="treeContainer">
+                <canvas id="treeCanvas" class="absolute top-0 left-0 w-full h-full cursor-move"></canvas>
+            </div>
+            
+            <!-- Leyenda del Árbol -->
+            <div class="mt-3 flex flex-wrap gap-4 justify-center text-xs text-slate-600">
+                <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-full bg-blue-500 border border-blue-700"></span> Analizando</span>
+                <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-full bg-orange-400 border border-orange-600"></span> Fallo FC (Dominio Vacío)</span>
+                <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-full bg-slate-400 border border-slate-600"></span> Camino Fallido</span>
+                <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-full bg-green-500 border border-green-700"></span> Solución</span>
+                <span class="flex items-center gap-1"><span class="w-4 h-4 rounded-full bg-slate-200 border-2 border-dashed border-slate-400 opacity-60"></span> Podado antes de visitar</span>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Configuración Global
+        let N = 5;
+        let isPlaying = false;
+        let playInterval = null;
+        let speed = 300;
+
+        // Referencias del DOM
+        const boardCanvas = document.getElementById('boardCanvas');
+        const boardCtx = boardCanvas.getContext('2d');
+        const treeCanvas = document.getElementById('treeCanvas');
+        const treeCtx = treeCanvas.getContext('2d');
+        const boardContainer = document.getElementById('boardContainer');
+        const treeContainer = document.getElementById('treeContainer');
+        const logPanel = document.getElementById('logPanel');
+        
+        // Botones
+        const btnStep = document.getElementById('btnStep');
+        const btnPlayPause = document.getElementById('btnPlayPause');
+        const btnReset = document.getElementById('btnReset');
+        const nSelect = document.getElementById('nSelect');
+        const speedSelect = document.getElementById('speedSelect');
+
+        // Estado del Sistema
+        let solverGenerator = null;
+        let currentState = null;
+        let treeRoot = null;
+        
+        // Panning para el árbol
+        let treeOffset = { x: 0, y: 0 };
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+
+        /* UTILIDADES */
+        function copyDomains(domains) {
+            return domains.map(d => [...d]);
+        }
+
+        function addLog(message, type = 'info') {
+            const el = document.createElement('div');
+            el.className = `log-item log-${type}`;
+            el.textContent = message;
+            logPanel.appendChild(el);
+            logPanel.scrollTop = logPanel.scrollHeight;
+        }
+
+        /* ALGORITMO GENERADOR N-REINAS (FORWARD CHECKING) */
+        function* solveNQueensFC(N) {
+            let domains = Array.from({length: N}, () => Array.from({length: N}, (_, i) => i));
+            let assignment = []; // Almacena las columnas elegidas por fila
+            let nodeIdCounter = 0;
+            
+            treeRoot = { id: nodeIdCounter++, r: -1, c: -1, status: 'root', children: [] };
+            
+            yield { 
+                action: 'start', 
+                board: [...assignment], 
+                domains: copyDomains(domains), 
+                node: treeRoot,
+                msg: `Iniciando búsqueda para N=${N}`,
+                logType: 'info'
+            };
+
+            function forwardCheck(row, col, currentDomains) {
+                let newDomains = copyDomains(currentDomains);
+                let domainWipeoutRow = -1;
+                
+                // Aplicar restricciones hacia adelante
+                for (let r = row + 1; r < N; r++) {
+                    newDomains[r] = newDomains[r].filter(c => {
+                        if (c === col) return false; // Misma columna
+                        if (Math.abs(r - row) === Math.abs(c - col)) return false; // Misma diagonal
+                        return true;
+                    });
+                    
+                    if (newDomains[r].length === 0 && domainWipeoutRow === -1) {
+                        domainWipeoutRow = r; // Se vació el dominio
+                    }
+                }
+                return { newDomains, domainWipeoutRow };
+            }
+
+            function* backtrack(row, parentNode, currentDomains) {
+                if (row === N) {
+                    parentNode.status = 'solution';
+                    yield { 
+                        action: 'solution', board: [...assignment], domains: copyDomains(currentDomains), node: parentNode,
+                        msg: '¡Solución encontrada!', logType: 'success'
+                    };
+                    return true; 
+                }
+
+                for (let col = 0; col < N; col++) {
+                    // Si el valor no está en el dominio, fue podado por un FC anterior
+                    if (!currentDomains[row].includes(col)) {
+                        let prunedNode = { id: nodeIdCounter++, r: row, c: col, status: 'pruned', children: [] };
+                        parentNode.children.push(prunedNode);
+                        yield { 
+                            action: 'pruned', board: [...assignment], domains: copyDomains(currentDomains), node: prunedNode,
+                            msg: `Fila ${row}, Col ${col}: Descartado por Forward Checking previo. Saltando.`, logType: 'skip'
+                        };
+                        continue; 
+                    }
+
+                    // Intentar valor válido
+                    let node = { id: nodeIdCounter++, r: row, c: col, status: 'active', children: [] };
+                    parentNode.children.push(node);
+                    assignment.push(col);
+
+                    yield { 
+                        action: 'try', board: [...assignment], domains: copyDomains(currentDomains), node: node,
+                        msg: `Colocando reina en Fila ${row}, Col ${col}... Evaluando FC.`, logType: 'info'
+                    };
+
+                    // Aplicar Forward Checking
+                    let fcResult = forwardCheck(row, col, currentDomains);
+                    
+                    yield {
+                        action: 'fc', board: [...assignment], domains: fcResult.newDomains, node: node,
+                        msg: `Aplicando Forward Checking para asignación (${row},${col}).`, logType: 'info'
+                    };
+
+                    if (fcResult.domainWipeoutRow !== -1) {
+                        // Fallo: Dominio vacío (Wipeout)
+                        node.status = 'fc_failed';
+                        yield { 
+                            action: 'wipeout', board: [...assignment], domains: fcResult.newDomains, node: node,
+                            msg: `Fallo FC: Dominio vacío en la fila ${fcResult.domainWipeoutRow}. Backtracking...`, logType: 'error'
+                        };
+                    } else {
+                        // Éxito: Continuar búsqueda en la siguiente fila
+                        let found = yield* backtrack(row + 1, node, fcResult.newDomains);
+                        if (found) return true; // Detener en la primera solución
+                    }
+
+                    // Backtrack
+                    assignment.pop();
+                    if (node.status !== 'solution') node.status = 'backtracked';
+                    yield { 
+                        action: 'backtrack', board: [...assignment], domains: copyDomains(currentDomains), node: parentNode,
+                        msg: `Retirando reina de Fila ${row}, Col ${col}.`, logType: 'info'
+                    };
+                }
+                return false;
+            }
+
+            yield* backtrack(0, treeRoot, domains);
+            
+            yield { 
+                action: 'end', board: [...assignment], domains: copyDomains(domains), node: treeRoot,
+                msg: `Búsqueda finalizada.`, logType: 'info'
+            };
+        }
+
+        /* DIBUJO DEL TABLERO */
+        function resizeCanvases() {
+            // Ajustar Board Canvas
+            const bRect = boardContainer.getBoundingClientRect();
+            boardCanvas.width = bRect.width;
+            boardCanvas.height = bRect.height;
+
+            // Ajustar Tree Canvas
+            const tRect = treeContainer.getBoundingClientRect();
+            treeCanvas.width = tRect.width;
+            treeCanvas.height = tRect.height;
+
+            if (currentState) render();
+        }
+        window.addEventListener('resize', resizeCanvases);
+
+        function isDark() {
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ||
+                   document.documentElement.style.cssText.includes('dark') ||
+                   (document.documentElement.getAttribute('style') || '').includes('dark');
+        }
+
+        function drawBoard(state) {
+            const ctx = boardCtx;
+            const size = boardCanvas.width;
+            const cellSize = size / N;
+            const dark = isDark();
+
+            ctx.clearRect(0, 0, size, size);
+
+            // Dibujar cuadrícula base
+            for (let r = 0; r < N; r++) {
+                for (let c = 0; c < N; c++) {
+                    if (dark) {
+                        ctx.fillStyle = (r + c) % 2 === 0 ? '#78350f' : '#92400e';
+                    } else {
+                        ctx.fillStyle = (r + c) % 2 === 0 ? '#fcd34d' : '#fef3c7';
+                    }
+                    ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+                }
+            }
+
+            // Dibujar Dominios Restantes y Descartados (Forward Checking)
+            if (state.domains) {
+                for (let r = 0; r < N; r++) {
+                    // Solo mostramos FC para filas inferiores a las ya asignadas
+                    if (r >= state.board.length) {
+                        for (let c = 0; c < N; c++) {
+                            if (!state.domains[r].includes(c)) {
+                                // Casilla descartada (rojo translúcido y X)
+                                ctx.fillStyle = dark ? 'rgba(220, 38, 38, 0.7)' : 'rgba(239, 68, 68, 0.6)';
+                                ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+                                
+                                ctx.strokeStyle = dark ? 'rgba(254, 202, 202, 0.9)' : 'rgba(153, 27, 27, 0.8)';
+                                ctx.lineWidth = 2;
+                                ctx.beginPath();
+                                ctx.moveTo(c * cellSize + cellSize*0.2, r * cellSize + cellSize*0.2);
+                                ctx.lineTo(c * cellSize + cellSize*0.8, r * cellSize + cellSize*0.8);
+                                ctx.moveTo(c * cellSize + cellSize*0.8, r * cellSize + cellSize*0.2);
+                                ctx.lineTo(c * cellSize + cellSize*0.2, r * cellSize + cellSize*0.8);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Dibujar Reinas
+            ctx.font = `${cellSize * 0.7}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            for (let r = 0; r < state.board.length; r++) {
+                let c = state.board[r];
+                
+                // Resaltar la última reina colocada si está activa
+                if (r === state.board.length - 1 && state.action !== 'backtrack') {
+                    ctx.fillStyle = dark ? 'rgba(96, 165, 250, 0.6)' : 'rgba(59, 130, 246, 0.5)';
+                    ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+                }
+
+                ctx.fillStyle = dark ? '#ffffff' : '#0f172a'; // Color de la reina
+                // ♛ Símbolo Unicode de reina
+                ctx.fillText('♛', c * cellSize + cellSize / 2, r * cellSize + cellSize / 2 + cellSize*0.05);
+            }
+        }
+
+        /* DIBUJO DEL ÁRBOL DE BÚSQUEDA */
+        function calculateTreeLayout(node) {
+            // Paso 1: Post-orden para calcular anchuras de subárboles
+            function calcWidth(n) {
+                if (!n.children || n.children.length === 0) {
+                    n.width = 1;
+                    return 1;
+                }
+                let w = 0;
+                for (let child of n.children) {
+                    w += calcWidth(child);
+                }
+                n.width = w;
+                return w;
+            }
+            calcWidth(node);
+
+            const horizontalSpacing = 50;
+            const verticalSpacing = 70;
+
+            // Paso 2: Pre-orden para asignar coordenadas X e Y
+            function assignCoordinates(n, depth, startX) {
+                n.y = depth * verticalSpacing;
+                
+                // Centro del espacio asignado a este nodo
+                n.x = startX + (n.width * horizontalSpacing) / 2;
+
+                let currentX = startX;
+                for (let child of n.children) {
+                    assignCoordinates(child, depth + 1, currentX);
+                    currentX += child.width * horizontalSpacing;
+                }
+            }
+            assignCoordinates(node, 0, 0);
+
+            // Devolver ancho y alto total para escalado
+            return {
+                totalWidth: node.width * horizontalSpacing,
+                maxDepth: N + 1, // Raíz + N filas
+                hSpacing: horizontalSpacing,
+                vSpacing: verticalSpacing
+            };
+        }
+
+        function drawTree(root, activeNode) {
+            const ctx = treeCtx;
+            const w = treeCanvas.width;
+            const h = treeCanvas.height;
+            
+            ctx.clearRect(0, 0, w, h);
+
+            if (!root) return;
+
+            const layout = calculateTreeLayout(root);
+
+            ctx.save();
+            
+            // Auto-centrar y escalar si es necesario
+            const padding = 40;
+            const scaleX = (w - padding * 2) / Math.max(layout.totalWidth, 1);
+            const scaleY = (h - padding * 2) / Math.max((layout.maxDepth * layout.vSpacing), 1);
+            const scale = Math.min(scaleX, scaleY, 1); // No escalar más de 1x
+            
+            // Aplicar panning (movimiento) y escalado
+            const contentCenterX = root.x * scale;
+            const offsetX = (w / 2) - contentCenterX + treeOffset.x;
+            const offsetY = padding + treeOffset.y;
+
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(scale, scale);
+
+            const dark = isDark();
+
+            // Dibujar Enlaces (Aristas)
+            function drawEdges(n) {
+                for (let child of n.children) {
+                    ctx.beginPath();
+                    ctx.moveTo(n.x, n.y);
+                    ctx.lineTo(child.x, child.y);
+                    
+                    if (child.status === 'pruned') {
+                        ctx.strokeStyle = dark ? '#475569' : '#cbd5e1';
+                        ctx.setLineDash([5, 5]);
+                        ctx.lineWidth = 1;
+                    } else {
+                        ctx.strokeStyle = dark ? '#64748b' : '#94a3b8';
+                        ctx.setLineDash([]);
+                        ctx.lineWidth = 2;
+                    }
+                    ctx.stroke();
+                    
+                    drawEdges(child);
+                }
+            }
+            drawEdges(root);
+            ctx.setLineDash([]); // Reset dash
+
+            // Dibujar Nodos (Vértices)
+            function drawNodes(n) {
+                // Colores según estado
+                let fill = dark ? '#334155' : '#94a3b8';
+                let stroke = dark ? '#475569' : '#64748b';
+                let text = '#ffffff';
+                let radius = 14;
+                let dashed = false;
+
+                if (n.status === 'root') {
+                    fill = dark ? '#1e293b' : '#475569'; stroke = dark ? '#475569' : '#334155'; text = '#ffffff';
+                } else if (n.status === 'active' || (activeNode && n.id === activeNode.id)) {
+                    fill = '#3b82f6'; stroke = '#93c5fd'; text = '#ffffff'; radius = 18;
+                    // Efecto de brillo (Glow)
+                    ctx.shadowColor = '#3b82f6';
+                    ctx.shadowBlur = 15;
+                } else if (n.status === 'solution') {
+                    fill = '#22c55e'; stroke = '#86efac'; text = '#ffffff'; radius = 18;
+                } else if (n.status === 'fc_failed') {
+                    fill = '#f97316'; stroke = '#fdba74'; text = '#ffffff';
+                } else if (n.status === 'pruned') {
+                    fill = dark ? 'rgba(30, 35, 48, 0.85)' : 'rgba(241, 245, 249, 0.8)';
+                    stroke = dark ? '#475569' : '#94a3b8';
+                    text = dark ? '#94a3b8' : '#64748b';
+                    dashed = true;
+                } else if (n.status === 'backtracked') {
+                    fill = dark ? '#334155' : '#64748b'; stroke = dark ? '#475569' : '#475569'; text = dark ? '#cbd5e1' : '#e2e8f0';
+                }
+
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = fill;
+                ctx.fill();
+
+                if (dashed) ctx.setLineDash([3, 3]);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = stroke;
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.shadowBlur = 0; // Reset shadow
+
+                // Texto del nodo (Valor de la columna asignada)
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = text;
+                let label = n.status === 'root' ? 'R' : n.c.toString();
+                ctx.fillText(label, n.x, n.y);
+
+                for (let child of n.children) {
+                    drawNodes(child);
+                }
+            }
+            drawNodes(root);
+
+            ctx.restore();
+        }
+
+        /* CONTROLADORES Y LÓGICA DE UI */
+        
+        function render() {
+            if (!currentState) return;
+            drawBoard(currentState);
+            drawTree(treeRoot, currentState.node);
+        }
+
+        function step() {
+            if (!solverGenerator) {
+                initSolver();
+            }
+
+            const result = solverGenerator.next();
+            
+            if (result.done) {
+                pause();
+                btnStep.disabled = true;
+                btnPlayPause.disabled = true;
+                addLog("Ejecución finalizada. No hay más ramas que explorar.", "success");
+                return;
+            }
+
+            currentState = result.value;
+            
+            if (currentState.msg) {
+                addLog(currentState.msg, currentState.logType);
+            }
+
+            render();
+
+            // Auto-centrar vista del árbol si hay un nodo activo
+            if(currentState.node && currentState.node.status !== 'root') {
+               // Aquí podríamos animar el treeOffset para seguir al nodo, pero por simplicidad de la visualización global lo dejamos fijo a menos que el usuario arrastre.
+            }
+            
+            if (currentState.action === 'solution') {
+                pause();
+                btnStep.disabled = true;
+                btnPlayPause.disabled = true;
+            }
+        }
+
+        function play() {
+            if (isPlaying) return;
+            isPlaying = true;
+            btnPlayPause.innerHTML = '⏸ Pausar';
+            btnPlayPause.classList.replace('bg-blue-600', 'bg-orange-500');
+            btnPlayPause.classList.replace('hover:bg-blue-700', 'hover:bg-orange-600');
+            
+            playInterval = setInterval(() => {
+                step();
+            }, speed);
+        }
+
+        function pause() {
+            if (!isPlaying) return;
+            isPlaying = false;
+            btnPlayPause.innerHTML = '▶ Reproducir';
+            btnPlayPause.classList.replace('bg-orange-500', 'bg-blue-600');
+            btnPlayPause.classList.replace('hover:bg-orange-600', 'hover:bg-blue-700');
+            clearInterval(playInterval);
+        }
+
+        function initSolver() {
+            logPanel.innerHTML = ''; // Limpiar logs
+            solverGenerator = solveNQueensFC(N);
+            btnStep.disabled = false;
+            btnPlayPause.disabled = false;
+            treeOffset = { x: 0, y: 0 }; // Resetear vista del árbol
+            step(); // Ejecutar el paso de 'start'
+        }
+
+        function reset() {
+            pause();
+            initSolver();
+        }
+
+        // Eventos Botones
+        btnStep.addEventListener('click', () => {
+            pause();
+            step();
+        });
+
+        btnPlayPause.addEventListener('click', () => {
+            if (isPlaying) pause();
+            else play();
+        });
+
+        btnReset.addEventListener('click', reset);
+
+        nSelect.addEventListener('change', (e) => {
+            N = parseInt(e.target.value);
+            reset();
+        });
+
+        speedSelect.addEventListener('change', (e) => {
+            speed = parseInt(e.target.value);
+            if (isPlaying) {
+                pause();
+                play();
+            }
+        });
+
+        // Eventos de Panning en el Árbol
+        treeCanvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            dragStart = { x: e.clientX - treeOffset.x, y: e.clientY - treeOffset.y };
+            treeCanvas.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            treeOffset.x = e.clientX - dragStart.x;
+            treeOffset.y = e.clientY - dragStart.y;
+            render(); // Redibujar con el nuevo offset
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            treeCanvas.style.cursor = 'move';
+        });
+        
+        // Touch events para panning en móviles
+        treeCanvas.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            isDragging = true;
+            dragStart = { x: touch.clientX - treeOffset.x, y: touch.clientY - treeOffset.y };
+        }, {passive: true});
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            treeOffset.x = touch.clientX - dragStart.x;
+            treeOffset.y = touch.clientY - dragStart.y;
+            render();
+        }, {passive: true});
+
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // Inicialización
+        window.onload = () => {
+            resizeCanvases();
+            initSolver();
+        };
+
+    </script>
+</body>
+</html>

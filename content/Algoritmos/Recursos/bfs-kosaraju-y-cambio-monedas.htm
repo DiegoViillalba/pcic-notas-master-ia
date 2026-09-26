@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dos BFS, Kosaraju y cambio de monedas</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#f8fafc, #0f172a);
+      --surface: light-dark(#ffffff, #182235);
+      --surface-2: light-dark(#eef2ff, #222d45);
+      --text: light-dark(#172033, #e8edf7);
+      --muted: light-dark(#5f6b7d, #a9b5c9);
+      --border: light-dark(#d7deea, #34415a);
+      --accent: light-dark(#3157c8, #91a9ff);
+      --accent-soft: light-dark(#e3e9ff, #26345f);
+      --good: light-dark(#18794e, #63d6a5);
+      --warn: light-dark(#a35b00, #f2b95f);
+      --bad: light-dark(#b42318, #ff8b83);
+      --node: light-dark(#ffffff, #1d2940);
+      --edge: light-dark(#64748b, #94a3b8);
+      --shadow: light-dark(0 8px 24px rgba(31, 45, 74, .09), 0 8px 24px rgba(0, 0, 0, .24));
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 18px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+    .app { max-width: 980px; margin: 0 auto; }
+    h1 { margin: 0 0 6px; font-size: clamp(1.35rem, 3vw, 2rem); font-weight: 700; }
+    h2 { margin: 0; font-size: 1.05rem; }
+    p { margin: 0; }
+    .lead { color: var(--muted); margin-bottom: 16px; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    button, select, input {
+      font: inherit;
+      color: inherit;
+    }
+    button {
+      min-height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface);
+      padding: 8px 12px;
+    }
+    button:hover { border-color: var(--accent); }
+    button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 2px; }
+    button[aria-selected="true"], .primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: light-dark(#ffffff, #101729);
+    }
+    button:disabled { opacity: .45; }
+    .panel[hidden] { display: none; }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    .panel-head { display: flex; gap: 12px; align-items: start; justify-content: space-between; margin-bottom: 12px; }
+    .status {
+      border-left: 4px solid var(--accent);
+      background: var(--surface-2);
+      padding: 10px 12px;
+      border-radius: 0 9px 9px 0;
+      min-height: 66px;
+      margin: 10px 0 14px;
+    }
+    .status strong { display: block; margin-bottom: 2px; }
+    .controls { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; margin-top: 12px; }
+    .field { display: grid; gap: 4px; min-width: 150px; }
+    label { color: var(--muted); font-size: .88rem; }
+    select, input {
+      min-height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--bg);
+      padding: 7px 9px;
+    }
+    .graph-wrap {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    svg { display: block; width: 100%; height: auto; min-height: 250px; }
+    .edge { fill: none; stroke: var(--edge); stroke-width: 2; }
+    .edge.dim { opacity: .28; }
+    .node circle { fill: var(--node); stroke: var(--border); stroke-width: 2; }
+    .node text { fill: var(--text); font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+    .node.visited circle { fill: var(--accent-soft); stroke: var(--accent); }
+    .node.active circle { fill: var(--accent); stroke: var(--accent); }
+    .node.active text { fill: light-dark(#ffffff, #101729); }
+    .node.scc-1 circle { fill: color-mix(in srgb, var(--accent) 18%, var(--node)); stroke: var(--accent); }
+    .node.scc-2 circle { fill: color-mix(in srgb, var(--good) 18%, var(--node)); stroke: var(--good); }
+    .node.scc-3 circle { fill: color-mix(in srgb, var(--warn) 18%, var(--node)); stroke: var(--warn); }
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: .88rem; margin-top: 8px; }
+    .dot { width: 11px; height: 11px; display: inline-block; border-radius: 50%; margin-right: 5px; vertical-align: -1px; background: var(--accent); }
+    .dot.v { background: var(--good); }
+    .dot.w { background: var(--warn); }
+    .sequence { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      min-height: 34px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+      font-variant-numeric: tabular-nums;
+    }
+    .arrow-text { color: var(--muted); }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    .result {
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 12px;
+      background: var(--bg);
+      min-height: 118px;
+    }
+    .result h3 { margin: 0 0 5px; font-size: .95rem; }
+    .result .big { font-size: 1.35rem; font-weight: 750; font-variant-numeric: tabular-nums; }
+    .muted { color: var(--muted); }
+    .good { color: var(--good); }
+    .bad { color: var(--bad); }
+    .warn { color: var(--warn); }
+    .formula { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; overflow-wrap: anywhere; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (max-width: 640px) {
+      body { padding: 10px; }
+      .panel { padding: 12px; }
+      .two-col { grid-template-columns: 1fr; }
+      .panel-head { display: block; }
+      svg { min-height: 215px; }
+      .controls button { flex: 1 1 auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>De la conectividad fuerte a la elección voraz</h1>
+    <p class="lead">Tres recorridos guiados: dos BFS, dos DFS de Kosaraju y cambio de monedas.</p>
+
+    <nav class="tabs" role="tablist" aria-label="Laboratorios">
+      <button id="tab-bfs" role="tab" aria-selected="true" aria-controls="panel-bfs">Dos BFS</button>
+      <button id="tab-kos" role="tab" aria-selected="false" aria-controls="panel-kos">Kosaraju</button>
+      <button id="tab-coins" role="tab" aria-selected="false" aria-controls="panel-coins">Monedas</button>
+    </nav>
+
+    <section id="panel-bfs" class="panel" role="tabpanel" aria-labelledby="tab-bfs">
+      <div class="panel-head">
+        <div>
+          <h2>¿Es fuertemente conexo?</h2>
+          <p class="muted">Raíz testigo: A. Avanza para comparar alcanzabilidad en G y Gᵀ.</p>
+        </div>
+      </div>
+      <div id="bfs-status" class="status" aria-live="polite"></div>
+      <div class="graph-wrap">
+        <svg id="bfs-graph" viewBox="0 0 660 250" role="img" aria-labelledby="bfs-title bfs-desc">
+          <title id="bfs-title">Grafo dirigido para la prueba de conectividad fuerte</title>
+          <desc id="bfs-desc">Seis nodos organizados en tres componentes fuertes y unidos de izquierda a derecha.</desc>
+        </svg>
+      </div>
+      <div class="legend"><span><i class="dot"></i>visitado</span><span>Contorno neutro: aún no visitado</span></div>
+      <div class="controls">
+        <button id="bfs-prev">Anterior</button>
+        <button id="bfs-next" class="primary">Siguiente</button>
+        <button id="bfs-reset">Reiniciar</button>
+      </div>
+    </section>
+
+    <section id="panel-kos" class="panel" role="tabpanel" aria-labelledby="tab-kos" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>Kosaraju–Sharir paso a paso</h2>
+          <p class="muted">El mismo digrafo se separa en tres componentes fuertes.</p>
+        </div>
+      </div>
+      <div id="kos-status" class="status" aria-live="polite"></div>
+      <div class="graph-wrap">
+        <svg id="kos-graph" viewBox="0 0 660 250" role="img" aria-labelledby="kos-title kos-desc">
+          <title id="kos-title">Ejecución conceptual de Kosaraju</title>
+          <desc id="kos-desc">El primer DFS calcula el orden de finalización y el segundo descubre las componentes en el grafo transpuesto.</desc>
+        </svg>
+      </div>
+      <div id="kos-sequence" class="sequence" aria-label="Orden o componentes"></div>
+      <div class="legend"><span><i class="dot"></i>{A,B,C}</span><span><i class="dot v"></i>{D,E}</span><span><i class="dot w"></i>{F}</span></div>
+      <div class="controls">
+        <button id="kos-prev">Anterior</button>
+        <button id="kos-next" class="primary">Siguiente</button>
+        <button id="kos-reset">Reiniciar</button>
+      </div>
+    </section>
+
+    <section id="panel-coins" class="panel" role="tabpanel" aria-labelledby="tab-coins" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>Greedy frente al óptimo</h2>
+          <p class="muted">Compara “tomar la moneda mayor” con una solución óptima calculada por programación dinámica.</p>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="field">
+          <label for="preset">Sistema de monedas</label>
+          <select id="preset">
+            <option value="us">EE. UU. · 1, 5, 10, 25, 100</option>
+            <option value="postage">Postal · 1, 10, 21, 34, 70, 100…</option>
+            <option value="stuck">Sin unidad · 7, 8, 9</option>
+            <option value="classic">Contraejemplo · 1, 3, 4</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="amount">Cantidad</label>
+          <input id="amount" type="number" min="1" max="3000" value="289" inputmode="numeric">
+        </div>
+        <button id="coin-run" class="primary">Calcular</button>
+      </div>
+      <div id="coin-status" class="status" aria-live="polite"></div>
+      <div class="two-col">
+        <article class="result">
+          <h3>Elección voraz</h3>
+          <div id="greedy-count" class="big">—</div>
+          <p id="greedy-expression" class="formula muted">—</p>
+        </article>
+        <article class="result">
+          <h3>Óptimo</h3>
+          <div id="optimal-count" class="big">—</div>
+          <p id="optimal-expression" class="formula muted">—</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const tabs = [...document.querySelectorAll('[role="tab"]')];
+    const panels = [...document.querySelectorAll('[role="tabpanel"]')];
+    tabs.forEach(tab => tab.addEventListener('click', () => {
+      tabs.forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+      panels.forEach(p => { p.hidden = p.id !== tab.getAttribute('aria-controls'); });
+    }));
+
+    const NS = 'http://www.w3.org/2000/svg';
+    const nodes = {
+      A: [75, 125], B: [180, 65], C: [180, 185],
+      D: [345, 100], E: [465, 150], F: [590, 100]
+    };
+    const edges = [
+      ['A','B',0], ['B','C',0], ['C','A',0], ['C','D',0],
+      ['D','E',-18], ['E','D',18], ['E','F',0]
+    ];
+
+    function svgEl(name, attrs = {}) {
+      const el = document.createElementNS(NS, name);
+      Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
+      return el;
+    }
+
+    function edgePath(from, to, bend = 0) {
+      const [x1,y1] = nodes[from], [x2,y2] = nodes[to];
+      const dx = x2 - x1, dy = y2 - y1;
+      const len = Math.hypot(dx, dy);
+      const ux = dx / len, uy = dy / len;
+      const startX = x1 + ux * 25, startY = y1 + uy * 25;
+      const endX = x2 - ux * 30, endY = y2 - uy * 30;
+      const mx = (startX + endX) / 2 - uy * bend;
+      const my = (startY + endY) / 2 + ux * bend;
+      return `M ${startX} ${startY} Q ${mx} ${my} ${endX} ${endY}`;
+    }
+
+    function drawGraph(svg, { transpose = false, visited = [], active = [], components = [] } = {}) {
+      svg.querySelectorAll(':scope > :not(title):not(desc)').forEach(el => el.remove());
+      const defs = svgEl('defs');
+      const marker = svgEl('marker', { id: `arrow-${svg.id}`, viewBox: '0 0 10 10', refX: '9', refY: '5', markerWidth: '7', markerHeight: '7', orient: 'auto-start-reverse' });
+      marker.appendChild(svgEl('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: 'var(--edge)' }));
+      defs.appendChild(marker);
+      svg.appendChild(defs);
+
+      edges.forEach(([a,b,bend]) => {
+        const from = transpose ? b : a;
+        const to = transpose ? a : b;
+        const path = svgEl('path', { d: edgePath(from, to, transpose ? -bend : bend), class: 'edge', 'marker-end': `url(#arrow-${svg.id})` });
+        svg.appendChild(path);
+      });
+
+      Object.entries(nodes).forEach(([name, [x,y]]) => {
+        let cls = 'node';
+        if (visited.includes(name)) cls += ' visited';
+        if (active.includes(name)) cls += ' active';
+        const componentIndex = components.findIndex(c => c.includes(name));
+        if (componentIndex >= 0) cls += ` scc-${componentIndex + 1}`;
+        const g = svgEl('g', { class: cls, 'aria-label': `Nodo ${name}` });
+        g.appendChild(svgEl('circle', { cx: x, cy: y, r: 24 }));
+        const text = svgEl('text', { x, y });
+        text.textContent = name;
+        g.appendChild(text);
+        svg.appendChild(g);
+      });
+    }
+
+    const bfsSteps = [
+      { t:'Elegimos un vértice testigo', d:'Tomamos s = A. Primero verificaremos a quién alcanza A en G.', trans:false, seen:[], active:['A'] },
+      { t:'BFS en G · visita A', d:'Desde A se descubre B.', trans:false, seen:['A'], active:['B'] },
+      { t:'BFS en G · visita B', d:'Desde B se descubre C.', trans:false, seen:['A','B'], active:['C'] },
+      { t:'BFS en G · visita C', d:'Cierra la primera SCC y descubre D.', trans:false, seen:['A','B','C'], active:['D'] },
+      { t:'BFS en G · visita D', d:'Desde D se descubre E.', trans:false, seen:['A','B','C','D'], active:['E'] },
+      { t:'BFS en G · visita E', d:'Desde E se descubre F.', trans:false, seen:['A','B','C','D','E'], active:['F'] },
+      { t:'Primera condición satisfecha', d:'A alcanza a todos los vértices en G. Falta comprobar el regreso hacia A.', trans:false, seen:['A','B','C','D','E','F'], active:[] },
+      { t:'BFS en Gᵀ · visita A', d:'Invertimos todas las aristas. Desde A se descubre C.', trans:true, seen:['A'], active:['C'] },
+      { t:'BFS en Gᵀ · visita C', d:'Desde C se descubre B, pero no se puede llegar a D.', trans:true, seen:['A','C'], active:['B'] },
+      { t:'Segunda condición falla', d:'En Gᵀ solo se alcanzan {A, B, C}. En G, D, E y F no pueden regresar a A. El grafo no es fuertemente conexo.', trans:true, seen:['A','B','C'], active:[] }
+    ];
+    let bfsIndex = 0;
+    const bfsStatus = document.getElementById('bfs-status');
+    const bfsGraph = document.getElementById('bfs-graph');
+    function renderBfs() {
+      const s = bfsSteps[bfsIndex];
+      bfsStatus.innerHTML = `<strong>${s.t}</strong><span>${s.d}</span>`;
+      drawGraph(bfsGraph, { transpose:s.trans, visited:s.seen, active:s.active });
+      document.getElementById('bfs-prev').disabled = bfsIndex === 0;
+      document.getElementById('bfs-next').disabled = bfsIndex === bfsSteps.length - 1;
+    }
+    document.getElementById('bfs-prev').addEventListener('click', () => { bfsIndex--; renderBfs(); });
+    document.getElementById('bfs-next').addEventListener('click', () => { bfsIndex++; renderBfs(); });
+    document.getElementById('bfs-reset').addEventListener('click', () => { bfsIndex = 0; renderBfs(); });
+
+    const kosSteps = [
+      { t:'1. Primer DFS en G', d:'Recorremos el grafo original y anotamos cada vértice cuando termina.', trans:false, comps:[], seq:['fin: F, E, D, C, B, A'] },
+      { t:'2. Orden decreciente de finalización', d:'Insertar al frente al finalizar produce L = [A, B, C, D, E, F].', trans:false, comps:[], seq:['A','B','C','D','E','F'] },
+      { t:'3. Construir Gᵀ', d:'Se invierte cada arista. Las SCC no cambian; sí cambia la dirección entre ellas.', trans:true, comps:[], seq:['A','B','C','D','E','F'] },
+      { t:'4. Primer árbol DFS en Gᵀ', d:'Comenzando en A se descubren exactamente A, C y B.', trans:true, comps:[['A','B','C']], seq:['{A, B, C}'] },
+      { t:'5. Segundo árbol DFS en Gᵀ', d:'D es el primer vértice no visitado de L; su árbol contiene D y E.', trans:true, comps:[['A','B','C'],['D','E']], seq:['{A, B, C}','{D, E}'] },
+      { t:'6. Tercer árbol y resultado', d:'F queda solo. Los árboles del segundo DFS son las tres SCC.', trans:true, comps:[['A','B','C'],['D','E'],['F']], seq:['{A, B, C}','{D, E}','{F}'] }
+    ];
+    let kosIndex = 0;
+    const kosStatus = document.getElementById('kos-status');
+    const kosGraph = document.getElementById('kos-graph');
+    const kosSequence = document.getElementById('kos-sequence');
+    function renderKos() {
+      const s = kosSteps[kosIndex];
+      kosStatus.innerHTML = `<strong>${s.t}</strong><span>${s.d}</span>`;
+      drawGraph(kosGraph, { transpose:s.trans, components:s.comps });
+      kosSequence.replaceChildren();
+      s.seq.forEach((item, i) => {
+        if (i > 0) {
+          const arrow = document.createElement('span');
+          arrow.className = 'arrow-text'; arrow.textContent = '→';
+          kosSequence.appendChild(arrow);
+        }
+        const chip = document.createElement('span');
+        chip.className = 'chip'; chip.textContent = item;
+        kosSequence.appendChild(chip);
+      });
+      document.getElementById('kos-prev').disabled = kosIndex === 0;
+      document.getElementById('kos-next').disabled = kosIndex === kosSteps.length - 1;
+    }
+    document.getElementById('kos-prev').addEventListener('click', () => { kosIndex--; renderKos(); });
+    document.getElementById('kos-next').addEventListener('click', () => { kosIndex++; renderKos(); });
+    document.getElementById('kos-reset').addEventListener('click', () => { kosIndex = 0; renderKos(); });
+
+    const presets = {
+      us: { coins:[1,5,10,25,100], amount:289 },
+      postage: { coins:[1,10,21,34,70,100,350,1225,1500], amount:140 },
+      stuck: { coins:[7,8,9], amount:15 },
+      classic: { coins:[1,3,4], amount:6 }
+    };
+
+    function greedyChange(amount, coins) {
+      const selected = [];
+      let rest = amount;
+      const descending = [...coins].sort((a,b) => b-a);
+      for (const c of descending) {
+        const count = Math.floor(rest / c);
+        for (let i=0; i<count; i++) selected.push(c);
+        rest %= c;
+      }
+      return { selected, rest };
+    }
+
+    function optimalChange(amount, coins) {
+      const best = Array(amount + 1).fill(Infinity);
+      const previous = Array(amount + 1).fill(null);
+      best[0] = 0;
+      for (let x=1; x<=amount; x++) {
+        for (const c of coins) {
+          if (c <= x && best[x-c] + 1 < best[x]) {
+            best[x] = best[x-c] + 1;
+            previous[x] = c;
+          }
+        }
+      }
+      if (!Number.isFinite(best[amount])) return null;
+      const selected = [];
+      for (let x=amount; x>0; x-=previous[x]) selected.push(previous[x]);
+      return selected;
+    }
+
+    function compress(values) {
+      if (!values || values.length === 0) return 'sin monedas';
+      const groups = [];
+      values.forEach(v => {
+        const last = groups.at(-1);
+        if (last && last.v === v) last.n++;
+        else groups.push({v, n:1});
+      });
+      return groups.map(g => g.n === 1 ? `${g.v}` : `${g.n}×${g.v}`).join(' + ');
+    }
+
+    const preset = document.getElementById('preset');
+    const amountInput = document.getElementById('amount');
+    const coinStatus = document.getElementById('coin-status');
+    function runCoins() {
+      const data = presets[preset.value];
+      const amount = Number(amountInput.value);
+      if (!Number.isInteger(amount) || amount < 1 || amount > 3000) {
+        coinStatus.innerHTML = '<strong class="bad">Cantidad inválida</strong><span>Usa un entero entre 1 y 3000.</span>';
+        return;
+      }
+      const greedy = greedyChange(amount, data.coins);
+      const optimal = optimalChange(amount, data.coins);
+      const greedyOk = greedy.rest === 0;
+      document.getElementById('greedy-count').textContent = greedyOk ? `${greedy.selected.length} moneda${greedy.selected.length === 1 ? '' : 's'}` : 'Sin solución';
+      document.getElementById('greedy-expression').textContent = greedyOk ? `${amount} = ${compress(greedy.selected)}` : `Se atora con residuo ${greedy.rest}`;
+      document.getElementById('optimal-count').textContent = optimal ? `${optimal.length} moneda${optimal.length === 1 ? '' : 's'}` : 'No existe';
+      document.getElementById('optimal-expression').textContent = optimal ? `${amount} = ${compress(optimal.sort((a,b) => b-a))}` : 'Ninguna combinación alcanza la cantidad';
+
+      if (!optimal) {
+        coinStatus.innerHTML = '<strong class="warn">La cantidad no es representable</strong><span>Ni greedy ni el algoritmo óptimo pueden formar exactamente esa cantidad.</span>';
+      } else if (!greedyOk) {
+        coinStatus.innerHTML = '<strong class="bad">Greedy falla aunque existe solución</strong><span>La primera elección local bloqueó el resto.</span>';
+      } else if (greedy.selected.length === optimal.length) {
+        coinStatus.innerHTML = '<strong class="good">Greedy coincide con el óptimo</strong><span>Para esta instancia usa el menor número posible de monedas.</span>';
+      } else {
+        const gap = greedy.selected.length - optimal.length;
+        coinStatus.innerHTML = `<strong class="bad">Greedy no es óptimo</strong><span>Usa ${gap} moneda${gap === 1 ? '' : 's'} más que la solución óptima.</span>`;
+      }
+    }
+    preset.addEventListener('change', () => { amountInput.value = presets[preset.value].amount; runCoins(); });
+    amountInput.addEventListener('keydown', event => { if (event.key === 'Enter') runCoins(); });
+    document.getElementById('coin-run').addEventListener('click', runCoins);
+
+    renderBfs();
+    renderKos();
+    runCoins();
+  </script>
+</body>
+</html>

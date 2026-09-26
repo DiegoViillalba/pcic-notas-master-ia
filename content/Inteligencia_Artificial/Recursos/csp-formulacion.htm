@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Un CSP = variables + dominios + restricciones</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: var(--obsidian-bg, #f7f8fc);
+      --fg: var(--obsidian-text, #202536);
+      --muted: var(--obsidian-text-muted, #5d6473);
+      --panel: var(--obsidian-bg-2, #ffffff);
+      --line: var(--obsidian-border, #c9cedb);
+      --btn-bg: var(--panel);
+      --btn-fg: var(--fg);
+      --btn-border: var(--line);
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --accent-fg: #1e40af;
+      --formula-bg: #eef2ff;
+      --formula-fg: #312e81;
+      --status-bg: #fff8dc;
+      --status-border: #d97706;
+      --status-fg: #78350f;
+      --c0-bg: #fee2e2;
+      --c0-fg: #991b1b;
+      --c0-border: #ef4444;
+      --c1-bg: #dcfce7;
+      --c1-fg: #166534;
+      --c1-border: #22c55e;
+      --c2-bg: #dbeafe;
+      --c2-fg: #1e40af;
+      --c2-border: #3b82f6;
+      --board-cell-border: #8b93a5;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1e222d;
+        --fg: #eef0f5;
+        --muted: #9aa2b2;
+        --panel: #272c39;
+        --line: #3d4455;
+        --btn-bg: #2d3342;
+        --btn-fg: #eef0f5;
+        --btn-border: #4a5368;
+        --accent: #60a5fa;
+        --accent-soft: #1e3a5f;
+        --accent-fg: #bfdbfe;
+        --formula-bg: #20273c;
+        --formula-fg: #c7d2fe;
+        --status-bg: #2c2414;
+        --status-border: #f59e0b;
+        --status-fg: #fde68a;
+        --c0-bg: #4c1d1d;
+        --c0-fg: #fecaca;
+        --c0-border: #f87171;
+        --c1-bg: #143823;
+        --c1-fg: #bbf7d0;
+        --c1-border: #4ade80;
+        --c2-bg: #1a3356;
+        --c2-fg: #bfdbfe;
+        --c2-border: #60a5fa;
+        --board-cell-border: #5a6478;
+      }
+    }
+    :root[style*="color-scheme: dark"],
+    :root[style*="--obsidian-color-scheme: dark"] {
+      --bg: var(--obsidian-bg, #1e222d);
+      --fg: var(--obsidian-text, #eef0f5);
+      --muted: var(--obsidian-text-muted, #9aa2b2);
+      --panel: var(--obsidian-bg-2, #272c39);
+      --line: var(--obsidian-border, #3d4455);
+      --btn-bg: #2d3342;
+      --btn-fg: var(--fg);
+      --btn-border: #4a5368;
+      --accent: #60a5fa;
+      --accent-soft: #1e3a5f;
+      --accent-fg: #bfdbfe;
+      --formula-bg: #20273c;
+      --formula-fg: #c7d2fe;
+      --status-bg: #2c2414;
+      --status-border: #f59e0b;
+      --status-fg: #fde68a;
+      --c0-bg: #4c1d1d;
+      --c0-fg: #fecaca;
+      --c0-border: #f87171;
+      --c1-bg: #143823;
+      --c1-fg: #bbf7d0;
+      --c1-border: #4ade80;
+      --c2-bg: #1a3356;
+      --c2-fg: #bfdbfe;
+      --c2-border: #60a5fa;
+      --board-cell-border: #5a6478;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font: 15px/1.45 system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--fg);
+    }
+    main { max-width: 780px; margin: auto; }
+    .top, .tabs, .legend {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .top { justify-content: space-between; }
+    h2 { font-size: 20px; margin: 0; }
+    .tabs { margin: 10px 0; }
+    button {
+      padding: 7px 12px;
+      border: 1px solid var(--btn-border);
+      border-radius: 7px;
+      background: var(--btn-bg);
+      color: var(--btn-fg);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all .15s ease;
+    }
+    button:hover { filter: brightness(1.08); }
+    button[aria-pressed="true"] {
+      background: var(--accent-soft) !important;
+      border-color: var(--accent) !important;
+      color: var(--accent-fg) !important;
+      font-weight: 700;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 12px;
+    }
+    .panel, .info {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .panel {
+      min-height: 330px;
+      display: grid;
+      place-items: center;
+    }
+    .info h3 { font-size: 16px; margin: 6px 0; color: var(--fg); }
+    .info ul { padding-left: 20px; margin: 5px 0 13px; }
+    .formula {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: var(--formula-bg);
+      color: var(--formula-fg);
+      padding: 10px 12px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .map {
+      display: grid;
+      grid-template-columns: repeat(3, 78px);
+      grid-template-rows: repeat(3, 70px);
+      gap: 6px;
+    }
+    .region {
+      display: grid;
+      place-items: center;
+      border: 3px solid #707789;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all .15s ease;
+    }
+    .wa { grid-area: 1/1/4/2; }
+    .nt { grid-area: 1/2/2/3; }
+    .q  { grid-area: 1/3/2/4; }
+    .sa { grid-area: 2/2/3/3; }
+    .nsw{ grid-area: 2/3/3/4; }
+    .v  { grid-area: 3/3/4/4; }
+    .t  { grid-area: 3/2/4/3; }
+    .c0 { background: var(--c0-bg) !important; color: var(--c0-fg) !important; border-color: var(--c0-border) !important; }
+    .c1 { background: var(--c1-bg) !important; color: var(--c1-fg) !important; border-color: var(--c1-border) !important; }
+    .c2 { background: var(--c2-bg) !important; color: var(--c2-fg) !important; border-color: var(--c2-border) !important; }
+    .conflict { outline: 4px solid #dc2626 !important; outline-offset: 1px; }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(4, 58px);
+      gap: 4px;
+    }
+    .cell {
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--board-cell-border);
+      border-radius: 6px;
+      font-size: 26px;
+      font-weight: 700;
+      background: var(--panel);
+      color: var(--fg);
+      cursor: pointer;
+    }
+    .queen {
+      background: var(--accent-soft) !important;
+      color: var(--accent-fg) !important;
+      border-color: var(--accent) !important;
+    }
+    .bad {
+      background: var(--c0-bg) !important;
+      color: var(--c0-fg) !important;
+      border-color: var(--c0-border) !important;
+      outline: 3px solid #dc2626 !important;
+    }
+
+    .status {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--status-border);
+      background: var(--status-bg);
+      color: var(--status-fg);
+      border-radius: 0 8px 8px 0;
+      min-height: 48px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .status b { color: var(--fg); }
+    .legend { font-size: 12px; margin-top: 8px; color: var(--muted); }
+
+    @media (max-width: 620px) {
+      .layout { grid-template-columns: 1fr; }
+      .panel { min-height: 290px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <h2>Un CSP = variables + dominios + restricciones</h2>
+  </div>
+  <div class="tabs">
+    <button type="button" data-mode="map">Mapa</button>
+    <button type="button" data-mode="queens">4 reinas</button>
+  </div>
+  <div class="layout">
+    <section class="panel">
+      <div id="visual"></div>
+    </section>
+    <section class="info">
+      <h3>Variables</h3>
+      <div id="vars"></div>
+      <h3>Dominios</h3>
+      <div id="domains"></div>
+      <h3>Restricciones</h3>
+      <div id="constraints"></div>
+      <div class="formula" id="goal"></div>
+    </section>
+  </div>
+  <div class="status" id="status" aria-live="polite"></div>
+</main>
+<script>
+  const visual = document.getElementById('visual');
+  const vars = document.getElementById('vars');
+  const domains = document.getElementById('domains');
+  const constraints = document.getElementById('constraints');
+  const goal = document.getElementById('goal');
+  const status = document.getElementById('status');
+  let mode = 'map';
+
+  const neighbors = {
+    WA: ['NT', 'SA'],
+    NT: ['WA', 'SA', 'Q'],
+    SA: ['WA', 'NT', 'Q', 'NSW', 'V'],
+    Q:  ['NT', 'SA', 'NSW'],
+    NSW:['Q', 'SA', 'V'],
+    V:  ['SA', 'NSW'],
+    T:  []
+  };
+  let colors = { WA: 0, NT: 1, Q: 0, SA: 2, NSW: 1, V: 0, T: 1 };
+
+  function drawMap() {
+    visual.innerHTML = '<div class="map">' + Object.keys(neighbors).map(x =>
+      `<button type="button" class="region ${x.toLowerCase()} c${colors[x]}" data-r="${x}" aria-label="${x}, cambiar color">${x}</button>`
+    ).join('') + '</div><div class="legend">Haz clic en un estado para rotar rojo → verde → azul.</div>';
+
+    vars.innerHTML = '<b>WA, NT, Q, SA, NSW, V, T</b> (una por región).';
+    domains.innerHTML = 'Cada variable puede tomar <b>{rojo, verde, azul}</b>.';
+    constraints.innerHTML = 'Para cada par de regiones vecinas: <b>X ≠ Y</b>. Tasmania no tiene vecinos.';
+    goal.textContent = 'Meta: asignación completa sin vecinos del mismo color.';
+
+    visual.querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
+      colors[b.dataset.r] = (colors[b.dataset.r] + 1) % 3;
+      drawMap();
+    });
+
+    let bad = [];
+    for (const [a, ns] of Object.entries(neighbors)) {
+      for (const b of ns) {
+        if (colors[a] === colors[b]) bad.push(a, b);
+      }
+    }
+    [...new Set(bad)].forEach(x => {
+      const el = visual.querySelector(`[data-r="${x}"]`);
+      if (el) el.classList.add('conflict');
+    });
+
+    status.innerHTML = bad.length
+      ? '<b>Asignación inconsistente:</b> hay regiones vecinas del mismo color.'
+      : '<b>Solución:</b> todas las restricciones binarias están satisfechas.';
+  }
+
+  let q = [1, 3, 0, 2];
+  function drawQueens() {
+    visual.innerHTML = '<div class="board">' + [0, 1, 2, 3].flatMap(r =>
+      [0, 1, 2, 3].map(c =>
+        `<button type="button" class="cell ${q[c] === r ? 'queen' : ''}" data-c="${c}" data-r="${r}" aria-label="fila ${r + 1}, columna ${c + 1}">${q[c] === r ? '♛' : ''}</button>`
+      )
+    ).join('') + '</div><div class="legend">Haz clic en una casilla para mover la reina de esa columna.</div>';
+
+    vars.innerHTML = '<b>Q₁, Q₂, Q₃, Q₄</b>: una variable por columna.';
+    domains.innerHTML = 'Cada Qᵢ elige una fila: <b>{1, 2, 3, 4}</b>.';
+    constraints.innerHTML = 'Para i ≠ j: <b>Qᵢ ≠ Qⱼ</b> y <b>|Qᵢ−Qⱼ| ≠ |i−j|</b>.';
+    goal.textContent = 'Meta: una reina por columna, sin compartir fila ni diagonal.';
+
+    visual.querySelectorAll('[data-c]').forEach(b => b.onclick = () => {
+      q[+b.dataset.c] = +b.dataset.r;
+      drawQueens();
+    });
+
+    let bad = [];
+    for (let i = 0; i < 4; i++) {
+      for (let j = i + 1; j < 4; j++) {
+        if (q[i] === q[j] || Math.abs(q[i] - q[j]) === j - i) bad.push(i, j);
+      }
+    }
+    [...new Set(bad)].forEach(c => {
+      visual.querySelectorAll(`[data-c="${c}"]`).forEach(x => x.classList.add('bad'));
+    });
+
+    status.innerHTML = bad.length
+      ? '<b>Conflicto:</b> al menos dos reinas comparten fila o diagonal.'
+      : '<b>Solución:</b> las seis parejas de reinas son compatibles.';
+  }
+
+  function draw() {
+    document.querySelectorAll('[data-mode]').forEach(b =>
+      b.setAttribute('aria-pressed', String(b.dataset.mode === mode))
+    );
+    mode === 'map' ? drawMap() : drawQueens();
+  }
+
+  document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => {
+    mode = b.dataset.mode;
+    draw();
+  });
+  draw();
+</script>
+</body>
+</html>

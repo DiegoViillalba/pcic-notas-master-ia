@@ -1,0 +1,213 @@
+% ================= Figuras compartidas (guía y respuestas) =================
+
+% ---- Gráfica G1: búsqueda no informada / informada ----
+\newcommand{\figGUno}{%
+\begin{tikzpicture}[scale=1.0]
+  \node[gnode] (S) at (0,0) {S};
+  \node[gnode] (A) at (2.4,1.3) {A};
+  \node[gnode] (B) at (2.4,-1.3) {B};
+  \node[gnode] (C) at (4.9,1.3) {C};
+  \node[gnode] (D) at (4.9,-1.3) {D};
+  \node[gnode,fill=verdeclaro] (G) at (7.3,0) {G};
+  \draw[garc] (S) -- node[above left]{2} (A);
+  \draw[garc] (S) -- node[below left]{1} (B);
+  \draw[garc] (A) -- node[above]{2} (C);
+  \draw[garc] (A) -- node[pos=0.3,right]{4} (D);
+  \draw[garc] (B) -- node[below]{1} (D);
+  \draw[garc] (B) to[bend right=50] node[below]{9} (G);
+  \draw[garc] (C) -- node[above right]{4} (G);
+  \draw[garc] (D) -- node[below right]{3} (G);
+\end{tikzpicture}\\[2pt]
+{\small\begin{tabular}{c|cccccc}$n$ & S & A & B & C & D & G\\\hline $h(n)$ & 4 & 2 & 3 & 1 & 2 & 0\end{tabular}}}
+
+% ---- Gráfica G2: heurística admisible pero inconsistente ----
+\newcommand{\figGDos}{%
+\begin{tikzpicture}
+  \node[gnode] (S) at (0,0) {S};
+  \node[gnode] (A) at (2,1) {A};
+  \node[gnode] (B) at (2,-1) {B};
+  \node[gnode] (C) at (4,0) {C};
+  \node[gnode,fill=verdeclaro] (G) at (6,0) {G};
+  \draw[garc] (S) -- node[above left]{1} (A);
+  \draw[garc] (S) -- node[below left]{1} (B);
+  \draw[garc] (A) -- node[above right]{1} (C);
+  \draw[garc] (B) -- node[below right]{2} (C);
+  \draw[garc] (C) -- node[above]{3} (G);
+\end{tikzpicture}\\[2pt]
+{\small\begin{tabular}{c|ccccc}$n$ & S & A & B & C & G\\\hline $h(n)$ & 2 & 4 & 1 & 1 & 0\end{tabular}}}
+
+% ---- Gráfica G3: examen simulado ----
+\newcommand{\figGTres}{%
+\begin{tikzpicture}
+  \node[gnode] (S) at (0,0) {S};
+  \node[gnode] (A) at (2.2,1.2) {A};
+  \node[gnode] (B) at (2.2,-1.2) {B};
+  \node[gnode] (C) at (4.6,0) {C};
+  \node[gnode,fill=verdeclaro] (G) at (6.8,0) {G};
+  \draw[garc] (S) -- node[above left]{1} (A);
+  \draw[garc] (S) -- node[below left]{4} (B);
+  \draw[garc] (A) -- node[right]{2} (B);
+  \draw[garc] (A) -- node[above right]{5} (C);
+  \draw[garc] (B) -- node[below right]{1} (C);
+  \draw[garc] (C) -- node[above]{3} (G);
+  \draw[garc] (B) to[bend right=35] node[below]{6} (G);
+\end{tikzpicture}\\[2pt]
+{\small\begin{tabular}{c|ccccc}$n$ & S & A & B & C & G\\\hline $h(n)$ & 6 & 5 & 2 & 3 & 0\end{tabular}}}
+
+% ---- Gráfica bidireccional ----
+\newcommand{\figBidir}{%
+\begin{tikzpicture}
+  \node[gnode] (S) at (0,0) {S};
+  \node[gnode] (M) at (3.5,1.3) {M};
+  \node[gnode] (A) at (2.2,-1.2) {A};
+  \node[gnode] (B) at (4.8,-1.2) {B};
+  \node[gnode,fill=verdeclaro] (G) at (7,0) {G};
+  \draw[thick] (S) -- node[above left]{10} (M);
+  \draw[thick] (M) -- node[above right]{10} (G);
+  \draw[thick] (S) -- node[below left]{8} (A);
+  \draw[thick] (A) -- node[below]{3} (B);
+  \draw[thick] (B) -- node[below right]{8} (G);
+\end{tikzpicture}}
+
+% ---- Árbol T1 (MAX-MIN-MAX-hojas) ----
+\newcommand{\figTUno}{%
+\begin{tikzpicture}[level distance=1.25cm,
+  level 1/.style={sibling distance=4.6cm},
+  level 2/.style={sibling distance=2.3cm},
+  level 3/.style={sibling distance=1.05cm}]
+  \node[maxn] {R}
+    child {node[minn] {A}
+      child {node[maxn] {\scriptsize A1} child {node[hoja]{4}} child {node[hoja]{7}}}
+      child {node[maxn] {\scriptsize A2} child {node[hoja]{2}} child {node[hoja]{9}}}}
+    child {node[minn] {B}
+      child {node[maxn] {\scriptsize B1} child {node[hoja]{6}} child {node[hoja]{1}}}
+      child {node[maxn] {\scriptsize B2} child {node[hoja]{3}} child {node[hoja]{8}}}}
+    child {node[minn] {C}
+      child {node[maxn] {\scriptsize C1} child {node[hoja]{5}} child {node[hoja]{10}}}
+      child {node[maxn] {\scriptsize C2} child {node[hoja]{12}} child {node[hoja]{2}}}};
+\end{tikzpicture}}
+
+% ---- Árbol T2 (AIMA Fig. 6.2) ----
+\newcommand{\figTDos}{%
+\begin{tikzpicture}[level distance=1.3cm,
+  level 1/.style={sibling distance=3.6cm},
+  level 2/.style={sibling distance=1.0cm}]
+  \node[maxn] {R}
+    child {node[minn] {A} child {node[hoja]{3}} child {node[hoja]{12}} child {node[hoja]{8}}}
+    child {node[minn] {B} child {node[hoja]{2}} child {node[hoja]{4}} child {node[hoja]{6}}}
+    child {node[minn] {C} child {node[hoja]{14}} child {node[hoja]{5}} child {node[hoja]{2}}};
+\end{tikzpicture}}
+
+% ---- Árbol T3 (profundidad 4) ----
+\newcommand{\figTTres}{%
+\begin{tikzpicture}[level distance=1.2cm,
+  level 1/.style={sibling distance=7.6cm},
+  level 2/.style={sibling distance=3.8cm},
+  level 3/.style={sibling distance=1.9cm},
+  level 4/.style={sibling distance=0.9cm}]
+  \node[maxn] {R}
+    child {node[minn] {\scriptsize 1}
+      child {node[maxn] {\scriptsize 11}
+        child {node[minn] {\tiny 111} child {node[hoja]{2}} child {node[hoja]{5}}}
+        child {node[minn] {\tiny 112} child {node[hoja]{8}} child {node[hoja]{1}}}}
+      child {node[maxn] {\scriptsize 12}
+        child {node[minn] {\tiny 121} child {node[hoja]{4}} child {node[hoja]{6}}}
+        child {node[minn] {\tiny 122} child {node[hoja]{7}} child {node[hoja]{3}}}}}
+    child {node[minn] {\scriptsize 2}
+      child {node[maxn] {\scriptsize 21}
+        child {node[minn] {\tiny 211} child {node[hoja]{9}} child {node[hoja]{2}}}
+        child {node[minn] {\tiny 212} child {node[hoja]{1}} child {node[hoja]{6}}}}
+      child {node[maxn] {\scriptsize 22}
+        child {node[minn] {\tiny 221} child {node[hoja]{5}} child {node[hoja]{8}}}
+        child {node[minn] {\tiny 222} child {node[hoja]{3}} child {node[hoja]{4}}}}};
+\end{tikzpicture}}
+
+% ---- Árbol expectiminimax ----
+\newcommand{\figExp}{%
+\begin{tikzpicture}[level distance=1.3cm,
+  level 1/.style={sibling distance=4.6cm},
+  level 2/.style={sibling distance=2.3cm},
+  level 3/.style={sibling distance=1.0cm}]
+  \node[maxn] {R}
+    child {node[chn] {$c_1$}
+      child {node[minn]{} child {node[hoja]{3}} child {node[hoja]{9}} edge from parent node[left,font=\scriptsize]{0.5}}
+      child {node[minn]{} child {node[hoja]{6}} child {node[hoja]{4}} edge from parent node[right,font=\scriptsize]{0.5}}}
+    child {node[chn] {$c_2$}
+      child {node[minn]{} child {node[hoja]{2}} child {node[hoja]{10}} edge from parent node[left,font=\scriptsize]{0.5}}
+      child {node[minn]{} child {node[hoja]{20}} child {node[hoja]{15}} edge from parent node[right,font=\scriptsize]{0.5}}}
+    child {node[chn] {$c_3$}
+      child {node[minn]{} child {node[hoja]{7}} child {node[hoja]{8}} edge from parent node[left,font=\scriptsize]{0.3}}
+      child {node[minn]{} child {node[hoja]{4}} child {node[hoja]{5}} edge from parent node[right,font=\scriptsize]{0.7}}};
+\end{tikzpicture}}
+
+% ---- Árbol de tres jugadores ----
+\newcommand{\figMaxN}{%
+\begin{tikzpicture}[level distance=1.3cm,
+  level 1/.style={sibling distance=6.2cm},
+  level 2/.style={sibling distance=3.1cm},
+  level 3/.style={sibling distance=1.55cm},
+  every node/.style={font=\small}]
+  \node[draw,circle,fill=azulclaro] {1}
+    child {node[draw,circle,fill=naranjaclaro] {2}
+      child {node[draw,circle,fill=verdeclaro] {3} child {node{$(1,2,6)$}} child {node{$(4,2,3)$}}}
+      child {node[draw,circle,fill=verdeclaro] {3} child {node{$(6,1,2)$}} child {node{$(7,4,1)$}}}}
+    child {node[draw,circle,fill=naranjaclaro] {2}
+      child {node[draw,circle,fill=verdeclaro] {3} child {node{$(5,1,1)$}} child {node{$(3,5,2)$}}}
+      child {node[draw,circle,fill=verdeclaro] {3} child {node{$(7,7,1)$}} child {node{$(5,4,5)$}}}};
+\end{tikzpicture}}
+
+% ---- Paisaje 1D ----
+\newcommand{\figPaisaje}{%
+\begin{tikzpicture}[yscale=0.35,xscale=0.62]
+  \foreach \x/\y in {0/3,1/5,2/6,3/5,4/4,5/6,6/8,7/9,8/7,9/4,10/2,11/5,12/7,13/6,14/3}{
+    \fill[azul!60] (\x-0.35,0) rectangle (\x+0.35,\y);
+    \node[font=\scriptsize] at (\x,\y+0.6) {\y};
+    \node[font=\scriptsize,text=gris] at (\x,-0.7) {\x};
+  }
+  \draw (-0.6,0) -- (14.6,0);
+  \node[font=\scriptsize,anchor=east] at (-0.7,-0.7) {estado};
+  \node[font=\scriptsize,anchor=east] at (-0.7,4) {$f$};
+\end{tikzpicture}}
+
+% ---- Tablero 4 reinas [2,1,4,4] ----
+\newcommand{\figReinas}[4]{%
+\begin{tikzpicture}[scale=0.55]
+  \foreach \i in {0,...,3}{\foreach \j in {0,...,3}{
+    \pgfmathparse{mod(\i+\j,2)==0 ? "gris!25" : "white"}
+    \fill[\pgfmathresult] (\i,\j) rectangle (\i+1,\j+1);}}
+  \draw (0,0) rectangle (4,4);
+  \foreach \c/\r in {0/#1,1/#2,2/#3,3/#4}{\node at (\c+0.5,\r-0.5) {\Large$\mathbf{Q}$};}
+  \foreach \c in {1,...,4}{\node[font=\scriptsize] at (\c-0.5,-0.4) {\c};}
+  \foreach \r in {1,...,4}{\node[font=\scriptsize] at (-0.4,\r-0.5) {\r};}
+\end{tikzpicture}}
+
+% ---- 8-puzzle ----
+\newcommand{\puzzle}[9]{%
+\begin{tikzpicture}[scale=0.5]
+  \draw (0,0) grid (3,3);
+  \node at (0.5,2.5){#1};\node at (1.5,2.5){#2};\node at (2.5,2.5){#3};
+  \node at (0.5,1.5){#4};\node at (1.5,1.5){#5};\node at (2.5,1.5){#6};
+  \node at (0.5,0.5){#7};\node at (1.5,0.5){#8};\node at (2.5,0.5){#9};
+\end{tikzpicture}}
+
+% ---- Gato ----
+\newcommand{\gato}[9]{%
+\begin{tikzpicture}[scale=0.45]
+  \draw (1,0)--(1,3) (2,0)--(2,3) (0,1)--(3,1) (0,2)--(3,2);
+  \node at (0.5,2.5){#1};\node at (1.5,2.5){#2};\node at (2.5,2.5){#3};
+  \node at (0.5,1.5){#4};\node at (1.5,1.5){#5};\node at (2.5,1.5){#6};
+  \node at (0.5,0.5){#7};\node at (1.5,0.5){#8};\node at (2.5,0.5){#9};
+\end{tikzpicture}}
+
+% ---- Mapa de Australia (grafo de restricciones) ----
+\newcommand{\figAustralia}{%
+\begin{tikzpicture}[scale=0.9]
+  \node[gnode] (WA) at (0,0.5) {\scriptsize WA};
+  \node[gnode] (NT) at (1.6,1.6) {\scriptsize NT};
+  \node[gnode] (SA) at (2.0,0) {\scriptsize SA};
+  \node[gnode] (Q) at (3.6,1.4) {\scriptsize Q};
+  \node[gnode] (NSW) at (4.0,-0.2) {\scriptsize NSW};
+  \node[gnode] (V) at (3.0,-1.5) {\scriptsize V};
+  \node[gnode] (T) at (4.6,-2.2) {\scriptsize T};
+  \draw[thick] (WA)--(NT) (WA)--(SA) (NT)--(SA) (NT)--(Q) (SA)--(Q) (SA)--(NSW) (SA)--(V) (Q)--(NSW) (NSW)--(V);
+\end{tikzpicture}}

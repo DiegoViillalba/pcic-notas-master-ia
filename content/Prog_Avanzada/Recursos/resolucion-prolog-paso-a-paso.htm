@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resolución y metas en Prolog</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#f7f7f5, #171817);
+      --surface: light-dark(#ffffff, #222422);
+      --surface-2: light-dark(#eef1ec, #2c302c);
+      --text: light-dark(#182019, #edf2ed);
+      --muted: light-dark(#5d685f, #b8c2ba);
+      --line: light-dark(#cbd2cc, #4b544d);
+      --accent: light-dark(#176b45, #77d9a5);
+      --accent-soft: light-dark(#dff2e8, #173d2a);
+      --warn: light-dark(#925d0a, #f1c36f);
+      --warn-soft: light-dark(#fff1d7, #493417);
+      --success: light-dark(#0d6940, #75dda6);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    main { max-width: 980px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 6px; font-size: clamp(1.45rem, 3vw, 2rem); font-weight: 600; }
+    p { line-height: 1.5; }
+    .lead { margin: 0 0 18px; color: var(--muted); }
+    .mode-tabs, .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .mode-tabs { margin-bottom: 16px; }
+    button {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 8px 13px;
+      background: var(--surface);
+      color: var(--text);
+      font: inherit;
+      font-weight: 500;
+    }
+    button:hover:not(:disabled) { border-color: var(--accent); }
+    button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    button[aria-pressed="true"], .primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    button:disabled { opacity: .45; }
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(240px, .8fr) minmax(320px, 1.4fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    h2 { font-size: 1.05rem; margin: 0 0 12px; font-weight: 600; }
+    .clause-list { display: grid; gap: 8px; }
+    .clause {
+      display: grid;
+      grid-template-columns: 2.2rem 1fr;
+      gap: 8px;
+      align-items: baseline;
+      padding: 9px 10px;
+      border-radius: 8px;
+      background: var(--surface-2);
+    }
+    .label { color: var(--muted); font-size: .84rem; }
+    code, .formula { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .goal { margin-top: 12px; padding: 11px; border-left: 4px solid var(--accent); background: var(--accent-soft); }
+    .stage { min-height: 345px; display: flex; flex-direction: column; }
+    .step-meta { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: .9rem; }
+    .derivation { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; margin: 20px 0; }
+    .node { min-height: 88px; display: grid; align-content: center; gap: 5px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); text-align: center; }
+    .node.active { border-color: var(--accent); background: var(--accent-soft); }
+    .operator { font-size: 1.5rem; color: var(--accent); text-align: center; }
+    .arrow { text-align: center; color: var(--accent); font-size: 1.7rem; line-height: 1; }
+    .resolvent { margin: 0 auto 18px; max-width: 480px; min-height: 88px; }
+    .empty { font-size: 1.5rem; color: var(--success); }
+    .explanation { margin: auto 0 16px; padding: 12px; border-left: 4px solid var(--warn); background: var(--warn-soft); line-height: 1.45; }
+    .controls { justify-content: space-between; border-top: 1px solid var(--line); padding-top: 14px; }
+    .button-group { display: flex; gap: 8px; }
+    .progress { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .legend { margin-top: 14px; color: var(--muted); font-size: .88rem; }
+    .dot { display: inline-block; width: .72rem; height: .72rem; border-radius: 50%; margin-right: 5px; background: var(--accent-soft); border: 1px solid var(--accent); vertical-align: -.04rem; }
+    @media (max-width: 720px) {
+      main { padding: 16px; }
+      .workspace { grid-template-columns: 1fr; }
+      .stage { min-height: auto; }
+      .derivation { grid-template-columns: 1fr; }
+      .operator { transform: rotate(90deg); }
+      .controls { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Resolución guiada por metas</h1>
+    <p class="lead">Compara una refutación general con la reducción lineal que usa Prolog sobre cláusulas de Horn.</p>
+    <div class="mode-tabs" role="group" aria-label="Tipo de resolución">
+      <button id="general-tab" type="button" aria-pressed="true">Resolución general</button>
+      <button id="sld-tab" type="button" aria-pressed="false">Prolog / SLD</button>
+    </div>
+    <section class="workspace">
+      <aside class="panel" aria-labelledby="knowledge-title">
+        <h2 id="knowledge-title">Cláusulas disponibles</h2>
+        <div id="clauses" class="clause-list"></div>
+        <div id="goal" class="goal"></div>
+        <p class="legend"><span class="dot"></span>El color señala el par usado en el paso actual.</p>
+      </aside>
+      <section class="panel stage" aria-labelledby="step-title">
+        <div class="step-meta">
+          <span id="mode-name"></span>
+          <span id="step-count"></span>
+        </div>
+        <h2 id="step-title">Paso de resolución</h2>
+        <div class="derivation" aria-live="polite">
+          <div id="left-node" class="node active"></div>
+          <div class="operator" aria-hidden="true">⊕</div>
+          <div id="right-node" class="node active"></div>
+        </div>
+        <div class="arrow" aria-hidden="true">↓</div>
+        <div id="result-node" class="node resolvent"></div>
+        <div id="explanation" class="explanation"></div>
+        <div class="controls">
+          <span id="progress" class="progress"></span>
+          <div class="button-group">
+            <button id="prev" type="button">Anterior</button>
+            <button id="next" class="primary" type="button">Siguiente</button>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+  <script>
+    const modes = {
+      general: {
+        name: "Refutación de S ∪ {¬R(X)}",
+        clauses: [
+          ["C₁", "R(X) ∨ S(X)"],
+          ["C₂", "¬S(X) ∨ T(X)"],
+          ["C₃", "¬T(X) ∨ R(X)"]
+        ],
+        goal: "Negación de la conclusión: ¬R(X)",
+        steps: [
+          { left: "¬R(X)", right: "¬T(X) ∨ R(X)", result: "¬T(X)", text: "Se cancelan R(X) y ¬R(X). El resolvente conserva ¬T(X)." },
+          { left: "¬T(X)", right: "¬S(X) ∨ T(X)", result: "¬S(X)", text: "Se cancelan T(X) y ¬T(X). El resolvente exige ahora ¬S(X)." },
+          { left: "¬S(X)", right: "R(X) ∨ S(X)", result: "R(X)", text: "Se cancelan S(X) y ¬S(X). La cadena obliga a R(X)." },
+          { left: "R(X)", right: "¬R(X)", result: "□", text: "La cláusula vacía es una contradicción. Por tanto, S ⊨ R(X)." }
+        ]
+      },
+      sld: {
+        name: "Consulta Prolog: ?- r(X)",
+        clauses: [
+          ["P₁", "t(X) :- s(X)."],
+          ["P₂", "r(X) :- t(X)."],
+          ["P₃", "r(X) :- q(X)."],
+          ["P₄", "s(X)."]
+        ],
+        goal: "Meta inicial: ← R(X)",
+        steps: [
+          { left: "← R(X)", right: "R(X) ← T(X)", result: "← T(X)", text: "La cabeza R(X) satisface la meta seleccionada; se reemplaza por el cuerpo T(X)." },
+          { left: "← T(X)", right: "T(X) ← S(X)", result: "← S(X)", text: "La nueva meta T(X) se reduce al cuerpo de su regla: S(X)." },
+          { left: "← S(X)", right: "S(X) ← true", result: "□  (meta vacía)", text: "El hecho S(X) elimina la última meta. La consulta tiene éxito." }
+        ]
+      }
+    };
+    let currentMode = "general";
+    let currentStep = 0;
+    const els = {
+      generalTab: document.getElementById("general-tab"),
+      sldTab: document.getElementById("sld-tab"),
+      clauses: document.getElementById("clauses"),
+      goal: document.getElementById("goal"),
+      modeName: document.getElementById("mode-name"),
+      stepCount: document.getElementById("step-count"),
+      left: document.getElementById("left-node"),
+      right: document.getElementById("right-node"),
+      result: document.getElementById("result-node"),
+      explanation: document.getElementById("explanation"),
+      progress: document.getElementById("progress"),
+      prev: document.getElementById("prev"),
+      next: document.getElementById("next")
+    };
+    function formulaNode(title, formula) {
+      return "<span class=\"label\">" + title + "</span><span class=\"formula\">" + formula + "</span>";
+    }
+    function render() {
+      const mode = modes[currentMode];
+      const step = mode.steps[currentStep];
+      els.clauses.innerHTML = mode.clauses.map(function (item) {
+        return "<div class=\"clause\"><span class=\"label\">" + item[0] + "</span><code>" + item[1] + "</code></div>";
+      }).join("");
+      els.goal.innerHTML = "<span class=\"label\">Objetivo</span><br><span class=\"formula\">" + mode.goal + "</span>";
+      els.modeName.textContent = mode.name;
+      els.stepCount.textContent = "Paso " + (currentStep + 1) + " de " + mode.steps.length;
+      els.left.innerHTML = formulaNode("Cláusula o meta", step.left);
+      els.right.innerHTML = formulaNode("Regla elegida", step.right);
+      els.result.innerHTML = formulaNode("Resultado", step.result);
+      els.result.classList.toggle("empty", currentStep === mode.steps.length - 1);
+      els.explanation.textContent = step.text;
+      els.progress.textContent = (currentStep + 1) + " / " + mode.steps.length;
+      els.prev.disabled = currentStep === 0;
+      els.next.disabled = currentStep === mode.steps.length - 1;
+      els.generalTab.setAttribute("aria-pressed", String(currentMode === "general"));
+      els.sldTab.setAttribute("aria-pressed", String(currentMode === "sld"));
+    }
+    function switchMode(mode) {
+      currentMode = mode;
+      currentStep = 0;
+      render();
+    }
+    els.generalTab.addEventListener("click", function () { switchMode("general"); });
+    els.sldTab.addEventListener("click", function () { switchMode("sld"); });
+    els.prev.addEventListener("click", function () { if (currentStep > 0) { currentStep -= 1; render(); } });
+    els.next.addEventListener("click", function () {
+      if (currentStep < modes[currentMode].steps.length - 1) { currentStep += 1; render(); }
+    });
+    render();
+  </script>
+</body>
+</html>

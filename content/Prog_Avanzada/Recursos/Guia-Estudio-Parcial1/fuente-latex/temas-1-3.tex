@@ -1,0 +1,394 @@
+% =====================================================================
+\section{Fundamentos y técnicas de programación}
+% =====================================================================
+
+\begin{prob}
+¿Qué significa que un programa sea \emph{correcto}? Explica por qué ``correcto'' y ``eficiente'' no son sinónimos y menciona tres criterios con los que suele juzgarse un programa.
+\end{prob}
+\begin{sol}
+Un programa es \textbf{correcto respecto de una especificación} (precondición $P$ y postcondición $Q$) si, para toda entrada que satisface $P$, produce una salida que satisface $Q$ (corrección parcial) y además siempre termina (corrección total). La corrección es \emph{relativa} a la especificación: no existe ``correcto en abstracto''.
+
+La eficiencia mide \emph{cuántos recursos} usa el programa (tiempo, memoria). Un programa puede ser correcto y lentísimo (p.\,ej.\ ordenar probando todas las permutaciones) o rápido e incorrecto.
+
+Criterios (preguntas del ``tour'' del curso): ¿está bien escrito y es legible?, ¿es óptimo en \textbf{tiempo} y \textbf{memoria}?, ¿usa eficientemente el lenguaje?, ¿el algoritmo es eficiente?, ¿se puede \textbf{demostrar} correcto?
+\end{sol}
+
+\begin{prob}
+Define \emph{algoritmo} y \emph{programa}. ¿Qué expresa la fórmula de Niklaus Wirth?
+\end{prob}
+\begin{sol}
+\textbf{Algoritmo:} método de solución con un número finito de pasos bien definidos; puede recibir datos, produce al menos un resultado y termina en tiempo finito. \textbf{Programa:} un algoritmo expresado en un lenguaje de programación (código fuente sintácticamente válido) para que una computadora lo ejecute.
+
+Wirth: \emph{Algoritmos $+$ Estructuras de datos $=$ Programas}. Resolver un problema no es solo describir pasos: también hay que decidir cómo representar y organizar la información sobre la que operan.
+\end{sol}
+
+\begin{prob}
+Sea $G=(V,T,S,P)$ con $T=\{a,b\}$, $N=\{S\}$ y producciones $S\to aSb\mid ab$.
+\begin{enumerate}[label=(\alph*)]
+\item Explica qué es cada componente de $G$.
+\item Deriva la cadena $aaabbb$. ¿Cuál es $L(G)$?
+\item ¿De qué tipo es $G$ en la jerarquía de Chomsky? ¿Y la gramática $S\to aS\mid b$?
+\end{enumerate}
+\end{prob}
+\begin{sol}
+(a) $V$: vocabulario finito; $T\subseteq V$: terminales; $N=V\setminus T$: no terminales; $S\in N$: símbolo inicial; $P$: reglas de producción.
+
+(b) $S\Rightarrow aSb\Rightarrow aaSbb\Rightarrow aaabbb$. \quad $L(G)=\{a^nb^n\mid n\ge1\}$.
+
+(c) Cada producción tiene un único no terminal a la izquierda: \textbf{tipo 2, libre de contexto}. No es regular (tipo 3): $a^nb^n$ exige ``contar'', cosa que un autómata finito no puede. La gramática $S\to aS\mid b$ tiene producciones $A\to aB$ o $A\to a$: \textbf{tipo 3, regular}; genera $L=\{a^nb\mid n\ge0\}$.
+
+Tabla: tipo 0 irrestricta, tipo 1 sensible al contexto, tipo 2 libre de contexto, tipo 3 regular. La sintaxis de casi todos los lenguajes de programación es libre de contexto; comprobaciones como ``variable declarada'' o ``tipos compatibles'' requieren análisis adicional.
+\end{sol}
+
+\begin{prob}
+Clasifica por paradigma (imperativo / declarativo funcional / declarativo lógico) y por forma de ejecución típica: C, Pascal, Java, Haskell, Lisp, Prolog, Python. ¿Por qué la clasificación compilado/interpretado no es absoluta?
+\end{prob}
+\begin{sol}
+\begin{tabular}{@{}lll@{}}
+\toprule Lenguaje & Paradigma & Ejecución típica\\\midrule
+C, Pascal & imperativo (estructurado) & compilado\\
+Java & imperativo, orientado a objetos & compilado a bytecode + JVM (interpreta/JIT)\\
+Python & imperativo / OO (multiparadigma) & interpretado\\
+Haskell & declarativo funcional & compilado (GHC) o interpretado (GHCi)\\
+Lisp & declarativo funcional & interpretado o compilado\\
+Prolog & declarativo lógico & interpretado (SWI) o compilado (GNU Prolog)\\\bottomrule
+\end{tabular}
+
+Imperativo: describe \emph{cómo} cambiar el estado. Declarativo: describe \emph{qué} relación o resultado se quiere. La forma de ejecución depende de la \emph{implementación}, no del lenguaje: un mismo lenguaje puede tener compilador, intérprete y JIT.
+\end{sol}
+
+\begin{prob}
+Enuncia el teorema de Böhm--Jacopini y da un ejemplo en pseudocódigo de cada estructura.
+\end{prob}
+\begin{sol}
+Todo algoritmo (programa con un punto de entrada y uno de salida) puede expresarse combinando solo tres estructuras de control:
+\begin{enumerate}
+\item \textbf{Secuencia:} \texttt{x := 1; y := x + 2}.
+\item \textbf{Selección:} \texttt{if x > 0 then y := x else y := -x}.
+\item \textbf{Iteración:} \texttt{while i < n do i := i + 1}.
+\end{enumerate}
+Es la base de la programación estructurada (sin \texttt{goto}). El teorema no garantiza legibilidad: los nombres, la modularidad y la organización siguen importando.
+\end{sol}
+
+\begin{prob}[\examen]
+¿Qué métricas de módulos existen para medir su eficiencia (y calidad)?
+\end{prob}
+\begin{sol}
+\textbf{Métricas de diseño modular vistas en clase:}
+\begin{itemize}
+\item \textbf{Cohesión:} medida de qué tan relacionadas están las responsabilidades \emph{internas} de un módulo. Se busca \textbf{alta} cohesión (el módulo hace una sola cosa bien definida), lo que facilita nombrarlo, entenderlo, probarlo y reutilizarlo.
+\item \textbf{Acoplamiento:} medida de la \emph{dependencia} de un módulo respecto de otros. Se busca \textbf{bajo} acoplamiento, para poder cambiar un módulo sin afectar a los demás.
+\end{itemize}
+Objetivo de diseño: \textbf{alta cohesión y bajo acoplamiento}.
+
+\textbf{Métricas de eficiencia del módulo:}
+\begin{itemize}
+\item \textbf{Tiempo de ejecución} / complejidad temporal (p.\,ej.\ $O(n\log n)$).
+\item \textbf{Uso de memoria} / complejidad espacial.
+\end{itemize}
+\textbf{Métrica de corrección:} si el módulo es correcto (corrección parcial) y si termina (corrección total).
+
+\emph{Complemento (útil si piden ejemplos, no desarrollado en clase):} tipos de cohesión de Yourdon--Constantine (funcional, secuencial, comunicacional, procedimental, temporal, lógica, coincidental; de mejor a peor) y de acoplamiento (de datos, por estampado, de control, externo, común, de contenido; de mejor a peor); complejidad ciclomática de McCabe $V(G)=E-N+2$; líneas de código; \emph{fan-in}/\emph{fan-out}.
+\end{sol}
+
+\begin{prob}
+Las diapositivas advierten que ``alta cohesión $\Rightarrow$ alto acoplamiento'' no es la meta. Explica la idea y describe cómo MVC reparte responsabilidades entre módulos.
+\end{prob}
+\begin{sol}
+Dividir un sistema en módulos muy cohesivos obliga a que se comuniquen, lo que \emph{podría} aumentar el acoplamiento. La meta es lograr alta cohesión \emph{sin} dependencias innecesarias: módulos que hablan mediante interfaces pequeñas y bien definidas.
+
+\textbf{MVC:} \emph{Controlador} recibe la solicitud y coordina (p.\,ej.\ servlet); \emph{Modelo} contiene datos y lógica del dominio (JavaBeans/EJB, acceso a datos); \emph{Vista} presenta el resultado (JSP). Cada parte tiene una responsabilidad (alta cohesión) y la vista puede cambiar sin tocar la lógica del dominio (bajo acoplamiento).
+\end{sol}
+
+% =====================================================================
+\section{Divide y vencerás}
+% =====================================================================
+
+\begin{prob}[\examen]
+Escribe en seudocódigo el algoritmo de \emph{Divide y vencerás} para resolver un problema y explica las condiciones que debe cumplir el problema para aplicarlo.
+\end{prob}
+\begin{sol}
+Esquema del profesor:
+\begin{lstlisting}
+Funcion Divide_y_Venceras( P : Problema ): Solución
+{ Devuelve la solución del problema P }
+Inicio
+  Si P es suficientemente pequeño o simple
+    Entonces devolver( solucion_simple( P ) )
+  Si_No
+    descomponer P en k partes( P1, P2, ..., Pk );
+    Para( i = 1; i <= k; i++ )
+      Si = Divide_y_Venceras( Pi );
+    devolver( combinar( S1, S2, ..., Sk ) );
+Fin
+\end{lstlisting}
+\textbf{Condiciones:}
+\begin{enumerate}
+\item $P$ se puede descomponer en subproblemas $P_1,\dots,P_k$ \textbf{semejantes} al original y \textbf{de menor tamaño}.
+\item Existe un \textbf{caso base} que se resuelve directamente (\texttt{solucion\_simple}).
+\item Las subsoluciones se pueden \textbf{combinar} eficientemente.
+\item Cada llamada reduce una medida (p.\,ej.\ el tamaño), lo que garantiza la \textbf{terminación}.
+\end{enumerate}
+Costo: $T(n)=\sum_i T(n_i)+D(n)+C(n)$ (dividir $+$ combinar); con $a$ subproblemas de tamaño $n/b$: $T(n)=aT(n/b)+f(n)$.
+
+Ejemplos: QuickSort, búsqueda binaria, mergesort, multiplicación de enteros grandes.
+
+\emph{Ojo:} en la hoja del ``tour'' aparece \texttt{combinar(P1,...,Pk)}; lo correcto es combinar las \emph{soluciones} $S_1,\dots,S_k$.
+\end{sol}
+
+\begin{prob}
+Escribe la búsqueda binaria recursiva sobre un arreglo ordenado $A[izq..der]$. Traza la búsqueda de $X=23$ y de $X=10$ en $A=[3,8,12,17,23,31,40,52]$ (índices $1..8$). ¿Por qué las llamadas usan $m-1$ y $m+1$? ¿Cuál es su complejidad?
+\end{prob}
+\begin{sol}
+\begin{lstlisting}
+Funcion BusBin( A, X, izq, der ): entero
+Inicio
+  Si izq > der entonces devolver( 0 )        // caso vacío: no está
+  m = (izq + der) div 2
+  Si X = A[m] entonces devolver( m )          // caso base
+  Si X < A[m] entonces devolver( BusBin(A, X, izq, m-1) )
+  Si_No devolver( BusBin(A, X, m+1, der) )
+Fin
+\end{lstlisting}
+\begin{tabular}{@{}l|l@{}}
+$X=23$ & $X=10$\\\hline
+$[1,8]$, $m=4$, $A[4]=17<23\to[5,8]$ & $[1,8]$, $m=4$, $A[4]=17>10\to[1,3]$\\
+$[5,8]$, $m=6$, $A[6]=31>23\to[5,5]$ & $[1,3]$, $m=2$, $A[2]=8<10\to[3,3]$\\
+$[5,5]$, $m=5$, $A[5]=23$ \ $\Rightarrow$ devuelve 5 & $[3,3]$, $m=3$, $A[3]=12>10\to[3,2]$: vacío $\Rightarrow$ 0
+\end{tabular}
+
+Usar $m\pm1$ excluye el elemento ya comparado; así el intervalo \emph{se reduce estrictamente} en cada llamada y la recursión termina (con $m$ en lugar de $m-1$ podría repetirse el mismo intervalo indefinidamente). Es divide y vencerás con un solo subproblema y combinación trivial: $T(n)=T(n/2)+\Theta(1)=\Theta(\log n)$. Requiere arreglo \textbf{ordenado}.
+\end{sol}
+
+\begin{prob}
+Diseña con divide y vencerás una función \texttt{Maximo(A, l, r)} que devuelva el mayor elemento de $A[l..r]$. Plantea la recurrencia y resuélvela.
+\end{prob}
+\begin{sol}
+\begin{lstlisting}
+Funcion Maximo( A, l, r ): valor
+Inicio
+  Si l = r entonces devolver( A[l] )            // caso simple
+  m = (l + r) div 2                             // descomponer en 2
+  M1 = Maximo( A, l, m )
+  M2 = Maximo( A, m+1, r )
+  Si M1 >= M2 entonces devolver( M1 )           // combinar
+  Si_No devolver( M2 )
+Fin
+\end{lstlisting}
+$T(1)=\Theta(1)$, $T(n)=2T(n/2)+\Theta(1)$. Al desarrollar: $T(n)=2^kT(n/2^k)+(2^k-1)c$; con $2^k=n$ queda $T(n)=\Theta(n)$ (exactamente $n-1$ comparaciones). Terminación: $l\le m<r$, así que ambos subintervalos son estrictamente menores.
+\end{sol}
+
+\begin{prob}
+Considera el procedimiento \texttt{Sort(l, r)} de \texttt{Qsort.PAS}:
+\begin{lstlisting}
+i := l; j := r; x := a[(l+r) div 2];
+repeat
+  while a[i] < x do i := i + 1;
+  while x < a[j] do j := j - 1;
+  if i <= j then begin
+    y := a[i]; a[i] := a[j]; a[j] := y;  i := i + 1; j := j - 1;
+  end;
+until i > j;
+if l < j then Sort(l, j);
+if i < r then Sort(i, r);
+\end{lstlisting}
+Traza la primera partición para $a=[5,3,8,1,9,2,7]$ (índices $1..7$) y di qué llamadas recursivas se generan. ¿Qué enseña este ejemplo sobre el pivote? Da la complejidad en el mejor y peor caso.
+\end{prob}
+\begin{sol}
+Pivote: $x=a[(1+7)\ \mathrm{div}\ 2]=a[4]=1$.
+\begin{itemize}
+\item $i$: $a[1]=5\not<1\Rightarrow i=1$. \quad $j$: $1<7,\,1<2,\,1<9$ retrocede; $1\not<a[4]=1\Rightarrow j=4$.
+\item $i\le j$: intercambiar $a[1]\leftrightarrow a[4]$: $[1,3,8,5,9,2,7]$; $i=2$, $j=3$.
+\item $i$: $a[2]=3\not<1\Rightarrow i=2$. \quad $j$: $1<8$, $1<3$ retrocede; $a[1]=1\Rightarrow j=1$.
+\item $i=2>j=1$: no hay intercambio y termina el \texttt{repeat}.
+\end{itemize}
+Llamadas: $l<j$? $1<1$ no. $\;i<r$? $2<7$ sí $\Rightarrow$ \texttt{Sort(2,7)}. Continúa: \texttt{Sort(2,7)} con pivote 5 $\to$ $[1,3,2,5,9,8,7]$, luego \texttt{Sort(2,3)} y \texttt{Sort(5,7)}; resultado $[1,2,3,5,7,8,9]$.
+
+\textbf{Lección:} tomar el elemento \emph{central por posición} no garantiza una partición equilibrada: aquí el pivote fue el mínimo y quedaron regiones de tamaño 0 y 6. Complejidad: $T(n)=T(k)+T(n-k-1)+\Theta(n)$. Balanceado: $\Theta(n\log n)$ (caso típico/esperado). Muy desbalanceado: $T(n)=T(n-1)+\Theta(n)=\Theta(n^2)$. Memoria de pila: $O(\log n)$ típico, $O(n)$ peor caso.
+
+\emph{Invariante de la partición:} lo recorrido a la izquierda de $i$ es $\le x$ y lo recorrido a la derecha de $j$ es $\ge x$.
+\end{sol}
+
+\begin{prob}
+Multiplica $u=1234$ y $v=5678$ con el esquema de divide y vencerás de clase ($s=2$, $B=10^2$). Da la recurrencia del esquema y explica la mejora de Karatsuba.
+\end{prob}
+\begin{sol}
+$u=Bw+x$ con $w=12$, $x=34$; \ $v=By+z$ con $y=56$, $z=78$. Por distributividad
+\[uv=B^2\,wy+B\,(wz+xy)+xz.\]
+$wy=672$, $wz=936$, $xy=1904$, $xz=2652$.
+\[uv=672\cdot10^4+(936+1904)\cdot10^2+2652=6\,720\,000+284\,000+2\,652=\mathbf{7\,006\,652}.\]
+Recurrencia: 4 multiplicaciones de la mitad de dígitos $+$ sumas/desplazamientos lineales: $T(n)=4T(n/2)+\Theta(n)=\Theta(n^2)$ — no mejora al método escolar.
+
+\textbf{Karatsuba:} calcula $wy$, $xz$ y $p=(w+x)(y+z)$; entonces $wz+xy=p-wy-xz$. Solo 3 multiplicaciones: $T(n)=3T(n/2)+\Theta(n)=\Theta(n^{\log_2 3})\approx\Theta(n^{1.585})$. Aquí: $p=46\cdot134=6164$ y $6164-672-2652=2840=936+1904$. \checkmark
+\end{sol}
+
+\begin{prob}
+Escribe \emph{mergesort} siguiendo el esquema del profesor, señalando qué parte es ``descomponer'' y cuál ``combinar''. Compáralo con QuickSort: ¿dónde hace cada uno el trabajo pesado?
+\end{prob}
+\begin{sol}
+\begin{lstlisting}
+Funcion MergeSort( A, l, r )
+Inicio
+  Si l >= r entonces devolver                     // 0 o 1 elemento: ya ordenado
+  m = (l + r) div 2                               // descomponer (trivial)
+  MergeSort( A, l, m );  MergeSort( A, m+1, r )   // resolver
+  Mezclar( A, l, m, r )                           // combinar: Theta(n)
+Fin
+\end{lstlisting}
+$T(n)=2T(n/2)+\Theta(n)=\Theta(n\log n)$ \emph{siempre}, con $\Theta(n)$ de memoria auxiliar. En \textbf{mergesort} dividir es trivial y el trabajo está en \textbf{combinar} (mezclar). En \textbf{QuickSort} el trabajo está en \textbf{dividir} (partición alrededor del pivote) y combinar es trivial (las regiones ya quedan en su lugar, \emph{in-place}).
+\end{sol}
+
+\begin{prob}
+Responde brevemente: (a) ¿Todo algoritmo recursivo es divide y vencerás? (b) ¿Qué diferencia hay entre caso base y caso vacío? (c) ¿Cuál es la diferencia esencial entre divide y vencerás y backtracking?
+\end{prob}
+\begin{sol}
+(a) No. La recursión es un \emph{mecanismo de implementación}; divide y vencerás es una \emph{estrategia de diseño} (dividir en subproblemas semejantes, resolver, combinar). Ej.: la función 91 es recursiva pero no divide ni combina.
+
+(b) El caso base da una solución directa (p.\,ej.\ $A[m]=X$); el caso vacío indica que ya no hay candidatos ($izq>der$).
+
+(c) Divide y vencerás \emph{necesita todas} las subsoluciones y las combina. Backtracking explora un árbol de decisiones, \emph{abandona} ramas inviables (poda) y deshace decisiones para probar alternativas; busca una, todas o la mejor solución.
+\end{sol}
+
+% =====================================================================
+\section{Backtracking, ocho reinas y cuadros mágicos}
+% =====================================================================
+
+\begin{prob}[\examen]
+Describe el algoritmo de \emph{Backtracking} cuando se trata de buscar la \textbf{mejor} solución de un problema. Indica en qué difiere de las versiones que buscan \emph{una} y \emph{todas} las soluciones.
+\end{prob}
+\begin{sol}
+Backtracking construye la solución por \textbf{etapas} $i$; en cada una prueba las opciones disponibles, \textbf{anota} solo las \emph{aceptables} (poda), avanza a la etapa $i+1$ y, al regresar, \textbf{cancela la anotación} para probar la siguiente opción (vuelta atrás). Recorre en profundidad el árbol de soluciones parciales.
+
+Versión \emph{mejor solución} (notación de la hoja del profesor):
+\begin{lstlisting}
+Funcion Backtracking( Etapa i, solucionMejor ) devuelve: boolean
+Inicio
+  Éxito = falso;
+  IniciarOpciones( i, GrupoOpciones o );
+  Repetir
+    SeleccionarNuevaOpcion( o, Opcion n );
+    Si ( Aceptable( n ) ) entonces
+      AnotarOpcion( i, n );
+      Si SolucionCompleta( i ) entonces
+        Éxito = verdadero;
+        Si EsMejorSolucion( solucionActual, solucionMejor ) entonces
+          ApuntarSolucionActual();      // solucionMejor := solucionActual
+        finsi;
+      Sino
+        Éxito = Backtracking( i+1, solucionMejor );
+        Si Éxito = falso entonces cancelamosAnotacion( i, n ); finsi;
+      Finsi;
+    Finsi;
+  Hasta ( NoQuedanOpciones( o ) );       // NO se detiene al primer éxito
+  Retorna Éxito;
+Fin
+\end{lstlisting}
+\textbf{Diferencias:}
+\begin{itemize}
+\item \textbf{Una solución:} el ciclo termina con \texttt{Hasta (Éxito = verdadero) o NoQuedanOpciones(o)}: se detiene en la primera hoja válida.
+\item \textbf{Todas:} el ciclo es \texttt{Hasta NoQuedanOpciones(o)}; cada solución completa se guarda con \texttt{ApuntarSoluciónCompleta(i, solucionesCompletas)} y se sigue explorando.
+\item \textbf{Mejor:} también explora todo el árbol, pero en vez de guardar todas compara cada solución completa con la mejor encontrada (\texttt{EsMejorSolucion}) y conserva solo la mejor. Requiere un \textbf{criterio de calidad}. Si además se podan ramas cuya cota no puede superar a la mejor actual, se obtiene \emph{ramificación y acotamiento} (branch and bound).
+\end{itemize}
+\emph{Detalle fino:} para seguir explorando después de registrar una solución hay que deshacer la anotación \emph{siempre} (no solo cuando falla la llamada); en muchas implementaciones se escribe \texttt{cancelamosAnotacion(i,n)} al final de cada intento. Costo sin poda efectiva: $O(b^d)$ nodos (ramificación $b$, profundidad $d$).
+\end{sol}
+
+\begin{prob}
+Problema de las 4 reinas (una reina por fila, filas $k=0..3$, columnas $j=1..4$).
+\begin{enumerate}[label=(\alph*)]
+\item ¿Por qué colocar una reina por fila elimina la restricción de filas sin comprobarla?
+\item ¿Qué identifican $j-k$ y $j+k$? ¿Se atacan $(k,j)=(0,2)$ y $(2,4)$? ¿Y $(1,4)$ y $(3,2)$?
+\item Traza el árbol de búsqueda en profundidad (probando columnas de 1 a 4) hasta la primera solución.
+\item ¿Cuántas soluciones tiene el problema de 4 reinas? ¿Y el de 8? ¿Qué son las 12 soluciones fundamentales?
+\end{enumerate}
+\end{prob}
+\begin{sol}
+(a) Cada nivel $k$ de la recursión decide solo la columna de la fila $k$; es imposible poner dos reinas en la misma fila, así que esa restricción se cumple \emph{por construcción}. La solución se representa como $\mathit{sol}[k]=j$.
+
+(b) $j-k$ es constante en cada diagonal ``$\searrow$'' ($45^\circ$ en el código) y $j+k$ en cada diagonal ``$\swarrow$'' ($135^\circ$). $(0,2)$ y $(2,4)$: $2-0=2=4-2$ $\Rightarrow$ \textbf{se atacan}. $(1,4)$ y $(3,2)$: $4+1=5=2+3$ $\Rightarrow$ \textbf{se atacan}.
+
+(c) Notación: $F_k=j$.
+\begin{itemize}
+\item $F_0=1$. $F_1$: 1 (columna), 2 (diag.\ $j-k$: $1=1$) \texttimes; $F_1=3$ \checkmark. $F_2$: 1 col.\ \texttimes, 2 ($j+k=4$ vs.\ $(1,3)$: $4$) \texttimes, 3 col.\ \texttimes, 4 ($j-k=2$ vs.\ $(1,3)$: $2$) \texttimes\ $\Rightarrow$ \emph{retroceder}.
+\item $F_1=4$ \checkmark. $F_2=2$ \checkmark. $F_3$: 1,2,4 columnas ocupadas, 3 ($j-k=0$ vs.\ $(2,2)$) \texttimes\ $\Rightarrow$ retroceder. $F_2=3$ ($j-k=1$ vs.\ $(0,1)$) \texttimes; 4 col.\ \texttimes\ $\Rightarrow$ retroceder hasta $F_0$.
+\item $F_0=2$. $F_1$: 1 ($j+k=2$) \texttimes, 2 col.\ \texttimes, 3 ($j-k=2$) \texttimes, $F_1=4$ \checkmark. $F_2=1$ \checkmark. $F_3$: 1 col., 2 col., $F_3=3$ \checkmark\ ($j-k=0$, $j+k=6$ libres).
+\end{itemize}
+Primera solución: $\mathit{sol}=[2,4,1,3]$.
+
+(d) 4 reinas: \textbf{2} soluciones, $[2,4,1,3]$ y $[3,1,4,2]$ (una es reflejo de la otra). 8 reinas: \textbf{92}; agrupando las que se obtienen por rotaciones y reflexiones del tablero quedan \textbf{12 fundamentales}. El programa de clase imprime 92 porque no elimina simetrías.
+\end{sol}
+
+\begin{prob}
+En el programa \texttt{Ocho reinas.c} visto en clase:
+\begin{lstlisting}
+for (int j = 1; j <= NREINAS; j++)
+  if (!contiene(col, j) && !contiene(diag45, j - k) && !contiene(diag135, j + k)) {
+    sol[k] = j;
+    col.push_back(j); diag45.push_back(j - k); diag135.push_back(j + k);
+    reinas(k + 1, col, diag45, diag135);
+    col.pop_back(); diag45.pop_back(); diag135.pop_back();
+  }
+\end{lstlisting}
+(a) Relaciona cada línea con las operaciones del esquema de backtracking del profesor. (b) ¿Qué representa \texttt{k == NREINAS}? (c) ¿Por qué no hace falta ``borrar'' \texttt{sol[k]}?
+\end{prob}
+\begin{sol}
+(a) \texttt{for j} $=$ \texttt{IniciarOpciones}/\texttt{SeleccionarNuevaOpcion}; el \texttt{if} con \texttt{contiene} $=$ \texttt{Aceptable(n)} (poda); \texttt{sol[k]=j} y los \texttt{push\_back} $=$ \texttt{AnotarOpcion}; \texttt{reinas(k+1,...)} $=$ \texttt{Backtracking(i+1)}; los \texttt{pop\_back} $=$ \texttt{cancelamosAnotacion} (deshacer). El ciclo recorre todas las columnas: versión \emph{todas las soluciones}.
+
+(b) Que ya se colocaron las 8 reinas (filas $0..7$): \texttt{SolucionCompleta}; se imprime y se regresa.
+
+(c) \texttt{sol[k]} se sobrescribe antes de volver a imprimir una solución completa. (Los vectores se pasan por valor, así que los \texttt{pop\_back} expresan el retroceso aunque no son indispensables para el nivel llamador.)
+\end{sol}
+
+\begin{prob}[\simil]
+Mochila $0/1$: objetos con pesos $w=(2,3,4,5)$ y valores $v=(3,4,5,7)$, capacidad $7$. Se quiere el subconjunto de mayor valor.
+\begin{enumerate}[label=(\alph*)]
+\item Formúlalo como backtracking de \emph{mejor solución}: ¿qué es una etapa, una opción, \texttt{Aceptable}, \texttt{SolucionCompleta} y \texttt{EsMejorSolucion}?
+\item Encuentra la mejor solución y muestra al menos una rama podada.
+\end{enumerate}
+\end{prob}
+\begin{sol}
+(a) Etapa $i$: decidir sobre el objeto $i$ ($i=1..4$). Opciones: \{incluir, no incluir\}. \texttt{Aceptable}: el peso acumulado no excede 7 (poda por factibilidad). \texttt{SolucionCompleta}: $i=4$ (se decidió sobre todos). \texttt{EsMejorSolucion}: valor actual $>$ mejor valor guardado. Poda adicional opcional (cota): si valor actual $+$ suma de valores restantes $\le$ mejor, no vale la pena seguir.
+
+(b) Soluciones factibles relevantes: $\{1,2\}$: peso 5, valor 7; $\{1,3\}$: 6, 8; $\{1,4\}$: 7, \textbf{10}; $\{2,3\}$: 7, 9; $\{4\}$: 5, 7. Mejor: $\{1,4\}$ (pesos $2+5$) con valor \textbf{10}.\\
+Ramas podadas por factibilidad: tras incluir 1 y 2 (peso 5), incluir el 3 daría peso 9 $>7$ $\Rightarrow$ no \texttt{Aceptable}; lo mismo con el 4 (peso 10). Tras $\{1,3\}$ (peso 6), incluir el 4 da 11: podado.\\
+Poda por cota (branch and bound): cuando ya se tiene la mejor $=10$, la rama ``no incluir 1, no incluir 2, no incluir 3'' puede lograr a lo más $v_4=7<10$, así que se descarta sin explorarla.
+\end{sol}
+
+\begin{prob}
+Cuadros mágicos.
+\begin{enumerate}[label=(\alph*)]
+\item Deduce la constante mágica $M_n$ y calcula $M_3, M_4, M_5, M_6$.
+\item Construye el cuadro $3\times3$ y el $5\times5$ con el método siamés.
+\item Construye el $4\times4$ con el método de complementos.
+\item ¿Por qué el método siamés no sirve para $n=4$ ni el de complementos para $n=6$?
+\end{enumerate}
+\end{prob}
+\begin{sol}
+(a) La suma de todas las casillas es $1+\dots+n^2=\frac{n^2(n^2+1)}{2}$; hay $n$ filas con la misma suma $M_n$: $nM_n=\frac{n^2(n^2+1)}{2}\Rightarrow M_n=\frac{n(n^2+1)}{2}$. $M_3=15$, $M_4=34$, $M_5=65$, $M_6=111$.
+
+(b) Siamés: 1 en el centro de la fila superior; el siguiente va arriba-derecha (con ``envoltura'' $(f-1)\bmod n$, $(c+1)\bmod n$); si esa casilla está ocupada, se coloca \emph{debajo} de la actual.
+\[
+\begin{array}{|c|c|c|}\hline 8&1&6\\\hline 3&5&7\\\hline 4&9&2\\\hline\end{array}
+\qquad
+\begin{array}{|c|c|c|c|c|}\hline 17&24&1&8&15\\\hline 23&5&7&14&16\\\hline 4&6&13&20&22\\\hline 10&12&19&21&3\\\hline 11&18&25&2&9\\\hline\end{array}
+\]
+Todas las filas, columnas y diagonales suman 15 y 65, respectivamente.
+
+(c) Llenar $1..16$ por filas; conservar las casillas de las diagonales ($i\bmod4=j\bmod4$ o $i\bmod 4+j\bmod4=3$) y sustituir las demás por $17-x$:
+\[
+\begin{array}{|c|c|c|c|}\hline 1&2&3&4\\\hline 5&6&7&8\\\hline 9&10&11&12\\\hline 13&14&15&16\\\hline\end{array}
+\;\longrightarrow\;
+\begin{array}{|c|c|c|c|}\hline 1&15&14&4\\\hline 12&6&7&9\\\hline 8&10&11&5\\\hline 13&3&2&16\\\hline\end{array}
+\quad(\text{todas suman }34)
+\]
+
+(d) El siamés depende de que $n$ sea impar (hay columna central y el recorrido diagonal cubre todas las casillas sin conflicto); el de complementos necesita bloques $4\times4$ completos ($n\equiv0\pmod4$). $n=6$ es ``simplemente par'' y requiere otra construcción (p.\,ej.\ LUX/Strachey).
+\end{sol}
+
+\begin{prob}
+Formula la búsqueda de \emph{todos} los cuadros mágicos $3\times3$ como backtracking: estado, opciones, condición de aceptación (poda) y solución completa. ¿Por qué para $n\ge5$ es preferible la construcción por patrones si solo se quiere uno?
+\end{prob}
+\begin{sol}
+\textbf{Estado:} matriz parcialmente llena y conjunto de números usados. \textbf{Etapa:} siguiente casilla vacía (por filas). \textbf{Opciones:} números de $1..9$ no usados. \textbf{Aceptable (poda):} ninguna suma parcial de fila/columna/diagonal supera 15, y toda línea que se complete suma exactamente 15. \textbf{Solución completa:} las 9 casillas llenas (y todas las líneas suman 15). Versión \emph{todas}: registrar y seguir. Para $3\times3$ hay 8 soluciones (una fundamental con sus rotaciones y reflexiones).
+
+El espacio crece como $(n^2)!$: 880 cuadros de orden 4 y 275\,305\,224 de orden 5. Un patrón (siamés, complementos) produce \emph{uno} directamente en $\Theta(n^2)$, sin explorar árbol alguno. Enumerar y construir son problemas distintos.
+\end{sol}

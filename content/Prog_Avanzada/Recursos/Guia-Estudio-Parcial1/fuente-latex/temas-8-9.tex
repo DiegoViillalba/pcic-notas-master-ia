@@ -1,0 +1,292 @@
+% =====================================================================
+\section{Función 91 de McCarthy, inducción modificada y Ackermann}
+% =====================================================================
+
+\begin{prob}
+Con $f(x)=x-10$ si $x>100$ y $f(x)=f(f(x+11))$ si $x\le100$:
+(a) desarrolla a mano $f(99)$ y $f(95)$ y cuenta cuántas llamadas se hacen en cada caso;
+(b) desarrolla $f(89)$ mostrando solo los pasos intermedios importantes;
+(c) calcula $f(105)$ y $f(101)$.
+\end{prob}
+\begin{sol}
+(a) $f(99)=f(f(110))=f(100)=f(f(111))=f(101)=91$. Llamadas: $f(99),f(110),f(100),f(111),f(101)$: \textbf{5}.\\
+$f(95)=f(f(106))=f(96)=f(f(107))=f(97)=\dots=f(100)=f(f(111))=f(101)=91$. Se llama a $f(95),\dots,f(101)$ (7) y a $f(106),\dots,f(111)$ (6): \textbf{13} llamadas.
+
+(b) $f(89)=f(f(100))$; como $f(100)=91$ (3 llamadas), queda $f(91)=f(f(102))=f(92)=\dots=f(100)=f(101)=91$. (Total: 25 llamadas.)
+
+(c) $f(105)=95$; \ $f(101)=91$. En general $f(x)=x-10$ para $x>100$ y $f(x)=91$ para $x\le101$.
+\end{sol}
+
+\begin{prob}
+Enuncia el principio de inducción matemática modificado y úsalo para demostrar que $f(x)=91$ para todo entero $x\le100$. Explica por qué la inducción simple (``si vale en $n$ vale en $n+1$'') no basta.
+\end{prob}
+\begin{sol}
+\textbf{Principio modificado.} Sea $k$ un entero fijo. Si (1) $P(k)$ es verdadera y (2) para todo $n<k$, [$P(m)$ verdadera para todo $m$ con $n<m\le k$] implica $P(n)$, entonces $P(n)$ vale para todo $n\le k$.
+
+\textbf{Demostración} con $k=100$ y $P(x): f(x)=91$.
+
+\emph{Paso básico:} $f(100)=f(f(111))=f(101)=91$ (pues $111>100$ y $101>100$).
+
+\emph{Hipótesis:} sea $x<100$ y supongamos $f(m)=91$ para todo $m$ con $x<m\le100$.
+
+\emph{Paso inductivo:} como $x\le100$, $f(x)=f(f(x+11))$.
+\begin{itemize}
+\item \textbf{Caso a)} $x+11>100$ (es decir, $90\le x\le99$): $f(x+11)=x+1$, luego $f(x)=f(x+1)$. Como $x<x+1\le100$, por H.I.\ $f(x+1)=91$.
+\item \textbf{Caso b)} $x+11\le100$ ($x\le89$): como $x<x+11\le100$, por H.I.\ $f(x+11)=91$, luego $f(x)=f(91)$. Como $x\le89<91\le100$, por H.I.\ $f(91)=91$.
+\end{itemize}
+En ambos casos $f(x)=91$. Por el principio modificado, $f(x)=91$ para todo $x\le100$. $\blacksquare$
+
+\textbf{Por qué no basta la inducción simple:} el caso b) necesita el valor de $f$ en \emph{dos} puntos mayores que $x$ ($x+11$ y $91$), no solo en $x+1$; la hipótesis debe cubrir todo el tramo $(x,100]$. Además la recursión ``se aleja'' (el argumento sube) antes de resolverse, así que no hay un contador que baje de uno en uno.
+\end{sol}
+
+\begin{prob}[\simil]
+Sea $g(x)=x-2$ si $x>20$ y $g(x)=g(g(x+3))$ si $x\le20$. Calcula $g(20)$, $g(19)$, $g(15)$; conjetura el valor de $g(x)$ para $x\le20$ y demuéstralo con inducción modificada.
+\end{prob}
+\begin{sol}
+$g(20)=g(g(23))=g(21)=19$; \ $g(19)=g(g(22))=g(20)=19$; \ $g(15)=g(g(18))=g(19)=19$ (usando $g(18)=g(g(21))=g(19)=19$).
+\textbf{Conjetura:} $g(x)=19$ para todo $x\le20$.
+
+\textbf{Paso básico} ($k=20$): $g(20)=19$ (calculado).
+\textbf{H.I.:} para $x<20$, $g(m)=19$ para todo $m$ con $x<m\le20$.
+\textbf{Paso:} $g(x)=g(g(x+3))$.
+\begin{itemize}
+\item Caso a) $x+3>20$ ($x\in\{18,19\}$): $g(x+3)=x+1$, así $g(x)=g(x+1)$ con $x<x+1\le20$: por H.I.\ vale 19.
+\item Caso b) $x+3\le20$ ($x\le17$): $x<x+3\le20\Rightarrow g(x+3)=19$; luego $g(x)=g(19)$ y $x\le17<19\le20\Rightarrow g(19)=19$.
+\end{itemize}
+Por inducción modificada, $g(x)=19$ para todo $x\le20$. $\blacksquare$ \ (Patrón general del tipo McCarthy: techo $c$, resta $a$, suma $b>a$: valor $c+b-2a$; aquí $20+3-4=19$ y $100+11-20=91$.)
+\end{sol}
+
+\begin{prob}
+Con la definición $A(0,y)=y+1$, $A(x+1,0)=A(x,1)$, $A(x+1,y+1)=A(x,A(x+1,y))$:
+(a) calcula $A(1,2)$ y $A(2,1)$ aplicando \emph{solo} la definición;
+(b) demuestra por inducción sobre $z$ que $A(1,z)=z+2$ y $A(2,z)=2z+3$.
+\end{prob}
+\begin{sol}
+(a) $A(1,0)=A(0,1)=2$; \ $A(1,1)=A(0,A(1,0))=A(0,2)=3$; \ $A(1,2)=A(0,A(1,1))=A(0,3)=\mathbf 4$.\\
+$A(2,0)=A(1,1)=3$; \ $A(2,1)=A(1,A(2,0))=A(1,3)=A(0,A(1,2))=A(0,4)=\mathbf 5$.
+
+(b) \textbf{$A(1,z)=z+2$.} Base: $A(1,0)=A(0,1)=2$. H.I.: $A(1,n)=n+2$. Paso:
+$A(1,n+1)=A(0,A(1,n))=A(0,n+2)=n+3=(n+1)+2$. \checkmark
+
+\textbf{$A(2,z)=2z+3$.} Base: $A(2,0)=A(1,1)=3$. H.I.: $A(2,n)=2n+3$. Paso:
+$A(2,n+1)=A(1,A(2,n))=A(1,2n+3)=(2n+3)+2=2(n+1)+3$, usando el resultado anterior como lema. \checkmark
+\end{sol}
+
+\begin{prob}
+Demuestra que $A(3,z)=2^{z+3}-3$. Calcula $A(3,3)$ y $A(4,1)$. ¿Por qué el programa recursivo de Ackermann termina en \texttt{StackOverflowException} para valores pequeños como $(4,2)$?
+\end{prob}
+\begin{sol}
+Base: $A(3,0)=A(2,1)=5=2^3-3$. Paso: $A(3,n+1)=A(2,A(3,n))=2(2^{n+3}-3)+3=2^{n+4}-6+3=2^{(n+1)+3}-3$. \checkmark
+
+$A(3,3)=2^6-3=\mathbf{61}$. \ $A(4,0)=A(3,1)=13$; \ $A(4,1)=A(3,A(4,0))=A(3,13)=2^{16}-3=\mathbf{65533}$.
+En general $A(4,z)$ es una torre de $z+3$ doses menos 3; $A(4,2)=2^{65536}-3$ tiene 19\,729 dígitos.
+
+La recursión es doble y el argumento interno crece de forma no primitiva recursiva: la profundidad de la pila y el número de llamadas son astronómicos antes de llegar a un caso base; ninguna pila finita alcanza.
+\end{sol}
+
+\begin{prob}
+Usando los lemas del problema anterior, demuestra $\hoare{x=2}{w\asg A(x,y)+1}{w=2y+4}$ y $\hoare{x=1}{w\asg A(x,y)}{w=y+2}$. ¿Por qué no basta el axioma de asignación?
+\end{prob}
+\begin{sol}
+Primera: por asignación, $\sust{(w=2y+4)}{A(x,y)+1}{w}\equiv A(x,y)+1=2y+4\equiv A(x,y)=2y+3$, así $\hoare{A(x,y)=2y+3}{w\asg A(x,y)+1}{w=2y+4}$. Por el lema $A(2,z)=2z+3$: $x=2\Rightarrow A(x,y)=2y+3$. Por consecuencia:
+\[\dfrac{x=2\Rightarrow A(x,y)=2y+3\qquad\hoare{A(x,y)=2y+3}{w\asg A(x,y)+1}{w=2y+4}}{\hoare{x=2}{w\asg A(x,y)+1}{w=2y+4}}.\]
+Segunda: idéntica con $\hoare{A(x,y)=y+2}{w\asg A(x,y)}{w=y+2}$ y el lema $x=1\Rightarrow A(x,y)=y+2$.
+
+El axioma solo produce la precondición $A(x,y)=\dots$; para llegar a $x=1$ o $x=2$ hace falta un \emph{teorema} sobre $A$ (demostrado por inducción aparte) y la regla de consecuencia. Así se reutilizan lemas sin volver a desenrollar la recursión.
+\end{sol}
+
+\begin{prob}
+Compara la inducción usada para ciclos con la usada para $f$ (McCarthy) y Ackermann: dirección, hipótesis y qué se demuestra.
+\end{prob}
+\begin{sol}
+\begin{tabular}{@{}p{3cm}p{5.5cm}p{6.3cm}@{}}
+\toprule & Ciclos & McCarthy / Ackermann\\\midrule
+Dirección & sube desde $n=0$ (iteraciones) & McCarthy: baja desde un techo $k$; Ackermann: inducción anidada sobre $x$ y, dentro, sobre $y$\\
+Hipótesis & $P(n)$ para el $n$ anterior & $P(m)$ para \emph{todo} $m\in(x,k]$ (fuerte)\\
+Qué prueba & un invariante se conserva & la función devuelve cierto valor/fórmula\\
+Ejemplo & $C=DA$ en \texttt{Cuadrado} & $f(x)=91$; $A(2,z)=2z+3$\\\bottomrule
+\end{tabular}
+\end{sol}
+
+% =====================================================================
+\section{Programación lógica y Prolog}
+% =====================================================================
+
+\begin{prob}
+(a) Escribe como cláusula (disyunción de literales) y como implicación la regla \texttt{abuelo(X,Z) :- padre(X,Y), padre(Y,Z).} (b) ¿Qué es una cláusula de Horn definida? ¿Y una cláusula objetivo? Representa la consulta \texttt{?- abuelo(juan, W).}
+\end{prob}
+\begin{sol}
+(a) Implicación: $\forall X,Y,Z\;(padre(X,Y)\land padre(Y,Z)\to abuelo(X,Z))$. Cláusula: $abuelo(X,Z)\lor\neg padre(X,Y)\lor\neg padre(Y,Z)$.
+
+(b) \textbf{Horn}: a lo más un literal positivo. \textbf{Definida}: exactamente uno (hechos y reglas; la cabeza es el positivo). \textbf{Objetivo}: ningún literal positivo; la consulta es $\leftarrow abuelo(juan,W)\equiv\neg abuelo(juan,W)$. Un hecho $padre(juan,pedro)$ es $padre(juan,pedro)\leftarrow\T$.
+\end{sol}
+
+\begin{prob}
+Da el unificador más general o explica por qué no existe:
+(a) $p(X,b)$ y $p(a,Y)$; \ (b) $f(X,g(Y))$ y $f(h(Z),g(a))$; \ (c) $p(X,X)$ y $p(a,b)$; \ (d) $gusta(maria,X)$ y $gusta(Y,cine)$; \ (e) $q(f(X),X)$ y $q(Y,a)$; \ (f) $p(X)$ y $p(f(X))$.
+\end{prob}
+\begin{sol}
+(a) $\{X/a,\ Y/b\}$. \ (b) $\{X/h(Z),\ Y/a\}$. \ (c) No: $X/a$ obliga a $a=b$, constantes distintas. \ (d) $\{Y/maria,\ X/cine\}$. \ (e) $\{Y/f(a),\ X/a\}$ (tras $X/a$, $f(X)$ se vuelve $f(a)$). \ (f) No (prueba de ocurrencia): $X=f(X)$ exigiría un término infinito.
+\end{sol}
+
+\begin{prob}
+Demuestra por \textbf{refutación} con resolución:
+(a) $S=\{\neg hombre(X)\lor mortal(X),\ hombre(socrates)\}\models mortal(socrates)$.
+(b) $S=\{P(X)\lor Q(X),\ \neg Q(X)\lor R(X),\ \neg R(X)\lor P(X)\}\models P(X)$.
+\end{prob}
+\begin{sol}
+Se agrega la negación de la conclusión y se busca la cláusula vacía $\square$.
+
+(a) $C_1:\neg hombre(X)\lor mortal(X)$, $C_2: hombre(socrates)$, $C_3:\neg mortal(socrates)$.
+$C_3,C_1$ con $\theta=\{X/socrates\}$: $\neg hombre(socrates)$; con $C_2$: $\square$. Luego $S\models mortal(socrates)$.
+
+(b) $C_4:\neg P(X)$.
+$C_4,C_3\Rightarrow\neg R(X)$; \ $\neg R(X),C_2\Rightarrow\neg Q(X)$; \ $\neg Q(X),C_1\Rightarrow P(X)$; \ $P(X),C_4\Rightarrow\square$.
+$S\cup\{\neg P(X)\}$ es insatisfactible $\Rightarrow S\models P(X)$.
+\end{sol}
+
+\begin{prob}
+Dado el programa
+\begin{lstlisting}[language=Prolog]
+padre(juan, pedro).
+padre(pedro, luis).
+padre(pedro, ana).
+abuelo(X, Z) :- padre(X, Y), padre(Y, Z).
+\end{lstlisting}
+(a) Escribe la derivación SLD para \texttt{?- abuelo(juan, W).} indicando en cada paso la cláusula usada y el unificador. (b) ¿Qué responde Prolog al teclear \texttt{;}?
+\end{prob}
+\begin{sol}
+Renombramos la regla: $abuelo(X_1,Z_1)\leftarrow padre(X_1,Y_1),padre(Y_1,Z_1)$.
+\begin{enumerate}
+\item $G_0:\ \leftarrow abuelo(juan,W)$. Con la regla, $\theta_1=\{X_1/juan,\ Z_1/W\}$.
+\item $G_1:\ \leftarrow padre(juan,Y_1),\ padre(Y_1,W)$. Primera meta con el hecho $padre(juan,pedro)$: $\theta_2=\{Y_1/pedro\}$.
+\item $G_2:\ \leftarrow padre(pedro,W)$. Con $padre(pedro,luis)$: $\theta_3=\{W/luis\}$.
+\item $G_3:\ \square$. Respuesta: \texttt{W = luis}.
+\end{enumerate}
+(b) Con \texttt{;} Prolog retrocede al último punto de elección ($G_2$) y usa $padre(pedro,ana)$: \texttt{W = ana}. Con otro \texttt{;} no quedan cláusulas para $padre(pedro,W)$ ni para $padre(juan,Y_1)$: \texttt{false}.
+\end{sol}
+
+\begin{prob}
+Explica por qué el paso ``reemplazar una meta por el cuerpo de una regla'' es una instancia de la regla de resolución. ¿Qué significan las letras S, L, D?
+\end{prob}
+\begin{sol}
+La regla $A\leftarrow B_1,\dots,B_m$ es la cláusula $A\lor\neg B_1\lor\dots\lor\neg B_m$ y la meta $\leftarrow A_1,\dots,A_k,\dots,A_n$ es $\neg A_1\lor\dots\lor\neg A_k\lor\dots\lor\neg A_n$. Si $\theta=\mathrm{UMG}(A,A_k)$, los literales $A$ y $\neg A_k$ son complementarios: se eliminan y el resolvente es
+$(\neg A_1\lor\dots\lor\neg A_{k-1}\lor\neg B_1\lor\dots\lor\neg B_m\lor\neg A_{k+1}\lor\dots\lor\neg A_n)\theta$, que en notación de metas es $\leftarrow(A_1,..,A_{k-1},B_1,..,B_m,A_{k+1},..,A_n)\theta$.
+
+\textbf{S}: regla de \emph{selección} de la meta (Prolog: la de más a la izquierda). \textbf{L}: \emph{lineal} (cada resolvente se obtiene del anterior y una cláusula del programa). \textbf{D}: cláusulas \emph{definidas}. Prolog además prueba las cláusulas en orden de programa, en profundidad, con retroceso.
+\end{sol}
+
+\begin{prob}
+Dado el programa, indica si cada consulta tiene éxito, falla o produce error, y justifica:
+\begin{lstlisting}[language=Prolog]
+a.
+b.
+c :- fail.
+s :- a, \+ c.
+t :- c ; b.
+u :- a, c.
+v :- \+ a ; c.
+w :- b, ( \+ c, a ).
+x :- y.
+\end{lstlisting}
+Consultas: \texttt{?- s.} \texttt{?- t.} \texttt{?- u.} \texttt{?- v.} \texttt{?- w.} \texttt{?- x.}
+\end{prob}
+\begin{sol}
+\begin{tabular}{@{}llp{11cm}@{}}
+\texttt{s} & \checkmark & \texttt{a} es hecho; \texttt{c} no se puede demostrar (su cuerpo es \texttt{fail}), así que \texttt{\textbackslash+ c} tiene éxito.\\
+\texttt{t} & \checkmark & disyunción: \texttt{c} falla, se prueba la alternativa \texttt{b}, que es hecho.\\
+\texttt{u} & \texttimes & \texttt{a} tiene éxito pero \texttt{c} falla.\\
+\texttt{v} & \texttimes & \texttt{\textbackslash+ a} falla (porque \texttt{a} sí se demuestra) y \texttt{c} también falla.\\
+\texttt{w} & \checkmark & \texttt{b}; luego \texttt{\textbackslash+ c} tiene éxito y \texttt{a} es hecho.\\
+\texttt{x} & error & \texttt{y} no está definido: SWI-Prolog lanza \emph{Unknown procedure: y/0} (\texttt{existence\_error}); no es lo mismo que ``falso''.
+\end{tabular}
+
+Recordatorio: \texttt{\textbackslash+ G} es \emph{negación como falla}: tiene éxito si el programa \emph{no logra demostrar} \texttt{G}.
+\end{sol}
+
+\begin{prob}
+Con el programa \texttt{MariaGusta.pl}
+\begin{lstlisting}[language=Prolog]
+gusta( maria, helado ).
+gusta( maria, leer ).
+gusta( maria, cine ).
+dar( juan, beso, maria ).
+recibe( X, beso ) :- dar( juan, beso, X ).
+\end{lstlisting}
+indica la respuesta de: (a) \texttt{gusta(maria, cine).} (b) \texttt{gusta(juan, cine).} (c) \texttt{gusta(Quien, helado).} (d) \texttt{gusta(maria, Maria).} (con \texttt{;}) (e) \texttt{recibe(X, beso).} (f) \texttt{recibe ( X, beso ).}
+\end{prob}
+\begin{sol}
+(a) \texttt{true} (átomos que coinciden). \ (b) \texttt{false}. \ (c) \texttt{Quien = maria}. \
+(d) \texttt{Maria} es una \emph{variable} (mayúscula inicial), no el átomo \texttt{maria}: responde \texttt{Maria = helado ; Maria = leer ; Maria = cine}. \
+(e) Se resuelve con la regla: la meta \texttt{dar(juan,beso,X)} unifica con el hecho: \texttt{X = maria}. \
+(f) \textbf{Error de sintaxis} (\emph{operator expected}): no puede haber espacio entre el nombre del predicado y el paréntesis.
+\end{sol}
+
+\begin{prob}[\simil]
+Considera
+\begin{lstlisting}[language=Prolog]
+maximo( X, Y, X ) :- X >= Y.
+maximo( X, Y, Y ) :- X < Y.
+mayor( X, Y, X ) :- X >= Y, !.
+mayor( X, Y, Y ) :- X < Y.
+max( X, Y, Y ) :- X < Y, !.
+max( X, _, X ).
+\end{lstlisting}
+(a) ¿Qué hace el corte \texttt{!}? (b) ¿Qué es un corte ``verde'' y uno ``rojo''? Clasifica los de \texttt{mayor} y \texttt{max}. (c) ¿Qué responde \texttt{?- max(3, 5, 3).}? ¿Es correcto? Corrígelo.
+\end{prob}
+\begin{sol}
+(a) El corte tiene éxito una vez y \emph{elimina los puntos de elección} creados desde que se eligió la cláusula actual: Prolog ya no probará otras cláusulas del mismo predicado ni otras alternativas de las metas anteriores al \texttt{!} dentro del cuerpo.
+
+(b) \textbf{Verde:} solo mejora eficiencia; quitarlo no cambia las respuestas. \textbf{Rojo:} cambia el significado; quitarlo cambia las respuestas. En \texttt{mayor} es verde (las condiciones $X\ge Y$ y $X<Y$ son excluyentes; el corte evita probar una cláusula que igual fallaría). En \texttt{max} es rojo: la segunda cláusula no tiene condición y depende del corte (sin él, \texttt{max(3,5,M)} daría \texttt{M = 5 ; M = 3}).
+
+(c) \texttt{?- max(3,5,3).} La primera cláusula exige unificar el tercer argumento con $Y=5$: $3\ne5$, falla \emph{antes} de llegar al corte. La segunda, \texttt{max(X,\_,X)}, unifica con $X=3$: responde \texttt{true}. \textbf{Incorrecto} (el máximo es 5).
+Corrección: hacer la unificación de la salida \emph{después} del corte:
+\begin{lstlisting}[language=Prolog]
+max( X, Y, Z ) :- X < Y, !, Z = Y.
+max( X, _, X ).
+\end{lstlisting}
+o usar la versión \texttt{maximo} sin cortes.
+\end{sol}
+
+\begin{prob}
+Indica la respuesta de SWI-Prolog: (a) \texttt{X = 2+3.} (b) \texttt{X is 2+3.} (c) \texttt{5 is 2+3.} (d) \texttt{2+3 = 5.} (e) \texttt{2+3 =:= 5.} (f) \texttt{X is Y+1.}
+\end{prob}
+\begin{sol}
+(a) \texttt{X = 2+3} (unifica con el \emph{término} sin evaluar). (b) \texttt{X = 5} (\texttt{is} evalúa el lado derecho). (c) \texttt{true}. (d) \texttt{false} (el término \texttt{+(2,3)} no es el número 5). (e) \texttt{true} (\texttt{=:=} compara valores aritméticos). (f) Error: \emph{arguments are not sufficiently instantiated} (\texttt{Y} no tiene valor).
+\end{sol}
+
+\begin{prob}
+(a) Traza \texttt{?- factorial(3, F).} con
+\begin{lstlisting}[language=Prolog]
+factorial(0, 1) :- !.
+factorial(N, F) :- N > 0, N1 is N - 1, factorial(N1, F1), F is N * F1.
+\end{lstlisting}
+(b) Escribe \texttt{suma\_hasta(N, S)} ($S=1+2+\dots+N$) y \texttt{mcd(A, B, G)} (algoritmo de Euclides) con el mismo estilo.
+\end{prob}
+\begin{sol}
+(a) \texttt{factorial(3,F)}: $3>0$, $N1=2$, llama \texttt{factorial(2,F1)} $\to$ $N1=1$, \texttt{factorial(1,F1')} $\to$ $N1=0$, \texttt{factorial(0,F1'')}: primera cláusula, $F1''=1$ y el corte descarta la segunda. Al regresar: $F1'=1\cdot1=1$, $F1=2\cdot1=2$, $F=3\cdot2=\mathbf 6$.
+\begin{lstlisting}[language=Prolog]
+suma_hasta(0, 0) :- !.
+suma_hasta(N, S) :- N > 0, N1 is N - 1, suma_hasta(N1, S1), S is S1 + N.
+
+mcd(A, 0, A) :- !.
+mcd(A, B, G) :- B > 0, R is A mod B, mcd(B, R, G).
+\end{lstlisting}
+\texttt{?- mcd(48, 18, G).} $\to$ \texttt{mcd(18,12)} $\to$ \texttt{mcd(12,6)} $\to$ \texttt{mcd(6,0)} $\to$ \texttt{G = 6}. Mismo patrón que en clase: caso base protegido por corte y caso recursivo que reduce el problema.
+\end{sol}
+
+\begin{prob}
+Compara resolución general y resolución SLD (qué cláusulas usan, forma de la derivación, qué significa el éxito, cómo manejan alternativas). ¿Por qué el orden de las cláusulas importa en Prolog aunque lógicamente no importe?
+\end{prob}
+\begin{sol}
+\begin{tabular}{@{}p{3.3cm}p{5.8cm}p{6cm}@{}}
+\toprule & General & SLD / Prolog\\\midrule
+Cláusulas & arbitrarias & definidas $+$ una meta\\
+Elección & cualquier par de cláusulas & la meta seleccionada con una cláusula del programa\\
+Derivación & árbol/grafo amplio & lineal por rama\\
+Éxito & se deriva $\square$ & la lista de metas queda vacía\\
+Alternativas & muchas combinaciones & retroceso (backtracking)\\\bottomrule
+\end{tabular}
+
+Lógicamente el conjunto de consecuencias no cambia al reordenar. Operacionalmente Prolog elige la meta de más a la izquierda y prueba cláusulas en orden, en profundidad: un orden desafortunado puede ser lento o \emph{no terminar} (p.\,ej.\ una regla recursiva por la izquierda como \texttt{anc(X,Y) :- anc(X,Z), padre(Z,Y).} antes del caso base). Además, que una búsqueda no termine no significa que la consulta sea falsa.
+\end{sol}

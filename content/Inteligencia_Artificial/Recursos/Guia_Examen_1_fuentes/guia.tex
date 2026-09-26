@@ -1,0 +1,963 @@
+\input{preambulo}
+\input{figuras}
+\fancyhead[L]{\small\textcolor{gris}{Inteligencia Artificial 2027-I · Guía para el Examen 1}}
+\fancyhead[R]{\small\textcolor{gris}{Enunciados}}
+\fancyfoot[C]{\small\thepage}
+
+\begin{document}
+
+% ======================= PORTADA =======================
+\begin{titlepage}
+\centering
+\vspace*{1.5cm}
+{\color{azul}\rule{\linewidth}{1.2pt}}\\[0.6cm]
+{\Huge\bfseries\color{azul} Guía de estudio para el Examen 1}\\[0.3cm]
+{\Large Ejercicios teóricos de Inteligencia Artificial}\\[0.2cm]
+{\large Posgrado en Ciencias e Ingeniería de la Computación, UNAM · 2027-I}\\[0.4cm]
+{\color{azul}\rule{\linewidth}{1.2pt}}\\[1.2cm]
+
+\begin{minipage}{0.86\linewidth}
+\large
+\textbf{Cobertura:} agentes racionales; formulación de problemas; búsqueda no informada
+e informada; heurísticas (admisibilidad, consistencia, dominancia); búsqueda
+bidireccional; CSP (backtracking, revisión hacia adelante, AC-3, MRV/LCV);
+búsqueda local y metaheurísticas; búsqueda con adversarios (minimax, alfa-beta,
+funciones de evaluación, expectimax, juegos de $n$ jugadores, utilidad);
+agentes lógicos y lógica proposicional (modelos, vinculación, CNF, resolución,
+Horn, encadenamiento, DPLL); lógica de primer orden (traducción, CNF,
+skolemización, unificación, resolución, Prolog).
+
+\vspace{0.6cm}
+\textbf{Fuentes:} tareas 1, 2 y 3 del curso; diapositivas 2–12; notas de clase;
+Russell \& Norvig, \emph{Artificial Intelligence: A Modern Approach}, 4.ª ed.\ global
+(citado como \textbf{AIMA}), capítulos 2–9 y 15.
+\end{minipage}
+
+\vfill
+\begin{tabular}{ll}
+\dif{1} & Nivel 1 — conceptos y definiciones (respuesta corta)\\[2pt]
+\dif{2} & Nivel 2 — ejercicios de procedimiento (trazas, cálculos, conversiones)\\[2pt]
+\dif{3} & Nivel 3 — tipo examen: formulaciones, demostraciones y problemas largos\\
+\end{tabular}
+
+\vspace{1cm}
+{\small Las respuestas completas están en el documento complementario
+\emph{Guía para el Examen 1 — Respuestas}. Intenta cada ejercicio antes de consultarlas.}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ======================= CÓMO USAR =======================
+\section*{Cómo usar esta guía}
+\addcontentsline{toc}{section}{Cómo usar esta guía}
+
+\begin{itemize}
+  \item Los ejercicios están ordenados \textbf{de menor a mayor dificultad}: Parte A (conceptos),
+  Parte B (procedimientos), Parte C (tipo examen) y Parte D (examen simulado de 2 horas).
+  Dentro de cada parte se sigue el orden del curso.
+  \item El profesor indicó que el examen se parecerá a las \textbf{preguntas teóricas de las
+  tareas}. Por ello la Parte C reproduce ese estilo: formular un espacio de estados y acotar su
+  tamaño, demostrar admisibilidad/consistencia, formular CSP, analizar alfa-beta formalmente,
+  clasificar oraciones, resolver con resolución, traducir a LPO y unificar.
+  \item Los problemas marcados con \textbf{[AIMA …]} provienen del libro (ejemplos del texto o
+  ejercicios del sitio de ejercicios del libro); los marcados con \textbf{[Clase]} o
+  \textbf{[Tarea]} son variantes del material del curso.
+  \item Convenciones, salvo que se diga otra cosa: búsqueda en \emph{grafo} (conjunto de
+  explorados), \textbf{prueba de meta al extraer el nodo} de la frontera, empates resueltos por
+  \textbf{orden alfabético}; en alfa-beta se poda cuando $v\le\alpha$ (en MIN) o $v\ge\beta$ (en MAX).
+  \item Un ejercicio de Nivel 3 típico toma entre 10 y 20 minutos. Cronométrate.
+\end{itemize}
+
+\subsection*{Plan de estudio (viernes 25 → miércoles 30 de septiembre)}
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\linewidth}{>{\bfseries}l X r}
+\toprule
+Día & Actividades & Tiempo \\
+\midrule
+Vie 25 & Leer el formulario (sección 1). Parte A: A1–A3. Parte B: B1–B7 (agentes y búsqueda). & 2–3 h\\
+Sáb 26 & Parte A: A4–A6. Parte B: B8–B19 (CSP, búsqueda local, juegos, utilidad). & 4 h\\
+Dom 27 & Parte A: A7–A8. Parte B: B20–B32 (lógica proposicional y de primer orden). & 4 h\\
+Lun 28 & Parte C: C1–C10 (formulación, heurísticas, A*, bidireccional, CSP, búsqueda local). & 4 h\\
+Mar 29 & Parte C: C11–C20 (juegos, utilidad, lógica). Por la tarde, \textbf{Parte D cronometrada} (2 h) y corrección. & 5 h\\
+Mié 30 & Repaso ligero: formulario + los ejercicios que marcaste como difíciles. Dormir bien. & 1 h\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{nota}
+\textbf{Estrategia.} En cada ejercicio escribe primero las definiciones que vas a usar
+(por ejemplo, «$h$ es consistente si $h(n)\le c(n,a,n')+h(n')$»). En las tareas se evaluó
+el procedimiento; en el examen también. Una demostración correcta con definiciones explícitas
+vale más que un resultado sin justificación.
+\end{nota}
+
+\newpage
+% ======================= FORMULARIO =======================
+\section{Formulario de repaso}
+
+\begin{formulario}
+\textbf{Agentes.} Agente racional: para cada secuencia de percepciones elige la acción que
+maximiza el desempeño \emph{esperado}, dada la evidencia y el conocimiento previo.
+PEAS = \emph{Performance, Environment, Actuators, Sensors}. Propiedades del entorno:
+observable (total/parcial), uno/varios agentes, determinista/estocástico, episódico/secuencial,
+estático/dinámico, discreto/continuo, conocido/desconocido.
+\end{formulario}
+
+\begin{formulario}
+\textbf{Problema de búsqueda:} estado inicial, $\textsc{Acciones}(s)$, $\textsc{Resultado}(s,a)$,
+prueba de meta, costo $c(s,a,s')$. $b$ = factor de ramificación, $d$ = profundidad de la solución
+más somera, $m$ = profundidad máxima, $C^*$ = costo óptimo, $\epsilon$ = costo mínimo de acción.
+
+\smallskip
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcccc}
+\toprule
+ & BFS & UCS & DFS & IDS \\
+\midrule
+Frontera & cola FIFO & cola de prioridad ($g$) & pila LIFO & pila con límite\\
+¿Completa? & Sí$^a$ & Sí$^{a,b}$ & No (sí en finito, grafo) & Sí$^a$\\
+¿Óptima? & Sí$^c$ & Sí & No & Sí$^c$\\
+Tiempo & $O(b^d)$ & $O(b^{1+\lfloor C^*/\epsilon\rfloor})$ & $O(b^m)$ & $O(b^d)$\\
+Espacio & $O(b^d)$ & $O(b^{1+\lfloor C^*/\epsilon\rfloor})$ & $O(bm)$ & $O(bd)$\\
+\bottomrule
+\end{tabular}
+
+\raggedright\footnotesize $^a$ si $b$ es finito; $^b$ si todo costo $\ge\epsilon>0$; $^c$ si todos los costos son iguales.
+Nodos generados por IDS: $(d)b+(d-1)b^2+\dots+(1)b^d$. Bidireccional: $O(b^{d/2})$.
+\end{formulario}
+
+\begin{formulario}
+\textbf{Búsqueda informada.} Voraz: $f(n)=h(n)$. A*: $f(n)=g(n)+h(n)$. A* ponderada: $f=g+w\,h$.
+\begin{itemize}[leftmargin=1.2em]
+\item Admisible: $0\le h(n)\le h^*(n)$. \quad Consistente: $h(n)\le c(n,a,n')+h(n')$ y $h(\text{meta})=0$.
+\item Consistente $\Rightarrow$ admisible. Con $h$ consistente, $f$ no decrece a lo largo de un camino.
+\item A* en árbol + $h$ admisible $\Rightarrow$ óptimo. A* en grafo + $h$ consistente $\Rightarrow$ óptimo y sin reexpansiones.
+\item Dominancia: $h_2\ge h_1$ (ambas admisibles) $\Rightarrow$ A* con $h_2$ no expande más nodos (salvo empates).
+A* expande seguramente todo nodo con $f(n)<C^*$.
+\item $\max(h_1,\dots,h_k)$ de admisibles es admisible (y consistente si todas lo son).
+\item Factor de ramificación efectivo: $N+1=1+b^*+(b^*)^2+\dots+(b^*)^d$.
+\end{itemize}
+\end{formulario}
+
+\begin{formulario}
+\textbf{CSP} $=(X,D,C)$. Backtracking = DFS asignando una variable por nivel y verificando
+restricciones. Revisión hacia adelante: al asignar $X$, borrar de los vecinos los valores
+inconsistentes. Arco $X\to Y$ consistente: $\forall x\in D_X\ \exists y\in D_Y$ compatible.
+AC-3: si $\textsc{Revise}(X,Y)$ borra algo, reencolar $(Z,X)$ para todo vecino $Z\ne Y$;
+costo $O(cd^3)$ con $c$ arcos. MRV: variable con menos valores legales (desempate: mayor grado).
+LCV: valor que elimina menos opciones a los vecinos. CSP con estructura de árbol: $O(nd^2)$.
+\end{formulario}
+
+\begin{formulario}
+\textbf{Búsqueda local.} Hill climbing: moverse al mejor vecino; parar si ninguno mejora
+(máximos locales, mesetas, crestas). Tabú: mejor vecino \emph{no tabú} aunque empeore.
+Recocido simulado (maximizando): si $\Delta E=f(n)-f(s)>0$ aceptar; si no, aceptar con
+probabilidad $e^{\Delta E/T}$; $T\leftarrow\alpha T$. Genético: población, aptitud, selección
+(proporcional o torneo), cruza, mutación ($P_m\approx 1/L$). No free lunch: promediado sobre
+todos los problemas, ningún algoritmo supera a otro.
+\end{formulario}
+
+\begin{formulario}
+\textbf{Juegos.} $\textsc{Minimax}(s)=\textsc{Utilidad}(s)$ si es terminal; $\max_a$ en MAX; $\min_a$
+en MIN. Tiempo $O(b^m)$, espacio $O(bm)$. Alfa-beta: $\alpha$ = mejor valor garantizado para MAX
+en el camino actual, $\beta$ = mejor (menor) para MIN; con orden perfecto $O(b^{m/2})$, orden
+aleatorio $\approx O(b^{3m/4})$. Expectimax: nodos de azar $=\sum_i p_i\,V(s_i)$. $n$ jugadores:
+vectores de utilidad, cada jugador maximiza su componente. Evaluación lineal:
+$\textsc{Eval}(s)=\sum_i w_i f_i(s)$.
+
+\textbf{Utilidad.} Lotería $L=[p,A;\,1-p,B]$. Axiomas: ordenabilidad, transitividad,
+continuidad, sustituibilidad, monotonicidad (y descomponibilidad en AIMA).
+Teorema: existe $U$ con $U(A)\ge U(B)\iff A\succeq B$ y $U(L)=\sum_i p_iU(S_i)$.
+\end{formulario}
+
+\begin{formulario}
+\textbf{Lógica proposicional.} $\alpha\ent\beta$ sii $M(\alpha)\subseteq M(\beta)$
+sii $\alpha\imp\beta$ es válida sii $\alpha\wedge\neg\beta$ es insatisfacible.
+Equivalencias: $\alpha\imp\beta\equiv\neg\alpha\vee\beta$;
+$\alpha\sii\beta\equiv(\alpha\imp\beta)\wedge(\beta\imp\alpha)$;
+De Morgan; contrapositiva $\alpha\imp\beta\equiv\neg\beta\imp\neg\alpha$;
+distributividad $\alpha\vee(\beta\wedge\gamma)\equiv(\alpha\vee\beta)\wedge(\alpha\vee\gamma)$.
+
+CNF: (1) eliminar $\sii$, (2) eliminar $\imp$, (3) meter $\neg$ (De Morgan, doble negación),
+(4) distribuir $\vee$ sobre $\wedge$.
+Resolución: $\dfrac{\ell_1\vee\dots\vee\ell_k\vee p,\quad \neg p\vee m_1\vee\dots\vee m_n}{\ell_1\vee\dots\vee\ell_k\vee m_1\vee\dots\vee m_n}$
+(correcta y completa por refutación).
+Horn: a lo más un literal positivo; definida: exactamente uno. Encadenamiento
+hacia adelante/atrás: lineal en el tamaño de la KB; modus ponens es completo para Horn.
+DPLL = backtracking + terminación temprana + símbolos puros + cláusulas unitarias.
+\end{formulario}
+
+\begin{formulario}
+\textbf{Lógica de primer orden.} $\forall x\,(P(x)\imp Q(x))$ \;/\; $\exists x\,(P(x)\wedge Q(x))$.
+$\neg\forall x\,P\equiv\exists x\,\neg P$; $\neg\exists x\,P\equiv\forall x\,\neg P$.
+CNF: (1) eliminar $\sii,\imp$; (2) meter $\neg$; (3) estandarizar variables; (4) skolemizar
+($\exists y$ dentro de $\forall x_1\dots x_k$ $\Rightarrow$ $F(x_1,\dots,x_k)$; sin $\forall$ externos
+$\Rightarrow$ constante); (5) quitar $\forall$; (6) distribuir $\vee$ sobre $\wedge$.
+Unificación: $\textsc{Unify}(p,q)=\theta$ tal que $p\theta=q\theta$; MGU = el más general;
+verificación de ocurrencia: $x$ no unifica con un término que contenga a $x$.
+Resolución de primer orden: resolver $p$ y $\neg q$ con $\theta=\textsc{Unify}(p,q)$ y aplicar
+$\theta$ al resolvente. Prolog: cláusulas de Horn, resolución SLD en profundidad, de izquierda a
+derecha y de arriba hacia abajo.
+\end{formulario}
+
+\newpage
+% ======================= PARTE A =======================
+\section{Parte A — Conceptos (Nivel 1)}
+
+\begin{ejercicio}{A1 · Agentes e introducción \dif{1}}
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item Define \emph{agente racional}. ¿Racionalidad es lo mismo que omnisciencia? Da un ejemplo que
+distinga ambos conceptos.
+\item Enuncia los cuatro enfoques de la IA (pensar/actuar $\times$ humanamente/racionalmente).
+¿Cuál adopta el curso y por qué es el más conveniente en ingeniería?
+\item ¿Qué evalúa la prueba de Turing? ¿Qué pretende mostrar el argumento de la habitación
+china de Searle? Distingue IA fuerte de IA débil.
+\item Verdadero o falso, justificando en una línea \fuente{AIMA, ejercicios cap.\ 2}:
+\begin{enumerate}[label=(\alph*)]
+\item Un agente que solo percibe información parcial del estado no puede ser perfectamente racional.
+\item Existen entornos de tarea en los que ningún agente puramente reflejo se comporta racionalmente.
+\item Existe un entorno de tarea en el que todo agente es racional.
+\item La entrada del programa de agente es la misma que la entrada de la función de agente.
+\item Toda función de agente puede implementarse con alguna combinación programa/máquina.
+\item Un agente que elige sus acciones uniformemente al azar puede ser racional en algún entorno determinista.
+\item Un agente de póker perfectamente racional nunca pierde.
+\end{enumerate}
+\item ¿En qué se distingue un agente reflejo de un agente que planea? ¿Puede un agente reflejo ser racional?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A2 · Búsqueda no informada \dif{1}}
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item Enumera los componentes de un problema de búsqueda. ¿Qué es una solución? ¿Y una solución óptima?
+\item Distingue \emph{estado} de \emph{nodo}, y \emph{grafo del espacio de estados} de
+\emph{árbol de búsqueda}. ¿Por qué un grafo finito puede producir un árbol infinito?
+\item ¿Qué cambia entre DFS, BFS, UCS y A*? Responde en términos de la frontera.
+\item Verdadero o falso \fuente{AIMA, ejercicios cap.\ 3}:
+(a) BFS es un caso particular de UCS. (b) DFS es un caso particular de búsqueda primero-el-mejor.
+(c) UCS es un caso particular de A*. (d) BFS es completa aunque existan costos de acción iguales a cero.
+(e) DFS siempre expande al menos tantos nodos como A* con heurística admisible.
+\item ¿Por qué en UCS la prueba de meta debe hacerse al \emph{extraer} el nodo y no al \emph{generarlo}?
+\item ¿Por qué IDS no desperdicia mucho tiempo a pesar de regenerar los niveles superiores?
+\item Explica de dónde sale la cota $O(b^{1+\lfloor C^*/\epsilon\rfloor})$ de UCS. ¿Qué ocurre si $\epsilon\to 0$?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A3 · Heurísticas \dif{1}}
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item Define heurística admisible y consistente. ¿Cuál implica a cuál? Da un ejemplo de admisible no consistente.
+\item ¿Qué es un problema relajado? ¿De qué relajaciones del 8-puzzle salen $h_1$ (fichas fuera de
+lugar) y $h_2$ (Manhattan)?
+\item ¿Qué significa que $h_2$ domine a $h_1$? ¿Por qué conviene usar la dominante?
+\item ¿Es óptima la búsqueda voraz? ¿Es completa en búsqueda en árbol? ¿Y en grafo finito?
+\item ¿Qué algoritmo es A* con $h\equiv 0$? ¿Qué hace A* con $h=h^*$?
+\item Define el factor de ramificación efectivo $b^*$. ¿Qué valor ideal tendría?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A4 · Problemas de satisfacción de restricciones \dif{1}}
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item Define CSP. ¿Qué es una asignación consistente, completa y una solución?
+\item Da un ejemplo de restricción unaria, binaria, global (de alto orden) y suave.
+\item Diferencia entre revisión hacia adelante (\emph{forward checking}) y consistencia de arcos.
+¿Cuál detecta más fallos? ¿Cuál cuesta más?
+\item MRV, heurística de grado y LCV: ¿qué decide cada una? ¿Por qué para variables se elige
+la que «falla primero» y para valores el que «falla al último»?
+\item Sin fijar el orden de variables, el árbol de búsqueda ingenuo tiene $n!\,d^n$ hojas. Explica
+por qué y por qué la conmutatividad permite reducirlo a $d^n$.
+\item Después de ejecutar AC-3, ¿qué tres situaciones pueden presentarse?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A5 · Búsqueda local y metaheurísticas \dif{1}}
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item ¿En qué se distingue la búsqueda local de la búsqueda sistemática? ¿Por qué es incompleta?
+\item Describe los tres obstáculos de hill climbing: máximos locales, mesetas y crestas.
+\item Recocido simulado: ¿cómo se comporta con temperatura muy alta? ¿Y muy baja?
+\item Búsqueda tabú: ¿para qué sirve la lista tabú? ¿Qué pasa si es muy corta o muy larga?
+\item Enumera los elementos de un algoritmo genético. ¿Qué ocurre si $P_m$ es muy alta? ¿Y si es nula?
+\item Enuncia informalmente el teorema \emph{No free lunch}. ¿Qué consecuencia práctica tiene?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A6 · Búsqueda con adversarios y utilidad \dif{1}}
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item Define formalmente un juego. ¿Qué es un juego de suma cero? ¿Y de información perfecta?
+\item Complejidad en tiempo y espacio de minimax. ¿Por qué no se puede aplicar tal cual al ajedrez?
+\item ¿Qué representan $\alpha$ y $\beta$? ¿Por qué la poda no cambia el valor de la raíz pero sí
+puede dejar valores intermedios «incorrectos»?
+\item ¿Cómo influye el orden de los movimientos en alfa-beta? Da la complejidad con orden perfecto.
+\item ¿Qué propiedades debe tener una buena función de evaluación? ¿Qué es el efecto horizonte?
+\item ¿Cuándo usar expectimax en vez de minimax? ¿Por qué en expectimax importa la
+\emph{magnitud} de las utilidades y en minimax solo su \emph{orden}?
+\item Enuncia los axiomas de racionalidad sobre preferencias y el teorema de utilidad esperada.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A7 · Lógica proposicional \dif{1}}
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item Distingue sintaxis, semántica y teoría de pruebas.
+\item Define modelo, $KB\ent\alpha$, validez, satisfacibilidad y equivalencia lógica.
+\item Justifica: $\alpha\ent\beta$ sii $(\alpha\imp\beta)$ es válida sii $(\alpha\wedge\neg\beta)$ es insatisfacible.
+\item $\textsc{Tell}(f)$ puede responder «ya lo sabía», «no lo creo» o «aprendí algo». Expresa cada
+respuesta en términos de $M(KB)$ y $M(f)$. Haz lo mismo para $\textsc{Ask}(f)$.
+\item ¿Qué significa que un procedimiento de inferencia sea correcto (coherente) y completo?
+¿Modus ponens es completo en general? ¿Y con cláusulas de Horn?
+\item Define cláusula de Horn, cláusula definida y cláusula meta. ¿Es $A\vee B$ de Horn?
+\item ¿Por qué la resolución se usa por refutación?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A8 · Lógica de primer orden \dif{1}}
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item ¿Qué agrega la LPO a la lógica proposicional? Enumera los tipos de términos y fórmulas.
+\item ¿Por qué con $\forall$ se usa normalmente $\imp$ y con $\exists$ se usa $\wedge$? Muestra qué sale
+mal con $\forall x\,(\p{Est}(x)\wedge\p{Listo}(x))$ y con $\exists x\,(\p{Est}(x)\imp\p{Listo}(x))$.
+\item ¿Qué es la skolemización? ¿Por qué la función de Skolem depende de las variables
+universales que \emph{rodean} al existencial?
+\item ¿Qué es un unificador más general? ¿Para qué sirve la verificación de ocurrencia?
+\item ¿Qué forma restringida de resolución usa Prolog? ¿Por qué puede ciclar aun cuando la
+consulta sea consecuencia lógica del programa?
+\end{enumerate}
+\end{ejercicio}
+
+\newpage
+% ======================= PARTE B =======================
+\section{Parte B — Procedimientos (Nivel 2)}
+
+\subsection{Agentes y formulación}
+
+\begin{ejercicio}{B1 · PEAS y propiedades del entorno \dif{2}\fuente{AIMA, ejercicios cap.\ 2}}
+Para cada actividad, da la descripción PEAS y clasifica el entorno (observable, agentes,
+determinista, episódico, estático, discreto):
+(a) jugar fútbol; (b) comprar libros usados de IA por internet; (c) jugar un partido de tenis;
+(d) practicar tenis contra una pared; (e) diagnóstico médico; (f) pujar por un artículo en una subasta.
+\end{ejercicio}
+
+\begin{ejercicio}{B2 · Misioneros y caníbales \dif{2}\fuente{AIMA, ejercicios cap.\ 3}}
+Tres misioneros y tres caníbales están en una orilla de un río con un bote para una o dos
+personas. Nunca puede haber en una orilla más caníbales que misioneros si hay al menos un misionero ahí.
+\begin{enumerate}[label=(\alph*)]
+\item Formula el problema: representación del estado, estado inicial, acciones, modelo de transición,
+prueba de meta y costo.
+\item ¿Cuántos estados tiene tu representación y cuántos son legales?
+\item Encuentra una solución óptima (número de cruces). ¿Qué algoritmo garantiza la óptima?
+\item ¿Por qué la gente encuentra difícil este problema aunque el espacio sea pequeño?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{B3 · Tamaños de espacios de estados \dif{2}\fuente{AIMA §3.2, §3.6}}
+\begin{enumerate}[label=(\alph*)]
+\item ¿Cuántos estados alcanzables tiene el 8-puzzle? ¿Y el 15-puzzle? Explica el factor $1/2$.
+\item 8 reinas, formulación incremental ingenua (colocar una reina en cualquier casilla vacía): cuenta
+las secuencias posibles. Compárala con la formulación «una reina por columna, en la columna más
+a la izquierda sin atacar» (2\,057 estados).
+\item Estima cuántas partidas de gato existen (cota superior simple).
+\end{enumerate}
+\end{ejercicio}
+
+\subsection{Búsqueda no informada e informada}
+
+\begin{ejercicio}{B4 · Trazas en la gráfica $G_1$ \dif{2}\fuente{Clase / Tarea 1}}
+\begin{center}\figGUno\end{center}
+Arcos dirigidos con su costo; los valores $h$ se usan solo en B5. Convenciones: búsqueda en grafo,
+prueba de meta al extraer, empates alfabéticos. Para cada algoritmo da el \textbf{orden de expansión},
+el \textbf{camino devuelto} y su \textbf{costo}:
+(a) BFS; (b) DFS; (c) IDS (búsqueda en árbol limitada, sin repetir nodos del camino actual;
+indica cada iteración); (d) UCS, mostrando la frontera con sus valores $g$ en cada paso.
+\end{ejercicio}
+
+\begin{ejercicio}{B5 · Voraz, A* y propiedades de $h$ en $G_1$ \dif{2}\fuente{Clase}}
+En la misma gráfica $G_1$:
+\begin{enumerate}[label=(\alph*)]
+\item Calcula $h^*(n)$ para todo nodo.
+\item ¿Es $h$ admisible? ¿Es consistente? Verifica arco por arco.
+\item Ejecuta la búsqueda voraz y A*, con la frontera y los valores $f$ en cada paso. ¿Cuál es óptima?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{B6 · Rumania \dif{2}\fuente{AIMA Fig.\ 3.1 y 3.16}}
+Usa el mapa de Rumania y las distancias en línea recta a Bucarest ($h_{SLD}$):
+
+{\small
+\begin{tabular}{@{}lll@{}}
+Arad–Zerind 75 & Arad–Sibiu 140 & Arad–Timisoara 118\\
+Zerind–Oradea 71 & Oradea–Sibiu 151 & Timisoara–Lugoj 111\\
+Lugoj–Mehadia 70 & Mehadia–Drobeta 75 & Drobeta–Craiova 120\\
+Craiova–Rimnicu 146 & Craiova–Pitesti 138 & Sibiu–Fagaras 99\\
+Sibiu–Rimnicu 80 & Rimnicu–Pitesti 97 & Fagaras–Bucarest 211\\
+Pitesti–Bucarest 101 & Bucarest–Urziceni 85 & Bucarest–Giurgiu 90
+\end{tabular}
+
+\smallskip
+$h_{SLD}$: Arad 366, Bucarest 0, Craiova 160, Drobeta 242, Fagaras 176, Lugoj 244, Mehadia 241,
+Oradea 380, Pitesti 100, Rimnicu 193, Sibiu 253, Timisoara 329, Zerind 374.}
+\begin{enumerate}[label=(\alph*)]
+\item UCS de Sibiu a Bucarest: ¿por qué no se detiene cuando genera Bucarest por primera vez?
+\item A* de Lugoj a Bucarest: da la secuencia de nodos extraídos con $g$, $h$ y $f$.
+\item Búsqueda voraz de Timisoara a Bucarest: camino y costo. Compáralo con el óptimo (536).
+\item \emph{(AIMA)} Con $h_{SLD}$ como heurística, ¿qué le pasa a la búsqueda voraz \emph{en árbol} para ir de Iasi a Fagaras?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{B7 · 8-puzzle, IDS y factor efectivo \dif{2}\fuente{AIMA §3.4.4, §3.6}}
+\begin{center}
+\begin{tabular}{ccc}
+\puzzle{7}{2}{4}{5}{}{6}{8}{3}{1} & \puzzle{1}{2}{3}{4}{5}{6}{}{7}{8} & \puzzle{}{1}{2}{3}{4}{5}{6}{7}{8}\\
+Inicio 1 & Inicio 2 & Meta
+\end{tabular}
+\end{center}
+\begin{enumerate}[label=(\alph*)]
+\item Calcula $h_1$ y $h_2$ para ambos estados iniciales (la meta es la de la derecha). Para el
+inicio 1 el óptimo es 26: ¿qué tan informadas son?
+\item Para el inicio 2 calcula $h_1$, $h_2$ y el costo óptimo exacto.
+\item Con $b=10$ y $d=5$, compara el número de nodos generados por BFS y por IDS.
+\item A* encuentra una solución a profundidad 5 generando 52 nodos. Plantea la ecuación de $b^*$ y
+verifica que $b^*\approx 1.92$.
+\end{enumerate}
+\end{ejercicio}
+
+\subsection{CSP}
+
+\begin{ejercicio}{B8 · Criptoaritmética \dif{2}\fuente{AIMA Fig.\ 5.2}}
+Formula como CSP el problema $\mathrm{TWO}+\mathrm{TWO}=\mathrm{FOUR}$ (letras distintas, dígitos
+distintos, sin ceros iniciales): variables (incluye acarreos), dominios y restricciones (incluye la
+restricción global y las de columna). Luego encuentra una solución razonando con las restricciones.
+\end{ejercicio}
+
+\begin{ejercicio}{B9 · AC-3 en el mapa de Australia \dif{2}\fuente{AIMA, ejercicios cap.\ 5}}
+\begin{center}\figAustralia\end{center}
+Dominios $\{R,G,B\}$ y restricciones $\ne$ en cada arista. Con la asignación parcial
+$\{WA=G,\ V=R\}$, usa AC-3 para mostrar que la inconsistencia se detecta sin buscar.
+Escribe cada llamada a \textsc{Revise} que elimina valores. Además: ¿cuántas soluciones tiene
+el problema completo con 3 colores?
+\end{ejercicio}
+
+\begin{ejercicio}{B10 · Revisión hacia adelante en 4 reinas \dif{2}\fuente{Clase}}
+Variables $Q_1,\dots,Q_4$ (columna $i$), dominio $\{1,2,3,4\}$ (fila). Aplica backtracking con
+revisión hacia adelante, orden de variables fijo $Q_1,Q_2,Q_3,Q_4$ y valores en orden creciente.
+Muestra los dominios después de cada asignación y cada retroceso, hasta hallar la primera solución.
+\end{ejercicio}
+
+\begin{ejercicio}{B11 · Heurísticas de ordenamiento \dif{2}\fuente{AIMA §5.3.1}}
+En el mapa de Australia (3 colores):
+(a) sin asignaciones, ¿qué variable elige MRV? ¿Y MRV con desempate por grado?
+(b) con $\{WA=R,\ NT=G\}$, ¿qué variable elige MRV y por qué?
+(c) con $\{WA=R,\ NT=G\}$ y la variable $Q$, ¿qué valor recomienda LCV?
+\end{ejercicio}
+
+\subsection{Búsqueda local}
+
+\begin{ejercicio}{B12 · Hill climbing en 4 reinas \dif{2}\fuente{AIMA §4.1.1}}
+\begin{center}\figReinas{2}{1}{4}{4}\end{center}
+Formulación de estado completo: una reina por columna; un movimiento cambia de fila a una reina
+dentro de su columna (12 sucesores). $h$ = número de pares de reinas que se atacan.
+(a) Calcula $h$ del estado $(2,1,4,4)$ (fila de la reina en cada columna).
+(b) Calcula $h$ para los 12 sucesores y aplica un paso de hill climbing de máximo descenso.
+(c) Continúa hasta que el algoritmo se detenga. ¿Llega a una solución?
+\end{ejercicio}
+
+\begin{ejercicio}{B13 · Paisaje unidimensional \dif{2}\fuente{Clase, quiz X–Y–Z}}
+\begin{center}\figPaisaje\end{center}
+Se maximiza $f$; los vecinos del estado $i$ son $i\pm1$.
+(a) Aplica hill climbing desde 0, 4, 10 y 13. ¿Dónde termina cada uno? ¿Cuál es el óptimo global?
+(b) Aplica búsqueda tabú desde el estado 2, con lista tabú de los 2 últimos estados visitados,
+desempate hacia la derecha, 6 iteraciones. ¿Cuál es la mejor solución vista?
+(c) ¿Con qué probabilidad aceptaría recocido simulado pasar de 7 a 8 con $T=10$, $T=1$, $T=0.1$?
+\end{ejercicio}
+
+\begin{ejercicio}{B14 · Algoritmo genético en 8 reinas \dif{2}\fuente{AIMA Fig.\ 4.6}}
+Cada individuo es una cadena de 8 dígitos: el dígito $i$ es la fila (1 = abajo) de la reina en
+la columna $i$. Aptitud = número de pares de reinas que \emph{no} se atacan (máximo 28).
+\begin{enumerate}[label=(\alph*)]
+\item Verifica que la aptitud de \texttt{24748552} es 24 y la de \texttt{32543213} es 11.
+\item La población es \texttt{24748552} (24), \texttt{32752411} (23), \texttt{24415124} (20),
+\texttt{32543213} (11). Calcula las probabilidades de selección proporcional a la aptitud.
+\item Cruza \texttt{32752411} con \texttt{24748552} en el punto 3 y calcula la aptitud de los hijos.
+\item Con torneo de tamaño 2, ¿cuál es la probabilidad de que el peor individuo sea padre en un torneo (muestreo con reemplazo)?
+\item Con $P_m=1/8$ por gen, ¿qué probabilidad hay de que un hijo no sufra ninguna mutación?
+\end{enumerate}
+\end{ejercicio}
+
+\subsection{Juegos y utilidad}
+
+\begin{ejercicio}{B15 · Minimax y alfa-beta (árbol $T_1$) \dif{2}\fuente{Clase}}
+\begin{center}\figTUno\end{center}
+(a) Calcula el valor minimax de cada nodo y la jugada de MAX.
+(b) Aplica alfa-beta de izquierda a derecha, indicando $(\alpha,\beta)$ al entrar a cada nodo.
+¿Qué hojas no se evalúan?
+\end{ejercicio}
+
+\begin{ejercicio}{B16 · Alfa-beta y orden de movimientos \dif{2}\fuente{AIMA Fig.\ 6.2}}
+\begin{center}\figTDos\end{center}
+(a) Valor minimax y hojas podadas por alfa-beta de izquierda a derecha.
+(b) Reordena las hojas (sin cambiar a qué nodo MIN pertenecen) para maximizar la poda.
+¿Cuántas hojas se evalúan entonces? Relaciónalo con $O(b^{m/2})$.
+\end{ejercicio}
+
+\begin{ejercicio}{B17 · Expectiminimax \dif{2}\fuente{Clase}}
+\begin{center}\figExp\end{center}
+Nodos: MAX (triángulo hacia arriba), azar (círculo), MIN (triángulo hacia abajo).
+(a) Calcula el valor de cada nodo y la jugada de MAX.
+(b) ¿Qué jugaría MAX si tratara los nodos de azar como nodos MIN (minimax pesimista)?
+(c) ¿Se podría podar algún subárbol en $c_3$ si se sabe que las hojas están en $[0,20]$?
+\end{ejercicio}
+
+\begin{ejercicio}{B18 · Juego de tres jugadores \dif{2}\fuente{AIMA Fig.\ 6.4, Clase}}
+\begin{center}\figMaxN\end{center}
+Cada hoja tiene el vector $(u_1,u_2,u_3)$. Juegan 1, luego 2, luego 3; cada uno maximiza su
+componente. Propaga los vectores. ¿Qué obtiene cada jugador? ¿Por qué pueden surgir alianzas?
+\end{ejercicio}
+
+\begin{ejercicio}{B19 · Loterías y utilidad \dif{2}\fuente{AIMA §15.2–15.3, Clase}}
+\begin{enumerate}[label=(\alph*)]
+\item Con $U(x)=\sqrt{x}$ (en miles), compara $A=[0.8,\$4k;\,0.2,\$0]$ y $B=[1.0,\$3k]$. ¿Cuál es el
+equivalente cierto de $A$?
+\item Muestra que preferir $B\succ A$ y $C\succ D$ con $C=[0.2,\$4k;\,0.8,\$0]$ y $D=[0.25,\$3k;\,0.75,\$0]$
+es incompatible con la maximización de utilidad esperada (paradoja de Allais).
+\item Si $A\succ B\succ C$, ¿qué axioma garantiza que existe $p$ con $[p,A;1-p,C]\sim B$? Calcula $p$ si
+$U(A)=10$, $U(B)=4$, $U(C)=0$.
+\end{enumerate}
+\end{ejercicio}
+
+\subsection{Lógica proposicional}
+
+\begin{ejercicio}{B20 · Validez y satisfacibilidad \dif{2}\fuente{AIMA, ejercicios cap.\ 7}}
+Clasifica como válida, insatisfacible o contingente (usa tablas o equivalencias):
+\begin{multicols}{2}
+\begin{enumerate}[label=(\alph*)]
+\item $(\p{Humo}\imp\p{Fuego})\imp(\neg\p{Fuego}\imp\neg\p{Humo})$
+\item $(A\wedge\neg A)\imp B$
+\item $(A\imp B)\wedge(B\imp A)\wedge\neg(A\sii B)$
+\item $((A\vee B)\wedge(\neg A\vee C))\imp(B\vee C)$
+\item $((A\imp B)\imp A)\imp A$
+\item $(A\imp B)\imp(B\imp A)$
+\item $(A\imp(B\imp C))\sii((A\wedge B)\imp C)$
+\item $(P\imp Q)\imp(\neg P\imp\neg Q)$
+\end{enumerate}
+\end{multicols}
+\end{ejercicio}
+
+\begin{ejercicio}{B21 · ¿Vinculación correcta? \dif{2}\fuente{AIMA, ejercicios cap.\ 7}}
+Decide si cada afirmación es correcta:
+\begin{multicols}{2}
+\begin{enumerate}[label=(\alph*)]
+\item $\p{False}\ent\p{True}$
+\item $\p{True}\ent\p{False}$
+\item $(A\wedge B)\ent(A\sii B)$
+\item $A\sii B\ent A\vee B$
+\item $A\sii B\ent\neg A\vee B$
+\item $(A\wedge B)\imp C\ent(A\imp C)\vee(B\imp C)$
+\item $(C\vee(\neg A\wedge\neg B))\equiv((A\imp C)\wedge(B\imp C))$
+\item $(A\vee B)\wedge(\neg C\vee\neg D\vee E)\ent(A\vee B)$
+\item $(A\vee B)\wedge(\neg C\vee\neg D\vee E)\ent(A\vee B)\wedge(\neg D\vee E)$
+\item $(A\vee B)\wedge\neg(A\imp B)$ es satisfacible
+\item $(A\sii B)\wedge(\neg A\vee B)$ es satisfacible
+\item $(A\sii B)\sii C$ tiene el mismo número de modelos que $A\sii B$
+\end{enumerate}
+\end{multicols}
+\end{ejercicio}
+
+\begin{ejercicio}{B22 · Conteo de modelos \dif{2}\fuente{AIMA, ejercicios cap.\ 7}}
+Con el vocabulario $\{A,B,C,D\}$, ¿cuántos modelos tiene cada oración?
+(a) $B\vee C$; (b) $\neg A\vee\neg B\vee\neg C\vee\neg D$; (c) $(A\imp B)\wedge A\wedge\neg B\wedge C\wedge D$;
+(d) $(A\wedge B)\vee(B\wedge C)$.
+\end{ejercicio}
+
+\begin{ejercicio}{B23 · Mundo del Wumpus por revisión de modelos \dif{2}\fuente{AIMA §7.3, Fig.\ 7.5}}
+El agente visitó $[1,1]$ (sin brisa) y $[2,1]$ (con brisa). Considera solo los símbolos
+$P_{1,2},P_{2,2},P_{3,1}$ (pozos).
+(a) Escribe la KB relevante. (b) Enumera los modelos de la KB. (c) Decide por revisión de modelos si
+$KB\ent\neg P_{1,2}$ y si $KB\ent\neg P_{2,2}$.
+\end{ejercicio}
+
+\begin{ejercicio}{B24 · Conversión a CNF \dif{2}\fuente{AIMA §7.5.2, Clase}}
+Convierte a CNF, mostrando cada paso:
+(a) $B_{1,1}\sii(P_{1,2}\vee P_{2,1})$; (b) $(A\wedge B)\imp(C\sii D)$; (c) $\neg(P\imp(Q\wedge R))$;
+(d) $\p{Verano}\imp(\p{Nieve}\imp\p{Raro})$; (e) $(\p{Verano}\imp\p{Nieve})\imp\p{Raro}$ (diapositiva). ¿Por qué (d) y (e) no son equivalentes?
+\end{ejercicio}
+
+\begin{ejercicio}{B25 · Resolución proposicional \dif{2}\fuente{AIMA §7.5, ejercicios cap.\ 7}}
+\begin{enumerate}[label=(\alph*)]
+\item KB $=\{B_{1,1}\sii(P_{1,2}\vee P_{2,1}),\ \neg B_{1,1}\}$. Demuestra $\neg P_{1,2}$ por resolución.
+\item KB $=\{A\imp(B\vee C),\ A,\ \neg B,\ \neg C\}$ (diapositiva). Muestra que la KB es insatisfacible.
+\item «Si llueve y no llevo paraguas, me mojo. Si me mojo, me enfermo. Llovió. No me enfermé.»
+Demuestra por resolución que llevé paraguas.
+\item \emph{El unicornio} (AIMA): «Si el unicornio es mítico, es inmortal; si no es mítico, es un
+mamífero mortal. Si es inmortal o mamífero, tiene cuerno. Si tiene cuerno, es mágico.» ¿Se puede
+demostrar que es mítico? ¿Mágico? ¿Que tiene cuerno? Justifica con resolución o con un modelo.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{B26 · Encadenamiento hacia adelante y hacia atrás \dif{2}\fuente{AIMA Fig.\ 7.16}}
+KB: $P\imp Q$;\; $L\wedge M\imp P$;\; $B\wedge L\imp M$;\; $A\wedge P\imp L$;\; $A\wedge B\imp L$;\; $A$;\; $B$.
+(a) Ejecuta encadenamiento hacia adelante para la consulta $Q$ mostrando la agenda y los contadores
+de premisas. (b) Ejecuta encadenamiento hacia atrás para $Q$. ¿Qué ciclo debe evitarse?
+\end{ejercicio}
+
+\begin{ejercicio}{B27 · DPLL \dif{2}\fuente{AIMA §7.6.1, Tarea 3}}
+Aplica DPLL (orden de símbolos $A,B,C,D,E$; primero \textit{true}) a
+\[(A\vee\neg B)\wedge(\neg A\vee C\vee D)\wedge(B\vee\neg C)\wedge(\neg D\vee\neg A)\wedge(E\vee A)\wedge(E\vee\neg C)\wedge(\neg A\vee\neg B\vee\neg C).\]
+Indica en cada paso si usas símbolo puro, cláusula unitaria o ramificación. Da el modelo encontrado.
+\end{ejercicio}
+
+\subsection{Lógica de primer orden}
+
+\begin{ejercicio}{B28 · Traducción a LPO \dif{2}\fuente{AIMA, ejercicios cap.\ 8}}
+Vocabulario: $\p{Est}(x)$, $\p{Persona}(x)$, $\p{Toma}(x,c,s)$, $\p{Aprueba}(x,c,s)$, $\p{Ama}(x,y)$,
+$\p{Compra}(x,y)$, $\p{Poliza}(y)$, $\p{Cara}(y)$, $\p{Afeita}(x,y)$, $\p{Barbero}(x)$, $\p{Hombre}(x)$,
+$\p{Engaña}(x,y,t)$, $\p{Politico}(x)$, $\p{Tiempo}(t)$; constantes $\p{Griego}$, $\p{Frances}$, $\p{P2001}$.
+\begin{enumerate}[label=(\alph*)]
+\item No todos los estudiantes toman francés y griego en P2001.
+\item Solo un estudiante reprobó griego en P2001.
+\item Todo mundo ama a alguien. / Hay alguien a quien todo mundo ama. (¿Son equivalentes?)
+\item Ninguna persona compra una póliza cara.
+\item Hay un barbero que afeita a todos los hombres que no se afeitan a sí mismos.
+\item Los políticos pueden engañar a algunas personas todo el tiempo y a todas las personas algún
+tiempo, pero no a todas las personas todo el tiempo.
+\item Nadie ama a quien no se ama a sí mismo.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{B29 · CNF en primer orden \dif{2}\fuente{AIMA §9.5.1, Clase}}
+Convierte a CNF (con skolemización):
+\begin{enumerate}[label=(\alph*)]
+\item $\forall x\,[\p{Persona}(x)\imp\exists y\,\p{Madre}(y,x)]$
+\item $\exists x\,\forall y\,\p{Ama}(y,x)$
+\item $\forall x\,[(\exists y\,P(x,y))\imp Q(x)]$
+\item $\forall x\,[\forall y\,P(x,y)\imp\exists z\,Q(x,z)]$
+\item $\neg\exists x\,[\p{Est}(x)\wedge\forall y\,(\p{Curso}(y)\imp\p{Aprueba}(x,y))]$
+\item $\forall x\,[\forall y\,\p{Animal}(y)\imp\p{Ama}(x,y)]\imp[\exists y\,\p{Ama}(y,x)]$ (ejemplo de clase)
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{B30 · Unificación \dif{2}\fuente{AIMA §9.2.2, ejercicios cap.\ 9}}
+Da el MGU o explica por qué no existe ($x,y,z,u$ variables; mayúsculas constantes o funciones):
+\begin{multicols}{2}
+\begin{enumerate}[label=(\alph*)]
+\item $\p{Conoce}(\p{Juan},x)$, $\p{Conoce}(y,\p{Madre}(y))$
+\item $\p{Conoce}(\p{Juan},x)$, $\p{Conoce}(x,\p{Isabel})$
+\item $P(x,F(x))$, $P(F(y),y)$
+\item $R(x,G(x),z)$, $R(F(y),G(F(A)),y)$
+\item $\p{Ama}(x,\p{Padre}(x))$, $\p{Ama}(\p{Padre}(y),z)$
+\item $P(A,x,F(G(y)))$, $P(z,F(z),F(u))$
+\item $H(x,x)$, $H(F(y),G(z))$
+\item $Q(F(x),G(y),x)$, $Q(F(G(z)),z,A)$
+\end{enumerate}
+\end{multicols}
+En (b), ¿qué cambia si se estandarizan las variables por separado?
+\end{ejercicio}
+
+\begin{ejercicio}{B31 · Prolog \dif{2}\fuente{Tarea 3, Clase}}
+\begin{lstlisting}
+p(a). p(b). q(b). q(c).
+r(X) :- p(X), q(X).
+progenitor(juan, maria). progenitor(maria, luis). progenitor(luis, ana).
+ancestro(X, Y) :- progenitor(X, Y).
+ancestro(X, Y) :- progenitor(X, Z), ancestro(Z, Y).
+\end{lstlisting}
+(a) Traza la consulta \texttt{?- r(Z).} indicando los retrocesos. (b) ¿Qué respuestas da
+\texttt{?- ancestro(juan, W).} y en qué orden? (c) ¿Qué pasa si la segunda regla de \texttt{ancestro}
+se escribe \texttt{ancestro(X,Y) :- ancestro(X,Z), progenitor(Z,Y).} y se pide
+\texttt{?- ancestro(ana, W).}?
+\end{ejercicio}
+
+\begin{ejercicio}{B32 · Encadenamiento en LPO: el crimen del coronel West \dif{2}\fuente{AIMA §9.3}}
+«La ley dice que es un crimen que un estadounidense venda armas a naciones hostiles. El país Nono, un
+enemigo de Estados Unidos, tiene algunos misiles, y todos sus misiles se los vendió el coronel West,
+que es estadounidense.»
+(a) Escribe la KB en cláusulas definidas de primer orden (misiles son armas; un enemigo de EE.\,UU.\ es hostil).
+(b) Demuestra $\p{Criminal}(\p{West})$ por encadenamiento hacia adelante, indicando las sustituciones.
+\end{ejercicio}
+
+\newpage
+% ======================= PARTE C =======================
+\section{Parte C — Problemas tipo examen (Nivel 3)}
+
+\subsection{Búsqueda y heurísticas}
+
+\begin{ejercicio}{C1 · Formulación y cotas: robot recolector \dif{3}\fuente{estilo Tarea 1, Problema 1}}
+Un robot está en una cuadrícula $n\times n$ sin obstáculos, en la casilla $H$ (base). Hay $k$ monedas
+en casillas conocidas. El robot se mueve N, S, E, O con costo 1; al entrar a una casilla con moneda
+la recoge automáticamente. Debe recoger todas las monedas y regresar a $H$.
+\begin{enumerate}[label=(\alph*)]
+\item Formula el espacio de estados (estado, estado inicial, meta, acciones, costo) y argumenta que
+es completo: toda solución del problema original es un camino en tu espacio y viceversa.
+\item Da el número de estados, una cota del factor de ramificación y una cota superior de la
+profundidad de la solución óptima. Estima los nodos que genera BFS en árbol.
+\item Compara BFS y DFS en memoria y optimalidad para este problema.
+\item ¿Cuándo se repite un estado? Propón cómo evitar la exploración redundante sin perder la
+optimalidad.
+\item Considera $h_a(s)=\max_{c\in\text{restantes}}[d(p,c)+d(c,H)]$ (o $d(p,H)$ si no quedan
+monedas) y $h_b(s)=$ número de monedas restantes, con $d$ la distancia Manhattan. Demuestra que
+ambas son admisibles, que $h_a$ es consistente, y que ninguna domina a la otra. ¿Qué heurística usarías?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{C2 · Consistencia, monotonía y no-reexpansión \dif{3}\fuente{Tarea 1, Problema 2}}
+\begin{enumerate}[label=(\alph*)]
+\item Demuestra que toda heurística consistente con $h(\text{meta})=0$ es admisible.
+\item Demuestra que si $h$ es consistente, los valores de $f$ a lo largo de cualquier camino no decrecen.
+\item Demuestra que con $h$ consistente, A* en grafo, al extraer un nodo $n$ por primera vez, ya
+encontró un camino óptimo hacia $n$; concluye que nunca reexpande nodos y que es óptimo.
+\item Da un ejemplo de heurística admisible e inconsistente (no puedes usar $G_2$).
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{C3 · Optimalidad de A* y el papel de la consistencia \dif{3}\fuente{Clase 4}}
+\begin{center}\figGDos\end{center}
+\begin{enumerate}[label=(\alph*)]
+\item Demuestra que A* en \emph{árbol} con $h$ admisible es óptimo (argumento del ancestro en la frontera).
+\item En $G_2$: ¿es $h$ admisible? ¿consistente? Ejecuta A* en \emph{grafo} sin reapertura de
+nodos cerrados. ¿Qué costo devuelve? ¿Cuál es el óptimo?
+\item Ejecuta A* en \emph{árbol} en $G_2$. ¿Qué costo devuelve? Explica la diferencia.
+\item Propón dos correcciones distintas para que la búsqueda en grafo sea óptima.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{C4 · Combinar heurísticas \dif{3}\fuente{AIMA §3.6.2, ejercicios cap.\ 3}}
+Sean $h_1,h_2$ admisibles. Demuestra o refuta:
+(a) $\max(h_1,h_2)$ es admisible; si ambas son consistentes, también lo es;
+(b) $h_1+h_2$ es admisible;
+(c) $\lambda h_1+(1-\lambda)h_2$ con $\lambda\in[0,1]$ es admisible;
+(d) $2h_1$ es admisible;
+(e) si $h_1$ es consistente, $\min(h_1,h_2)$ es consistente.
+\end{ejercicio}
+
+\begin{ejercicio}{C5 · Heurísticas del $N$-puzzle \dif{3}\fuente{Tarea 1, Problema 2}}
+Para el 8-puzzle:
+(a) Demuestra que $h_1$ (fichas fuera de lugar) y $h_2$ (Manhattan) son admisibles, identificando
+el problema relajado cuyo costo óptimo es exactamente cada heurística.
+(b) Demuestra que $h_2$ es consistente. ¿Lo es $h_1$?
+(c) Demuestra que $h_2\ge h_1$ y explica por qué A* con $h_2$ expande a lo más los nodos que
+expande con $h_1$ (salvo empates).
+(d) Explica por qué la heurística de conflicto lineal $h_3=h_2+2\cdot lc$ sigue siendo admisible.
+\end{ejercicio}
+
+\begin{ejercicio}{C6 · A* ponderada \dif{3}\fuente{AIMA §3.5.5}}
+Sea $h$ admisible y $w\ge1$. A* ponderada ordena la frontera por $f_w(n)=g(n)+w\,h(n)$.
+Demuestra que, en búsqueda en árbol, el costo de la solución devuelta es a lo más $w\,C^*$.
+¿Qué algoritmo se obtiene con $w=0$, $w=1$ y $w\to\infty$?
+\end{ejercicio}
+
+\begin{ejercicio}{C7 · Búsqueda bidireccional \dif{3}\fuente{Tarea 1, Problema 4}}
+\begin{center}\figBidir\end{center}
+Gráfica no dirigida. Se ejecuta Dijkstra bidireccional alternando expansiones (primero hacia
+adelante desde $S$, luego hacia atrás desde $G$).
+\begin{enumerate}[label=(\alph*)]
+\item Ejecuta la versión ingenua que se detiene en cuanto un nodo ha sido \emph{expandido} en ambas
+direcciones y devuelve el camino por ese nodo. ¿Qué costo devuelve? ¿Cuál es $C^*$?
+\item Sea $\mu$ el costo de la mejor solución encontrada (actualizada cada vez que se genera un nodo
+ya alcanzado desde el otro lado). Demuestra que si $\mu\le g^F_{\min}+g^B_{\min}$ entonces $\mu=C^*$.
+Aplícalo a la gráfica.
+\item ¿Por qué la condición $\mu\le f^F_{\min}+f^B_{\min}$ con $f=g+h$ \emph{no} es válida en general
+con heurísticas admisibles?
+\item Enuncia la prioridad de MM y explica por qué ninguna de las dos búsquedas expande nodos con
+$g>C^*/2$.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{C8 · Verdadero o falso con justificación \dif{3}\fuente{AIMA, ejercicios cap.\ 3–4}}
+\begin{enumerate}[label=(\alph*)]
+\item Si una torre de ajedrez puede moverse cualquier número de casillas en línea recta, la distancia
+Manhattan es admisible para el problema de llevarla de $A$ a $B$ en el mínimo número de movimientos.
+\item A* no sirve en robótica porque los estados y acciones son continuos.
+\item Si $h$ es admisible, A* en grafo sin reapertura siempre es óptimo.
+\item IDS con costos no uniformes es óptima.
+\item Hill climbing con reinicios aleatorios es completo con probabilidad 1 (en un espacio finito).
+\item Si en 8 reinas hill climbing tiene éxito con probabilidad $p=0.14$, el número esperado de reinicios es $\approx 7$.
+\item La búsqueda en haz local con $k$ estados es equivalente a $k$ reinicios aleatorios en paralelo.
+\end{enumerate}
+\end{ejercicio}
+
+\subsection{CSP y búsqueda local}
+
+\begin{ejercicio}{C9 · Reyes en un tablero \dif{3}\fuente{variante de Tarea 2, Ejercicio 1}}
+Se quieren colocar $k$ reyes en un tablero $n\times n$ de modo que ningún par se ataque (un rey
+ataca las 8 casillas adyacentes).
+\begin{enumerate}[label=(\alph*)]
+\item Da dos formulaciones como CSP: (i) una variable por rey; (ii) una variable booleana por casilla.
+En cada una: variables, dominios, restricciones (explícitas) y número de restricciones binarias.
+\item ¿Qué formulación es preferible para backtracking con MRV? ¿Cómo rompes la simetría entre reyes en (i)?
+\item Para colocar la \emph{mayor} cantidad de reyes, define un algoritmo de búsqueda local:
+estado, $\textsc{Acciones}$, $\textsc{Resultado}$ y función objetivo. ¿Cuál es el máximo teórico?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{C10 · Límites de la consistencia y estructura \dif{3}\fuente{AIMA §5.2, §5.5}}
+\begin{enumerate}[label=(\alph*)]
+\item Da un CSP que sea arco-consistente y no tenga solución.
+\item Demuestra que AC-3 tarda $O(cd^3)$ con $c$ restricciones binarias y dominios de tamaño $d$.
+\item Explica el algoritmo para CSP con estructura de árbol y demuestra que es $O(nd^2)$.
+\item ¿Por qué un solucionador local que minimiza conflictos funciona muy bien en $n$-reinas y mal
+en Sudoku difíciles?
+\end{enumerate}
+\end{ejercicio}
+
+\subsection{Juegos}
+
+\begin{ejercicio}{C11 · Minimax contra un oponente subóptimo \dif{3}\fuente{AIMA, ejercicios cap.\ 6}}
+(a) Demuestra que, para cualquier árbol, la utilidad que obtiene MAX usando decisiones minimax contra
+un MIN subóptimo nunca es menor que la que obtiene contra un MIN óptimo.
+(b) Construye un árbol en el que MAX obtiene más que el valor minimax usando una estrategia
+\emph{no} minimax contra un MIN subóptimo (y describe ese MIN).
+\end{ejercicio}
+
+\begin{ejercicio}{C12 · Corrección de la poda alfa-beta \dif{3}\fuente{Tarea 2, Ejercicio 4}}
+Considera un camino $n_1,n_2,\dots,n_j$ desde la raíz, con $n_1$ un nodo MIN y $n_j$ un nodo MAX.
+\begin{enumerate}[label=(\alph*)]
+\item Escribe $n_1$ en función de $n_2$ y sus hermanos; luego $n_2$ en función de $n_3$, etc., y
+obtén una expresión para $n_1$ que contenga a $n_j$.
+\item Con $l_i$ (valor ya conocido de los hermanos a la izquierda de $n_i$) y $r_i$ (hermanos
+a la derecha aún no explorados), reescribe la expresión.
+\item Muestra que $n_j$ puede afectar a $n_1$ solo si $n_j<\min\{l_i : i \text{ impar}\}$ (nodos MIN
+del camino). Concluye la regla de poda.
+\item Repite para el caso en que $n_j$ es un nodo MIN.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{C13 · Transformaciones de utilidad \dif{3}\fuente{AIMA, ejercicios cap.\ 6}}
+\begin{enumerate}[label=(\alph*)]
+\item Demuestra que si se aplica a todas las hojas una transformación estrictamente creciente $g$, la
+jugada elegida por minimax no cambia.
+\item Demuestra que expectimax es invariante ante transformaciones afines positivas $g(x)=ax+b$, $a>0$.
+\item Da un árbol de expectimax en el que $g(x)=\sqrt{x}$ cambie la decisión.
+\item Si las hojas están acotadas en $[L,U]$, explica cómo podar en un nodo de azar.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{C14 · Función de evaluación en el gato \dif{3}\fuente{Tarea 2, Ejercicio 3}}
+Usa $\textsc{Eval}(s)=3X_2+X_1-(3O_2+O_1)$, donde $X_n$ ($O_n$) es el número de líneas con exactamente
+$n$ X (O) y ninguna O (X). Posición actual (juega X):
+\begin{center}\gato{O}{}{}{}{X}{}{}{}{}\end{center}
+(a) Calcula $\textsc{Eval}$ de la posición. (b) Usando la simetría, lista las jugadas distintas de X y
+calcula su $\textsc{Eval}$ (profundidad 1). (c) Para cada jugada de X, calcula el mínimo sobre las respuestas
+de O (profundidad 2) y elige la jugada minimax. (d) ¿Coinciden las decisiones a profundidad 1 y 2? ¿Por qué?
+\end{ejercicio}
+
+\subsection{Lógica}
+
+\begin{ejercicio}{C15 · Vinculación, validez y corrección de la resolución \dif{3}\fuente{AIMA §7.4–7.5}}
+\begin{enumerate}[label=(\alph*)]
+\item Demuestra que $\alpha\ent\beta$ si y solo si $\alpha\wedge\neg\beta$ es insatisfacible.
+\item Demuestra que la regla de resolución es correcta.
+\item Demuestra que si $KB\ent\alpha$ entonces $KB\wedge\beta\ent\alpha$ para cualquier $\beta$ (monotonía).
+\item Demuestra que el resolvente de dos cláusulas de Horn es una cláusula de Horn.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{C16 · Clases de cláusulas y complejidad \dif{3}\fuente{Tarea 3, 3b}}
+\begin{enumerate}[label=(\alph*)]
+\item ¿Cuántas cláusulas de exactamente 3 literales semánticamente distintas hay con $n$ símbolos?
+(Considera tautologías y literales repetidos.)
+\item Explica por qué la resolución sobre 2-CNF termina en tiempo polinomial pero la cota análoga
+no da un algoritmo polinomial para 3-CNF.
+\item Explica por qué el encadenamiento hacia adelante con cláusulas de Horn es lineal en el tamaño de la KB.
+\item ¿Se puede expresar $P\vee Q$ con cláusulas de Horn? ¿Qué se pierde en expresividad?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{C17 · Rudolph y Scrooge \dif{3}\fuente{problema clásico de resolución}}
+«Todo niño ama a Santa. Todo el que ama a Santa ama a cualquier reno. Rudolph es un reno y tiene
+la nariz roja. Todo lo que tiene la nariz roja es raro o es un payaso. Ningún reno es un payaso.
+Scrooge no ama nada que sea raro.» Demuestra por resolución que Scrooge no es un niño:
+(a) traduce a LPO; (b) convierte a CNF agregando la negación de la conclusión; (c) da la refutación
+indicando las sustituciones.
+\end{ejercicio}
+
+\begin{ejercicio}{C18 · ¿Mató la curiosidad al gato? \dif{3}\fuente{AIMA §9.5.3, Clase}}
+A. Todo el que ama a todos los animales es amado por alguien. B. Todo el que mata a un animal no es
+amado por nadie. C. Jack ama a todos los animales. D. Jack o Curiosidad mató al gato, que se llama Tuna.
+Pregunta: ¿mató Curiosidad al gato? (Añade: los gatos son animales.)
+Traduce, convierte a CNF y demuestra $\p{Mata}(\p{Curiosidad},\p{Tuna})$ por resolución.
+\end{ejercicio}
+
+\begin{ejercicio}{C19 · Cuantificadores y la cabeza de un animal \dif{3}\fuente{AIMA, ejercicios cap.\ 8–9}}
+\begin{enumerate}[label=(\alph*)]
+\item Demuestra que $\exists y\,\forall x\,\p{Ama}(x,y)\ent\forall x\,\exists y\,\p{Ama}(x,y)$ y
+construye un modelo que muestre que la vinculación inversa no se cumple.
+\item Variante de la Tarea 3: «Los perros son animales» implica «la cola de un perro es la cola de un
+animal». Traduce con $\p{ColaDe}(t,x)$, $\p{Perro}(x)$, $\p{Animal}(x)$, niega la conclusión, pasa a CNF y
+demuestra por resolución.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{C20 · Preguntas de ensayo breve \dif{3}\fuente{Clase 1, AIMA cap.\ 1–2}}
+(Responde en 5–8 líneas cada una.)
+(a) ¿Por qué el curso adopta el enfoque de agente racional y no el de la prueba de Turing?
+(b) Expón el argumento de la habitación china y la «respuesta del sistema».
+(c) ¿Por qué el problema de la parada impone límites a lo que un agente puede decidir?
+(d) Compara búsqueda sistemática, CSP y búsqueda local: ¿cuándo usarías cada una?
+\end{ejercicio}
+
+\newpage
+% ======================= PARTE D =======================
+\section{Parte D — Examen simulado (2 horas, 100 puntos)}
+
+\begin{nota}
+Resuélvelo sin notas y cronometrado. Distribución sugerida: 15 min por pregunta y 15 min de revisión.
+Convenciones generales de la guía (empates alfabéticos, prueba de meta al extraer, poda con $\le$/$\ge$).
+\end{nota}
+
+\begin{ejercicio}{D1 · Formulación \ptst{12}}
+Tienes una jarra de 4 litros y una de 3 litros, sin marcas, y una llave de agua. Quieres tener
+exactamente 2 litros en alguna jarra.
+(a) Formula el problema (estado, inicial, meta, acciones con precondiciones, costo). \pts{5}
+(b) ¿Cuántos estados hay en tu representación y cuántos son alcanzables desde el inicial? \pts{3}
+(c) Da una solución óptima en número de acciones y justifica su optimalidad. \pts{4}
+\end{ejercicio}
+
+\begin{ejercicio}{D2 · A* y consistencia \ptst{15}}
+\begin{center}\figGTres\end{center}
+(a) Calcula $h^*$ y decide si $h$ es admisible y si es consistente. \pts{4}
+(b) Ejecuta A* en grafo sin reapertura, desempate alfabético. Da la tabla de extracciones y el costo. \pts{5}
+(c) Repite con desempate que favorece a $B$. ¿Qué ocurre y por qué? \pts{3}
+(d) Demuestra que si $h_1,h_2$ son consistentes, $\max(h_1,h_2)$ es consistente. \pts{3}
+\end{ejercicio}
+
+\begin{ejercicio}{D3 · CSP \ptst{13}}
+Variables $A,B,C,D$ con dominio $\{1,2,3\}$ y restricciones $A<B$, $B<C$, $D\ne C$, $D>A$.
+(a) Dibuja el grafo de restricciones. \pts{2}
+(b) Ejecuta AC-3 y da los dominios finales. ¿Hace falta buscar? \pts{6}
+(c) Sin AC-3, ¿qué variable elegiría MRV al inicio? ¿Y con desempate por grado? \pts{2}
+(d) Explica la diferencia entre revisión hacia adelante y AC-3 con este ejemplo, tras asignar $A=1$. \pts{3}
+\end{ejercicio}
+
+\begin{ejercicio}{D4 · Alfa-beta \ptst{15}}
+\begin{center}\figTTres\end{center}
+(a) Calcula el valor minimax de la raíz. \pts{4}
+(b) Aplica alfa-beta de izquierda a derecha. Indica $(\alpha,\beta)$ en cada nodo interno y las hojas no evaluadas. \pts{8}
+(c) ¿Cuántas hojas se evaluarían con orden perfecto en un árbol uniforme con $b=2$ y $m=4$? \pts{3}
+\end{ejercicio}
+
+\begin{ejercicio}{D5 · Búsqueda local \ptst{10}}
+(a) En recocido simulado (maximizando), el estado actual vale 10 y el vecino 7. Calcula la probabilidad
+de aceptación con $T=5$ y $T=1$. ¿Qué pasa cuando $T\to 0$? \pts{4}
+(b) En OneMax ($L=8$, aptitud = número de unos), cruza \texttt{11010010} y \texttt{01101101} en el punto
+3, y da la aptitud de los hijos. Con $P_m=1/8$, ¿probabilidad de que un hijo no mute? \pts{4}
+(c) ¿Por qué la búsqueda tabú puede escapar de un máximo local y hill climbing no? \pts{2}
+\end{ejercicio}
+
+\begin{ejercicio}{D6 · Lógica proposicional \ptst{15}}
+(a) Demuestra que $((P\imp Q)\wedge(R\imp S)\wedge(P\vee R))\imp(Q\vee S)$ es válida. \pts{4}
+(b) Demuestra por resolución que $\{P\imp Q,\ R\imp S,\ P\vee R\}\ent Q\vee S$. \pts{6}
+(c) ¿Puede escribirse esta KB solo con cláusulas de Horn? ¿Qué implica para el uso de modus ponens? \pts{3}
+(d) ¿Cuántos modelos tiene $P\vee R$ sobre $\{P,Q,R,S\}$? \pts{2}
+\end{ejercicio}
+
+\begin{ejercicio}{D7 · Lógica de primer orden \ptst{20}}
+«Todo el que sabe leer es letrado. Los delfines no son letrados. Algunos delfines son inteligentes.»
+Conclusión: «Algunos que son inteligentes no saben leer».
+(a) Traduce premisas y conclusión a LPO. \pts{5}
+(b) Niega la conclusión y convierte todo a CNF (indica la skolemización). \pts{5}
+(c) Demuestra la conclusión por resolución, con sustituciones. \pts{6}
+(d) Da el MGU de $\p{Conoce}(x,\p{Madre}(x))$ y $\p{Conoce}(\p{Padre}(y),z)$, y explica por qué
+$P(x,x)$ y $P(F(y),y)$ no unifican. \pts{4}
+\end{ejercicio}
+
+\vfill
+\begin{center}\textcolor{gris}{— Fin de la guía. ¡Éxito en el examen! —}\end{center}
+
+\end{document}

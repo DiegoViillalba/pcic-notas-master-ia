@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>TopoSort con DFS y Componentes Fuertemente Conexas (SCC)</title>
+  <style>
+    :root {
+      --bg-primary: #1e1e2e;
+      --bg-secondary: #252538;
+      --bg-card: #2a2a40;
+      --text-main: #e0e2ee;
+      --text-muted: #a0a4be;
+      --accent-blue: #89b4fa;
+      --accent-green: #a6e3a1;
+      --accent-red: #f38ba8;
+      --accent-yellow: #f9e2af;
+      --accent-mauve: #cba6f7;
+      --accent-peach: #fab387;
+      --border-color: #3e405a;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .header-panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .title-group h1 {
+      font-size: 1.25rem;
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    .title-group p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--accent-blue);
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-blue);
+      color: #11111b;
+      border-color: var(--accent-blue);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .canvas-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      position: relative;
+      min-height: 460px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .canvas-toolbar {
+      padding: 10px 16px;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .control-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .control-btn:hover:not(:disabled) {
+      background: var(--accent-blue);
+      color: #111;
+      border-color: var(--accent-blue);
+    }
+
+    .control-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .svg-canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent-mauve);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-badge {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .badge-white { background: #585b70; color: #fff; }
+    .badge-gray { background: #fab387; color: #111; }
+    .badge-black { background: #a6e3a1; color: #111; }
+    .badge-alert { background: #f38ba8; color: #111; }
+
+    .case-banner {
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      line-height: 1.4;
+      background: var(--bg-card);
+      border-left: 4px solid var(--accent-blue);
+    }
+
+    .case-banner.case-1 { border-left-color: var(--accent-red); background: rgba(243, 139, 168, 0.1); }
+    .case-banner.case-2 { border-left-color: var(--accent-green); background: rgba(166, 227, 161, 0.1); }
+    .case-banner.case-3 { border-left-color: var(--accent-yellow); background: rgba(249, 226, 175, 0.1); }
+
+    .list-container {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      min-height: 38px;
+      align-items: center;
+      padding: 6px;
+      background: var(--bg-card);
+      border-radius: 6px;
+      border: 1px dashed var(--border-color);
+    }
+
+    .list-node {
+      background: var(--accent-green);
+      color: #11111b;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      animation: popIn 0.3s ease;
+      font-size: 0.82rem;
+    }
+
+    .list-node .f-time {
+      font-size: 0.72rem;
+      opacity: 0.8;
+      background: rgba(0,0,0,0.15);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .call-stack {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 4px;
+      max-height: 140px;
+      overflow-y: auto;
+      padding: 4px;
+      background: var(--bg-card);
+      border-radius: 6px;
+    }
+
+    .stack-frame {
+      background: rgba(250, 179, 135, 0.2);
+      border-left: 3px solid var(--accent-peach);
+      padding: 4px 8px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      border-radius: 3px;
+    }
+
+    .legend-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* SVG Elements */
+    .node-circle {
+      cursor: pointer;
+      transition: all 0.3s ease;
+      stroke-width: 2.5px;
+    }
+
+    .node-circle.white { fill: #313244; stroke: #9399b2; }
+    .node-circle.gray { fill: #fab387; stroke: #f9e2af; filter: drop-shadow(0 0 6px rgba(250,179,135,0.6)); }
+    .node-circle.black { fill: #a6e3a1; stroke: #94e2d5; }
+    .node-circle.highlight { stroke: #cba6f7; stroke-width: 4px; }
+
+    .node-text {
+      font-size: 13px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .node-times {
+      font-size: 10px;
+      font-family: monospace;
+      text-anchor: middle;
+      pointer-events: none;
+      user-select: none;
+      fill: #cdd6f4;
+    }
+
+    .edge-line {
+      stroke: #585b70;
+      stroke-width: 2px;
+      transition: stroke 0.3s, stroke-width 0.3s;
+      fill: none;
+    }
+
+    .edge-line.active {
+      stroke: #f38ba8;
+      stroke-width: 3.5px;
+      stroke-dasharray: 5;
+      animation: dash 1s linear infinite;
+    }
+
+    .edge-line.tree { stroke: #a6e3a1; stroke-width: 2.5px; }
+    .edge-line.cross { stroke: #89dceb; stroke-width: 2px; }
+    .edge-line.back { stroke: #f38ba8; stroke-width: 3.5px; }
+
+    @keyframes dash {
+      to { stroke-dashoffset: -10; }
+    }
+
+    .scc-hull {
+      fill-opacity: 0.15;
+      stroke-width: 2px;
+      stroke-dasharray: 4 4;
+      transition: all 0.4s ease;
+    }
+
+    .scc-hull.c1 { fill: #89b4fa; stroke: #89b4fa; }
+    .scc-hull.c2 { fill: #fab387; stroke: #fab387; }
+    .scc-hull.c3 { fill: #cba6f7; stroke: #cba6f7; }
+    .scc-hull.c4 { fill: #a6e3a1; stroke: #a6e3a1; }
+  </style>
+</head>
+<body>
+
+  <div class="header-panel">
+    <div class="title-group">
+      <h1>Laboratorio Visual: TopoSort (DFS) y Gráfica de Componentes ($G_{cc}$)</h1>
+      <p>Explora el análisis formal de los 3 casos de coloración y la condensación de digrafos en DAGs.</p>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabTopoBtn" onclick="setTab('topo')">1. TopoSort mediante DFS</button>
+      <button class="tab-btn" id="tabSccBtn" onclick="setTab('scc')">2. SCC y Condensación ($G_{cc}$)</button>
+    </div>
+  </div>
+
+  <!-- TAB 1: TOPOSORT DFS -->
+  <div id="tabTopo" class="workspace">
+    <div class="canvas-container">
+      <div class="canvas-toolbar">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="control-btn" id="btnPrev" onclick="stepBackward()">◀ Paso Anterior</button>
+          <button class="control-btn" id="btnPlay" onclick="togglePlay()">▶ Reproducir</button>
+          <button class="control-btn" id="btnNext" onclick="stepForward()">Paso Siguiente ▶</button>
+          <button class="control-btn" onclick="resetTopo()">↺ Reiniciar</button>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <label style="font-size:0.8rem; color:var(--text-muted);">
+            Grafo:
+            <select id="topoGraphSelect" onchange="changeGraph()" style="background:var(--bg-card); color:var(--text-main); border:1px solid var(--border-color); border-radius:4px; padding:2px 6px;">
+              <option value="dag">DAG Acíclico (Válido)</option>
+              <option value="cycle">Con Ciclo (Demostrar Caso 1: Gris)</option>
+            </select>
+          </label>
+          <div class="legend-row">
+            <span><span class="legend-dot" style="background:#585b70"></span> Blanco</span>
+            <span><span class="legend-dot" style="background:#fab387"></span> Gris</span>
+            <span><span class="legend-dot" style="background:#a6e3a1"></span> Negro</span>
+          </div>
+        </div>
+      </div>
+      <svg id="svgTopo" class="svg-canvas"></svg>
+    </div>
+
+    <div class="sidebar">
+      <div class="card">
+        <div class="card-title">
+          <span>Estado del Recorrido</span>
+          <span id="badgeStep" class="status-badge badge-white">Paso 0 / 0</span>
+        </div>
+        <div id="caseExplanation" class="case-banner">
+          Presiona <strong>Paso Siguiente</strong> o <strong>Reproducir</strong> para iniciar la exploración DFS.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Lista Topológica $L$</span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Orden $v_i.f > v_j.f$</span>
+        </div>
+        <div id="topoSortedList" class="list-container">
+          <span style="color:var(--text-muted); font-size:0.8rem;">(Lista vacía)</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Pila de Recursión DFS</span>
+          <span id="badgeTime" style="font-size:0.75rem; color:var(--accent-blue);">Reloj $t = 0$</span>
+        </div>
+        <div id="callStack" class="call-stack">
+          <div style="color:var(--text-muted); font-size:0.8rem; padding:4px;">Pila inactiva</div>
+        </div>
+      </div>
+
+      <div class="card" style="font-size:0.8rem; color:var(--text-muted);">
+        <strong style="color:var(--accent-yellow);">Teorema Central:</strong> Al examinar $(u, v)$ con $u$ gris:
+        <ul style="margin-left:16px; margin-top:4px;">
+          <li><span style="color:var(--accent-red)">$v$ Gris:</span> Arista atrás $\to$ ciclo ($\bot$).</li>
+          <li><span style="color:var(--accent-green)">$v$ Blanco:</span> Subárbol recursivo $\to u.f > v.f$.</li>
+          <li><span style="color:var(--accent-yellow)">$v$ Negro:</span> Ya finalizó $\to u.f > v.f$.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: SCC Y CONDENSACION -->
+  <div id="tabScc" class="workspace" style="display:none;">
+    <div class="canvas-container">
+      <div class="canvas-toolbar">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="control-btn" id="btnToggleCondense" onclick="toggleCondensation()">🔄 Condensar a $G_{cc}$ (DAG)</button>
+          <button class="control-btn" onclick="resetSccView()">↺ Restaurar Grafo Original</button>
+        </div>
+        <div style="color:var(--text-muted); font-size:0.82rem;">
+          Digrafo Canónico de Tarjan (1972) · 13 vértices
+        </div>
+      </div>
+      <svg id="svgScc" class="svg-canvas"></svg>
+    </div>
+
+    <div class="sidebar">
+      <div class="card">
+        <div class="card-title">
+          <span>Estructura de Componentes</span>
+          <span id="sccStateBadge" class="status-badge badge-black">Grafo $G$</span>
+        </div>
+        <div id="sccExplanation" class="case-banner">
+          El grafo contiene 4 componentes fuertemente conexas (SCCs). Haz clic en <strong>Condensar a $G_{cc}$</strong> para colapsar cada SCC en un supernodo y verificar que el resultado es estrictamente un <strong>DAG</strong>.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Componentes Fuertes (SCC)</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; font-size:0.82rem;">
+          <div style="padding:6px; background:rgba(137, 180, 250, 0.15); border-left:3px solid var(--accent-blue); border-radius:4px;">
+            <strong style="color:var(--accent-blue)">$C_1$:</strong> {0, 1, 2, 3, 4, 5} (Ciclos mutuos)
+          </div>
+          <div style="padding:6px; background:rgba(250, 179, 135, 0.15); border-left:3px solid var(--accent-peach); border-radius:4px;">
+            <strong style="color:var(--accent-peach)">$C_2$:</strong> {6, 8} (Ciclo 6 ⇄ 8)
+          </div>
+          <div style="padding:6px; background:rgba(203, 166, 247, 0.15); border-left:3px solid var(--accent-mauve); border-radius:4px;">
+            <strong style="color:var(--accent-mauve)">$C_3$:</strong> {7} (Nodo aislado de salida)
+          </div>
+          <div style="padding:6px; background:rgba(166, 227, 161, 0.15); border-left:3px solid var(--accent-green); border-radius:4px;">
+            <strong style="color:var(--accent-green)">$C_4$:</strong> {9, 10, 11, 12} (Ciclo cuádruple)
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Orden Topológico de $G_{cc}$</span>
+        </div>
+        <div id="sccTopologicalOrder" class="list-container">
+          <div class="list-node" style="background:var(--accent-blue)">C₁</div>
+          <span style="color:var(--text-muted)">⟶</span>
+          <div class="list-node" style="background:var(--accent-peach)">C₂</div>
+          <span style="color:var(--text-muted)">⟶</span>
+          <div class="list-node" style="background:var(--accent-mauve)">C₃</div>
+          <span style="color:var(--text-muted)">|</span>
+          <div class="list-node" style="background:var(--accent-green)">C₄</div>
+        </div>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">
+          Como $G_{cc}$ es un DAG, las dependencias entre componentes admiten orden lineal.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- ESTADO GLOBAL ---
+    let currentTab = 'topo';
+    let topoGraphType = 'dag';
+    let currentStep = 0;
+    let steps = [];
+    let isPlaying = false;
+    let playTimer = null;
+    let isCondensed = false;
+
+    // --- DEFINICIÓN DE GRAFOS PARA TOPOSORT ---
+    const dagGraph = {
+      nodes: [
+        { id: 'v1', label: 'v1', x: 80,  y: 120 },
+        { id: 'v2', label: 'v2', x: 220, y: 70 },
+        { id: 'v3', label: 'v3', x: 380, y: 70 },
+        { id: 'v4', label: 'v4', x: 500, y: 140 },
+        { id: 'v5', label: 'v5', x: 300, y: 200 },
+        { id: 'v6', label: 'v6', x: 180, y: 280 }
+      ],
+      edges: [
+        { from: 'v1', to: 'v2' },
+        { from: 'v1', to: 'v5' },
+        { from: 'v2', to: 'v3' },
+        { from: 'v3', to: 'v4' },
+        { from: 'v5', to: 'v4' },
+        { from: 'v5', to: 'v6' },
+        { from: 'v2', to: 'v5' }
+      ]
+    };
+
+    const cycleGraph = {
+      nodes: [
+        { id: 'A', label: 'A', x: 140, y: 100 },
+        { id: 'B', label: 'B', x: 320, y: 100 },
+        { id: 'C', label: 'C', x: 440, y: 220 },
+        { id: 'D', label: 'D', x: 220, y: 260 }
+      ],
+      edges: [
+        { from: 'A', to: 'B' },
+        { from: 'B', to: 'C' },
+        { from: 'C', to: 'D' },
+        { from: 'D', to: 'B' } // CICLO B -> C -> D -> B
+      ]
+    };
+
+    // --- GRAFO CANÓNICO TARJAN (13 NODOS) ---
+    const tarjanGraph = {
+      nodes: [
+        { id: 0,  label: '0',  x: 80,  y: 70,  c: 'c1' },
+        { id: 1,  label: '1',  x: 40,  y: 160, c: 'c1' },
+        { id: 2,  label: '2',  x: 160, y: 140, c: 'c1' },
+        { id: 3,  label: '3',  x: 100, y: 220, c: 'c1' },
+        { id: 4,  label: '4',  x: 180, y: 270, c: 'c1' },
+        { id: 5,  label: '5',  x: 80,  y: 320, c: 'c1' },
+        { id: 6,  label: '6',  x: 290, y: 100, c: 'c2' },
+        { id: 8,  label: '8',  x: 380, y: 100, c: 'c2' },
+        { id: 7,  label: '7',  x: 480, y: 100, c: 'c3' },
+        { id: 9,  label: '9',  x: 340, y: 240, c: 'c4' },
+        { id: 10, label: '10', x: 450, y: 240, c: 'c4' },
+        { id: 11, label: '11', x: 340, y: 340, c: 'c4' },
+        { id: 12, label: '12', x: 450, y: 340, c: 'c4' }
+      ],
+      edges: [
+        // C1 internas
+        { from: 0, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 5 },
+        { from: 5, to: 1 }, { from: 1, to: 0 }, { from: 2, to: 4 }, { from: 4, to: 3 },
+        // C2 internas
+        { from: 6, to: 8 }, { from: 8, to: 6 },
+        // C4 internas
+        { from: 9, to: 10 }, { from: 10, to: 12 }, { from: 12, to: 11 }, { from: 11, to: 9 },
+        { from: 9, to: 12 },
+        // Inter-componentes (C1 -> C2, C1 -> C4, C2 -> C3, C2 -> C4)
+        { from: 0, to: 6 }, { from: 2, to: 6 },
+        { from: 4, to: 9 },
+        { from: 6, to: 7 }, { from: 8, to: 7 },
+        { from: 6, to: 9 }
+      ],
+      components: [
+        { id: 'c1', label: 'C₁: {0,1,2,3,4,5}', color: '#89b4fa', cx: 110, cy: 190, r: 130 },
+        { id: 'c2', label: 'C₂: {6,8}', color: '#fab387', cx: 335, cy: 100, r: 65 },
+        { id: 'c3', label: 'C₃: {7}', color: '#cba6f7', cx: 480, cy: 100, r: 40 },
+        { id: 'c4', label: 'C₄: {9,10,11,12}', color: '#a6e3a1', cx: 395, cy: 290, r: 90 }
+      ],
+      condensedEdges: [
+        { from: 'c1', to: 'c2' },
+        { from: 'c1', to: 'c4' },
+        { from: 'c2', to: 'c3' },
+        { from: 'c2', to: 'c4' }
+      ]
+    };
+
+    // --- GENERADOR DE TRAZA DE TOPOSORT DFS ---
+    function generateDfsTrace(graph) {
+      let time = 0;
+      let colors = {};
+      let d = {};
+      let f = {};
+      let trace = [];
+      let stack = [];
+      let topoList = [];
+
+      graph.nodes.forEach(n => {
+        colors[n.id] = 'white';
+        d[n.id] = null;
+        f[n.id] = null;
+      });
+
+      function snapshot(u, v, edgeStatus, caseNum, explanation) {
+        trace.push({
+          time,
+          colors: { ...colors },
+          d: { ...d },
+          f: { ...f },
+          stack: [...stack],
+          topoList: [...topoList],
+          activeEdge: (u && v) ? { from: u, to: v, status: edgeStatus } : null,
+          caseNum,
+          explanation
+        });
+      }
+
+      snapshot(null, null, null, 0, "Inicio de TopoSort-DFS. Todos los vértices están en color BLANCO.");
+
+      function dfsVisit(u) {
+        time++;
+        d[u] = time;
+        colors[u] = 'gray';
+        stack.push(u);
+        snapshot(u, null, null, 0, `Descubriendo vértice <strong>${u}</strong>. Se pinta de GRIS y se asigna tiempo de descubrimiento <strong>${u}.d = ${time}</strong>.`);
+
+        const outEdges = graph.edges.filter(e => e.from === u);
+        for (let edge of outEdges) {
+          const v = edge.to;
+          if (colors[v] === 'white') {
+            snapshot(u, v, 'tree', 2, `Examinando arista (${u}, ${v}). <strong style="color:var(--accent-green)">CASO 2: ${v} es BLANCO</strong>. Se realizará llamada recursiva a ${v}. Su tiempo ${v}.f terminará antes de que regrese la llamada a ${u}. Por ende, <strong>${u}.f > ${v}.f</strong>.`);
+            dfsVisit(v);
+          } else if (colors[v] === 'gray') {
+            snapshot(u, v, 'back', 1, `Examinando arista (${u}, ${v}). <strong style="color:var(--accent-red)">CASO 1: ${v} es GRIS</strong>. ¡Arista hacia atrás! ${v} es un ancestro activo en la pila. Se detecta un ciclo dirigido. <strong>¡En un DAG esto es una contradicción!</strong>`);
+            return; // Termina con error de ciclo
+          } else if (colors[v] === 'black') {
+            snapshot(u, v, 'cross', 3, `Examinando arista (${u}, ${v}). <strong style="color:var(--accent-yellow)">CASO 3: ${v} es NEGRO</strong>. ${v} ya finalizó en el pasado (${v}.f = ${f[v]}). Como ${u} sigue en gris, <strong>${u}.f > ${v}.f</strong>.`);
+          }
+        }
+
+        time++;
+        f[u] = time;
+        colors[u] = 'black';
+        stack.pop();
+        topoList.unshift({ id: u, f: f[u] });
+        snapshot(u, null, null, 0, `Vértice <strong>${u}</strong> completa todas sus aristas. Pasa a NEGRO con <strong>${u}.f = ${time}</strong> y se inserta al <strong>frente</strong> de la lista L.`);
+      }
+
+      for (let node of graph.nodes) {
+        if (colors[node.id] === 'white') {
+          dfsVisit(node.id);
+        }
+      }
+
+      snapshot(null, null, null, 0, "DFS completado. La lista L resultante está estrictamente ordenada en forma decreciente por tiempos de terminación: v₁.f > v₂.f > ... > vₙ.f.");
+      return trace;
+    }
+
+    // --- RENDERIZADO TAB 1: TOPOSORT ---
+    function initTopo() {
+      const graph = topoGraphType === 'dag' ? dagGraph : cycleGraph;
+      steps = generateDfsTrace(graph);
+      currentStep = 0;
+      renderTopoStep();
+    }
+
+    function renderTopoStep() {
+      const graph = topoGraphType === 'dag' ? dagGraph : cycleGraph;
+      const step = steps[currentStep];
+      const svg = document.getElementById('svgTopo');
+      svg.innerHTML = '';
+
+      // Actualizar información lateral
+      document.getElementById('badgeStep').innerText = `Paso ${currentStep + 1} / ${steps.length}`;
+      document.getElementById('badgeTime').innerText = `Reloj t = ${step.time}`;
+
+      const expEl = document.getElementById('caseExplanation');
+      expEl.innerHTML = step.explanation;
+      expEl.className = 'case-banner' + (step.caseNum ? ` case-${step.caseNum}` : '');
+
+      // Renderizar Pila de llamadas
+      const stackEl = document.getElementById('callStack');
+      if (step.stack.length === 0) {
+        stackEl.innerHTML = '<div style="color:var(--text-muted); font-size:0.8rem; padding:4px;">Pila vacía</div>';
+      } else {
+        stackEl.innerHTML = step.stack.map(n => `<div class="stack-frame">DFS-Visit(${n}) [Gris]</div>`).join('');
+      }
+
+      // Renderizar Lista Topológica L
+      const listEl = document.getElementById('topoSortedList');
+      if (step.topoList.length === 0) {
+        listEl.innerHTML = '<span style="color:var(--text-muted); font-size:0.8rem;">(Lista vacía)</span>';
+      } else {
+        listEl.innerHTML = step.topoList.map(item => `
+          <div class="list-node">
+            <span>${item.id}</span>
+            <span class="f-time">f:${item.f}</span>
+          </div>
+        `).join('');
+      }
+
+      // Definir marcador de flecha
+      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      defs.innerHTML = `
+        <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#585b70" />
+        </marker>
+        <marker id="arrow-active" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#f38ba8" />
+        </marker>
+        <marker id="arrow-tree" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#a6e3a1" />
+        </marker>
+      `;
+      svg.appendChild(defs);
+
+      // Dibujar Aristas
+      graph.edges.forEach(e => {
+        const u = graph.nodes.find(n => n.id === e.from);
+        const v = graph.nodes.find(n => n.id === e.to);
+        const isActive = step.activeEdge && step.activeEdge.from === e.from && step.activeEdge.to === e.to;
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', u.x);
+        line.setAttribute('y1', u.y);
+        line.setAttribute('x2', v.x);
+        line.setAttribute('y2', v.y);
+        line.setAttribute('class', 'edge-line' + (isActive ? ' active' : ''));
+        line.setAttribute('marker-end', isActive ? 'url(#arrow-active)' : 'url(#arrow)');
+        svg.appendChild(line);
+      });
+
+      // Dibujar Nodos
+      graph.nodes.forEach(n => {
+        const colorClass = step.colors[n.id];
+        const isCurrent = step.stack.length > 0 && step.stack[step.stack.length - 1] === n.id;
+
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', n.x);
+        circle.setAttribute('cy', n.y);
+        circle.setAttribute('r', 20);
+        circle.setAttribute('class', `node-circle ${colorClass}` + (isCurrent ? ' highlight' : ''));
+        g.appendChild(circle);
+
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', n.x);
+        text.setAttribute('y', n.y);
+        text.setAttribute('class', 'node-text');
+        text.setAttribute('fill', colorClass === 'black' ? '#111' : (colorClass === 'gray' ? '#111' : '#cdd6f4'));
+        text.textContent = n.label;
+        g.appendChild(text);
+
+        // Mostrar d y f
+        const dVal = step.d[n.id] !== null ? step.d[n.id] : '-';
+        const fVal = step.f[n.id] !== null ? step.f[n.id] : '-';
+        const times = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        times.setAttribute('x', n.x);
+        times.setAttribute('y', n.y + 32);
+        times.setAttribute('class', 'node-times');
+        times.textContent = `d:${dVal} | f:${fVal}`;
+        g.appendChild(times);
+
+        svg.appendChild(g);
+      });
+
+      // Actualizar botones
+      document.getElementById('btnPrev').disabled = currentStep === 0;
+      document.getElementById('btnNext').disabled = currentStep === steps.length - 1;
+    }
+
+    function stepForward() {
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        renderTopoStep();
+      } else {
+        pause();
+      }
+    }
+
+    function stepBackward() {
+      if (currentStep > 0) {
+        currentStep--;
+        renderTopoStep();
+      }
+    }
+
+    function togglePlay() {
+      if (isPlaying) {
+        pause();
+      } else {
+        play();
+      }
+    }
+
+    function play() {
+      isPlaying = true;
+      document.getElementById('btnPlay').innerText = '⏸ Pausa';
+      playTimer = setInterval(() => {
+        if (currentStep < steps.length - 1) {
+          stepForward();
+        } else {
+          pause();
+        }
+      }, 1200);
+    }
+
+    function pause() {
+      isPlaying = false;
+      document.getElementById('btnPlay').innerText = '▶ Reproducir';
+      if (playTimer) clearInterval(playTimer);
+    }
+
+    function resetTopo() {
+      pause();
+      currentStep = 0;
+      renderTopoStep();
+    }
+
+    function changeGraph() {
+      pause();
+      topoGraphType = document.getElementById('topoGraphSelect').value;
+      initTopo();
+    }
+
+    // --- RENDERIZADO TAB 2: SCC Y CONDENSACIÓN ---
+    function renderScc() {
+      const svg = document.getElementById('svgScc');
+      svg.innerHTML = '';
+
+      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      defs.innerHTML = `
+        <marker id="arrow-scc" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#9399b2" />
+        </marker>
+        <marker id="arrow-macro" viewBox="0 0 10 10" refX="35" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#f9e2af" />
+        </marker>
+      `;
+      svg.appendChild(defs);
+
+      if (!isCondensed) {
+        // MODO EXPANDIDO (GRAFO ORIGINAL CON HULLS DE COMPONENTES)
+        document.getElementById('sccStateBadge').innerText = 'Grafo G (13 nodos)';
+        document.getElementById('sccStateBadge').className = 'status-badge badge-gray';
+        document.getElementById('btnToggleCondense').innerText = '🔄 Condensar a G_cc (DAG)';
+        document.getElementById('sccExplanation').innerHTML = `
+          Mostrando el grafo $G$ particionado en sus 4 componentes fuertemente conexas maximales.
+          Observa cómo dentro de cada componente existe mutua alcanzabilidad, mientras que los arcos entre componentes fluyen sin retornos.
+        `;
+
+        // Dibujar envolturas convexas / elipses de componentes
+        tarjanGraph.components.forEach(c => {
+          const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+          ellipse.setAttribute('cx', c.cx);
+          ellipse.setAttribute('cy', c.cy);
+          ellipse.setAttribute('rx', c.r);
+          ellipse.setAttribute('ry', c.r * 0.7);
+          ellipse.setAttribute('class', `scc-hull ${c.id}`);
+          svg.appendChild(ellipse);
+
+          const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          lbl.setAttribute('x', c.cx - c.r + 20);
+          lbl.setAttribute('y', c.cy - (c.r * 0.7) + 16);
+          lbl.setAttribute('fill', c.color);
+          lbl.setAttribute('font-weight', '700');
+          lbl.setAttribute('font-size', '12px');
+          lbl.textContent = c.label.split(':')[0];
+          svg.appendChild(lbl);
+        });
+
+        // Dibujar Aristas
+        tarjanGraph.edges.forEach(e => {
+          const u = tarjanGraph.nodes.find(n => n.id === e.from);
+          const v = tarjanGraph.nodes.find(n => n.id === e.to);
+          const isInter = u.c !== v.c;
+
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', u.x);
+          line.setAttribute('y1', u.y);
+          line.setAttribute('x2', v.x);
+          line.setAttribute('y2', v.y);
+          line.setAttribute('class', 'edge-line');
+          line.setAttribute('stroke', isInter ? '#f9e2af' : '#585b70');
+          line.setAttribute('stroke-width', isInter ? '2.5' : '1.5');
+          line.setAttribute('marker-end', 'url(#arrow-scc)');
+          svg.appendChild(line);
+        });
+
+        // Dibujar Nodos
+        tarjanGraph.nodes.forEach(n => {
+          const comp = tarjanGraph.components.find(c => c.id === n.c);
+          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', n.x);
+          circle.setAttribute('cy', n.y);
+          circle.setAttribute('r', 15);
+          circle.setAttribute('fill', comp.color);
+          circle.setAttribute('stroke', '#1e1e2e');
+          circle.setAttribute('stroke-width', '2');
+          circle.setAttribute('class', 'node-circle');
+          g.appendChild(circle);
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', n.x);
+          text.setAttribute('y', n.y);
+          text.setAttribute('class', 'node-text');
+          text.setAttribute('fill', '#111');
+          text.textContent = n.label;
+          g.appendChild(text);
+
+          svg.appendChild(g);
+        });
+
+      } else {
+        // MODO CONDENSADO: G_cc
+        document.getElementById('sccStateBadge').innerText = 'Gráfica Condensada G_cc (DAG)';
+        document.getElementById('sccStateBadge').className = 'status-badge badge-black';
+        document.getElementById('btnToggleCondense').innerText = '🔄 Expandir a Grafo G';
+        document.getElementById('sccExplanation').innerHTML = `
+          <strong>¡Teorema Demostrado!</strong> La gráfica condensada $G_{cc}$ colapsa cada SCC en un supernodo.
+          Observa que las aristas van estrictamente en un solo sentido: <strong>$G_{cc}$ es siempre un DAG</strong>.
+          No puede existir un ciclo entre componentes porque colapsarían en una única componente mayor.
+        `;
+
+        // Posiciones condensadas para visualizar el DAG limpio
+        const cPos = {
+          c1: { x: 100, y: 220 },
+          c2: { x: 260, y: 140 },
+          c3: { x: 440, y: 140 },
+          c4: { x: 350, y: 300 }
+        };
+
+        // Dibujar Macro-Aristas
+        tarjanGraph.condensedEdges.forEach(ce => {
+          const u = cPos[ce.from];
+          const v = cPos[ce.to];
+
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', u.x);
+          line.setAttribute('y1', u.y);
+          line.setAttribute('x2', v.x);
+          line.setAttribute('y2', v.y);
+          line.setAttribute('stroke', '#f9e2af');
+          line.setAttribute('stroke-width', '4');
+          line.setAttribute('marker-end', 'url(#arrow-macro)');
+          svg.appendChild(line);
+        });
+
+        // Dibujar Supernodos
+        tarjanGraph.components.forEach(c => {
+          const pos = cPos[c.id];
+          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', pos.x);
+          circle.setAttribute('cy', pos.y);
+          circle.setAttribute('r', 32);
+          circle.setAttribute('fill', c.color);
+          circle.setAttribute('stroke', '#ffffff');
+          circle.setAttribute('stroke-width', '3');
+          circle.setAttribute('class', 'node-circle');
+          g.appendChild(circle);
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', pos.x);
+          text.setAttribute('y', pos.y);
+          text.setAttribute('class', 'node-text');
+          text.setAttribute('font-size', '16px');
+          text.setAttribute('fill', '#111');
+          text.textContent = c.label.split(':')[0];
+          g.appendChild(text);
+
+          const sub = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          sub.setAttribute('x', pos.x);
+          sub.setAttribute('y', pos.y + 44);
+          sub.setAttribute('class', 'node-times');
+          sub.setAttribute('fill', c.color);
+          sub.setAttribute('font-size', '11px');
+          sub.textContent = c.label.split(':')[1];
+          g.appendChild(sub);
+
+          svg.appendChild(g);
+        });
+      }
+    }
+
+    function toggleCondensation() {
+      isCondensed = !isCondensed;
+      renderScc();
+    }
+
+    function resetSccView() {
+      isCondensed = false;
+      renderScc();
+    }
+
+    function setTab(tab) {
+      currentTab = tab;
+      if (tab === 'topo') {
+        document.getElementById('tabTopo').style.display = 'grid';
+        document.getElementById('tabScc').style.display = 'none';
+        document.getElementById('tabTopoBtn').classList.add('active');
+        document.getElementById('tabSccBtn').classList.remove('active');
+        renderTopoStep();
+      } else {
+        pause();
+        document.getElementById('tabTopo').style.display = 'none';
+        document.getElementById('tabScc').style.display = 'grid';
+        document.getElementById('tabTopoBtn').classList.remove('active');
+        document.getElementById('tabSccBtn').classList.add('active');
+        renderScc();
+      }
+    }
+
+    // Inicialización al cargar la ventana
+    window.onload = () => {
+      initTopo();
+    };
+  </script>
+</body>
+</html>

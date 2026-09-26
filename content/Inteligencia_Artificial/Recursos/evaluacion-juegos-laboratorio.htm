@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laboratorio de evaluación de juegos</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fb;--panel:#fff;--ink:#182033;--muted:#667085;--line:#d5dae4;--blue:#2563eb;--purple:#7c3aed;--green:#16a34a;--red:#dc2626}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,sans-serif}main{max-width:1000px;margin:auto}h2{font-size:21px;margin:0 0 4px}h3{font-size:17px;margin:0 0 10px}.sub{color:var(--muted);margin:0 0 13px}.grid{display:grid;grid-template-columns:1fr 1.45fr;gap:12px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}.slider{display:grid;grid-template-columns:130px 1fr 42px;gap:8px;align-items:center;margin:10px 0}.slider output{font:700 14px ui-monospace,monospace;text-align:right}.positions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.position{border:1px solid var(--line);border-radius:10px;padding:10px}.position h4{margin:0 0 8px;display:flex;justify-content:space-between}.position table{width:100%;border-collapse:collapse}.position th,.position td{text-align:center;padding:4px}.position th:first-child,.position td:first-child{text-align:left}.position input{width:58px;padding:5px;border:1px solid #aeb8c8;border-radius:6px;background:var(--panel);color:var(--ink)}.score{margin-top:9px;padding:9px;border-radius:8px;background:#eef2ff;font:700 14px ui-monospace,monospace}.winner{outline:3px solid var(--green)}.formula{margin-top:10px;padding:11px;border-left:4px solid var(--purple);background:#f5f3ff;font:700 14px ui-monospace,monospace;overflow:auto}.depth{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.big{font:800 22px ui-monospace,monospace;color:var(--blue)}.bar{height:14px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:7px 0}.fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));width:0}.warning{font-size:13px;color:var(--muted)}button{font:inherit;color:inherit;background:var(--panel);border:1px solid #aeb8c8;border-radius:8px;padding:7px 10px;cursor:pointer}@media(max-width:760px){.grid,.positions,.depth{grid-template-columns:1fr}.slider{grid-template-columns:105px 1fr 42px}}@media(prefers-color-scheme:dark){:root{--bg:#1d222d;--panel:#282e3a;--ink:#eef2f7;--muted:#b9c1ce;--line:#4e5869}.score{background:#25395b}.formula{background:#352b50}.bar{background:#414958}.position input{border-color:#657083}}
+</style>
+</head>
+<body>
+<main>
+  <h2>Funciones de evaluación y límite de profundidad</h2>
+  <p class="sub">Modifica pesos, rasgos y profundidad. Una evaluación ordena posiciones no terminales; no reemplaza la utilidad verdadera del final del juego.</p>
+  <div class="grid">
+    <section class="panel">
+      <h3>1 · ¿Cuánto vale cada rasgo?</h3>
+      <div class="slider"><label for="pawnW">Ficha normal</label><input id="pawnW" type="range" min="0" max="4" step="0.25" value="1"><output id="pawnOut"></output></div>
+      <div class="slider"><label for="kingW">Dama / rey</label><input id="kingW" type="range" min="0" max="8" step="0.25" value="2"><output id="kingOut"></output></div>
+      <div class="slider"><label for="moveW">Movilidad</label><input id="moveW" type="range" min="0" max="2" step="0.05" value="0.25"><output id="moveOut"></output></div>
+      <div class="formula" id="formula"></div>
+      <p class="warning">Los rasgos propios suman y los del rival restan porque la puntuación está expresada desde la perspectiva de MAX.</p>
+      <button id="defaults">Restaurar ejemplo</button>
+    </section>
+    <section class="panel">
+      <h3>2 · Comparar dos posiciones de damas</h3>
+      <div class="positions" id="positions"></div>
+      <p class="warning" id="decision"></p>
+    </section>
+  </div>
+
+  <section class="panel depth">
+    <div>
+      <h3>3 · El precio de mirar más lejos</h3>
+      <div class="slider"><label for="branch">Ramificación b</label><input id="branch" type="range" min="2" max="40" step="1" value="3"><output id="branchOut"></output></div>
+      <div class="slider"><label for="depth">Profundidad m</label><input id="depth" type="range" min="1" max="10" step="1" value="4"><output id="depthOut"></output></div>
+      <p>Hojas aproximadas: <span class="big" id="leaves"></span></p>
+      <p>Nodos totales del árbol completo: <strong id="total"></strong></p>
+    </div>
+    <div>
+      <h3>Lectura</h3>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <p id="costText"></p>
+      <p class="warning">La estimación <code>b<sup>m</sup></code> supone ramificación uniforme. Alfa–beta puede evitar parte del árbol; el caso ideal se acerca a <code>b<sup>m/2</sup></code>, pero el orden de las acciones es decisivo.</p>
+    </div>
+  </section>
+</main>
+<script>
+const defaultsData={A:{pMe:6,kMe:1,mMe:5,pOp:5,kOp:0,mOp:3},B:{pMe:4,kMe:0,mMe:8,pOp:3,kOp:1,mOp:2}};
+let data=JSON.parse(JSON.stringify(defaultsData));
+const defs=[['p','Fichas'],['k','Damas'],['m','Movimientos']];
+function positionCard(id){
+  const p=data[id],rows=defs.map(([key,label])=>`<tr><td>${label}</td><td><input type="number" min="0" max="20" data-pos="${id}" data-key="${key}Me" value="${p[key+'Me']}"></td><td><input type="number" min="0" max="20" data-pos="${id}" data-key="${key}Op" value="${p[key+'Op']}"></td></tr>`).join('');
+  return `<article class="position" id="card${id}"><h4>Posición ${id}<span id="badge${id}"></span></h4><table><tr><th>Rasgo</th><th>MAX</th><th>MIN</th></tr>${rows}</table><div class="score" id="score${id}"></div></article>`;
+}
+function resetCards(){positions.innerHTML=positionCard('A')+positionCard('B');positions.querySelectorAll('input').forEach(el=>el.oninput=()=>{data[el.dataset.pos][el.dataset.key]=Number(el.value)||0;update()})}
+function score(p){return +pawnW.value*(p.pMe-p.pOp)+ +kingW.value*(p.kMe-p.kOp)+ +moveW.value*(p.mMe-p.mOp)}
+function nice(n){return Number(n.toFixed(2)).toString()}
+function update(){
+  pawnOut.value=pawnW.value;kingOut.value=kingW.value;moveOut.value=moveW.value;
+  formula.textContent=`Eval(s) = ${pawnW.value}(P_MAX−P_MIN) + ${kingW.value}(K_MAX−K_MIN) + ${moveW.value}(M_MAX−M_MIN)`;
+  const a=score(data.A),b=score(data.B);scoreA.textContent=`Eval(A) = ${nice(a)}`;scoreB.textContent=`Eval(B) = ${nice(b)}`;
+  cardA.classList.toggle('winner',a>b);cardB.classList.toggle('winner',b>a);badgeA.textContent=a>b?'preferida':'';badgeB.textContent=b>a?'preferida':'';
+  decision.textContent=a===b?'MAX es indiferente entre A y B con estos pesos.':`MAX prefiere ${a>b?'A':'B'} porque ${nice(Math.max(a,b))} > ${nice(Math.min(a,b))}. MIN preferiría la de menor puntuación.`;
+  const bfactor=+branch.value,d=+depth.value,leafCount=bfactor**d,totalNodes=(bfactor**(d+1)-1)/(bfactor-1),ideal=bfactor**(d/2);
+  branchOut.value=bfactor;depthOut.value=d;leaves.textContent=leafCount.toLocaleString('es-MX');total.textContent=Math.round(totalNodes).toLocaleString('es-MX');
+  fill.style.width=`${Math.min(100,Math.log10(totalNodes+1)/12*100)}%`;
+  costText.innerHTML=`Minimax completo examinaría del orden de <strong>${leafCount.toLocaleString('es-MX')}</strong> hojas. Con orden ideal, alfa–beta puede acercarse a <strong>${Math.ceil(ideal).toLocaleString('es-MX')}</strong> hojas. Al cortar aquí, <em>Eval</em> sustituye provisionalmente la utilidad terminal.`;
+}
+[pawnW,kingW,moveW,branch,depth].forEach(x=>x.oninput=update);
+defaults.onclick=()=>{pawnW.value=1;kingW.value=2;moveW.value=.25;branch.value=3;depth.value=4;data=JSON.parse(JSON.stringify(defaultsData));resetCards();update()};
+resetCards();update();
+</script>
+</body>
+</html>

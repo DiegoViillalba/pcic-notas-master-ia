@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Backtracking: decidir, propagar, retroceder</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: var(--obsidian-bg, #f7f8fc);
+      --fg: var(--obsidian-text, #202536);
+      --muted: var(--obsidian-text-muted, #5d6473);
+      --panel: var(--obsidian-bg-2, #ffffff);
+      --line: var(--obsidian-border, #c9cedb);
+      --btn-bg: var(--panel);
+      --btn-fg: var(--fg);
+      --btn-border: var(--line);
+      --step-badge-bg: #e2e8f0;
+      --step-badge-fg: #334155;
+      --edge-stroke: #9aa2b3;
+      --node-fill: #ffffff;
+      --node-stroke: #8b93a5;
+      --node-text: #202536;
+      --assigned-fill: #dcfce7;
+      --assigned-stroke: #16a34a;
+      --assigned-text: #14532d;
+      --current-fill: #dbeafe;
+      --current-stroke: #2563eb;
+      --current-text: #1e3a8a;
+      --failed-fill: #fee2e2;
+      --failed-stroke: #dc2626;
+      --failed-text: #7f1d1d;
+      --status-bg: #fff8dc;
+      --status-border: #d97706;
+      --status-fg: #78350f;
+      --stack-fg: #92400e;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1e222d;
+        --fg: #eef0f5;
+        --muted: #9aa2b2;
+        --panel: #272c39;
+        --line: #3d4455;
+        --btn-bg: #2d3342;
+        --btn-fg: #eef0f5;
+        --btn-border: #4a5368;
+        --step-badge-bg: #323949;
+        --step-badge-fg: #cbd5e1;
+        --edge-stroke: #64748b;
+        --node-fill: #222733;
+        --node-stroke: #5a6478;
+        --node-text: #f3f4f6;
+        --assigned-fill: #153a24;
+        --assigned-stroke: #4ade80;
+        --assigned-text: #bbf7d0;
+        --current-fill: #1e3557;
+        --current-stroke: #60a5fa;
+        --current-text: #bfdbfe;
+        --failed-fill: #451b1b;
+        --failed-stroke: #f87171;
+        --failed-text: #fecaca;
+        --status-bg: #2c2414;
+        --status-border: #f59e0b;
+        --status-fg: #fde68a;
+        --stack-fg: #fcd34d;
+      }
+    }
+    :root[style*="color-scheme: dark"],
+    :root[style*="--obsidian-color-scheme: dark"] {
+      --bg: var(--obsidian-bg, #1e222d);
+      --fg: var(--obsidian-text, #eef0f5);
+      --muted: var(--obsidian-text-muted, #9aa2b2);
+      --panel: var(--obsidian-bg-2, #272c39);
+      --line: var(--obsidian-border, #3d4455);
+      --btn-bg: #2d3342;
+      --btn-fg: var(--fg);
+      --btn-border: #4a5368;
+      --step-badge-bg: #323949;
+      --step-badge-fg: #cbd5e1;
+      --edge-stroke: #64748b;
+      --node-fill: #222733;
+      --node-stroke: #5a6478;
+      --node-text: #f3f4f6;
+      --assigned-fill: #153a24;
+      --assigned-stroke: #4ade80;
+      --assigned-text: #bbf7d0;
+      --current-fill: #1e3557;
+      --current-stroke: #60a5fa;
+      --current-text: #bfdbfe;
+      --failed-fill: #451b1b;
+      --failed-stroke: #f87171;
+      --failed-text: #fecaca;
+      --status-bg: #2c2414;
+      --status-border: #f59e0b;
+      --status-fg: #fde68a;
+      --stack-fg: #fcd34d;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font: 15px/1.45 system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--fg);
+    }
+    main { max-width: 780px; margin: auto; }
+    .top, .controls, .domains {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .top { justify-content: space-between; }
+    h2 { font-size: 20px; margin: 0; }
+    button {
+      padding: 7px 12px;
+      border: 1px solid var(--btn-border);
+      border-radius: 7px;
+      background: var(--btn-bg);
+      color: var(--btn-fg);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color .15s, opacity .15s;
+    }
+    button:hover:not(:disabled) { filter: brightness(1.08); }
+    button:disabled { opacity: .35; cursor: not-allowed; }
+    #count {
+      font-weight: 700;
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--step-badge-bg);
+      color: var(--step-badge-fg);
+      border: 1px solid var(--line);
+    }
+    .graph {
+      width: 100%;
+      margin-top: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      display: block;
+    }
+    .edge { stroke: var(--edge-stroke); stroke-width: 3; }
+    .node circle {
+      fill: var(--node-fill);
+      stroke: var(--node-stroke);
+      stroke-width: 3;
+      transition: all .2s ease;
+    }
+    .node text {
+      text-anchor: middle;
+      dominant-baseline: central;
+      font-weight: 700;
+      fill: var(--node-text);
+      font-size: 15px;
+    }
+    .assigned circle { fill: var(--assigned-fill); stroke: var(--assigned-stroke); }
+    .assigned text { fill: var(--assigned-text); }
+    .current circle { fill: var(--current-fill); stroke: var(--current-stroke); }
+    .current text { fill: var(--current-text); }
+    .failed circle { fill: var(--failed-fill); stroke: var(--failed-stroke); }
+    .failed text { fill: var(--failed-text); }
+
+    .domains { margin: 12px 0 10px; gap: 8px; }
+    .domain {
+      padding: 7px 10px;
+      background: var(--panel);
+      color: var(--fg);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      font-size: 14px;
+    }
+    .removed {
+      text-decoration: line-through;
+      opacity: .35;
+      color: var(--muted);
+    }
+    .status {
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--status-border);
+      background: var(--status-bg);
+      color: var(--status-fg);
+      border-radius: 0 8px 8px 0;
+      min-height: 54px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .stack {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-weight: 700;
+      color: var(--stack-fg);
+      display: inline-block;
+      margin-bottom: 3px;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <h2>Backtracking: decidir, propagar, retroceder</h2>
+    <div class="controls">
+      <button id="prev" type="button" aria-label="Paso anterior">← Atrás</button>
+      <span id="count" aria-live="polite"></span>
+      <button id="next" type="button" aria-label="Siguiente paso">Siguiente →</button>
+    </div>
+  </div>
+  <svg class="graph" viewBox="0 0 700 240" role="img" aria-label="Grafo de cuatro variables">
+    <g class="edge">
+      <line x1="110" y1="120" x2="290" y2="55"/>
+      <line x1="110" y1="120" x2="290" y2="185"/>
+      <line x1="290" y1="55" x2="500" y2="120"/>
+      <line x1="290" y1="185" x2="500" y2="120"/>
+      <line x1="290" y1="55" x2="290" y2="185"/>
+    </g>
+    <g id="nodes"></g>
+  </svg>
+  <div class="domains" id="domains"></div>
+  <div class="status" id="status" aria-live="polite"></div>
+</main>
+<script>
+  const pos = { A: [110, 120], B: [290, 55], C: [290, 185], D: [500, 120] };
+  const all = ['R', 'V', 'A'];
+  const steps = [
+    {cur:'A', as:{}, dom:{A:all,B:all,C:all,D:all}, t:'Estado inicial: ninguna variable asignada. MRV empata; elegimos A.'},
+    {cur:'B', as:{A:'R'}, dom:{A:['R'],B:['V','A'],C:['V','A'],D:all}, t:'Decisión A=R. Forward checking elimina R de B y C.'},
+    {cur:'C', as:{A:'R',B:'V'}, dom:{A:['R'],B:['V'],C:['A'],D:['R','A']}, t:'MRV elige B. Probamos B=V; C queda forzada a A.'},
+    {cur:'D', as:{A:'R',B:'V',C:'A'}, dom:{A:['R'],B:['V'],C:['A'],D:[]}, fail:'D', t:'Al asignar C=A, D pierde V por B y A por C: dominio vacío. Fallo detectado antes de completar.'},
+    {cur:'B', as:{A:'R'}, dom:{A:['R'],B:['V','A'],C:['V','A'],D:all}, t:'Backtracking deshace C y B. Volvemos al último punto con otra opción.'},
+    {cur:'C', as:{A:'R',B:'A'}, dom:{A:['R'],B:['A'],C:['V'],D:['R','V']}, t:'Segunda opción B=A. La propagación fuerza C=V.'},
+    {cur:'D', as:{A:'R',B:'A',C:'V'}, dom:{A:['R'],B:['A'],C:['V'],D:['R']}, t:'Con C=V, D solo puede ser R.'},
+    {cur:null, as:{A:'R',B:'A',C:'V',D:'R'}, dom:{A:['R'],B:['A'],C:['V'],D:['R']}, t:'Asignación completa y consistente: se devuelve la solución.'}
+  ];
+
+  const nodes = document.getElementById('nodes');
+  const domains = document.getElementById('domains');
+  const status = document.getElementById('status');
+  const count = document.getElementById('count');
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+
+  for (const [id, p] of Object.entries(pos)) {
+    let g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.dataset.id = id;
+    g.setAttribute('transform', `translate(${p[0]} ${p[1]})`);
+    g.innerHTML = `<circle r="34"/><text>${id}</text>`;
+    nodes.append(g);
+  }
+
+  let i = 0;
+  function draw() {
+    let s = steps[i];
+    nodes.querySelectorAll('g').forEach(g => {
+      let id = g.dataset.id, c = 'node';
+      if (s.as[id]) c += ' assigned';
+      if (id === s.cur) c += ' current';
+      if (id === s.fail) c += ' failed';
+      g.setAttribute('class', c);
+      g.querySelector('text').textContent = id + (s.as[id] ? '=' + s.as[id] : '');
+    });
+
+    domains.innerHTML = Object.entries(s.dom).map(([x, d]) =>
+      `<span class="domain"><b>D(${x})</b> = {${all.map(v => `<span class="${d.includes(v) ? '' : 'removed'}">${v}</span>`).join(', ')}}</span>`
+    ).join('');
+
+    status.innerHTML = `<span class="stack">Pila: ${Object.entries(s.as).map(([x, v]) => x + '=' + v).join(' → ') || '∅'}</span><br>${s.t}`;
+    count.textContent = `Paso ${i + 1}/${steps.length}`;
+    prev.disabled = i === 0;
+    next.disabled = i === steps.length - 1;
+  }
+
+  prev.onclick = () => { if (i > 0) { i--; draw(); } };
+  next.onclick = () => { if (i < steps.length - 1) { i++; draw(); } };
+  draw();
+</script>
+</body>
+</html>

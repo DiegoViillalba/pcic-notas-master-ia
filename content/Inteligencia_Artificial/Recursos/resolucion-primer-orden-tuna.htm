@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resolución de primer orden: Curiosity y Tuna</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fb;--panel:#fff;--ink:#172235;--muted:#5b6879;--line:#ccd5e2;--accent:#2258a5;--soft:#eaf1fc;--derived:#eef8ee;--derived-ink:#1f6032;--danger:#8d2a32;--danger-soft:#fbeaec}
+*{box-sizing:border-box}body{margin:0;padding:18px;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:980px;margin:auto}h1{margin:0 0 5px;font-size:1.45rem}h2{font-size:1.05rem;margin:0 0 9px}.muted{color:var(--muted)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.controls button{font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}.controls button.primary{background:var(--accent);border-color:var(--accent);color:#fff}.controls button:disabled{opacity:.5}.counter{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}.progress{height:7px;border-radius:6px;background:var(--line);overflow:hidden;margin:10px 0 4px}.progress span{display:block;height:100%;background:var(--accent);transition:width .18s ease}.layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(285px,.95fr);gap:12px}.clause-list{display:grid;gap:7px}.clause{padding:8px 10px;border-left:4px solid var(--line);background:var(--bg);border-radius:5px}.clause.active{border-left-color:var(--accent);background:var(--soft)}.clause.derived{border-left-color:var(--derived-ink);background:var(--derived)}.clause.empty{border-left-color:var(--danger);background:var(--danger-soft);color:var(--danger);font-weight:700}.formula{font-family:"STIX Two Text","Times New Roman",serif;font-size:1.05rem}.step-title{font-weight:700;margin-bottom:7px}.meta{display:grid;grid-template-columns:max-content 1fr;gap:6px 10px;margin:10px 0}.meta dt{color:var(--muted)}.meta dd{margin:0}.meaning{border-left:4px solid var(--accent);padding:9px 11px;background:var(--soft);border-radius:5px}.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:9px;color:var(--muted);font-size:.9rem}.dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;background:var(--line)}.dot.active{background:var(--accent)}.dot.derived{background:var(--derived-ink)}@media(max-width:720px){.layout{grid-template-columns:1fr}.counter{width:100%;margin-left:0}}@media(prefers-color-scheme:dark){:root{--bg:#172130;--panel:#223043;--ink:#f2f5fa;--muted:#bcc9d8;--line:#607186;--accent:#6796df;--soft:#263e61;--derived:#244838;--derived-ink:#b9efc8;--danger:#ff9aa3;--danger-soft:#4a2930}}
+</style>
+</head>
+<body>
+<main>
+<h1>¿Curiosity mató a Tuna?</h1>
+<p class="muted">Prueba por refutación: añadimos ¬Kills(Curiosity,Tuna) y avanzamos hasta la cláusula vacía □.</p>
+
+<section class="panel" aria-label="Controles de la derivación">
+  <div class="controls">
+    <button type="button" id="prev">← Anterior</button>
+    <button type="button" class="primary" id="next">Siguiente →</button>
+    <button type="button" id="reset">Reiniciar</button>
+    <span class="counter" id="counter" aria-live="polite"></span>
+  </div>
+  <div class="progress" role="progressbar" aria-label="Progreso de la prueba" aria-valuemin="0" aria-valuemax="8" id="progress"><span id="bar"></span></div>
+</section>
+
+<div class="layout">
+  <section class="panel" aria-labelledby="clauses-title">
+    <h2 id="clauses-title">Cláusulas disponibles</h2>
+    <div id="clauses" class="clause-list" aria-live="polite"></div>
+    <div class="legend"><span><i class="dot active"></i>premisas del paso</span><span><i class="dot derived"></i>cláusula derivada</span></div>
+  </section>
+
+  <section class="panel" aria-labelledby="step-title-heading">
+    <h2 id="step-title-heading">Paso actual</h2>
+    <div class="step-title" id="stepTitle"></div>
+    <dl class="meta">
+      <dt>Resolver</dt><dd id="parents"></dd>
+      <dt>Unificador</dt><dd class="formula" id="theta"></dd>
+      <dt>Resultado</dt><dd class="formula" id="result"></dd>
+    </dl>
+    <p class="meaning" id="meaning"></p>
+  </section>
+</div>
+</main>
+
+<script>
+const initial=[
+  {id:"A1",f:"Animal(F(x)) ∨ Loves(G(x),x)"},
+  {id:"A2",f:"¬Loves(x,F(x)) ∨ Loves(G(x),x)"},
+  {id:"B",f:"¬Loves(y,x) ∨ ¬Animal(z) ∨ ¬Kills(x,z)"},
+  {id:"C",f:"¬Animal(u) ∨ Loves(Jack,u)"},
+  {id:"D",f:"Kills(Jack,Tuna) ∨ Kills(Curiosity,Tuna)"},
+  {id:"E",f:"Cat(Tuna)"},
+  {id:"F",f:"¬Cat(v) ∨ Animal(v)"},
+  {id:"¬G",f:"¬Kills(Curiosity,Tuna)"}
+];
+const steps=[
+  {title:"Hipótesis de refutación",parents:"—",theta:"—",result:"Cláusulas iniciales",meaning:"Suponemos que Curiosity no mató a Tuna. Si esta hipótesis contradice la base, la consulta original queda demostrada.",use:[],out:null},
+  {title:"Tuna es un animal",parents:"E y F",theta:"{v/Tuna}",result:"Animal(Tuna)",meaning:"Tuna es gato y todo gato es animal.",use:["E","F"],out:{id:"R1",f:"Animal(Tuna)"}},
+  {title:"Jack mató a Tuna",parents:"D y ¬G",theta:"{}",result:"Kills(Jack,Tuna)",meaning:"Si Jack o Curiosity mató a Tuna y descartamos a Curiosity, queda Jack.",use:["D","¬G"],out:{id:"R2",f:"Kills(Jack,Tuna)"}},
+  {title:"Instanciar la regla del asesino",parents:"B y R1",theta:"{z/Tuna}",result:"¬Loves(y,x) ∨ ¬Kills(x,Tuna)",meaning:"Como Tuna es animal, desaparece el literal ¬Animal(z) de la regla B.",use:["B","R1"],out:{id:"R3",f:"¬Loves(y,x) ∨ ¬Kills(x,Tuna)"}},
+  {title:"Nadie ama a Jack",parents:"R3 y R2",theta:"{x/Jack}",result:"¬Loves(y,Jack)",meaning:"Jack mató al animal Tuna; por B, ninguna persona ama a Jack.",use:["R3","R2"],out:{id:"R4",f:"¬Loves(y,Jack)"}},
+  {title:"Aplicar la condición de A a Jack",parents:"A2 y C",theta:"{x/Jack, u/F(Jack)}",result:"¬Animal(F(Jack)) ∨ Loves(G(Jack),Jack)",meaning:"Se cancela Loves(Jack,F(Jack)). La variable u de C se estandarizó aparte antes de unificar.",use:["A2","C"],out:{id:"R5",f:"¬Animal(F(Jack)) ∨ Loves(G(Jack),Jack)"}},
+  {title:"Alguien ama a Jack",parents:"R5 y A1",theta:"{x/Jack}",result:"Loves(G(Jack),Jack)",meaning:"A fuerza la existencia de un testigo G(Jack) que ama a Jack.",use:["R5","A1"],out:{id:"R6",f:"Loves(G(Jack),Jack)"}},
+  {title:"Contradicción",parents:"R4 y R6",theta:"{y/G(Jack)}",result:"□",meaning:"La misma persona G(Jack) ama y no ama a Jack. La hipótesis ¬Kills(Curiosity,Tuna) es imposible; por tanto, Curiosity mató a Tuna.",use:["R4","R6"],out:{id:"R7",f:"□"}}
+];
+let index=0;
+const $=id=>document.getElementById(id);
+function available(){
+  const items=initial.map(x=>({...x,kind:"base"}));
+  for(let i=1;i<=index;i++) if(steps[i].out) items.push({...steps[i].out,kind:i===index?"new":"derived"});
+  return items;
+}
+function render(){
+  const step=steps[index];
+  $("clauses").replaceChildren();
+  available().forEach(c=>{
+    const div=document.createElement("div");
+    const active=step.use.includes(c.id);
+    div.className="clause"+(active?" active":"")+(c.kind==="new"||c.kind==="derived"?" derived":"")+(c.f==="□"?" empty":"");
+    const strong=document.createElement("strong");strong.textContent=c.id+": ";
+    const span=document.createElement("span");span.className="formula";span.textContent=c.f;
+    div.append(strong,span);$("clauses").append(div);
+  });
+  $("stepTitle").textContent=step.title;
+  $("parents").textContent=step.parents;
+  $("theta").textContent=step.theta;
+  $("result").textContent=step.result;
+  $("meaning").textContent=step.meaning;
+  $("counter").textContent="Paso "+index+" de "+(steps.length-1);
+  $("bar").style.width=(index/(steps.length-1)*100)+"%";
+  $("progress").setAttribute("aria-valuenow",String(index));
+  $("prev").disabled=index===0;
+  $("next").disabled=index===steps.length-1;
+}
+$("prev").addEventListener("click",()=>{if(index>0){index--;render()}});
+$("next").addEventListener("click",()=>{if(index<steps.length-1){index++;render()}});
+$("reset").addEventListener("click",()=>{index=0;render()});
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Búsqueda local · laboratorio</title>
+<style>
+:root{color-scheme:light dark;font-family:system-ui,sans-serif;color:light-dark(#202e40,#e0e8f2);background:light-dark(#fafbfe,#161c27)}body{margin:0;padding:22px;max-width:940px}h1{font-size:23px;margin:0 0 8px}p{line-height:1.5}.controls{display:flex;flex-wrap:wrap;gap:14px;margin:20px 0}label{display:flex;flex-direction:column;gap:6px;font-size:14px}select,input,button{font:inherit;padding:9px;border:1px solid #8191a5;border-radius:6px;background:light-dark(white,#242f40);color:inherit}input{width:100px}button{cursor:pointer}button:disabled{opacity:.5;cursor:default}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #d68726;outline-offset:3px}#step{background:#246ab5;color:white}svg{display:block;width:100%;height:auto;min-height:180px}svg text{fill:currentColor;font-size:15px}.line{stroke:#7b8da3;stroke-width:3;fill:none}.node{fill:light-dark(#e4ecf8,#334964);stroke:#6684aa;stroke-width:2}.current{fill:#247ac5;stroke:#10446e;stroke-width:3}.best{fill:none;stroke:#d99324;stroke-width:4}.tabu{stroke:#ce6482;stroke-width:3;stroke-dasharray:4 3}.stats{display:flex;flex-wrap:wrap;gap:12px 26px;font-weight:600;margin:16px 0}#message{min-height:52px;padding:12px 0;border-top:1px solid #8191a5}#history{max-height:200px;overflow:auto;font-size:14px;line-height:1.6;padding-left:24px}.muted{font-size:13px;opacity:.8}
+</style></head><body>
+<h1>Una misma montaña, tres decisiones</h1><p>Maximizar f. Solo puedes pasar a la letra contigua. Azul: estado actual · aro dorado: mejor visitado · borde discontinuo: tabú.</p>
+<div class="controls">
+<label>Algoritmo<select id="method"><option value="hill">Hill climbing</option><option value="tabu">Búsqueda tabú</option><option value="sa">Recocido simulado</option></select></label>
+<label>Inicio<select id="start"><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></label>
+<label>Temperatura inicial<input id="temp" type="number" min="0.01" max="1000" step="0.5" value="10"></label>
+<label>Factor α<input id="alpha" type="number" min="0.01" max="0.99" step="0.01" value="0.9"></label>
+<label>Semilla aleatoria<input id="seed" type="number" min="1" max="999999" step="1" value="17"></label>
+</div>
+<svg id="plot" viewBox="0 0 720 270" role="img" aria-label="Paisaje discreto: A vale 2, B 5, C 3, D 4, E 8 y F 6"></svg>
+<div class="stats"><span id="current"></span><span id="best"></span><span id="memory"></span><span id="temperature"></span></div>
+<div class="controls"><button id="step" type="button">Siguiente paso</button><button id="reset" type="button">Reiniciar</button></div>
+<p id="message" role="status" aria-live="polite"></p><ol id="history" aria-label="Historial de decisiones"></ol>
+<p class="muted">Tabú: cola de los dos últimos estados, incluido el actual; sin aspiración. Recocido: vecino uniforme y enfriamiento tras cada intento. Paro: 40 intentos, T ≤ 0.01 o sin movimiento admisible. Reiniciar repite los sorteos con la misma semilla.</p>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),names=['A','B','C','D','E','F'],values=[2,5,3,4,8,6];
+let current,best,queue,T,k,rng,stopped,mode,alpha;
+const neighbors=i=>[i-1,i+1].filter(j=>j>=0&&j<6);
+function random(){rng=(Math.imul(1664525,rng)+1013904223)>>>0;return rng/4294967296;}
+function draw(){
+ const xy=i=>[65+i*116,225-values[i]*23];
+ let s='<title>Paisaje de búsqueda A–F</title><text x="8" y="22">f</text><path class="line" d="M35 30 V235 H685"/>';
+ s+='<polyline class="line" points="'+names.map((_,i)=>xy(i).join(',')).join(' ')+'"/>';
+ names.forEach((n,i)=>{const[x,y]=xy(i);if(i===best)s+=`<circle class="best" cx="${x}" cy="${y}" r="19"/>`;s+=`<circle class="node ${i===current?'current':''} ${mode==='tabu'&&queue.includes(i)?'tabu':''}" cx="${x}" cy="${y}" r="12"/><text x="${x}" y="${y-27}" text-anchor="middle">${values[i]}</text><text x="${x}" y="259" text-anchor="middle">${n}</text>`;});
+ $('plot').innerHTML=s;$('current').textContent=`Actual: ${names[current]} · ${values[current]}`;$('best').textContent=`Récord: ${names[best]} · ${values[best]}`;$('memory').textContent=mode==='tabu'?`Tabú: [${queue.map(i=>names[i]).join(', ')}]`:'';$('temperature').textContent=mode==='sa'?`T siguiente: ${T.toFixed(4)}`:'';$('step').disabled=stopped;
+}
+function reset(){
+ mode=$('method').value;current=names.indexOf($('start').value);best=current;queue=[current];
+ T=Math.min(1000,Math.max(.01,Number($('temp').value)||10));alpha=Math.min(.99,Math.max(.01,Number($('alpha').value)||.9));rng=(Number($('seed').value)||17)>>>0;
+ $('temp').value=T;$('alpha').value=alpha;k=0;stopped=false;$('history').innerHTML='';$('message').textContent='Listo. Avanza para ver una propuesta y su decisión.';
+ for(const id of ['temp','alpha','seed'])$(id).disabled=mode!=='sa';draw();
+}
+function step(){if(stopped)return;let ns=neighbors(current),before=current,msg='';k++;
+ if(mode==='hill'){
+  const n=ns.sort((a,b)=>values[b]-values[a]||a-b)[0];
+  if(values[n]>values[current]){current=n;msg=`${names[before]} → ${names[n]}: mejor vecino, ${values[before]} → ${values[n]}.`;}
+  else{stopped=true;msg=`Paro en ${names[current]}: ningún vecino mejora ${values[current]}.`;}
+ }else if(mode==='tabu'){
+  ns=ns.filter(n=>!queue.includes(n)).sort((a,b)=>values[b]-values[a]||a-b);
+  if(!ns.length){stopped=true;msg='Paro: todos los vecinos están tabú. Se devuelve el récord.';}
+  else{current=ns[0];queue.push(current);if(queue.length>2)queue.shift();msg=`${names[before]} → ${names[current]}: mejor admisible, ${values[before]} → ${values[current]}${values[current]<values[before]?' (se acepta empeorar)':''}.`;}
+ }else{
+  if(T<=.01){stopped=true;msg='Paro: temperatura mínima alcanzada.';}
+  else{const n=ns[Math.floor(random()*ns.length)],delta=values[n]-values[current],p=Math.min(1,Math.exp(delta/T)),u=random(),accept=u<p;
+   msg=`Propuesta ${names[before]} → ${names[n]}: Δ=${delta}, T=${T.toFixed(3)}, p=${p.toFixed(4)}, u=${u.toFixed(4)}. ${accept?'Aceptar.':'Rechazar; se conserva '+names[before]+'.'}`;if(accept)current=n;T*=alpha;}
+ }
+ if(values[current]>values[best])best=current;
+ if(k>=40){stopped=true;msg+=' Presupuesto agotado.';}
+ $('message').textContent=msg;const li=document.createElement('li');li.textContent=msg;$('history').appendChild(li);$('history').scrollTop=$('history').scrollHeight;draw();
+}
+$('step').addEventListener('click',step);$('reset').addEventListener('click',reset);for(const id of ['method','start','temp','alpha','seed'])$(id).addEventListener('change',reset);reset();
+})();
+</script></body></html>

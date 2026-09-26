@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simulador de unificación en Prolog</title>
+<style>
+  :root{
+    --bg:#f5f6f8;
+    --surface:#ffffff;
+    --surface-2:#eef1f5;
+    --text:#1a2130;
+    --text-muted:#5a6472;
+    --border:#dbe0e6;
+    --accent:#2f6b64;
+    --accent-strong:#1f4d47;
+    --accent-soft:#dcece8;
+    --warn:#a8540f;
+    --warn-soft:#f5e2cf;
+    --bad:#b3261e;
+    --bad-soft:#fbe4e2;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#10141b; --surface:#171d26; --surface-2:#1e2530;
+      --text:#e7eaf0; --text-muted:#94a0b3; --border:#2b3341;
+      --accent:#6fd0c5; --accent-strong:#94e4da; --accent-soft:#1c3532;
+      --warn:#f0a868; --warn-soft:#3a2a19;
+      --bad:#f2938c; --bad-soft:#3a2020;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+      --bg:#10141b; --surface:#171d26; --surface-2:#1e2530;
+      --text:#e7eaf0; --text-muted:#94a0b3; --border:#2b3341;
+      --accent:#6fd0c5; --accent-strong:#94e4da; --accent-soft:#1c3532;
+      --warn:#f0a868; --warn-soft:#3a2a19;
+      --bad:#f2938c; --bad-soft:#3a2020;
+      color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;padding:20px 16px 32px;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;}
+  .wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:20px;}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;}
+  h1{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-size:1.25rem;margin:0 0 4px;color:var(--accent-strong);text-wrap:balance;}
+  .sub{color:var(--text-muted);font-size:0.92rem;margin:0;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 18px 20px;}
+  .card h2{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-size:1rem;margin:0 0 10px;display:flex;align-items:center;gap:8px;}
+  .card h2::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--accent);display:inline-block;}
+  .facts{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:0.85rem;}
+  .facts pre{margin:0;white-space:pre-wrap;}
+  .group-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);margin:10px 0 6px;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:8px;
+    padding:6px 10px;font-size:0.82rem;cursor:pointer;font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;}
+  .chip:hover{border-color:var(--accent);}
+  .chip.err{border-color:var(--bad);}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;}
+  button.btn{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:8px;
+    padding:7px 12px;font-size:0.85rem;cursor:pointer;font-family:inherit;}
+  button.btn:hover{border-color:var(--accent);}
+  button.btn.primary{background:var(--accent);border-color:var(--accent);color:#08201d;font-weight:600;}
+  button.btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+  .console{
+    margin-top:12px;
+    background:#fbfbfb;
+    color:#1a1a1a;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px 14px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size:0.84rem;
+    min-height:170px;
+    max-height:280px;
+    overflow-y:auto;
+    white-space:pre-wrap;
+    line-height:1.55;
+  }
+  .console .sysline{color:#256029;}
+  .console .errline{color:#b3261e;font-weight:600;}
+  .console .trueline{font-weight:700;}
+  .console .prompt{color:#555;}
+
+  .cases{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;}
+  .case-box{flex:1 1 260px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--surface-2);}
+  .case-box .tag{display:inline-block;font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-size:0.75rem;
+    padding:2px 8px;border-radius:999px;background:var(--accent);color:#08201d;margin-bottom:8px;}
+  .case-box p{margin:4px 0;font-size:0.88rem;}
+
+  /* árbol de corte */
+  .tree{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:14px;}
+  .tnode{border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:var(--surface-2);font-size:0.85rem;}
+  .tnode.ok{border-left:4px solid var(--accent);}
+  .tnode.pruned{border-left:4px solid var(--text-muted);opacity:0.45;text-decoration:line-through;}
+  .branch{margin-left:28px;display:flex;flex-direction:column;gap:8px;position:relative;}
+  .branch::before{content:"";position:absolute;left:-14px;top:-8px;bottom:8px;border-left:1px dashed var(--border);}
+  .cut-toggle{display:flex;gap:8px;margin-top:10px;}
+
+  footer.note{font-size:0.78rem;color:var(--text-muted);text-align:center;margin-top:4px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div>
+    <h1>Consultas, unificación y corte en Prolog</h1>
+    <p class="sub">Simulador basado en <code class="mono">MariaGusta.pl</code> y en las sesiones reales de SWI-Prolog de los apuntes.</p>
+  </div>
+
+  <!-- CONSOLA INTERACTIVA -->
+  <div class="card">
+    <h2>Consola interactiva de SWI-Prolog</h2>
+    <div class="facts">
+<pre class="mono">gusta( maria, helado ).
+gusta( maria, leer ).
+gusta( maria, cine ).
+
+dar( juan, beso, maria ).
+recibe( X, beso ) :- dar( juan, beso, X ).</pre>
+    </div>
+    <p class="sub">Elige una consulta y presiona «Ejecutar». Si tiene varias soluciones, usa «Siguiente solución ( ; )» para pedirle a Prolog más respuestas, tal como en la consola real.</p>
+
+    <div class="group-label">Hechos con átomos</div>
+    <div class="chips" id="chipsA"></div>
+    <div class="group-label">Consultas con variables (una posición)</div>
+    <div class="chips" id="chipsB"></div>
+    <div class="group-label">Átomos en mayúscula: ¿variable o constante?</div>
+    <div class="chips" id="chipsC"></div>
+    <div class="group-label">La regla recibe/2, y un error de sintaxis clásico</div>
+    <div class="chips" id="chipsD"></div>
+
+    <div class="row">
+      <button class="btn" id="nextBtn" disabled>Siguiente solución ( ; )</button>
+      <button class="btn primary" id="clearBtn">Reiniciar consola</button>
+    </div>
+
+    <div class="console" id="console" role="log" aria-live="polite"></div>
+  </div>
+
+  <!-- CORTE -->
+  <div class="card">
+    <h2>El corte ( ! ): qué rama poda</h2>
+    <p class="sub" style="margin-bottom:6px;">Predicado con corte:</p>
+    <div class="facts"><pre class="mono">factorial( 0, 1 ) :- !.
+factorial( N, F ) :- N > 0, N1 is N - 1, factorial( N1, F1 ), F is N * F1.</pre></div>
+    <p class="sub">Al resolver <code class="mono">factorial(0, F)</code>, Prolog encuentra <code class="mono">F = 1</code> con la primera cláusula. Si más adelante el programa falla y Prolog necesita <strong>retroceder (backtracking)</strong> hasta este punto, ¿vuelve a intentar la segunda cláusula?</p>
+
+    <div class="cut-toggle">
+      <button class="btn" id="withoutCutBtn">Sin corte</button>
+      <button class="btn primary" id="withCutBtn">Con corte ( ! )</button>
+    </div>
+
+    <div class="tree" id="cutTree"></div>
+
+    <div class="cases" style="margin-top:14px;">
+      <div class="case-box">
+        <span class="tag">Sin !</span>
+        <p>Al retroceder, Prolog sí prueba <code class="mono">N &gt; 0</code> con N = 0. La condición falla, así que el resultado final es el mismo — pero Prolog perdió tiempo explorando una rama inútil.</p>
+      </div>
+      <div class="case-box">
+        <span class="tag">Con !</span>
+        <p>El corte descarta de inmediato la segunda cláusula para esta llamada. Prolog nunca vuelve a intentarla, sin importar qué pase después en el programa.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="note">Clase del 10 de septiembre — Programación Avanzada · Hechos, reglas, unificación y corte en Prolog</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var queries = [
+    {group:'A', label:'gusta(maria,leer)', text:'gusta( maria, leer ).', type:'true'},
+    {group:'A', label:'gusta(maria,helado)', text:'gusta( maria, helado ).', type:'true'},
+    {group:'A', label:'gusta(maria,cine)', text:'gusta( maria, cine).', type:'true'},
+    {group:'A', label:'gusta(maria,chocolate)', text:'gusta( maria, chocolate ).', type:'false'},
+
+    {group:'B', label:'gusta(Y,leer)', text:'gusta( Y, leer ).', type:'bindings', sols:['Y = maria']},
+    {group:'B', label:'gusta(Y,helado)', text:'gusta( Y, helado ).', type:'bindings', sols:['Y = maria']},
+    {group:'B', label:'gusta(maria,X)', text:'gusta( maria, X ).', type:'bindings', sols:['X = helado','X = leer','X = cine']},
+    {group:'B', label:'gusta(Y,X)', text:'gusta( Y, X ).', type:'bindings', sols:['Y = maria,\nX = helado','Y = maria,\nX = leer','Y = maria,\nX = cine']},
+
+    {group:'C', label:'gusta(Maria,helado)', text:'gusta( Maria, helado ).', type:'bindings', sols:['Maria = maria']},
+    {group:'C', label:'gusta(maria,Helado)', text:'gusta( maria, Helado ).', type:'bindings', sols:['Helado = helado','Helado = leer','Helado = cine']},
+    {group:'C', label:'gusta(maria,Maria)', text:'gusta( maria, Maria ).', type:'bindings', sols:['Maria = helado','Maria = leer','Maria = cine']},
+
+    {group:'D', label:'recibe(X,beso)', text:'recibe( X, beso ).', type:'bindings', sols:['X = maria']},
+    {group:'D', label:'recibe(maria,beso)', text:'recibe( maria, beso ).', type:'true'},
+    {group:'D', label:'recibe(maria,X)', text:'recibe( maria, X ).', type:'bindings', sols:['X = beso']},
+    {group:'D', label:'recibe (X,beso) — con espacio', text:'recibe ( X, beso ).', type:'error', err:'ERROR: Syntax error: Operator expected\nERROR: recibe\nERROR: ** here **\nERROR: ( X, beso ) .'}
+  ];
+
+  var consoleEl = document.getElementById('console');
+  var nextBtn = document.getElementById('nextBtn');
+  var clearBtn = document.getElementById('clearBtn');
+  var counter = 1;
+  var active = null; // {query, solIndex}
+
+  function appendLine(text, cls){
+    var div = document.createElement('div');
+    if(cls) div.className = cls;
+    div.textContent = text;
+    consoleEl.appendChild(div);
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+  }
+
+  function runQuery(q){
+    active = {q:q, idx:0};
+    appendLine(counter + ' ?- ' + q.text, 'prompt');
+    counter++;
+    if(q.type === 'true'){
+      appendLine('true.', 'trueline');
+      active = null;
+      nextBtn.disabled = true;
+    } else if(q.type === 'false'){
+      appendLine('false.');
+      active = null;
+      nextBtn.disabled = true;
+    } else if(q.type === 'error'){
+      appendLine(q.err, 'errline');
+      active = null;
+      nextBtn.disabled = true;
+    } else if(q.type === 'bindings'){
+      showNextBinding();
+    }
+  }
+
+  function showNextBinding(){
+    if(!active) return;
+    var sols = active.q.sols;
+    var isLast = active.idx === sols.length - 1;
+    var text = sols[active.idx] + (isLast ? '.' : ' ;');
+    appendLine(text);
+    active.idx++;
+    if(isLast){
+      active = null;
+      nextBtn.disabled = true;
+    } else {
+      nextBtn.disabled = false;
+    }
+  }
+
+  nextBtn.addEventListener('click', showNextBinding);
+  clearBtn.addEventListener('click', function(){
+    consoleEl.innerHTML = '';
+    counter = 1;
+    active = null;
+    nextBtn.disabled = true;
+    appendLine('% consulta reiniciada — 34 clauses cargadas', 'sysline');
+  });
+
+  var groups = {A: document.getElementById('chipsA'), B: document.getElementById('chipsB'),
+                C: document.getElementById('chipsC'), D: document.getElementById('chipsD')};
+  queries.forEach(function(q){
+    var chip = document.createElement('button');
+    chip.className = 'chip' + (q.type === 'error' ? ' err' : '');
+    chip.textContent = q.label;
+    chip.addEventListener('click', function(){ runQuery(q); });
+    groups[q.group].appendChild(chip);
+  });
+
+  appendLine('% MariaGusta.pl compiled 0.00 sec, 6 clauses', 'sysline');
+
+  // ---------- árbol de corte ----------
+  var cutTree = document.getElementById('cutTree');
+  function renderTree(withCut){
+    cutTree.innerHTML = '';
+    var root = document.createElement('div');
+    root.className = 'tnode';
+    root.textContent = '?- factorial( 0, F ).';
+    cutTree.appendChild(root);
+
+    var branch = document.createElement('div');
+    branch.className = 'branch';
+
+    var c1 = document.createElement('div');
+    c1.className = 'tnode ok';
+    c1.textContent = withCut
+      ? 'Cláusula 1: factorial(0,1) :- !.   →  F = 1   (corte activado)'
+      : 'Cláusula 1: factorial(0,1).   →  F = 1';
+    branch.appendChild(c1);
+
+    var c2 = document.createElement('div');
+    c2.className = 'tnode' + (withCut ? ' pruned' : '');
+    c2.textContent = withCut
+      ? 'Cláusula 2: nunca se intenta — el corte ya la descartó'
+      : 'Cláusula 2: N > 0 con N = 0  →  falla, sin más soluciones';
+    branch.appendChild(c2);
+
+    cutTree.appendChild(branch);
+  }
+  document.getElementById('withCutBtn').addEventListener('click', function(){ renderTree(true); });
+  document.getElementById('withoutCutBtn').addEventListener('click', function(){ renderTree(false); });
+  renderTree(true);
+
+})();
+</script>
+</body>
+</html>

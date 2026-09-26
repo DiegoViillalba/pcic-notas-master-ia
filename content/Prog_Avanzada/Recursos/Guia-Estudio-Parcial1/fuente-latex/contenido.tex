@@ -1,0 +1,132 @@
+% ================= PORTADA =================
+\thispagestyle{empty}
+\begin{center}
+{\small UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO · Posgrado en Ciencia e Ingeniería de la Computación}\\[1.2cm]
+{\color{azul}\rule{\linewidth}{1pt}}\\[0.4cm]
+{\Huge\bfseries\color{azul} Guía de estudio}\\[0.3cm]
+{\LARGE Programación Avanzada — Primer examen parcial}\\[0.3cm]
+{\large Prof. Gustavo Márquez Flores · Semestre 2026-1}\\[0.4cm]
+{\color{azul}\rule{\linewidth}{1pt}}\\[0.8cm]
+\ifsol
+{\Large\bfseries\color{verde} CUADERNO DE SOLUCIONES}\\[0.2cm]
+{\normalsize Cada problema aparece con su enunciado y su solución desarrollada paso a paso.}
+\else
+{\Large\bfseries\color{azul} CUADERNO DE PROBLEMAS}\\[0.2cm]
+{\normalsize Resuelve primero sin mirar; después compara con el cuaderno de soluciones (misma numeración).}
+\fi
+\end{center}
+\vspace{0.8cm}
+
+\begin{formulario}[Contenido]
+\begin{enumerate}[label=\textbf{\arabic*.},leftmargin=*]
+\item Fundamentos: lenguajes, gramáticas, paradigmas, programación estructurada y modular, métricas de módulos.
+\item Divide y vencerás: esquema general, búsqueda binaria, QuickSort, multiplicación de enteros grandes.
+\item Backtracking: una, todas y la mejor solución; ocho reinas; cuadros mágicos y construcción por patrones.
+\item Lógica de Hoare básica: aserciones, fortaleza, corrección parcial/total, asignación, consecuencia, conjunción.
+\item Composición secuencial e invariantes de bloque.
+\item Condicionales (\textbf{if} con y sin \textbf{else}).
+\item Ciclos: inducción, invariante de ciclo, salida y terminación.
+\item Recursión doble: función 91 de McCarthy, inducción modificada y función de Ackermann.
+\item Programación lógica: cláusulas de Horn, resolución, SLD, unificación, backtracking y corte en Prolog.
+\item Dos exámenes simulados (formato de 5--6 preguntas, como el del año pasado).
+\end{enumerate}
+Los problemas marcados con $\bigstar$ son \emph{literalmente} las preguntas del examen del año pasado.
+\end{formulario}
+
+\newpage
+% ================= CÓMO ES EL EXAMEN =================
+\section*{Cómo es el examen del profesor}
+\addcontentsline{toc}{section}{Cómo es el examen}
+
+El primer parcial del año pasado tuvo \textbf{cinco preguntas} que combinan demostración formal, teoría breve y pseudocódigo:
+
+\begin{center}
+\begin{tabular}{@{}c p{10.4cm} p{3.9cm}@{}}
+\toprule
+\# & Pregunta & Tipo \\ \midrule
+1 & Demostrar que $\hoare{a<b}{\kw{if}\ (a>b)\ \kw{then}\ m\asg a\ \kw{else}\ m\asg b}{m=b}$ es válida. & Demostración (Hoare) \\
+2 & ¿Qué métricas de módulos existen para medir su eficiencia? & Teoría breve \\
+3 & Escribir en seudocódigo el algoritmo de \emph{Divide y vencerás}. & Pseudocódigo \\
+4 & Demostrar que el invariante de \texttt{int j=9; for(int i=0;i<10;i++) j--;} es $i+j=9$. & Demostración (inducción) \\
+5 & Describir el algoritmo de \emph{Backtracking} para buscar la \emph{mejor} solución. & Pseudocódigo + teoría \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Qué se deduce:} el profesor pide (i) demostraciones con reglas de Hoare escritas completas, (ii) invariantes de ciclos probados por inducción, (iii) los esquemas de sus hojas \emph{``Algoritmo BackTracking y Divide-Venceras''} en su misma notación y (iv) definiciones cortas. Como este año el curso ya avanzó a la función 91, Ackermann y Prolog, es razonable esperar al menos una pregunta de esos temas.
+
+\begin{consejo}[Lección del examen corregido]
+En la pregunta 1 el alumno supuso $a>b$ y trató de ``forzar'' $m=b$; el profesor anotó \emph{``revisar planteamiento''}. La clave era \textbf{reconocer que la rama \textbf{then} es inalcanzable}: $a<b \land a>b\equiv\bot$, y una terna con precondición $\bot$ es válida por vacuidad. Siempre escribe explícitamente $P$, $B$, $Q$, las dos ramas y la regla que usas.
+\end{consejo}
+
+\subsection*{Plantillas que conviene memorizar}
+\begin{formulario}[Plantilla: demostrar una terna con condicional]
+\begin{enumerate}[leftmargin=*]
+\item Identificar $P$ (precondición), $B$ (guarda) y $Q$ (postcondición).
+\item \textbf{Rama verdadera:} con precondición $P\land B$, calcular $wp(C_1,Q)$ por sustitución y probar $P\land B\Rightarrow wp(C_1,Q)$ (regla de consecuencia). Si $P\land B\equiv\bot$, la rama es inalcanzable y la terna vale por vacuidad.
+\item \textbf{Rama falsa:} igual con $P\land\neg B$ y $C_2$ (si no hay \textbf{else}: probar $P\land\neg B\Rightarrow Q$).
+\item Concluir con la regla condicional. Sin ciclos ni recursión, el código termina: corrección total.
+\end{enumerate}
+\end{formulario}
+
+\begin{formulario}[Plantilla: demostrar un invariante de ciclo]
+\begin{enumerate}[leftmargin=*]
+\item Traducir el \texttt{for} a \texttt{while} y nombrar valores tras $n$ iteraciones: $x_n$.
+\item \textbf{Caso base} ($n=0$): el invariante $I$ vale antes de la primera iteración.
+\item \textbf{Hipótesis de inducción:} $I$ vale tras $n$ iteraciones.
+\item \textbf{Paso inductivo:} si la guarda $B$ es cierta y se ejecuta el cuerpo, $I$ vale tras $n+1$ iteraciones (equivalente: $\hoare{I\land B}{\text{cuerpo}}{I}$).
+\item \textbf{Salida:} $I\land\neg B\Rightarrow Q$. \quad \textbf{Terminación:} variante entera $\ge0$ que decrece.
+\end{enumerate}
+\end{formulario}
+
+\newpage
+% ================= FORMULARIO =================
+\section*{Formulario de repaso}
+\addcontentsline{toc}{section}{Formulario}
+
+\begin{formulario}[Lógica de Hoare]
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{@{}p{4.3cm} p{11.3cm}@{}}
+Terna & $\hoare{P}{C}{Q}$: si $C$ inicia en un estado que satisface $P$ \emph{y termina}, el estado final satisface $Q$. \\[2pt]
+Corrección & total $=$ parcial $+$ terminación. \\[2pt]
+Fortaleza & $R$ es más fuerte que $S$ si $R\Rightarrow S$.\quad $\bot$ (ningún estado) es la más fuerte; $\T\equiv\{\ \}$ (todos) la más débil. \\[2pt]
+Asignación & $\hoare{\sust{Q}{E}{V}}{V\asg E}{Q}$ \quad (sustituir $V$ por $E$ en $Q$; añadir condiciones de dominio, p.\,ej. divisor $\neq0$). \\[2pt]
+Consecuencia & $\dfrac{P_1\Rightarrow P\quad \hoare{P}{C}{Q}}{\hoare{P_1}{C}{Q}}$ \qquad $\dfrac{\hoare{P}{C}{Q}\quad Q\Rightarrow Q_1}{\hoare{P}{C}{Q_1}}$ \\[10pt]
+Conjunción / disyunción & $\dfrac{\hoare{P_1}{C}{Q_1}\quad\hoare{P_2}{C}{Q_2}}{\hoare{P_1\land P_2}{C}{Q_1\land Q_2}}$ \qquad $\dfrac{\hoare{P_1}{C}{Q_1}\quad\hoare{P_2}{C}{Q_2}}{\hoare{P_1\lor P_2}{C}{Q_1\lor Q_2}}$ \\[10pt]
+Composición & $\dfrac{\hoare{P}{C_1}{R}\quad\hoare{R}{C_2}{Q}}{\hoare{P}{C_1;C_2}{Q}}$ \quad ($R$: aserción intermedia; se calcula hacia atrás). \\[10pt]
+\textbf{if} sin \textbf{else} & $\dfrac{\hoare{P\land B}{C_1}{Q}\quad (P\land\neg B)\Rightarrow Q}{\hoare{P}{\kw{if}\ B\ \kw{then}\ C_1}{Q}}$ \\[10pt]
+\textbf{if} con \textbf{else} & $\dfrac{\hoare{P\land B}{C_1}{Q}\quad \hoare{P\land\neg B}{C_2}{Q}}{\hoare{P}{\kw{if}\ B\ \kw{then}\ C_1\ \kw{else}\ C_2}{Q}}$ \\[10pt]
+\textbf{while} & $P\Rightarrow I$;\ \ $\hoare{I\land B}{C}{I}$;\ \ $I\land\neg B\Rightarrow Q$;\ \ variante $V\in\mathbb N$ que decrece estrictamente. \\[2pt]
+Invariante de bloque & $\hoare{I}{C}{I}$: se conserva la \emph{relación}, no los valores.
+\end{tabular}
+\end{formulario}
+
+\begin{formulario}[Inducción, McCarthy y Ackermann]
+\textbf{Inducción ordinaria:} $P(k)$ y $\forall n\ge k\,(P(n)\Rightarrow P(n+1))$ $\Rightarrow$ $\forall n\ge k\ P(n)$.\\
+\textbf{Inducción modificada (hacia abajo):} $P(k)$ y, para todo $n<k$, [$P(m)$ para todo $m$ con $n<m\le k$] $\Rightarrow P(n)$ $\;\Longrightarrow\;$ $\forall n\le k\ P(n)$.\\[3pt]
+\textbf{Función 91:} $f(x)=x-10$ si $x>100$; $f(x)=f(f(x+11))$ si $x\le100$. \ Teorema: $f(x)=91$ para $x\le 100$.\\[3pt]
+\textbf{Ackermann:} $A(0,y)=y+1$;\ $A(x+1,0)=A(x,1)$;\ $A(x+1,y+1)=A(x,A(x+1,y))$.\\
+$A(1,z)=z+2$,\quad $A(2,z)=2z+3$,\quad $A(3,z)=2^{z+3}-3$,\quad $A(4,z)=\underbrace{2^{2^{\cdot^{\cdot^{2}}}}}_{z+3\text{ doses}}-3$ \ ($A(4,0)=13$, $A(4,1)=65533$).
+\end{formulario}
+
+\begin{formulario}[Técnicas de diseño]
+\textbf{Divide y vencerás:} caso base simple; descomponer en $k$ subproblemas \emph{semejantes y menores}; resolver recursivamente; \emph{combinar}.\\
+Recurrencias típicas: $T(n)=T(n/2)+\Theta(1)\Rightarrow\Theta(\log n)$ (búsqueda binaria); $2T(n/2)+\Theta(1)\Rightarrow\Theta(n)$ (máximo); $2T(n/2)+\Theta(n)\Rightarrow\Theta(n\log n)$ (mergesort, QuickSort balanceado); $T(n-1)+\Theta(n)\Rightarrow\Theta(n^2)$ (QuickSort peor caso); $4T(n/2)+\Theta(n)\Rightarrow\Theta(n^2)$; $3T(n/2)+\Theta(n)\Rightarrow\Theta(n^{\log_2 3})$ (Karatsuba).\\[3pt]
+\textbf{Backtracking:} árbol de decisiones recorrido en profundidad; \emph{elegir – validar (poda) – anotar – avanzar – deshacer}. \emph{Una}: se detiene con el primer éxito. \emph{Todas}: registra y sigue. \emph{Mejor}: compara con la mejor guardada y sigue (con cota $\to$ \emph{branch and bound}).\\[3pt]
+\textbf{Ocho reinas:} una reina por fila; columna $j$, diagonales $j-k$ y $j+k$. 92 soluciones (12 fundamentales). $n=4$: 2 soluciones.\\
+\textbf{Cuadro mágico:} $M_n=\dfrac{n(n^2+1)}{2}$ ($M_3=15$, $M_4=34$, $M_5=65$). Impar: método siamés (arriba-derecha; si está ocupada, abajo). $n\equiv0\pmod 4$: llenar $1..n^2$ y cambiar $x\mapsto n^2+1-x$ fuera de las diagonales de cada bloque $4\times4$.
+\end{formulario}
+
+\begin{formulario}[Prolog y resolución]
+Regla \ \texttt{a :- b1, ..., bm.} \ $\equiv$ \ $b_1\land\dots\land b_m\to a$ \ $\equiv$ \ $a\lor\neg b_1\lor\dots\lor\neg b_m$ (cláusula de Horn definida).\\
+Meta \ \texttt{?- a1, ..., an.} \ $\equiv$ \ $\leftarrow A_1,\dots,A_n$ \ $\equiv$ \ $\neg A_1\lor\dots\lor\neg A_n$.\\
+Resolución: $\dfrac{C\lor L\qquad D\lor\neg L'}{(C\lor D)\theta}$,\ \ $\theta=\mathrm{UMG}(L,L')$. Refutación: $S\cup\{\neg F\}\vdash\square\;\Rightarrow\;S\models F$.\\
+Paso SLD: $\leftarrow A_1,\dots,A_k,\dots,A_n$ con regla $A\leftarrow B_1..B_m$ y $\theta=\mathrm{UMG}(A,A_k)$ da $\leftarrow(A_1..A_{k-1},B_1..B_m,A_{k+1}..A_n)\theta$. Éxito: meta vacía $\square$.\\
+Sintaxis: \texttt{,} conjunción; \texttt{;} disyunción (u otra respuesta en consola); \texttt{\textbackslash+} negación como falla; \texttt{!} corte; \texttt{is} evalúa aritmética; \texttt{=} solo unifica; \texttt{=:=} compara valores; Mayúscula inicial o \texttt{\_} = variable; minúscula = átomo; sin espacio entre predicado y paréntesis.
+\end{formulario}
+
+\newpage
+\input{temas-1-3}
+\input{temas-4-7}
+\input{temas-8-9}
+\input{simulacros}

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Expectimax paso a paso</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fb;--panel:#fff;--ink:#172033;--muted:#5f6b7a;--line:#aeb8c8;--max:#2563eb;--chance:#16a34a;--leaf:#7c3aed;--active:#f59e0b;--chosen:#dc2626;--soft:#eef2ff}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,sans-serif}main{max-width:1000px;margin:auto}h2{font-size:21px;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 12px}.controls,.weights,.legend{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.controls,.weights{padding:10px;background:var(--panel);border:1px solid #d7dce6;border-radius:10px;margin-bottom:10px}.weights label{display:flex;align-items:center;gap:6px}.weights input{width:95px}.controls button{font:inherit;color:inherit;background:var(--panel);border:1px solid #aeb8c8;border-radius:8px;padding:7px 10px;cursor:pointer}.controls button:disabled{opacity:.35;cursor:default}.counter{min-width:86px;text-align:center;font-variant-numeric:tabular-nums}.canvas{width:100%;display:block;background:var(--panel);border:1px solid #d7dce6;border-radius:12px}.edge{stroke:var(--line);stroke-width:2.5}.edge.chosen{stroke:var(--chosen);stroke-width:5}.node text{text-anchor:middle;dominant-baseline:central;font-weight:800;fill:var(--ink)}.node .shape{fill:var(--panel);stroke-width:3}.node.max .shape{stroke:var(--max);fill:#dbeafe}.node.chance .shape{stroke:var(--chance);fill:#dcfce7}.node.leaf .shape{stroke:var(--leaf);fill:#ede9fe}.node.active .shape{stroke:var(--active);stroke-width:6}.node.chosen .shape{stroke:var(--chosen);stroke-width:6}.role,.prob{font-size:13px;font-weight:800;fill:var(--muted);text-anchor:middle}.status{margin-top:10px;padding:12px 14px;min-height:82px;border-left:5px solid var(--active);border-radius:8px;background:#fff7df}.formula{font:700 15px ui-monospace,SFMono-Regular,monospace}.legend{margin:9px 2px;color:var(--muted);font-size:13px}.dot{width:12px;height:12px;border-radius:50%;display:inline-block}.dot.max{background:var(--max)}.dot.chance{background:var(--chance)}.dot.leaf{background:var(--leaf)}.compare{margin-top:10px;padding:12px 14px;background:var(--soft);border-radius:8px}.compare strong{font-family:ui-monospace,SFMono-Regular,monospace}.tip{margin-top:8px;color:var(--muted);font-size:13px}@media(max-width:620px){body{padding:10px}.weights label{width:100%;justify-content:space-between}.weights input{width:55%}.canvas{display:none}.mobile-tree{display:block!important}.status{min-height:120px}}@media(prefers-color-scheme:dark){:root{--bg:#1d222d;--panel:#282e3a;--ink:#eef2f7;--muted:#b8c0cd;--line:#687386;--soft:#25395b}.node.max .shape{fill:#1e3a5f}.node.chance .shape{fill:#214c36}.node.leaf .shape{fill:#3c2b64}.status{background:#3c3521}.controls,.weights,.canvas{border-color:#4f596b}}
+</style>
+</head>
+<body>
+<main>
+  <h2>Expectimax: propagar promedios y después elegir</h2>
+  <p class="sub">El árbol usa exactamente las hojas de la diapositiva 9. Las probabilidades no aparecen allí, por eso el laboratorio inicia con distribución uniforme y permite explorar otros modelos.</p>
+  <div class="weights" aria-label="Pesos probabilísticos compartidos por los nodos de azar">
+    <strong>Pesos de los tres resultados:</strong>
+    <label>primero <input id="w0" type="range" min="0" max="10" step="1" value="1"><output id="o0"></output></label>
+    <label>segundo <input id="w1" type="range" min="0" max="10" step="1" value="1"><output id="o1"></output></label>
+    <label>tercero <input id="w2" type="range" min="0" max="10" step="1" value="1"><output id="o2"></output></label>
+  </div>
+  <div class="controls">
+    <button id="prev" aria-label="Paso anterior">← Atrás</button>
+    <span class="counter" id="counter"></span>
+    <button id="next">Siguiente →</button>
+    <button id="reset">Restaurar uniforme</button>
+  </div>
+
+  <svg class="canvas" viewBox="0 0 960 440" role="img" aria-label="Árbol expectimax con una raíz MAX, tres nodos de azar y nueve utilidades terminales">
+    <g id="edges"></g>
+    <g id="nodes"></g>
+  </svg>
+  <div class="mobile-tree" style="display:none" id="mobileTree" aria-live="polite"></div>
+  <div class="legend">
+    <span class="dot max"></span> MAX conserva el mayor
+    <span class="dot chance"></span> AZAR calcula una suma ponderada
+    <span class="dot leaf"></span> utilidad del resultado
+  </div>
+  <div class="status" id="status" aria-live="polite"></div>
+  <div class="compare" id="compare"></div>
+  <div class="tip">Los deslizadores son pesos relativos: el laboratorio los normaliza para que las tres probabilidades sumen 1. Una rama con probabilidad 0 no contribuye.</div>
+</main>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const groups=[[3,12,9],[2,4,6],[15,6,0]];
+const positions={R:[480,60],A:[175,190],B:[480,190],C:[785,190],L0:[75,350],L1:[175,350],L2:[275,350],L3:[380,350],L4:[480,350],L5:[580,350],L6:[685,350],L7:[785,350],L8:[885,350]};
+const childIds=['A','B','C'];
+const statusEl=document.getElementById('status');
+let step=0;
+function svg(tag,attrs={}){const e=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);return e}
+function build(){
+  edges.replaceChildren();nodes.replaceChildren();
+  childIds.forEach((id,i)=>{
+    edges.append(svg('line',{x1:positions.R[0],y1:positions.R[1]+31,x2:positions[id][0],y2:positions[id][1]-31,class:'edge',id:`e-R-${id}`}));
+    groups[i].forEach((value,j)=>{const lid=`L${i*3+j}`,p=positions[lid];edges.append(svg('line',{x1:positions[id][0],y1:positions[id][1]+31,x2:p[0],y2:p[1]-24,class:'edge'}));const q=svg('text',{class:'prob',id:`p-${lid}`,x:(positions[id][0]+p[0])/2,y:(positions[id][1]+p[1])/2-4});nodes.append(q)});
+  });
+  const root=svg('g',{class:'node max',id:'n-R',transform:`translate(${positions.R[0]} ${positions.R[1]})`});root.append(svg('path',{class:'shape',d:'M 0 -36 L 39 0 L 0 36 L -39 0 Z'}));const rt=svg('text');rt.textContent='?';root.append(rt);nodes.append(root);const rl=svg('text',{class:'role',x:480,y:15});rl.textContent='MAX';nodes.append(rl);
+  childIds.forEach(id=>{const p=positions[id],g=svg('g',{class:'node chance',id:`n-${id}`,transform:`translate(${p[0]} ${p[1]})`});g.append(svg('circle',{class:'shape',r:31}));const t=svg('text');t.textContent='?';g.append(t);nodes.append(g);const l=svg('text',{class:'role',x:p[0],y:p[1]-45});l.textContent='AZAR';nodes.append(l)});
+  groups.flat().forEach((value,i)=>{const p=positions[`L${i}`],g=svg('g',{class:'node leaf',id:`n-L${i}`,transform:`translate(${p[0]} ${p[1]})`});g.append(svg('rect',{class:'shape',x:-29,y:-23,width:58,height:46,rx:8}));const t=svg('text');t.textContent=value;g.append(t);nodes.append(g)});
+}
+function probabilities(){const raw=[+w0.value,+w1.value,+w2.value],sum=raw.reduce((a,b)=>a+b,0);return sum===0?[1/3,1/3,1/3]:raw.map(x=>x/sum)}
+function nice(n){return Number(n.toFixed(2)).toString()}
+function calc(){const p=probabilities(),expected=groups.map(g=>g.reduce((s,v,i)=>s+p[i]*v,0)),root=Math.max(...expected),chosen=expected.indexOf(root);return {p,expected,root,chosen}}
+function expression(g,p){return g.map((v,i)=>`${nice(p[i])}×${v}`).join(' + ')}
+function draw(){
+  const d=calc();
+  [o0,o1,o2].forEach((o,i)=>o.value=`${(d.p[i]*100).toFixed(0)} %`);
+  document.querySelectorAll('.node').forEach(n=>n.classList.remove('active','chosen'));document.querySelectorAll('.edge').forEach(e=>e.classList.remove('chosen'));
+  childIds.forEach((id,i)=>{const n=document.querySelector(`#n-${id}`);n.querySelector('text').textContent=step>i?nice(d.expected[i]):'?';if(step===i+1)n.classList.add('active');groups[i].forEach((_,j)=>document.querySelector(`#p-L${i*3+j}`).textContent=nice(d.p[j]))});
+  const root=document.querySelector('#n-R');root.querySelector('text').textContent=step===4?nice(d.root):'?';if(step===4){root.classList.add('active');document.querySelector(`#n-${childIds[d.chosen]}`).classList.add('chosen');document.querySelector(`#e-R-${childIds[d.chosen]}`).classList.add('chosen')}
+  const names=['izquierda','central','derecha'];
+  const messages=[
+    `<span class="formula">Paso 0.</span> Las hojas son resultados evaluados. Todavía no se promedian: primero hay que especificar una distribución de probabilidad para cada nodo de azar.`,
+    `<span class="formula">E(izquierda) = ${expression(groups[0],d.p)} = ${nice(d.expected[0])}</span><br>Se multiplica cada utilidad por su probabilidad y se suman las contribuciones.`,
+    `<span class="formula">E(central) = ${expression(groups[1],d.p)} = ${nice(d.expected[1])}</span><br>Un nodo de azar no elige el mejor ni el peor hijo: representa qué tan probable es cada resultado.`,
+    `<span class="formula">E(derecha) = ${expression(groups[2],d.p)} = ${nice(d.expected[2])}</span><br>Ya quedó resumida cada acción de MAX por su utilidad esperada.`,
+    `<span class="formula">MAX(${d.expected.map(nice).join(', ')}) = ${nice(d.root)}</span><br>MAX elige la rama ${names[d.chosen]} porque tiene la mayor utilidad esperada bajo el modelo probabilístico actual.`
+  ];
+  statusEl.innerHTML=messages[step];counter.textContent=`Paso ${step}/4`;prev.disabled=step===0;next.disabled=step===4;
+  const worst=groups.map(g=>Math.min(...g)),minimax=Math.max(...worst),miniChoice=worst.indexOf(minimax);
+  compare.innerHTML=`<strong>Comparación conservadora:</strong> si los nodos fueran rivales MIN, las ramas valdrían (${worst.join(', ')}) y minimax elegiría ${names[miniChoice]} con ${minimax}. Expectimax usa (${d.expected.map(nice).join(', ')}) y elige ${names[d.chosen]} con ${nice(d.root)}. Que ambas coincidan o no depende de utilidades y probabilidades.`;
+  mobileTree.innerHTML=`<div class="compare"><strong>Ramas:</strong> izquierda [${groups[0]}] → ${nice(d.expected[0])}; central [${groups[1]}] → ${nice(d.expected[1])}; derecha [${groups[2]}] → ${nice(d.expected[2])}. MAX elige ${names[d.chosen]}.</div>`;
+}
+[w0,w1,w2].forEach(x=>x.oninput=draw);prev.onclick=()=>{if(step>0)step--;draw()};next.onclick=()=>{if(step<4)step++;draw()};reset.onclick=()=>{w0.value=w1.value=w2.value=1;step=0;draw()};
+build();draw();
+</script>
+</body>
+</html>

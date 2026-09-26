@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El Mundo del Wumpus: Deducción Lógica Paso a Paso</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #cbd5e1;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --safe: #16a34a;
+  --safe-soft: #dcfce7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+  --gold: #eab308;
+  --gold-soft: #fef9c3;
+  --card-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --ink: #f1f5f9;
+    --muted: #94a3b8;
+    --line: #334155;
+    --accent: #3b82f6;
+    --accent-soft: #1e3a8a;
+    --safe: #22c55e;
+    --safe-soft: #14532d;
+    --danger: #ef4444;
+    --danger-soft: #7f1d1d;
+    --warning: #f59e0b;
+    --warning-soft: #78350f;
+    --gold: #facc15;
+    --gold-soft: #713f12;
+    --card-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  padding: 16px;
+}
+main {
+  max-width: 1060px;
+  margin: 0 auto;
+}
+header {
+  margin-bottom: 16px;
+}
+h1 {
+  font-size: 1.35rem;
+  margin-bottom: 4px;
+}
+.subtitle {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+.app-container {
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  gap: 16px;
+}
+@media (max-width: 860px) {
+  .app-container { grid-template-columns: 1fr; }
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+}
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 6px;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: 12px;
+}
+.cell {
+  background: var(--bg);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px;
+  font-size: 0.72rem;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.cell.agent-here {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.cell.safe {
+  background: var(--safe-soft);
+  border-color: var(--safe);
+}
+.cell.danger {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+.cell.unknown {
+  opacity: 0.75;
+}
+.cell-coords {
+  font-size: 0.65rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+.cell-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  min-height: 24px;
+}
+.cell-status {
+  font-size: 0.65rem;
+  text-align: right;
+  font-weight: 700;
+}
+.badge {
+  display: inline-block;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+.badge-safe { background: var(--safe); color: #fff; }
+.badge-pit { background: var(--danger); color: #fff; }
+.badge-wumpus { background: #7c3aed; color: #fff; }
+.badge-gold { background: var(--gold); color: #000; }
+.badge-stench { background: #ec4899; color: #fff; }
+.badge-breeze { background: #06b6d4; color: #fff; }
+.controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+button {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+}
+button:hover:not(:disabled) {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+  color: #fff;
+}
+.score-badge {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  margin-left: auto;
+}
+.log-box {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.log-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+.log-content {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  max-height: 160px;
+  overflow-y: auto;
+}
+.deduction-card {
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 8px 8px 0;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 0.84rem;
+}
+.formula-line {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: block;
+  margin: 4px 0;
+}
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 8px;
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>El Mundo del Wumpus: Laboratorio de Deducción Lógica</h1>
+    <p class="subtitle">Tablero oficial 4×4 (Diapositiva 4). Observa cómo las percepciones actualizan la Base de Conocimiento ($KB$) y permiten deducir hechos no observables sin adivinar.</p>
+  </header>
+
+  <div class="app-container">
+    <!-- COLUMNA IZQUIERDA: TABLERO 4x4 -->
+    <div class="panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="font-weight: 700; font-size: 0.9rem;">Cueva del Wumpus (4×4)</span>
+        <span id="score" class="score-badge">Puntaje: 0</span>
+      </div>
+
+      <div class="board-grid" id="board">
+        <!-- Generado por JS de [1,4] a [4,1] -->
+      </div>
+
+      <div class="controls">
+        <button id="btn-prev" onclick="prevStep()">← Paso previo</button>
+        <button id="btn-next" class="btn-primary" onclick="nextStep()">Siguiente paso →</button>
+        <button onclick="resetBoard()">Reiniciar</button>
+      </div>
+
+      <div class="legend-grid">
+        <div>🤖 Agente (en casilla)</div>
+        <div>🏆 Oro (Glitter)</div>
+        <div>👾 Wumpus (+1000 pts / muerte)</div>
+        <div>🕳️ Pozo / Pit (-1000 pts)</div>
+        <div>👃 Hedor (Stench en adyacentes)</div>
+        <div>💨 Brisa (Breeze en adyacentes)</div>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA: MOTOR DE DEDUCCIÓN Y KB -->
+    <div class="panel">
+      <div class="log-box">
+        <div class="log-title">
+          <span>Perceptos Actuales del Agente</span>
+          <span id="step-label" style="font-size:0.75rem; color:var(--muted)">Paso 0 / 5</span>
+        </div>
+        <div id="percepts-display" style="font-size:0.85rem; font-weight:600;">
+          Ninguno (Cueva silenciosa)
+        </div>
+      </div>
+
+      <div class="log-box">
+        <div class="log-title">
+          <span>Fórmulas Añadidas a la KB (Tell[f])</span>
+          <span style="font-size:0.75rem; color:var(--muted)">Reglas y Percepciones</span>
+        </div>
+        <div id="kb-display" class="log-content">
+          <!-- Lista viva de fórmulas -->
+        </div>
+      </div>
+
+      <div class="deduction-card" id="deduction-card">
+        <!-- Explicación pedagógica paso a paso -->
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// Especificación exacta del tablero de la diapositiva 4
+// Coordenadas [col, fila] con col de 1 a 4, fila de 1 a 4
+const WORLD = {
+  wumpus: [1, 3],
+  gold: [2, 3],
+  pits: [[3, 1], [3, 3], [4, 4]],
+  stench: [[1, 2], [1, 4], [2, 3]],
+  breeze: [[2, 1], [4, 1], [3, 2], [2, 3], [4, 3], [3, 4]]
+};
+
+// Pasos didácticos del recorrido guiado
+const STEPS = [
+  {
+    step: 0,
+    agent: [1, 1],
+    percepts: ['Ninguno'],
+    score: 0,
+    action: 'Inicio en [1, 1]',
+    kbAdds: [
+      '¬P_11 ∧ ¬W_11 (Casilla inicial segura)',
+      '¬B_11 (No hay brisa en [1,1])',
+      '¬S_11 (No hay hedor en [1,1])',
+      'B_11 ↔ (P_12 ∨ P_21)',
+      'S_11 ↔ (W_12 ∨ W_21)'
+    ],
+    deductions: [
+      '1. De ¬B_11 y la regla de brisa, se deduce: ¬(P_12 ∨ P_21) ≡ ¬P_12 ∧ ¬P_21 (No hay pozo en [1,2] ni en [2,1]).',
+      '2. De ¬S_11 y la regla de hedor, se deduce: ¬(W_12 ∨ W_21) ≡ ¬W_12 ∧ ¬W_21 (No hay Wumpus en [1,2] ni en [2,1]).',
+      '3. Conclusión: ¡Las casillas [2,1] y [1,2] son 100% SEGURAS (OK)!'
+    ],
+    knownSafe: [[1, 1], [2, 1], [1, 2]],
+    knownPits: [],
+    knownWumpus: null
+  },
+  {
+    step: 1,
+    agent: [2, 1],
+    percepts: ['Brisa 💨'],
+    score: -1,
+    action: 'Mover a [2,1] (casilla segura conocida)',
+    kbAdds: [
+      'B_21 (Se percibe brisa en [2,1])',
+      '¬S_21 (No hay hedor en [2,1])',
+      'B_21 ↔ (P_11 ∨ P_22 ∨ P_31)',
+      'S_21 ↔ (W_11 ∨ W_22 ∨ W_31)'
+    ],
+    deductions: [
+      '1. Ya sabíamos ¬P_11. Al sustituir en la regla de brisa: P_22 ∨ P_31 (Hay pozo en [2,2] o en [3,1]).',
+      '2. Como ¬S_21, entonces ¬W_22 y ¬W_31 (No hay Wumpus en [2,2] ni [3,1]).',
+      '3. Como [2,2] es dudosa (posible pozo), no arriesgamos: regresamos a [1,1] y exploramos la otra segura: [1,2].'
+    ],
+    knownSafe: [[1, 1], [2, 1], [1, 2]],
+    knownPits: [],
+    knownWumpus: null
+  },
+  {
+    step: 2,
+    agent: [1, 2],
+    percepts: ['Hedor 👃'],
+    score: -3,
+    action: 'Regresar vía [1,1] y entrar a [1,2]',
+    kbAdds: [
+      'S_12 (Se percibe hedor en [1,2])',
+      '¬B_12 (No hay brisa en [1,2])',
+      'S_12 ↔ (W_11 ∨ W_22 ∨ W_13)',
+      '¬B_12 ↔ ¬(P_11 ∨ P_22 ∨ P_13)'
+    ],
+    deductions: [
+      '1. Deducción del Wumpus: S_12 exige (W_11 ∨ W_22 ∨ W_13). Ya descartamos W_11 y W_22 (por ¬S_21). Por eliminación: ¡EL WUMPUS ESTÁ EN [1,3]! (W_13 = True).',
+      '2. Deducción del Pozo: De ¬B_12 se deduce ¬P_22. Del paso anterior teníamos (P_22 ∨ P_31). Al negar P_22, por silogismo disyuntivo: ¡EL POZO ESTÁ EN [3,1]! (P_31 = True).',
+      '3. Deducción de seguridad: [2,2] no tiene Wumpus (¬W_22) ni pozo (¬P_22). ¡[2,2] es COMPLETAMENTE SEGURA!'
+    ],
+    knownSafe: [[1, 1], [2, 1], [1, 2], [2, 2]],
+    knownPits: [[3, 1]],
+    knownWumpus: [1, 3]
+  },
+  {
+    step: 3,
+    agent: [2, 2],
+    percepts: ['Ninguno (Limpio)'],
+    score: -4,
+    action: 'Avanzar a [2,2] con certeza absoluta',
+    kbAdds: [
+      '¬B_22 (No hay brisa en [2,2])',
+      '¬S_22 (No hay hedor en [2,2])',
+      '¬B_22 → ¬P_23 ∧ ¬P_32',
+      '¬S_22 → ¬W_23 ∧ ¬W_32'
+    ],
+    deductions: [
+      '1. Al no haber brisa ni hedor en [2,2], las celdas adyacentes no visitadas [2,3] y [3,2] quedan libres de peligros inmediatos.',
+      '2. Sabemos que el Wumpus está en [1,3], por lo que [2,3] es segura para avanzar hacia el norte.'
+    ],
+    knownSafe: [[1, 1], [2, 1], [1, 2], [2, 2], [2, 3], [3, 2]],
+    knownPits: [[3, 1]],
+    knownWumpus: [1, 3]
+  },
+  {
+    step: 4,
+    agent: [2, 3],
+    percepts: ['Brillo 🏆', 'Hedor 👃', 'Brisa 💨'],
+    score: -5,
+    action: 'Mover a [2,3]: ¡Oro encontrado!',
+    kbAdds: [
+      'Glitter_23 (Brillo en [2,3])',
+      'Glitter_23 → Gold_23',
+      'TomarOro (Acción racional)'
+    ],
+    deductions: [
+      '1. El sensor Glitter detecta el oro directamente en la celda actual [2,3].',
+      '2. El hedor confirma la adyacencia del Wumpus que ya habíamos deducido en [1,3].',
+      '3. La brisa proviene de los pozos en [3,3].',
+      '4. Plan óptimo de salida: Tomar el oro (+1000) y desandar el camino seguro: [2,3] → [2,2] → [1,2] → [1,1] → Salir.'
+    ],
+    knownSafe: [[1, 1], [2, 1], [1, 2], [2, 2], [2, 3], [3, 2]],
+    knownPits: [[3, 1]],
+    knownWumpus: [1, 3],
+    goldFound: true
+  },
+  {
+    step: 5,
+    agent: [1, 1],
+    percepts: ['Salida de la cueva'],
+    score: 991,
+    action: 'Retorno a [1,1] y acción Salir',
+    kbAdds: [
+      'En[1,1] ∧ TieneOro',
+      'Acción: Salir (Climb)',
+      'Resultado: Victoria con puntuación máxima'
+    ],
+    deductions: [
+      '¡Misión completada con éxito!',
+      'Puntaje final: +1000 (oro) - 9 (pasos de ida, vuelta y toma de oro) = 991 puntos.',
+      'El agente resolvió el mundo sin arriesgarse nunca a ciegas gracias al razonamiento proposicional.'
+    ],
+    knownSafe: [[1, 1], [2, 1], [1, 2], [2, 2], [2, 3]],
+    knownPits: [[3, 1]],
+    knownWumpus: [1, 3],
+    goldFound: true
+  }
+];
+
+let currentStepIdx = 0;
+
+function renderBoard() {
+  const boardEl = document.getElementById('board');
+  boardEl.innerHTML = '';
+  const currentStep = STEPS[currentStepIdx];
+
+  // Filas de 4 a 1, columnas de 1 a 4
+  for (let r = 4; r >= 1; r--) {
+    for (let c = 1; c <= 4; c++) {
+      const cellEl = document.createElement('div');
+      cellEl.className = 'cell';
+
+      const isAgent = (currentStep.agent[0] === c && currentStep.agent[1] === r);
+      const isKnownSafe = currentStep.knownSafe.some(([x, y]) => x === c && y === r);
+      const isKnownPit = currentStep.knownPits.some(([x, y]) => x === c && y === r);
+      const isKnownWumpus = (currentStep.knownWumpus && currentStep.knownWumpus[0] === c && currentStep.knownWumpus[1] === r);
+
+      if (isAgent) cellEl.classList.add('agent-here');
+      if (isKnownSafe) cellEl.classList.add('safe');
+      if (isKnownPit || isKnownWumpus) cellEl.classList.add('danger');
+
+      // Coordenadas
+      const topBar = document.createElement('div');
+      topBar.style.display = 'flex';
+      topBar.style.justifyContent = 'space-between';
+      topBar.innerHTML = `<span class="cell-coords">[${c},${r}]</span>`;
+      cellEl.appendChild(topBar);
+
+      // Contenido
+      const contentEl = document.createElement('div');
+      contentEl.className = 'cell-content';
+
+      if (isAgent) contentEl.innerHTML += '<span title="Agente">🤖</span>';
+      if (isKnownWumpus) contentEl.innerHTML += '<span title="Wumpus">👾</span>';
+      if (isKnownPit) contentEl.innerHTML += '<span title="Pozo">🕳️</span>';
+      if (c === WORLD.gold[0] && r === WORLD.gold[1] && currentStepIdx >= 4) {
+        contentEl.innerHTML += '<span title="Oro">🏆</span>';
+      }
+
+      // Sensores estáticos del mapa de diapositiva 4
+      const hasStench = WORLD.stench.some(([x, y]) => x === c && y === r);
+      const hasBreeze = WORLD.breeze.some(([x, y]) => x === c && y === r);
+      if (hasStench) contentEl.innerHTML += '<span title="Hedor" style="font-size:0.75rem">👃</span>';
+      if (hasBreeze) contentEl.innerHTML += '<span title="Brisa" style="font-size:0.75rem">💨</span>';
+
+      cellEl.appendChild(contentEl);
+
+      // Estado inferior
+      const statusEl = document.createElement('div');
+      statusEl.className = 'cell-status';
+      if (isAgent) statusEl.innerHTML = '<span class="badge badge-safe">AGENTE</span>';
+      else if (isKnownWumpus) statusEl.innerHTML = '<span class="badge badge-wumpus">WUMPUS</span>';
+      else if (isKnownPit) statusEl.innerHTML = '<span class="badge badge-pit">POZO</span>';
+      else if (isKnownSafe) statusEl.innerHTML = '<span class="badge badge-safe">OK</span>';
+      else statusEl.innerHTML = '<span style="color:var(--muted)">?</span>';
+
+      cellEl.appendChild(statusEl);
+      boardEl.appendChild(cellEl);
+    }
+  }
+
+  // Actualizar paneles laterales
+  document.getElementById('score').textContent = `Puntaje: ${currentStep.score}`;
+  document.getElementById('step-label').textContent = `Paso ${currentStep.step} / ${STEPS.length - 1}`;
+  document.getElementById('percepts-display').innerHTML = currentStep.percepts.map(p => `<span class="badge" style="background:var(--accent); color:#fff; font-size:0.8rem; margin-right:4px;">${p}</span>`).join('');
+
+  const kbEl = document.getElementById('kb-display');
+  kbEl.innerHTML = '';
+  // Acumular KB de pasos previos
+  for (let s = 0; s <= currentStepIdx; s++) {
+    STEPS[s].kbAdds.forEach(formula => {
+      const line = document.createElement('div');
+      line.textContent = `• ${formula}`;
+      kbEl.appendChild(line);
+    });
+  }
+
+  const dedCard = document.getElementById('deduction-card');
+  dedCard.innerHTML = `
+    <div style="font-weight:700; margin-bottom:6px; color:var(--accent);">${currentStep.action}</div>
+    <div>${currentStep.deductions.map(d => `<p style="margin-bottom:6px;">${d}</p>`).join('')}</div>
+  `;
+
+  document.getElementById('btn-prev').disabled = (currentStepIdx === 0);
+  document.getElementById('btn-next').disabled = (currentStepIdx === STEPS.length - 1);
+}
+
+function nextStep() {
+  if (currentStepIdx < STEPS.length - 1) {
+    currentStepIdx++;
+    renderBoard();
+  }
+}
+
+function prevStep() {
+  if (currentStepIdx > 0) {
+    currentStepIdx--;
+    renderBoard();
+  }
+}
+
+function resetBoard() {
+  currentStepIdx = 0;
+  renderBoard();
+}
+
+window.onload = renderBoard;
+</script>
+</body>
+</html>

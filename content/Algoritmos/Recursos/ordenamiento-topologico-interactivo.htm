@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulador de Ordenamiento Topológico (Kahn vs. Ingenuo)</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #cbd5e1;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --node-active: #f59e0b;
+  --node-active-soft: #fef3c7;
+  --node-done: #16a34a;
+  --node-done-soft: #dcfce7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --ink: #f1f5f9;
+    --muted: #94a3b8;
+    --line: #334155;
+    --accent: #3b82f6;
+    --accent-soft: #1e3a8a;
+    --node-active: #fbbf24;
+    --node-active-soft: #78350f;
+    --node-done: #22c55e;
+    --node-done-soft: #14532d;
+    --danger: #ef4444;
+    --danger-soft: #7f1d1d;
+    --card-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  padding: 16px;
+}
+main { max-width: 1060px; margin: 0 auto; }
+header { margin-bottom: 16px; }
+h1 { font-size: 1.35rem; margin-bottom: 4px; }
+.subtitle { font-size: 0.88rem; color: var(--muted); }
+.layout {
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  gap: 16px;
+}
+@media (max-width: 880px) {
+  .layout { grid-template-columns: 1fr; }
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+}
+.svg-canvas {
+  width: 100%;
+  height: 280px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: block;
+}
+.linear-canvas {
+  width: 100%;
+  height: 90px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-top: 10px;
+}
+.controls {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+  align-items: center;
+}
+button {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+}
+button:hover:not(:disabled) {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+button:disabled { opacity: 0.4; cursor: default; }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.box {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.box-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+.status-card {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  margin-bottom: 12px;
+}
+.status-card.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+.status-card.success { border-left-color: var(--node-done); background: var(--node-done-soft); }
+.pill-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.85rem;
+}
+.pill {
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.pill.active { background: var(--node-active-soft); border-color: var(--node-active); font-weight: 700; }
+.pill.done { background: var(--node-done-soft); border-color: var(--node-done); }
+table.data-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: center;
+  margin-top: 6px;
+}
+table.data-tbl th, table.data-tbl td {
+  padding: 4px 6px;
+  border: 1px solid var(--line);
+}
+table.data-tbl th { background: var(--panel); font-weight: 700; }
+.legend {
+  display: flex;
+  gap: 12px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.legend-item { display: flex; align-items: center; gap: 4px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Laboratorio: Ordenamiento Topológico en DAGs</h1>
+    <p class="subtitle">Simula el Algoritmo de Kahn (Iterativo Mejorado en $O(n+m)$) sobre la gráfica hexagonal canónica (Diapositiva 45 y clase de Ordenamiento Topológico).</p>
+  </header>
+
+  <div class="layout">
+    <!-- COLUMNA IZQUIERDA: VISUALIZACIÓN GRÁFICA -->
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-weight:700; font-size:0.9rem;">Gráfica Dirigida (DAG de 7 nodos)</span>
+        <button onclick="toggleCycle()" id="btn-cycle" style="font-size:0.75rem; padding:3px 8px;">+ Inyectar Ciclo (v7 → v1)</button>
+      </div>
+
+      <svg class="svg-canvas" id="graph-svg" viewBox="0 0 440 280"></svg>
+
+      <div style="margin-top:10px; font-weight:700; font-size:0.82rem; color:var(--muted)">
+        Orden Topológico Lineal (Lista L): Aristas apuntan de izquierda a derecha (i &lt; j)
+      </div>
+      <svg class="linear-canvas" id="linear-svg" viewBox="0 0 440 90"></svg>
+
+      <div class="controls">
+        <button id="btn-prev" onclick="prevStep()">← Paso previo</button>
+        <button id="btn-next" class="btn-primary" onclick="nextStep()">Siguiente paso →</button>
+        <button onclick="resetSim()">Reiniciar</button>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="dot" style="background:var(--panel); border:2px solid var(--line)"></span> Grado &gt; 0</div>
+        <div class="legend-item"><span class="dot" style="background:var(--node-active)"></span> En cola S (Grado = 0)</div>
+        <div class="legend-item"><span class="dot" style="background:var(--node-done)"></span> Procesado en L</div>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA: ESTADO DEL ALGORITMO -->
+    <div class="panel">
+      <div id="status-card" class="status-card">
+        Iniciando simulación...
+      </div>
+
+      <div class="box">
+        <div class="box-title">
+          <span>Cola de Fuentes S (in-degree == 0):</span>
+          <span id="queue-count" style="font-size:0.75rem; color:var(--muted)"></span>
+        </div>
+        <div class="pill-row" id="queue-display"></div>
+      </div>
+
+      <div class="box">
+        <div class="box-title">
+          <span>Lista de Salida L (Orden Topológico construido):</span>
+          <span id="list-count" style="font-size:0.75rem; color:var(--muted)">|L| = 0 / 7</span>
+        </div>
+        <div class="pill-row" id="list-display"></div>
+      </div>
+
+      <div class="box">
+        <div class="box-title">
+          <span>Vector dinámico de Grados de Entrada (in-degree):</span>
+        </div>
+        <table class="data-tbl">
+          <thead>
+            <tr id="deg-header"></tr>
+          </thead>
+          <tbody>
+            <tr id="deg-row"></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box" style="font-size:0.82rem;">
+        <strong>Comparativa de Complejidad (Diapositivas 4, 5, 7, 8):</strong>
+        <table class="data-tbl" style="margin-top:6px;">
+          <thead>
+            <tr><th>Versión</th><th>Tiempo $T(n,m)$</th><th>Espacio $S(n,m)$</th><th>Estrategia</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Iterativa ingenua</td><td>$O(n^2 + nm)$</td><td>$O(n)$</td><td>Escanea toda $G$ cada ronda</td></tr>
+            <tr style="font-weight:700; background:var(--node-done-soft);"><td>Iterativa mejorada (Kahn)</td><td>$O(n + m)$</td><td>$O(n)$</td><td>Cola $S$ + vector dinámico</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// Grafo canónico de la diapositiva 45 (hexágono con nodo central v5)
+// Vértices: v1, v2, v3, v4, v5, v6, v7
+const NODES = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'];
+const POS = {
+  v1: [70, 210],
+  v2: [70, 70],
+  v3: [220, 40],
+  v4: [370, 70],
+  v5: [220, 140],
+  v6: [220, 240],
+  v7: [370, 210]
+};
+
+// Aristas del DAG estándar de Kleinberg & Tardos
+const BASE_EDGES = [
+  ['v1', 'v4'],
+  ['v1', 'v5'],
+  ['v1', 'v7'],
+  ['v2', 'v3'],
+  ['v2', 'v5'],
+  ['v2', 'v6'],
+  ['v3', 'v4'],
+  ['v3', 'v5'],
+  ['v4', 'v5'],
+  ['v5', 'v7'],
+  ['v6', 'v7']
+];
+
+let hasCycle = false;
+let currentEdges = [];
+let historySteps = [];
+let currentStepIdx = 0;
+
+function init() {
+  currentEdges = BASE_EDGES.map(e => [...e]);
+  buildSimulation();
+  render();
+}
+
+function toggleCycle() {
+  hasCycle = !hasCycle;
+  const btn = document.getElementById('btn-cycle');
+  if (hasCycle) {
+    btn.textContent = '- Quitar Ciclo (v7 → v1)';
+    btn.style.color = 'var(--danger)';
+    currentEdges = [...BASE_EDGES.map(e => [...e]), ['v7', 'v1']];
+  } else {
+    btn.textContent = '+ Inyectar Ciclo (v7 → v1)';
+    btn.style.color = '';
+    currentEdges = BASE_EDGES.map(e => [...e]);
+  }
+  buildSimulation();
+  render();
+}
+
+function buildSimulation() {
+  historySteps = [];
+  const inDeg = {};
+  NODES.forEach(u => inDeg[u] = 0);
+  currentEdges.forEach(([u, v]) => inDeg[v]++);
+
+  const S = [];
+  NODES.forEach(u => { if (inDeg[u] === 0) S.push(u); });
+
+  // Paso inicial 0
+  historySteps.push({
+    action: 'Inicialización',
+    explanation: `Inicialización en O(n+m): Se escanea la gráfica para contar grados de entrada. Nodos fuente con grado 0 encolados en S: [${S.join(', ')}].`,
+    inDeg: { ...inDeg },
+    S: [...S],
+    L: [],
+    activeNode: null,
+    removedEdges: []
+  });
+
+  const simInDeg = { ...inDeg };
+  const simS = [...S];
+  const simL = [];
+  const removedEdges = [];
+
+  while (simS.length > 0) {
+    const v = simS.shift();
+    simL.push(v);
+
+    const outgoing = currentEdges.filter(([u, w]) => u === v);
+    const newS = [];
+
+    outgoing.forEach(([u, w]) => {
+      removedEdges.push([u, w]);
+      simInDeg[w]--;
+      if (simInDeg[w] === 0) {
+        simS.push(w);
+        newS.push(w);
+      }
+    });
+
+    historySteps.push({
+      action: `Procesando ${v}`,
+      explanation: `Se toma <strong>${v}</strong> de S y se concatena a L. Se decrementa in-degree de sus aristas salientes.${newS.length > 0 ? ` ¡Nuevas fuentes descubiertas (grado 0): [${newS.join(', ')}] entran a S!` : ''}`,
+      inDeg: { ...simInDeg },
+      S: [...simS],
+      L: [...simL],
+      activeNode: v,
+      removedEdges: [...removedEdges]
+    });
+  }
+
+  // Paso final
+  const isDAG = (simL.length === NODES.length);
+  historySteps.push({
+    action: isDAG ? 'Ordenamiento completado' : '¡Ciclo detectado! (NO-DAG)',
+    explanation: isDAG
+      ? `<strong>Éxito:</strong> Se obtuvo el orden topológico completo: [${simL.join(' → ')}]. Todas las aristas apuntan hacia adelante.`
+      : `<strong>Fallo (|L| = ${simL.length} < ${NODES.length}):</strong> La cola S se vació antes de procesar todos los vértices. La gráfica contiene al menos un ciclo dirigido (NO-DAG).`,
+    inDeg: { ...simInDeg },
+    S: [...simS],
+    L: [...simL],
+    activeNode: null,
+    removedEdges: [...removedEdges],
+    finished: true,
+    isDAG: isDAG
+  });
+
+  currentStepIdx = 0;
+}
+
+function nextStep() {
+  if (currentStepIdx < historySteps.length - 1) {
+    currentStepIdx++;
+    render();
+  }
+}
+
+function prevStep() {
+  if (currentStepIdx > 0) {
+    currentStepIdx--;
+    render();
+  }
+}
+
+function resetSim() {
+  currentStepIdx = 0;
+  render();
+}
+
+function render() {
+  const step = historySteps[currentStepIdx];
+  const svg = document.getElementById('graph-svg');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // Marcador flecha
+  const defs = document.createElementNS(ns, 'defs');
+  const marker = document.createElementNS(ns, 'marker');
+  marker.setAttribute('id', 'arr'); marker.setAttribute('viewBox', '0 0 10 10');
+  marker.setAttribute('refX', '24'); marker.setAttribute('refY', '5');
+  marker.setAttribute('markerWidth', '6'); marker.setAttribute('markerHeight', '6');
+  marker.setAttribute('orient', 'auto-start-reverse');
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+  path.setAttribute('fill', 'var(--muted)');
+  marker.appendChild(path);
+  defs.appendChild(marker);
+  svg.appendChild(defs);
+
+  // Dibujar aristas
+  currentEdges.forEach(([u, v]) => {
+    const isRemoved = step.removedEdges.some(([ru, rv]) => ru === u && rv === v);
+    const p1 = POS[u], p2 = POS[v];
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', p1[0]); line.setAttribute('y1', p1[1]);
+    line.setAttribute('x2', p2[0]); line.setAttribute('y2', p2[1]);
+    line.setAttribute('stroke', isRemoved ? 'var(--line)' : (hasCycle && u === 'v7' && v === 'v1' ? 'var(--danger)' : 'var(--muted)'));
+    line.setAttribute('stroke-width', isRemoved ? '1' : (hasCycle && u === 'v7' && v === 'v1' ? '2.5' : '1.8'));
+    line.setAttribute('stroke-dasharray', isRemoved ? '3 3' : 'none');
+    line.setAttribute('opacity', isRemoved ? '0.25' : '1');
+    line.setAttribute('marker-end', 'url(#arr)');
+    svg.appendChild(line);
+  });
+
+  // Dibujar nodos
+  NODES.forEach(u => {
+    const [x, y] = POS[u];
+    const inL = step.L.includes(u);
+    const inS = step.S.includes(u);
+    const isActive = (step.activeNode === u);
+
+    let fill = 'var(--panel)';
+    let stroke = 'var(--line)';
+    let strokeWidth = '2';
+
+    if (inL) { fill = 'var(--node-done-soft)'; stroke = 'var(--node-done)'; }
+    else if (inS) { fill = 'var(--node-active-soft)'; stroke = 'var(--node-active)'; strokeWidth = '2.5'; }
+    if (isActive) { stroke = 'var(--accent)'; strokeWidth = '3.5'; }
+
+    const c = document.createElementNS(ns, 'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y);
+    c.setAttribute('r', '19');
+    c.setAttribute('fill', fill);
+    c.setAttribute('stroke', stroke);
+    c.setAttribute('stroke-width', strokeWidth);
+    svg.appendChild(c);
+
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', x); t.setAttribute('y', y + 4);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', '12');
+    t.setAttribute('font-weight', '700');
+    t.setAttribute('fill', 'var(--ink)');
+    t.textContent = u;
+    svg.appendChild(t);
+  });
+
+  // Dibujar orden lineal en linear-svg
+  const lSvg = document.getElementById('linear-svg');
+  lSvg.innerHTML = '';
+  if (step.L.length > 0) {
+    const gap = 380 / (NODES.length);
+    step.L.forEach((u, i) => {
+      const x = 30 + i * gap;
+      const y = 45;
+
+      const c = document.createElementNS(ns, 'circle');
+      c.setAttribute('cx', x); c.setAttribute('cy', y);
+      c.setAttribute('r', '15');
+      c.setAttribute('fill', 'var(--node-done-soft)');
+      c.setAttribute('stroke', 'var(--node-done)');
+      c.setAttribute('stroke-width', '2');
+      lSvg.appendChild(c);
+
+      const t = document.createElementNS(ns, 'text');
+      t.setAttribute('x', x); t.setAttribute('y', y + 4);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('font-size', '11');
+      t.setAttribute('font-weight', '700');
+      t.setAttribute('fill', 'var(--ink)');
+      t.textContent = u;
+      lSvg.appendChild(t);
+
+      if (i > 0) {
+        const prevX = 30 + (i - 1) * gap;
+        const l = document.createElementNS(ns, 'line');
+        l.setAttribute('x1', prevX + 16); l.setAttribute('y1', y);
+        l.setAttribute('x2', x - 16); l.setAttribute('y2', y);
+        l.setAttribute('stroke', 'var(--node-done)');
+        l.setAttribute('stroke-width', '2');
+        lSvg.appendChild(l);
+      }
+    });
+  }
+
+  // Actualizar paneles laterales
+  const card = document.getElementById('status-card');
+  card.innerHTML = `<div style="font-weight:700; margin-bottom:4px;">${step.action} (Paso ${currentStepIdx}/${historySteps.length - 1})</div><div>${step.explanation}</div>`;
+  card.className = 'status-card' + (step.finished ? (step.isDAG ? ' success' : ' danger') : '');
+
+  // Display S
+  const qDisp = document.getElementById('queue-display');
+  qDisp.innerHTML = step.S.length === 0
+    ? '<span style="color:var(--muted); font-style:italic;">Cola vacía</span>'
+    : step.S.map(u => `<span class="pill active">${u}</span>`).join('');
+  document.getElementById('queue-count').textContent = `|S| = ${step.S.length}`;
+
+  // Display L
+  const lDisp = document.getElementById('list-display');
+  lDisp.innerHTML = step.L.length === 0
+    ? '<span style="color:var(--muted); font-style:italic;">Lista vacía</span>'
+    : step.L.map(u => `<span class="pill done">${u}</span>`).join(' → ');
+  document.getElementById('list-count').textContent = `|L| = ${step.L.length} / ${NODES.length}`;
+
+  // Tabla in-degree
+  const dHead = document.getElementById('deg-header');
+  const dRow = document.getElementById('deg-row');
+  dHead.innerHTML = NODES.map(u => `<th>${u}</th>`).join('');
+  dRow.innerHTML = NODES.map(u => {
+    const val = step.inDeg[u];
+    const isZero = (val === 0);
+    const inL = step.L.includes(u);
+    return `<td style="${inL ? 'opacity:0.4;' : ''} font-weight:${isZero ? '700' : '400'}; color:${isZero && !inL ? 'var(--node-active)' : 'inherit'}">${val}</td>`;
+  }).join('');
+
+  document.getElementById('btn-prev').disabled = (currentStepIdx === 0);
+  document.getElementById('btn-next').disabled = (currentStepIdx === historySteps.length - 1);
+}
+
+window.onload = init;
+</script>
+</body>
+</html>

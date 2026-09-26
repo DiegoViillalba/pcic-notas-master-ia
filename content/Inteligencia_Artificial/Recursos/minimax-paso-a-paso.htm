@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Minimax paso a paso</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fb;--panel:#fff;--ink:#172033;--muted:#5f6b7a;--line:#aeb8c8;--max:#2563eb;--min:#dc2626;--leaf:#7c3aed;--active:#f59e0b;--chosen:#16a34a}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,sans-serif}main{max-width:980px;margin:auto}.header,.controls,.legend{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.header{justify-content:space-between;margin-bottom:10px}h2{font-size:21px;margin:0}.controls{padding:10px;background:var(--panel);border:1px solid #d7dce6;border-radius:10px}label{font-weight:700}select,button{font:inherit;color:inherit;background:var(--panel);border:1px solid #aeb8c8;border-radius:8px;padding:7px 10px}button{cursor:pointer}button:disabled{opacity:.35;cursor:default}.counter{min-width:86px;text-align:center;font-variant-numeric:tabular-nums}.canvas{width:100%;display:block;background:var(--panel);border:1px solid #d7dce6;border-radius:12px}.edge{stroke:var(--line);stroke-width:3}.edge.chosen{stroke:var(--chosen);stroke-width:5}.node text{text-anchor:middle;dominant-baseline:central;font-weight:800;fill:var(--ink)}.node .shape{fill:var(--panel);stroke-width:3}.node.max .shape{stroke:var(--max);fill:#dbeafe}.node.min .shape{stroke:var(--min);fill:#fee2e2}.node.leaf .shape{stroke:var(--leaf);fill:#ede9fe}.node.active .shape{stroke:var(--active);stroke-width:6}.node.chosen .shape{stroke:var(--chosen);stroke-width:6}.role{font-size:13px;font-weight:800;fill:var(--muted);text-anchor:middle}.status{margin-top:10px;padding:12px 14px;min-height:76px;border-left:5px solid var(--active);border-radius:8px;background:#fff7df}.formula{font:700 16px ui-monospace,SFMono-Regular,monospace}.legend{margin:9px 2px;color:var(--muted);font-size:13px}.dot{width:12px;height:12px;border-radius:50%;display:inline-block}.dot.max{background:var(--max)}.dot.min{background:var(--min)}.dot.leaf{background:var(--leaf)}.tip{margin-top:8px;color:var(--muted);font-size:13px}@media(prefers-color-scheme:dark){:root{--bg:#1d222d;--panel:#282e3a;--ink:#eef2f7;--muted:#b8c0cd;--line:#687386}.node.max .shape{fill:#1e3a5f}.node.min .shape{fill:#5a292d}.node.leaf .shape{fill:#3c2b64}.status{background:#3c3521}.controls,.canvas{border-color:#4f596b}}
+</style>
+</head>
+<body>
+<main>
+  <div class="header">
+    <h2>Minimax: propagar valores desde las hojas</h2>
+    <div class="controls">
+      <label for="starter">En la raíz juega</label>
+      <select id="starter"><option value="max">MAX</option><option value="min">MIN</option></select>
+      <button id="prev" aria-label="Paso anterior">← Atrás</button>
+      <span class="counter" id="counter"></span>
+      <button id="next">Siguiente →</button>
+      <button id="reset">Reiniciar</button>
+    </div>
+  </div>
+
+  <svg class="canvas" viewBox="0 0 900 430" role="img" aria-label="Árbol minimax de dos niveles">
+    <g id="edges"></g>
+    <g id="nodes"></g>
+  </svg>
+  <div class="legend">
+    <span class="dot max"></span> MAX elige el mayor
+    <span class="dot min"></span> MIN elige el menor
+    <span class="dot leaf"></span> utilidad terminal
+  </div>
+  <div class="status" id="status" aria-live="polite"></div>
+  <div class="tip">Cambia quién inicia y observa que no basta con memorizar “max, min, max”: primero hay que identificar quién controla la raíz.</div>
+</main>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const groups=[[3,12,8],[2,4,6],[14,5,2]];
+const positions={R:[450,65],A:[170,195],B:[450,195],C:[730,195],L0:[70,345],L1:[170,345],L2:[270,345],L3:[350,345],L4:[450,345],L5:[550,345],L6:[630,345],L7:[730,345],L8:[830,345]};
+const childIds=['A','B','C'];
+let step=0,role='max';
+
+function svg(tag,attrs={}){const e=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);return e}
+
+function build(){
+  edges.replaceChildren();nodes.replaceChildren();
+  childIds.forEach((id,i)=>{
+    const line=svg('line',{x1:positions.R[0],y1:positions.R[1]+30,x2:positions[id][0],y2:positions[id][1]-30,class:'edge',id:`e-R-${id}`});edges.append(line);
+    groups[i].forEach((value,j)=>{const lid=`L${i*3+j}`,p=positions[lid];edges.append(svg('line',{x1:positions[id][0],y1:positions[id][1]+30,x2:p[0],y2:p[1]-24,class:'edge'}))});
+  });
+  makeDecision('R',positions.R);
+  childIds.forEach(id=>makeDecision(id,positions[id]));
+  groups.flat().forEach((value,i)=>makeLeaf(`L${i}`,positions[`L${i}`],value));
+}
+
+function makeDecision(id,p){
+  const g=svg('g',{class:'node',id:`n-${id}`,transform:`translate(${p[0]} ${p[1]})`});
+  g.append(svg('circle',{class:'shape',r:31}));
+  const t=svg('text');t.textContent='?';g.append(t);nodes.append(g);
+  const label=svg('text',{class:'role',id:`role-${id}`,x:p[0],y:p[1]-45});nodes.append(label);
+}
+function makeLeaf(id,p,value){
+  const g=svg('g',{class:'node leaf',id:`n-${id}`,transform:`translate(${p[0]} ${p[1]})`});
+  g.append(svg('rect',{class:'shape',x:-30,y:-23,width:60,height:46,rx:8}));
+  const t=svg('text');t.textContent=value;g.append(t);nodes.append(g);
+}
+
+function data(){
+  const childRole=role==='max'?'min':'max';
+  const op=childRole==='min'?Math.min:Math.max;
+  const childValues=groups.map(g=>op(...g));
+  const rootOp=role==='max'?Math.max:Math.min;
+  const rootValue=rootOp(...childValues);
+  const chosen=childValues.indexOf(rootValue);
+  return {childRole,childValues,rootValue,chosen};
+}
+
+function draw(){
+  const d=data();
+  document.querySelectorAll('.node').forEach(n=>n.classList.remove('max','min','active','chosen'));
+  document.querySelectorAll('.edge').forEach(e=>e.classList.remove('chosen'));
+  const root=document.querySelector('#n-R');root.classList.add(role);root.querySelector('text').textContent=step===4?d.rootValue:'?';
+  document.querySelector('#role-R').textContent=`RAÍZ · ${role.toUpperCase()}`;
+  childIds.forEach((id,i)=>{
+    const n=document.querySelector(`#n-${id}`);n.classList.add(d.childRole);n.querySelector('text').textContent=step>i?d.childValues[i]:'?';
+    document.querySelector(`#role-${id}`).textContent=d.childRole.toUpperCase();
+    if(step===i+1)n.classList.add('active');
+  });
+  if(step===4){
+    root.classList.add('active');
+    document.querySelector(`#n-${childIds[d.chosen]}`).classList.add('chosen');
+    document.querySelector(`#e-R-${childIds[d.chosen]}`).classList.add('chosen');
+  }
+  const childName=d.childRole.toUpperCase(),rootName=role.toUpperCase();
+  const messages=[
+    `<span class="formula">Paso 0.</span> Las hojas ya tienen utilidades terminales. Se calculan primero los nodos más profundos; la raíz todavía no puede decidir.`,
+    `<span class="formula">${childName}(${groups[0].join(', ')}) = ${d.childValues[0]}</span><br>El nodo izquierdo está controlado por ${childName}, así que conserva ${d.childRole==='min'?'la menor':'la mayor'} utilidad disponible.`,
+    `<span class="formula">${childName}(${groups[1].join(', ')}) = ${d.childValues[1]}</span><br>Ahora se resuelve el subárbol central con la misma regla.`,
+    `<span class="formula">${childName}(${groups[2].join(', ')}) = ${d.childValues[2]}</span><br>Ya conocemos el valor de cada acción posible desde la raíz.`,
+    `<span class="formula">${rootName}(${d.childValues.join(', ')}) = ${d.rootValue}</span><br>${rootName} elige la rama ${['izquierda','central','derecha'][d.chosen]}. Ese valor supone que el rival también elige óptimamente en su turno.`
+  ];
+  status.innerHTML=messages[step];counter.textContent=`Paso ${step}/4`;prev.disabled=step===0;next.disabled=step===4;
+}
+
+starter.onchange=()=>{role=starter.value;step=0;draw()};
+prev.onclick=()=>{if(step>0)step--;draw()};next.onclick=()=>{if(step<4)step++;draw()};reset.onclick=()=>{step=0;draw()};
+build();draw();
+</script>
+</body>
+</html>

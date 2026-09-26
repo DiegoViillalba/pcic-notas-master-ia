@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MRV y LCV desde lo esencial</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: var(--obsidian-bg, #f7f8fc);
+      --fg: var(--obsidian-text, #202536);
+      --muted: #646b79;
+      --panel: #ffffff;
+      --line: #c9cedb;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --accent-text: #1d4ed8;
+      --good: #15803d;
+      --good-soft: #dcfce7;
+      --good-text: #14532d;
+      --bad: #b91c1c;
+      --bad-soft: #fee2e2;
+      --bad-text: #7f1d1d;
+    }
+    :root[style*="color-scheme: dark"],
+    :root[style*="--obsidian-color-scheme: dark"] {
+      --bg: var(--obsidian-bg, #1a1d24);
+      --fg: var(--obsidian-text, #eef0f5);
+      --muted: #94a3b8;
+      --panel: #242832;
+      --line: #3b4252;
+      --accent: #60a5fa;
+      --accent-soft: #1e3a5f;
+      --accent-text: #93c5fd;
+      --good: #4ade80;
+      --good-soft: #143823;
+      --good-text: #86efac;
+      --bad: #f87171;
+      --bad-soft: #3f1d24;
+      --bad-text: #fca5a5;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([style*="color-scheme: light"]) {
+        --bg: var(--obsidian-bg, #1a1d24);
+        --fg: var(--obsidian-text, #eef0f5);
+        --muted: #94a3b8;
+        --panel: #242832;
+        --line: #3b4252;
+        --accent: #60a5fa;
+        --accent-soft: #1e3a5f;
+        --accent-text: #93c5fd;
+        --good: #4ade80;
+        --good-soft: #143823;
+        --good-text: #86efac;
+        --bad: #f87171;
+        --bad-soft: #3f1d24;
+        --bad-text: #fca5a5;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--fg);
+      font: 15px/1.45 system-ui, -apple-system, sans-serif;
+    }
+    main { max-width: 820px; margin: auto; }
+    h2 { font-size: 21px; margin: 0 0 4px; color: var(--fg); }
+    p { margin: 0; }
+    .sub { color: var(--muted); }
+    .tabs, .choices { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
+    button {
+      font: inherit;
+      color: var(--fg);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    button:hover {
+      border-color: var(--accent);
+    }
+    button[aria-selected="true"],
+    button[aria-pressed="true"] {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent-text);
+      font-weight: 700;
+    }
+    .context {
+      padding: 10px 12px;
+      border-left: 4px solid var(--accent);
+      background: var(--panel);
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 12px;
+      color: var(--fg);
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      color: var(--fg);
+    }
+    th, td {
+      text-align: left;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    th {
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .selected td {
+      background: var(--good-soft);
+      color: var(--good-text);
+    }
+    .domain {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+    }
+    .result {
+      margin-top: 12px;
+      padding: 11px 14px;
+      border-left: 4px solid var(--good);
+      background: var(--good-soft);
+      color: var(--good-text);
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .result.bad {
+      border-left-color: var(--bad);
+      background: var(--bad-soft);
+      color: var(--bad-text);
+    }
+    .empty {
+      color: var(--bad);
+      font-weight: 700;
+    }
+    .metric {
+      font-weight: 700;
+    }
+    .explain {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    [hidden] { display: none !important; }
+    @media (max-width: 520px) {
+      body { padding: 12px; }
+      th, td { padding: 8px 7px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h2>MRV y LCV: dos preguntas diferentes</h2>
+  <p class="sub">Estado parcial del mapa: WA = rojo y NT = verde.</p>
+
+  <div class="tabs" role="tablist" aria-label="Heurística que se desea estudiar">
+    <button id="tab-mrv" role="tab" aria-selected="true" aria-controls="panel-mrv" type="button">1. Elegir variable: MRV</button>
+    <button id="tab-lcv" role="tab" aria-selected="false" aria-controls="panel-lcv" type="button">2. Elegir valor: LCV</button>
+  </div>
+
+  <section id="panel-mrv" role="tabpanel" aria-labelledby="tab-mrv">
+    <div class="context"><strong>Pregunta:</strong> ¿qué variable no asignada tiene menos valores legales?</div>
+    <div class="table-wrap">
+      <table aria-label="Dominios restantes para aplicar MRV">
+        <thead><tr><th>Variable</th><th>Dominio actual</th><th>Valores restantes</th></tr></thead>
+        <tbody>
+          <tr class="selected"><td><strong>SA ← MRV</strong></td><td class="domain">{azul}</td><td>1</td></tr>
+          <tr><td>Q</td><td class="domain">{rojo, azul}</td><td>2</td></tr>
+          <tr><td>NSW</td><td class="domain">{rojo, verde, azul}</td><td>3</td></tr>
+          <tr><td>V</td><td class="domain">{rojo, verde, azul}</td><td>3</td></tr>
+          <tr><td>T</td><td class="domain">{rojo, verde, azul}</td><td>3</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="result" aria-live="polite"><span class="metric">MRV elige SA.</span> Su única opción permite confirmar pronto si la rama puede continuar.</div>
+  </section>
+
+  <section id="panel-lcv" role="tabpanel" aria-labelledby="tab-lcv" hidden>
+    <div class="context"><strong>Supuesto:</strong> la variable elegida es Q, con dominio <span class="domain">{rojo, azul}</span>. ¿Qué color elimina menos opciones vecinas?</div>
+    <div class="choices" aria-label="Valores candidatos para Q">
+      <button type="button" data-color="rojo" aria-pressed="true">Probar Q = rojo</button>
+      <button type="button" data-color="azul" aria-pressed="false">Probar Q = azul</button>
+    </div>
+    <div class="table-wrap">
+      <table aria-label="Efecto del valor elegido para Q">
+        <thead><tr><th>Vecina</th><th>Antes</th><th>Después</th><th>Opciones eliminadas</th></tr></thead>
+        <tbody id="lcv-body"></tbody>
+      </table>
+    </div>
+    <div id="lcv-result" class="result" aria-live="polite"></div>
+    <p class="explain">LCV compara el efecto sobre los dominios vecinos; no elige la variable.</p>
+  </section>
+</main>
+<script>
+  const tabs=[document.getElementById('tab-mrv'),document.getElementById('tab-lcv')];
+  const panels=[document.getElementById('panel-mrv'),document.getElementById('panel-lcv')];
+  function showTab(index){
+    tabs.forEach((tab,i)=>tab.setAttribute('aria-selected',String(i===index)));
+    panels.forEach((panel,i)=>panel.hidden=i!==index);
+  }
+  tabs[0].addEventListener('click',()=>showTab(0));
+  tabs[1].addEventListener('click',()=>showTab(1));
+
+  const cases={
+    rojo:{rows:[['SA','{azul}','{azul}','0'],['NSW','{rojo, verde, azul}','{verde, azul}','1']],cost:1,bad:false,text:'LCV prefiere rojo: elimina 1 opción y todos los dominios conservan valores.'},
+    azul:{rows:[['SA','{azul}','∅','1'],['NSW','{rojo, verde, azul}','{rojo, verde}','1']],cost:2,bad:true,text:'Azul elimina 2 opciones y vacía D(SA): esta rama fallaría inmediatamente.'}
+  };
+  const body=document.getElementById('lcv-body');
+  const result=document.getElementById('lcv-result');
+  const choices=[...document.querySelectorAll('[data-color]')];
+  function choose(color){
+    const item=cases[color];
+    choices.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.color===color)));
+    body.innerHTML=item.rows.map(row=>`<tr><td><strong>${row[0]}</strong></td><td class="domain">${row[1]}</td><td class="domain ${row[2]==='∅'?'empty':''}">${row[2]}</td><td>${row[3]}</td></tr>`).join('');
+    result.className='result'+(item.bad?' bad':'');
+    result.innerHTML=`<span class="metric">Costo de poda: ${item.cost}.</span> ${item.text}`;
+  }
+  choices.forEach(button=>button.addEventListener('click',()=>choose(button.dataset.color)));
+  choose('rojo');
+</script>
+</body>
+</html>

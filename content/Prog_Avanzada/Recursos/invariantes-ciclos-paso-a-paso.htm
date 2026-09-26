@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invariantes de ciclos paso a paso</title>
+<style>
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: light-dark(#20242d, #e8eaf0);
+  background: transparent;
+  --surface: light-dark(#f5f7fb, #202631);
+  --surface-strong: light-dark(#e9eef8, #293344);
+  --border: light-dark(#b8c1d1, #536075);
+  --accent: light-dark(#2459a8, #8db8ff);
+  --good: light-dark(#166534, #86efac);
+  --muted: light-dark(#586174, #aab3c3);
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 18px; line-height: 1.5; }
+h2 { margin: 0 0 6px; font-size: 1.25rem; }
+p { margin: 7px 0; }
+.subtle { color: var(--muted); }
+.tabs, .controls, .step-controls { display: flex; flex-wrap: wrap; gap: 9px; align-items: end; }
+.tabs { margin: 16px 0; }
+button, input {
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 9px 12px;
+}
+button { min-height: 42px; }
+button[aria-selected="true"] { background: var(--accent); color: light-dark(#ffffff, #14213a); border-color: transparent; }
+button:disabled { opacity: .45; }
+label { display: grid; gap: 4px; }
+input { width: 7rem; }
+.stage { margin: 18px 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.state {
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.state .label { color: var(--muted); font-size: .84rem; }
+.state output { display: block; font-size: 1.25rem; font-variant-numeric: tabular-nums; margin-top: 3px; }
+.invariant {
+  padding: 14px;
+  border-left: 5px solid var(--good);
+  background: var(--surface-strong);
+  border-radius: 6px;
+}
+.formula { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; overflow-wrap: anywhere; }
+.code-line { margin: 14px 0; padding: 10px 12px; background: var(--surface); border-radius: 7px; }
+.step-controls { margin-top: 16px; }
+@media (max-width: 560px) {
+  body { padding: 12px; }
+  .stage { grid-template-columns: 1fr; }
+  input { width: 100%; }
+  .controls label { flex: 1 1 8rem; }
+}
+</style>
+</head>
+<body>
+<h2>El invariante sobrevive a cada iteración</h2>
+<p class="subtle">Cambia los datos y avanza una iteración. La igualdad verde debe seguir siendo verdadera desde el inicio hasta la salida.</p>
+
+<div class="tabs" role="tablist" aria-label="Elegir algoritmo">
+  <button id="tab-square" type="button" role="tab" aria-selected="true" aria-controls="panel">Cuadrado por sumas</button>
+  <button id="tab-power" type="button" role="tab" aria-selected="false" aria-controls="panel">Potencia por productos</button>
+</div>
+
+<section id="panel" role="tabpanel" aria-live="polite">
+  <div id="square-controls" class="controls">
+    <label>Entrada A
+      <input id="input-a" type="number" min="0" max="9" step="1" value="4">
+    </label>
+  </div>
+  <div id="power-controls" class="controls" hidden>
+    <label>Base N
+      <input id="input-n" type="number" min="0" max="9" step="1" value="2">
+    </label>
+    <label>Exponente inicial M₀
+      <input id="input-m" type="number" min="0" max="9" step="1" value="5">
+    </label>
+  </div>
+
+  <p id="code" class="code-line formula"></p>
+  <div class="stage" aria-label="Estado actual del ciclo">
+    <div class="state"><div class="label">Iteraciones ejecutadas</div><output id="iterations"></output></div>
+    <div class="state"><div id="state-one-label" class="label"></div><output id="state-one"></output></div>
+    <div class="state"><div id="state-two-label" class="label"></div><output id="state-two"></output></div>
+  </div>
+
+  <div class="invariant">
+    <strong>Invariante</strong>
+    <p id="invariant" class="formula"></p>
+    <p id="meaning"></p>
+  </div>
+
+  <div class="step-controls">
+    <button id="previous" type="button">← Anterior</button>
+    <button id="next" type="button">Siguiente iteración →</button>
+    <button id="reset" type="button">Reiniciar</button>
+  </div>
+</section>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  let mode = "square";
+  let step = 0;
+
+  function integer(id, fallback, min, max) {
+    const raw = Number($(id).value);
+    const value = Number.isInteger(raw) ? Math.min(max, Math.max(min, raw)) : fallback;
+    $(id).value = value;
+    return value;
+  }
+
+  function limit() {
+    return mode === "square"
+      ? integer("input-a", 4, 0, 9)
+      : integer("input-m", 5, 0, 9);
+  }
+
+  function drawSquare() {
+    const a = integer("input-a", 4, 0, 9);
+    step = Math.min(step, a);
+    const c = step * a;
+    const d = step;
+    $("code").textContent = d < a ? "C ← C + A;   D ← D + 1" : "D = A: la guarda D ≠ A es falsa y el ciclo termina";
+    $("state-one-label").textContent = "Acumulador C";
+    $("state-two-label").textContent = "Contador D";
+    $("state-one").textContent = c;
+    $("state-two").textContent = d;
+    $("iterations").textContent = step;
+    $("invariant").textContent = `C = D·A   →   ${c} = ${d}·${a} = ${d * a}`;
+    $("meaning").textContent = d < a
+      ? "C contiene A sumado exactamente D veces. Una iteración más aumenta ambos lados en A."
+      : `Al salir, D = A; por tanto C = D·A = A² = ${a * a}.`;
+  }
+
+  function drawPower() {
+    const n = integer("input-n", 2, 0, 9);
+    const m0 = integer("input-m", 5, 0, 9);
+    step = Math.min(step, m0);
+    const r = n ** step;
+    const m = m0 - step;
+    const left = r * (n ** m);
+    const right = n ** m0;
+    $("code").textContent = m > 0 ? "R ← R·N;   M ← M − 1" : "M = 0: la guarda M > 0 es falsa y el ciclo termina";
+    $("state-one-label").textContent = "Acumulador R";
+    $("state-two-label").textContent = "Exponente pendiente M";
+    $("state-one").textContent = r;
+    $("state-two").textContent = m;
+    $("iterations").textContent = step;
+    $("invariant").textContent = `R·N^M = N^M₀   →   ${r}·${n}^${m} = ${left} = ${right}`;
+    $("meaning").textContent = m > 0
+      ? "R guarda la parte ya calculada y M cuenta cuántos factores N faltan. El producto total no cambia."
+      : `Al salir, M = 0; entonces R·N⁰ = R = N^M₀ = ${right}.`;
+  }
+
+  function draw() {
+    mode === "square" ? drawSquare() : drawPower();
+    $("previous").disabled = step === 0;
+    $("next").disabled = step === limit();
+  }
+
+  function setMode(nextMode) {
+    mode = nextMode;
+    step = 0;
+    const square = mode === "square";
+    $("tab-square").setAttribute("aria-selected", String(square));
+    $("tab-power").setAttribute("aria-selected", String(!square));
+    $("square-controls").hidden = !square;
+    $("power-controls").hidden = square;
+    draw();
+  }
+
+  $("tab-square").addEventListener("click", () => setMode("square"));
+  $("tab-power").addEventListener("click", () => setMode("power"));
+  $("previous").addEventListener("click", () => { if (step > 0) step -= 1; draw(); });
+  $("next").addEventListener("click", () => { if (step < limit()) step += 1; draw(); });
+  $("reset").addEventListener("click", () => { step = 0; draw(); });
+  ["input-a", "input-n", "input-m"].forEach((id) => $(id).addEventListener("change", () => { step = 0; draw(); }));
+  draw();
+})();
+</script>
+</body>
+</html>

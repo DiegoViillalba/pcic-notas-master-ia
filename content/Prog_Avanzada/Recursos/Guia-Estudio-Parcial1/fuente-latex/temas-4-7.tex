@@ -1,0 +1,414 @@
+% =====================================================================
+\section{Lógica de Hoare: aserciones, asignación y consecuencia}
+% =====================================================================
+
+\begin{prob}
+Define: aserción, estado, $s\models P$, terna de Hoare, corrección parcial y corrección total. ¿Por qué en un fragmento sin ciclos ni recursión basta la corrección parcial?
+\end{prob}
+\begin{sol}
+\textbf{Aserción:} fórmula lógica sobre las variables del programa (p.\,ej.\ $x=3\land y\le z$). \textbf{Estado:} asignación de valores a las variables. $s\models P$: el estado $s$ satisface $P$. \textbf{Terna} $\hoare{P}{C}{Q}$: si $C$ empieza en un estado que satisface $P$ y termina, el estado final satisface $Q$. \textbf{Parcial:} la terna es válida (``si termina, el resultado es correcto''). \textbf{Total:} parcial $+$ se demuestra que $C$ termina para toda entrada que cumple $P$.
+
+Un fragmento sin ciclos ni recursión ejecuta un número finito de instrucciones primitivas que terminan; la terminación es inmediata y parcial $\Rightarrow$ total.
+\end{sol}
+
+\begin{prob}
+Ordena de la más fuerte a la más débil: $\;x\ge0,\ \ \T,\ \ x>10,\ \ \F,\ \ x=15,\ \ x>0$. ¿Qué significa la aserción vacía \{\ \}? ¿Es cierto que $y\neq0\Rightarrow y=4$?
+\end{prob}
+\begin{sol}
+$\F\;\Rightarrow\;x=15\;\Rightarrow\;x>10\;\Rightarrow\;x>0\;\Rightarrow\;x\ge0\;\Rightarrow\;\T$.
+Más fuerte $=$ admite menos estados. $\F$ no admite ninguno (la más fuerte); \{\ \} $\equiv\T$ admite todos (la más débil): $\T\land P\equiv P$, $\T\lor P\equiv\T$. La implicación no es simétrica: $y=4\Rightarrow y\ne0$, pero $y\ne0\not\Rightarrow y=4$ (contraejemplo $y=7$).
+\end{sol}
+
+\begin{prob}
+Calcula la precondición más débil $P$ en cada caso:
+\[
+\begin{array}{ll}
+\text{(a) } \hoare{P}{x\asg x+5}{x>12} & \text{(b) } \hoare{P}{y\asg 3x-1}{y\le 8}\\[2pt]
+\text{(c) } \hoare{P}{x\asg x\cdot x}{x<9} & \text{(d) } \hoare{P}{z\asg z/2}{z=5}\\[2pt]
+\text{(e) } \hoare{P}{a\asg b}{a=b} & \text{(f) } \hoare{P}{x\asg 10/(y-2)}{x>0}
+\end{array}
+\]
+\end{prob}
+\begin{sol}
+Axioma: $P=\sust{Q}{E}{V}$ (sustituir la variable asignada por la expresión), más condiciones de dominio.
+\begin{enumerate}[label=(\alph*)]
+\item $x+5>12\iff \mathbf{x>7}$.
+\item $3x-1\le8\iff\mathbf{x\le3}$.
+\item $x^2<9\iff\mathbf{-3<x<3}$.
+\item $z/2=5\iff\mathbf{z=10}$.
+\item $b=b\iff\mathbf{\T}$: no hace falta ninguna condición; $\hoare{\ }{a\asg b}{a=b}$.
+\item $\frac{10}{y-2}>0$ y dominio $y\ne2$: el cociente es positivo si y solo si $y-2>0$: $\mathbf{y>2}$.
+\end{enumerate}
+\end{sol}
+
+\begin{prob}
+¿Son válidas? Justifica con el axioma de asignación y la regla de consecuencia, o da un contraejemplo.
+\[
+\begin{array}{ll}
+\text{(a) }\hoare{x=5}{x\asg x+1}{x>5} & \text{(b) }\hoare{x>0}{x\asg x-1}{x>0}\\[2pt]
+\text{(c) }\hoare{\T}{y\asg x\cdot x}{y\ge0} & \text{(d) }\hoare{x\ge0}{x\asg x-1}{x\ge-1}
+\end{array}
+\]
+\end{prob}
+\begin{sol}
+\begin{enumerate}[label=(\alph*)]
+\item $wp=x+1>5\iff x>4$. Como $x=5\Rightarrow x>4$, por \textbf{fortalecimiento de la precondición} es \textbf{válida}.
+\item $wp=x-1>0\iff x>1$. Pero $x>0\not\Rightarrow x>1$. Contraejemplo: $x=1$ termina con $x=0$. \textbf{No válida}.
+\item $wp=x^2\ge0\iff\T$. \textbf{Válida} para cualquier estado.
+\item $wp=x-1\ge-1\iff x\ge0$: la precondición dada es exactamente la $wp$. \textbf{Válida}.
+\end{enumerate}
+\end{sol}
+
+\begin{prob}
+(a) A partir de $\hoare{y\neq0}{x\asg 1/y}{x=1/y}$ deduce $\hoare{y=4}{x\asg1/y}{x=1/y}$ escribiendo la regla usada.
+(b) A partir de $\hoare{\T}{max\asg b}{max=b}$ deduce $\hoare{\T}{max\asg b}{max\ge b}$.
+(c) Explica con conjuntos de estados por qué se puede \emph{fortalecer} la precondición y \emph{debilitar} la postcondición, pero no al revés.
+\end{prob}
+\begin{sol}
+(a) Fortalecimiento de la precondición:
+$\dfrac{y=4\Rightarrow y\ne0\qquad\hoare{y\ne0}{x\asg1/y}{x=1/y}}{\hoare{y=4}{x\asg1/y}{x=1/y}}$.
+
+(b) Debilitamiento de la postcondición:
+$\dfrac{\hoare{\T}{max\asg b}{max=b}\qquad max=b\Rightarrow max\ge b}{\hoare{\T}{max\asg b}{max\ge b}}$.
+
+(c) Si el código funciona para \emph{todos} los estados de $P$, funciona para cualquier subconjunto $P_1\subseteq P$ (más fuerte). Si el resultado cae en el conjunto $Q$, también cae en cualquier superconjunto $Q_1\supseteq Q$ (más débil). Al revés no: ampliar la precondición mete estados no verificados (en (a), $y=0$), y restringir la postcondición puede excluir resultados reales.
+\end{sol}
+
+\begin{prob}
+Usa la regla de conjunción (y consecuencia) para demostrar $\hoare{i=i_0\land i_0\ge3}{i\asg i+2}{i\ge5}$, partiendo de las ternas $\hoare{i=i_0}{i\asg i+2}{i=i_0+2}$ y $\hoare{i_0\ge3}{i\asg i+2}{i_0\ge3}$. ¿Por qué la segunda terna es válida?
+\end{prob}
+\begin{sol}
+La segunda es válida por el axioma de asignación: $i_0$ es una variable lógica (el valor inicial) que no aparece asignada, así que $\sust{(i_0\ge3)}{i+2}{i}=i_0\ge3$.
+Conjunción:
+$\dfrac{\hoare{i=i_0}{i\asg i+2}{i=i_0+2}\qquad\hoare{i_0\ge3}{i\asg i+2}{i_0\ge3}}{\hoare{i=i_0\land i_0\ge3}{i\asg i+2}{i=i_0+2\land i_0\ge3}}$.
+Como $i=i_0+2\land i_0\ge3\Rightarrow i\ge5$, por debilitamiento de la postcondición: $\hoare{i=i_0\land i_0\ge3}{i\asg i+2}{i\ge5}$. \checkmark
+
+(Directo con el axioma: $wp=i+2\ge5\iff i\ge3$.)
+\end{sol}
+
+% =====================================================================
+\section{Composición secuencial e invariantes de bloque}
+% =====================================================================
+
+\begin{prob}
+Demuestra $\hoare{\ }{c\asg a+b;\ c\asg c/2}{c=(a+b)/2}$ (ejercicio del ``tour'' del curso).
+\end{prob}
+\begin{sol}
+Hacia atrás desde $Q: c=\frac{a+b}{2}$.
+\begin{enumerate}
+\item Por $c\asg c/2$: $\sust{Q}{c/2}{c}$: $\frac c2=\frac{a+b}2\iff c=a+b$. \quad (1) $\hoare{c=a+b}{c\asg c/2}{c=\tfrac{a+b}2}$.
+\item Por $c\asg a+b$: $\sust{(c=a+b)}{a+b}{c}$: $a+b=a+b\iff\T$. \quad (2) $\hoare{\T}{c\asg a+b}{c=a+b}$.
+\item Composición de (2) y (1) con aserción intermedia $R: c=a+b$:
+$\dfrac{\hoare{\T}{c\asg a+b}{c=a+b}\quad\hoare{c=a+b}{c\asg c/2}{c=\frac{a+b}2}}{\hoare{\T}{c\asg a+b;\ c\asg c/2}{c=\frac{a+b}2}}$.
+\end{enumerate}
+La precondición \{\ \} $\equiv\T$: funciona para todos los valores de $a$ y $b$.
+\end{sol}
+
+\begin{prob}
+Encuentra la precondición más débil: (a) $\hoare{P}{x\asg x+1;\ y\asg 2x}{y>10}$; \ (b) $\hoare{P}{y\asg x-3;\ z\asg y\cdot y}{z>16}$.
+\end{prob}
+\begin{sol}
+(a) Por $y\asg2x$: $2x>10\iff x>5$. Por $x\asg x+1$: $x+1>5\iff x>4$. \ $P: x>4$.
+
+(b) Por $z\asg y\cdot y$: $y^2>16\iff y>4\lor y<-4$. Por $y\asg x-3$: $x-3>4\lor x-3<-4\iff x>7\lor x<-1$. \ $P: x>7\lor x<-1$.
+\end{sol}
+
+\begin{prob}
+Demuestra que el intercambio \emph{sin variable auxiliar} es correcto:
+$\hoare{a=A\land b=B}{a\asg a+b;\ b\asg a-b;\ a\asg a-b}{a=B\land b=A}$.
+\end{prob}
+\begin{sol}
+$A,B$ son constantes lógicas (valores iniciales). Hacia atrás:
+\begin{enumerate}
+\item Por $a\asg a-b$: $(a-b=B)\land(b=A)$. \hfill (3)
+\item Por $b\asg a-b$: sustituir $b$ por $a-b$ en (3): $(a-(a-b)=B)\land(a-b=A)\iff b=B\land a-b=A$. \hfill (2)
+\item Por $a\asg a+b$: sustituir $a$ por $a+b$ en (2): $b=B\land (a+b)-b=A\iff b=B\land a=A$. \hfill (1)
+\end{enumerate}
+(1) coincide con la precondición. Componiendo las tres ternas:
+$\hoare{a=A\land b=B}{a\asg a+b}{b=B\land a-b=A}$, $\hoare{b=B\land a-b=A}{b\asg a-b}{a-b=B\land b=A}$, $\hoare{a-b=B\land b=A}{a\asg a-b}{a=B\land b=A}$. \checkmark\ (Con enteros de máquina podría haber desbordamiento en $a+b$.)
+\end{sol}
+
+\begin{prob}
+Demuestra que $I: s=i^2$ es invariante del bloque $\;i\asg i+1;\ s\asg s+2i-1$. Comprueba con $i=3,s=9$.
+\end{prob}
+\begin{sol}
+Hay que probar $\hoare{s=i^2}{i\asg i+1;\ s\asg s+2i-1}{s=i^2}$.
+\begin{enumerate}
+\item Por $s\asg s+2i-1$: $s+2i-1=i^2\iff s=(i-1)^2$. \quad $\hoare{s=(i-1)^2}{s\asg s+2i-1}{s=i^2}$.
+\item Por $i\asg i+1$: $s=((i+1)-1)^2=i^2$. \quad $\hoare{s=i^2}{i\asg i+1}{s=(i-1)^2}$.
+\item Composición $\Rightarrow\hoare{s=i^2}{i\asg i+1;\ s\asg s+2i-1}{s=i^2}$. \checkmark
+\end{enumerate}
+Con valores: $i_1=4$, $s_1=9+2\cdot4-1=16=4^2$. El invariante no dice que los valores no cambien, sino que se conserva la \emph{relación}.
+\end{sol}
+
+\begin{prob}
+Demuestra $\hoare{\ }{s\asg1;\ s\asg s\cdot r+2;\ s\asg s\cdot r+3}{s=r^2+2r+3}$ (evaluación de Horner). Observa dónde es necesaria la regla de consecuencia.
+\end{prob}
+\begin{sol}
+\begin{enumerate}
+\item Por $s\asg s\cdot r+3$: $wp=(s\cdot r+3=r^2+2r+3)\iff s\cdot r=r(r+2)$. Esta $wp$ es incómoda (si $r=0$ cualquier $s$ sirve). Usamos una aserción más fuerte: $R_2: s=r+2$, que \emph{implica} la $wp$. Por consecuencia: $\hoare{s=r+2}{s\asg s\cdot r+3}{s=r^2+2r+3}$.
+\item Por $s\asg s\cdot r+2$ con postcondición $R_2$: $wp=(s\cdot r+2=r+2)\iff s\cdot r=r$. Tomamos $R_1: s=1$, que la implica: $\hoare{s=1}{s\asg s\cdot r+2}{s=r+2}$.
+\item Por $s\asg1$: $1=1\iff\T$: $\hoare{\T}{s\asg1}{s=1}$.
+\item Composición de las tres. \checkmark
+\end{enumerate}
+\textbf{Lección:} la aserción intermedia no tiene que ser la $wp$ exacta; basta una condición más fuerte que la implique (regla de consecuencia).
+\end{sol}
+
+% =====================================================================
+\section{Condicionales}
+% =====================================================================
+
+\begin{prob}[\examen]
+Demostrar que la siguiente terna de Hoare es válida:
+\[\hoare{a<b}{\kw{if}\ (a>b)\ \kw{then}\ m\asg a\ \kw{else}\ m\asg b}{m=b}.\]
+\end{prob}
+\begin{sol}
+Identificamos $P: a<b$, \ $B: a>b$, \ $Q: m=b$. Por la regla del \textbf{if} con \textbf{else} basta probar
+(1) $\hoare{P\land B}{m\asg a}{Q}$ y (2) $\hoare{P\land\neg B}{m\asg b}{Q}$.
+
+\textbf{(1) Rama verdadera.} $P\land B\equiv a<b\land a>b\equiv\F$ (no existe estado con $a<b$ y $a>b$ a la vez). Formalmente: por asignación, $\hoare{a=b}{m\asg a}{m=b}$ (sustituir $m$ por $a$ en $m=b$). Como $\F\Rightarrow a=b$ (de lo falso se sigue cualquier cosa), por fortalecimiento de la precondición:
+\[\hoare{a<b\land a>b}{m\asg a}{m=b}\quad\text{es válida (por vacuidad): la rama es \emph{inalcanzable}.}\]
+
+\textbf{(2) Rama falsa.} $P\land\neg B\equiv a<b\land a\le b\equiv a<b$. Por asignación: $\sust{(m=b)}{b}{m}\equiv b=b\equiv\T$, es decir, $\hoare{\T}{m\asg b}{m=b}$. Como $a<b\Rightarrow\T$, por consecuencia:
+\[\hoare{a<b\land\neg(a>b)}{m\asg b}{m=b}.\]
+
+\textbf{Conclusión.} Por la regla condicional,
+\[\dfrac{\hoare{a<b\land a>b}{m\asg a}{m=b}\qquad\hoare{a<b\land\neg(a>b)}{m\asg b}{m=b}}{\hoare{a<b}{\kw{if}\ (a>b)\ \kw{then}\ m\asg a\ \kw{else}\ m\asg b}{m=b}}\]
+Como no hay ciclos ni recursión, el programa termina: la terna es \textbf{totalmente correcta}. \ $\blacksquare$
+
+\emph{Intuición:} si $a<b$, la guarda $a>b$ es falsa, siempre se ejecuta $m\asg b$ y por tanto $m=b$.
+\end{sol}
+
+\begin{prob}
+Demuestra $\hoare{\ }{\kw{if}\ a>b\ \kw{then}\ m\asg a\ \kw{else}\ m\asg b}{m\ge a\land m\ge b}$.
+\end{prob}
+\begin{sol}
+$P=\T$, $B: a>b$, $Q: m\ge a\land m\ge b$.
+
+\textbf{Rama verdadera} ($a>b$): $\sust{Q}{a}{m}=a\ge a\land a\ge b\equiv a\ge b$. Como $a>b\Rightarrow a\ge b$: $\hoare{a>b}{m\asg a}{Q}$.
+
+\textbf{Rama falsa} ($\neg(a>b)\equiv a\le b$): $\sust{Q}{b}{m}=b\ge a\land b\ge b\equiv b\ge a$. Como $a\le b\Rightarrow b\ge a$: $\hoare{\neg(a>b)}{m\asg b}{Q}$.
+
+Por la regla condicional, la terna es válida (y total). Caso límite $a=b$: se ejecuta $m\asg b$ y $m=a=b$ cumple $Q$.
+\end{sol}
+
+\begin{prob}[\simil]
+Demuestra $\hoare{a>b}{\kw{if}\ (a<b)\ \kw{then}\ m\asg b\ \kw{else}\ m\asg a}{m=a}$.
+\end{prob}
+\begin{sol}
+$P: a>b$, $B: a<b$, $Q: m=a$.
+\textbf{Rama verdadera:} $P\land B\equiv a>b\land a<b\equiv\F$: inalcanzable; $\hoare{\F}{m\asg b}{m=a}$ es válida por vacuidad (formalmente: $wp=(b=a)$ y $\F\Rightarrow b=a$).
+\textbf{Rama falsa:} $P\land\neg B\equiv a>b\land a\ge b\equiv a>b$; $wp(m\asg a,\ m=a)=(a=a)\equiv\T$ y $a>b\Rightarrow\T$.
+Por la regla condicional la terna es válida. $\blacksquare$
+\end{sol}
+
+\begin{prob}
+¿Es válida $\hoare{\ }{\kw{if}\ a>b\ \kw{then}\ m\asg a\ \kw{else}\ m\asg b}{m>b}$? Si no, da un contraejemplo y propón dos formas de corregirla (cambiando solo la pre o solo la postcondición).
+\end{prob}
+\begin{sol}
+\textbf{No es válida.} Rama falsa: $\neg(a>b)$ y $m\asg b$ exige $\sust{(m>b)}{b}{m}\equiv b>b\equiv\F$, pero $\neg(a>b)\not\Rightarrow\F$. Contraejemplo: $a=b=3$: $m=3$ y $3>3$ es falso.
+Correcciones: (i) postcondición $m\ge b$ (válida en ambas ramas); (ii) precondición $a>b$: así la rama falsa se vuelve inalcanzable y la verdadera da $m=a>b$. (Con $a\neq b$ \emph{no} basta: si $a<b$, $m=b$ y $b>b$ es falso.)
+\end{sol}
+
+\begin{prob}
+Demuestra $\hoare{\ }{\kw{if}\ x<0\ \kw{then}\ y\asg -x\ \kw{else}\ y\asg x}{y\ge0\land y^2=x^2}$ (valor absoluto).
+\end{prob}
+\begin{sol}
+\textbf{Rama verdadera} ($x<0$): $\sust{Q}{-x}{y}=(-x\ge0)\land(x^2=x^2)\equiv x\le0$. Como $x<0\Rightarrow x\le0$: válida.
+\textbf{Rama falsa} ($x\ge0$): $\sust{Q}{x}{y}=(x\ge0)\land(x^2=x^2)\equiv x\ge0$: coincide con la condición de la rama.
+Regla condicional $\Rightarrow$ válida. Es decir, $y=|x|$.
+\end{sol}
+
+\begin{prob}
+(\textbf{if} sin \textbf{else}) Demuestra $\hoare{\ }{\kw{if}\ x>y\ \kw{then}\ (t\asg x;\ x\asg y;\ y\asg t)}{x\le y}$.
+\end{prob}
+\begin{sol}
+Regla: probar $\hoare{P\land B}{C_1}{Q}$ y $(P\land\neg B)\Rightarrow Q$.
+
+\textbf{Rama verdadera}, hacia atrás desde $x\le y$:
+por $y\asg t$: $x\le t$; \ por $x\asg y$: $y\le t$; \ por $t\asg x$: $y\le x$. Así $\hoare{y\le x}{t\asg x;\ x\asg y;\ y\asg t}{x\le y}$, y como $x>y\Rightarrow y\le x$, por consecuencia $\hoare{x>y}{C_1}{x\le y}$.
+
+\textbf{Rama falsa (skip):} $\T\land\neg(x>y)\equiv x\le y\Rightarrow x\le y$. \checkmark
+
+Por la regla del \textbf{if} sin \textbf{else}, la terna es válida.
+\end{sol}
+
+\begin{prob}
+Demuestra $\hoare{x>0}{\kw{if}\ x>10\ \kw{then}\ x\asg x-10\ \kw{else}\ x\asg x+5}{x>0}$.
+\end{prob}
+\begin{sol}
+\textbf{Rama verdadera:} $P\land B\equiv x>10$; $wp=x-10>0\iff x>10$. \checkmark
+\textbf{Rama falsa:} $P\land\neg B\equiv 0<x\le10$; $wp=x+5>0\iff x>-5$, y $0<x\le10\Rightarrow x>-5$. \checkmark
+Regla condicional $\Rightarrow$ válida. (Nótese que $x>0$ es un invariante de este bloque.)
+\end{sol}
+
+\begin{prob}[\reto]
+Demuestra que el máximo de tres valores es correcto:
+\[\kw{if}\ a\ge b\ \kw{then}\ (\kw{if}\ a\ge c\ \kw{then}\ m\asg a\ \kw{else}\ m\asg c)\ \kw{else}\ (\kw{if}\ b\ge c\ \kw{then}\ m\asg b\ \kw{else}\ m\asg c)\]
+con $P=\T$ y $Q: m\ge a\land m\ge b\land m\ge c$.
+\end{prob}
+\begin{sol}
+Se aplica la regla condicional tres veces; quedan 4 hojas, cada una con su precondición acumulada:
+\begin{enumerate}
+\item $a\ge b\land a\ge c$, $m\asg a$: $wp=a\ge a\land a\ge b\land a\ge c$, implicada. \checkmark
+\item $a\ge b\land a<c$, $m\asg c$: $wp=c\ge a\land c\ge b\land c\ge c$; $c>a\ge b$ da $c\ge a$ y $c\ge b$. \checkmark
+\item $a<b\land b\ge c$, $m\asg b$: $wp=b\ge a\land b\ge b\land b\ge c$. \checkmark
+\item $a<b\land b<c$, $m\asg c$: $c>b>a$. \checkmark
+\end{enumerate}
+Cada \textbf{if} interno se demuestra con precondición $a\ge b$ (o $a<b$) y la misma $Q$; luego el \textbf{if} externo. Válida y total.
+\end{sol}
+
+% =====================================================================
+\section{Ciclos: inducción, invariantes y terminación}
+% =====================================================================
+
+\begin{prob}[\examen]
+Demostrar que el invariante en las siguientes instrucciones es $i+j=9$:
+\begin{lstlisting}
+int j = 9;
+for( int i=0; i<10; i++ )
+    j--;
+\end{lstlisting}
+¿Qué valores tienen $i$ y $j$ al terminar? ¿Por qué termina?
+\end{prob}
+\begin{sol}
+Equivalente con \textbf{while}: \ \texttt{j:=9; i:=0; while i<10 do \{ j:=j-1; i:=i+1 \}}.
+
+Sean $i_n$, $j_n$ los valores tras $n$ iteraciones. Traza: $(i,j)=(0,9),(1,8),(2,7),\dots$ \ Sea $P(n): i_n+j_n=9$.
+
+\textbf{Caso base} ($n=0$, antes de entrar): $i_0=0$, $j_0=9\Rightarrow i_0+j_0=9$. \checkmark
+
+\textbf{Hipótesis de inducción:} tras $n$ iteraciones, $i_n+j_n=9$.
+
+\textbf{Paso inductivo:} si la guarda $i_n<10$ se cumple, el cuerpo hace $j_{n+1}=j_n-1$ e $i_{n+1}=i_n+1$. Entonces
+\[i_{n+1}+j_{n+1}=(i_n+1)+(j_n-1)=i_n+j_n\overset{\text{H.I.}}{=}9.\]
+Por inducción, $i+j=9$ vale después de cualquier número de iteraciones: es invariante. $\blacksquare$
+
+\emph{(Forma Hoare equivalente:} $\hoare{i+j=9\land i<10}{j\asg j-1;\ i\asg i+1}{i+j=9}$. Hacia atrás: por $i\asg i+1$: $i+1+j=9$; por $j\asg j-1$: $i+1+j-1=9\iff i+j=9$. \checkmark)
+
+\textbf{Salida:} también es invariante $0\le i\le10$ (empieza en 0, sube de uno en uno y solo sube si $i<10$). Al salir, $\neg(i<10)\land i\le10\Rightarrow i=10$, y por el invariante $j=9-10=\mathbf{-1}$.
+
+\textbf{Terminación:} variante $V=10-i$: entero, $\ge0$ mientras el ciclo continúa y decrece en 1 cada iteración. Se ejecutan exactamente 10 iteraciones: corrección total.
+\end{sol}
+
+\begin{prob}[\simil]
+Encuentra y demuestra el invariante que relaciona $k$ e $i$, y el valor final de $k$:
+\begin{lstlisting}
+int k = 20;
+for( int i = 0; i < 5; i++ )
+    k = k - 4;
+\end{lstlisting}
+\end{prob}
+\begin{sol}
+Traza: $(i,k)=(0,20),(1,16),(2,12),(3,8),(4,4),(5,0)$. Se observa $k_n=20-4n$, $i_n=n$; eliminando $n$: $\mathbf{I: k+4i=20}$.
+
+Base: $k_0+4i_0=20+0=20$. \ Paso: $k_{n+1}+4i_{n+1}=(k_n-4)+4(i_n+1)=k_n+4i_n=20$. Por inducción, invariante.
+Salida: $i=5\Rightarrow k=20-20=\mathbf 0$. Variante $5-i$.
+\end{sol}
+
+\begin{prob}
+Demuestra que la función calcula el cuadrado de un entero $A\ge0$ (identifica invariante, salida y variante):
+\begin{lstlisting}
+Function Cuadrado( A )
+  C (*$\leftarrow$*) 0;  D (*$\leftarrow$*) 0
+  While ( D (*$\neq$*) A )
+    C (*$\leftarrow$*) C + A
+    D (*$\leftarrow$*) D + 1
+  Return C
+\end{lstlisting}
+¿Qué ocurre si $A<0$?
+\end{prob}
+\begin{sol}
+Traza con $A=4$: $(C,D)=(0,0),(4,1),(8,2),(12,3),(16,4)$: $C_n=nA$, $D_n=n\Rightarrow\mathbf{I: C=D\cdot A}$.
+
+\textbf{Base:} $C_0=0=0\cdot A=D_0A$. \ \textbf{H.I.:} $C_n=D_nA$. \ \textbf{Paso:} $C_{n+1}=C_n+A=D_nA+A=(D_n+1)A=D_{n+1}A$. Por inducción, $I$ es invariante.
+
+\textbf{Salida:} el ciclo termina con $D=A$; entonces $C=DA=A\cdot A=A^2$. (El invariante solo no basta: se combina con $\neg B$.)
+
+\textbf{Terminación:} con $A\ge0$, $D$ parte de 0 y sube de 1 en 1; la variante $V=A-D$ es entera, $\ge0$ y decrece en 1: tras $A$ iteraciones $D=A$. Corrección total.
+
+Si $A<0$: $D$ nunca alcanza $A$ (solo crece) y el ciclo \textbf{no termina}. La terna solo sería parcialmente correcta (``si terminara, $C=A^2$'').
+\end{sol}
+
+\begin{prob}
+¿Qué realiza la subrutina? Demuéstralo ($N,M$ enteros, $M\ge0$).
+\begin{lstlisting}
+Subroutine ?( N, M; R )
+  R (*$\leftarrow$*) 1
+  While ( M > 0 )
+    R (*$\leftarrow$*) R (*$\times$*) N
+    M (*$\leftarrow$*) M (*$-$*) 1
+  Return
+End Subroutine
+\end{lstlisting}
+¿Por qué $R=N^M$ \emph{no} es un invariante?
+\end{prob}
+\begin{sol}
+Calcula $R=N^{M_0}$, donde $M_0$ es el valor original de $M$.
+Traza con $N=2$, $M_0=5$: $(R,M)=(1,5),(2,4),(4,3),(8,2),(16,1),(32,0)$; siempre $R\cdot2^M=32$.
+
+\textbf{Invariante:} $I: R\cdot N^{M}=N^{M_0}$ (``calculado $\times$ pendiente $=$ total'').
+\textbf{Base:} $R_0N^{M_0}=1\cdot N^{M_0}$. \checkmark\
+\textbf{Paso:} si $M_n>0$: $R_{n+1}N^{M_{n+1}}=(R_nN)N^{M_n-1}=R_nN^{M_n}\overset{\text{H.I.}}=N^{M_0}$. \checkmark\
+\textbf{Salida:} $M=0\Rightarrow R\cdot N^0=R=N^{M_0}$.
+\textbf{Terminación:} variante $V=M$, entero $\ge0$ que decrece en 1.
+
+$R=N^M$ no se conserva: al inicio $R=1$ y $N^M=N^{M_0}$ (falla si $M_0>0$, $N\ne1$). $R$ crece mientras $M$ baja: la relación conservada es el \emph{producto} $RN^M$. Error típico: expresar el resultado con el $M$ final (que vale 0) en lugar de $M_0$.
+\end{sol}
+
+\begin{prob}
+Demuestra la corrección total de ($n\ge0$):
+\begin{lstlisting}
+s := 0; i := 0;
+while i (*$\neq$*) n do
+    i := i + 1;
+    s := s + i
+\end{lstlisting}
+con postcondición $s=\frac{n(n+1)}{2}$.
+\end{prob}
+\begin{sol}
+\textbf{Invariante:} $I: s=\frac{i(i+1)}{2}\land 0\le i\le n$.
+\textbf{Base:} $i=0,s=0=\frac{0\cdot1}{2}$. \checkmark
+\textbf{Paso:} si $i_n\ne n$ (y $i_n\le n$, luego $i_n<n$): $i_{n+1}=i_n+1\le n$ y
+$s_{n+1}=s_n+i_{n+1}=\frac{i_n(i_n+1)}2+(i_n+1)=\frac{(i_n+1)(i_n+2)}{2}=\frac{i_{n+1}(i_{n+1}+1)}2$. \checkmark
+\textbf{Salida:} $i=n\Rightarrow s=\frac{n(n+1)}2$. \quad \textbf{Variante:} $n-i$.
+\end{sol}
+
+\begin{prob}
+División entera por restas sucesivas ($a\ge0$, $b>0$):
+\begin{lstlisting}
+q := 0; r := a;
+while r (*$\geq$*) b do
+    r := r - b;
+    q := q + 1
+\end{lstlisting}
+Demuestra que al terminar $q=a\ \mathrm{div}\ b$ y $r=a\bmod b$. Traza con $a=17$, $b=5$.
+\end{prob}
+\begin{sol}
+\textbf{Invariante:} $I: a=q\cdot b+r\land r\ge0$.
+\textbf{Base:} $q=0$, $r=a$: $0\cdot b+a=a$ y $a\ge0$. \checkmark
+\textbf{Paso:} con guarda $r\ge b$: $r'=r-b\ge0$, $q'=q+1$ y $q'b+r'=qb+b+r-b=qb+r=a$. \checkmark
+\textbf{Salida:} $I\land\neg(r\ge b)\Rightarrow a=qb+r\land0\le r<b$, que es exactamente la definición de cociente y residuo.
+\textbf{Terminación:} variante $r$: entera, $\ge0$ (por $I$) y decrece en $b\ge1$ cada iteración.
+Traza: $(q,r)=(0,17),(1,12),(2,7),(3,2)$; sale con $r=2<5$: $17=3\cdot5+2$. \checkmark
+\end{sol}
+
+\begin{prob}
+Para cada ciclo, propón el invariante y demuéstralo por inducción ($n\ge0$):
+(a) \texttt{f:=1; i:=0; while i<n do \{ i:=i+1; f:=f*i \}} \qquad
+(b) \texttt{s:=0; i:=0; while i<n do \{ s:=s+2*i+1; i:=i+1 \}}
+\end{prob}
+\begin{sol}
+(a) $I: f=i!$. Base: $f=1=0!$. Paso: $f_{n+1}=f_n\cdot i_{n+1}=i_n!\,(i_n+1)=(i_n+1)!=i_{n+1}!$. Salida $i=n$: $f=n!$. Variante $n-i$.
+
+(b) $I: s=i^2$ (suma de los primeros $i$ impares). Base: $0=0^2$. Paso: $s_{n+1}=s_n+2i_n+1=i_n^2+2i_n+1=(i_n+1)^2=i_{n+1}^2$. Salida: $s=n^2$. Variante $n-i$.
+\end{sol}
+
+\begin{prob}
+Responde: (a) ¿Por qué una tabla de valores no es una demostración? (b) ¿Qué relación hay entre el caso base/paso inductivo y las obligaciones de Hoare para \textbf{while}? (c) ¿Qué se obtiene si se prueba el invariante y la salida, pero no la variante?
+\end{prob}
+\begin{sol}
+(a) La tabla muestra algunos casos y sugiere el patrón; la inducción prueba que vale para \emph{cualquier} número de iteraciones.
+(b) Caso base $\leftrightarrow$ inicialización ($P\Rightarrow I$); paso inductivo $\leftrightarrow$ mantenimiento $\hoare{I\land B}{C}{I}$; después se añade la salida $I\land\neg B\Rightarrow Q$.
+(c) Solo corrección \emph{parcial}: ``si el ciclo termina, el resultado es correcto''. La variante (entera, no negativa, estrictamente decreciente) aporta la terminación y con ella la corrección total.
+\end{sol}

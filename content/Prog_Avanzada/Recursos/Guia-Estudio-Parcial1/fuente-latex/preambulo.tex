@@ -1,0 +1,81 @@
+% Preámbulo común a problemas.tex y soluciones.tex
+\documentclass[11pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-noshorthands,es-nodecimaldot,es-tabla]{babel}
+\usepackage{kpfonts}
+\linespread{1.05}
+\usepackage[margin=2.2cm,headheight=14pt]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{booktabs,array,multicol}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{comment}
+\usepackage{tikz}
+\usetikzlibrary{trees,positioning,arrows.meta}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{azul}{HTML}{1F4E79}
+\definecolor{azulclaro}{HTML}{EAF1F8}
+\definecolor{verde}{HTML}{2E6B30}
+\definecolor{verdeclaro}{HTML}{EFF7EE}
+\definecolor{ambar}{HTML}{8A5A00}
+\definecolor{ambarclaro}{HTML}{FFF6E0}
+\definecolor{gris}{HTML}{555555}
+
+\setlist{itemsep=2pt,topsep=4pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+
+\titleformat{\section}{\Large\bfseries\color{azul}}{Tema \thesection.}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{azul}}{\thesubsection}{0.6em}{}
+
+% ---------- Notación ----------
+\newcommand{\hoare}[3]{\{#1\}\;#2\;\{#3\}}
+\newcommand{\asg}{\mathrel{:=}}
+\newcommand{\kw}[1]{\mathbf{#1}}
+\newcommand{\T}{\top}
+\newcommand{\F}{\bot}
+\newcommand{\sust}[3]{#1[#2/#3]}
+\newcommand{\examen}{\quad\textnormal{\small($\bigstar$ pregunta del examen del año pasado)}}
+\newcommand{\simil}{\quad\textnormal{\small(estilo examen)}}
+\newcommand{\reto}{\quad\textnormal{\small(reto)}}
+
+% ---------- Código ----------
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  frame=single, framerule=0.3pt, rulecolor=\color{gris!50},
+  backgroundcolor=\color{gris!5},
+  xleftmargin=4pt, xrightmargin=4pt, aboveskip=6pt, belowskip=6pt,
+  escapeinside={(*}{*)},
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+           {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+           {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?`}}1 {¡}{{!`}}1
+}
+
+% ---------- Cajas ----------
+\newtcolorbox[auto counter, number within=section]{prob}[1][]{%
+  enhanced, breakable, colback=white, colframe=azul, boxrule=0.6pt,
+  arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
+  fonttitle=\bfseries, coltitle=white,
+  title={Problema~\thetcbcounter#1}, before skip=10pt, after skip=6pt}
+
+\newtcolorbox{formulario}[1][]{%
+  enhanced, breakable, colback=azulclaro, colframe=azul!70, boxrule=0.4pt,
+  arc=2pt, fonttitle=\bfseries, title={#1}}
+
+\newtcolorbox{consejo}[1][Consejo]{%
+  enhanced, breakable, colback=ambarclaro, colframe=ambar, boxrule=0.4pt,
+  arc=2pt, fonttitle=\bfseries, title={#1}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.3pt}
+\fancyfoot[C]{\small\thepage}

@@ -1,0 +1,568 @@
+\newpage
+% ============================================================
+\section{Parte C — Problemas tipo examen}
+
+\begin{solucion}{C1 · Robot recolector}
+\textbf{(a)} Sea $M$ el conjunto de casillas con moneda. Estado $s=(p,R)$ con $p$ la casilla del robot y
+$R\subseteq M$ las monedas aún no recogidas. Inicial: $(H,\,M\setminus\{H\})$. Meta: $p=H$ y $R=\emptyset$.
+Acciones: N, S, E, O si la casilla destino está en el tablero. Transición: $p'=p+\delta$,
+$R'=R\setminus\{p'\}$. Costo 1.
+
+\emph{Completitud.} Toda solución del problema original es una caminata $H=q_0,q_1,\dots,q_T=H$ por
+casillas adyacentes que visita todas las de $M$. Le corresponde la sucesión de estados
+$(q_t,R_t)$ con $R_t=M\setminus\{q_0,\dots,q_t\}$, que es un camino válido en el espacio (cada paso es
+una acción legal) y termina en $(H,\emptyset)$ porque todas las monedas fueron visitadas. Recíprocamente,
+un camino del inicial a la meta proyecta a una caminata que acaba en $H$ con $R_T=\emptyset$, es decir,
+que visitó todas las monedas. Los costos coinciden (1 por paso), así que la correspondencia preserva la
+optimalidad.
+
+\textbf{(b)} Estados: $n^2\cdot2^k$. Factor de ramificación $b\le4$ (2 en esquinas, 3 en bordes).
+Profundidad óptima: recoger las monedas en cualquier orden fijo con tramos de Manhattan
+$\le2(n-1)$ cada uno y volver: $d\le 2(k+1)(n-1)$; también $d\le (n^2-1)+2(n-1)$ recorriendo todo el
+tablero en serpiente y regresando. BFS en árbol genera $O(4^{d})$ nodos, $\le \sum_{i=0}^{d}4^i=(4^{d+1}-1)/3$;
+en grafo, a lo más $n^2 2^k$ estados.
+
+\textbf{(c)} BFS: memoria $O(b^d)$ (o $O(n^22^k)$ en grafo) y es óptima porque los costos son
+uniformes. DFS: memoria $O(bm)$, pero en árbol hay ciclos (ir y volver), así que sin límite ni control de
+ciclos puede no terminar; aun en grafo, devuelve el primer camino que encuentra: no es óptima.
+
+\textbf{(d)} El estado $(p,R)$ se repite al llegar por secuencias distintas (NE vs.\ EN, ir y volver).
+Búsqueda en grafo: conjunto de explorados sobre $(p,R)$; se descarta un estado ya explorado o en la
+frontera con $g$ menor o igual. No se pierde la óptima: el costo futuro depende solo de $(p,R)$
+(propiedad de Markov del estado); si un camino óptimo pasa por un estado repetido, sustituir su
+prefijo por el primer camino a ese estado (de costo $\le$, porque BFS/UCS extrae en orden de $g$) da
+otra solución de costo $\le$, es decir, también óptima.
+
+\textbf{(e) Admisibilidad.} Toda solución desde $s$ debe entrar a cada $c\in R$ y terminar en $H$: la
+parte de la caminata $p\leadsto c\leadsto H$ mide al menos $d(p,c)+d(c,H)$, pues Manhattan es la
+distancia más corta en una cuadrícula sin obstáculos. Luego $h^*(s)\ge h_a(s)$ (y $\ge d(p,H)$ si
+$R=\emptyset$). Para $h_b$: cada moneda exige entrar a su casilla, cada entrada es un movimiento distinto:
+$h^*(s)\ge|R|$.
+
+\emph{Consistencia de $h_a$.} Sea $s=(p,R)\to s'=(p',R')$ con costo 1, $|d(p,x)-d(p',x)|\le1$.
+Para $c\in R'$: $d(p,c)+d(c,H)\le1+d(p',c)+d(c,H)\le1+h_a(s')$. Si se recogió $c'=p'$:
+$d(p,c')+d(c',H)=1+d(p',H)\le1+h_a(s')$, porque $h_a(s')\ge d(p',H)$ (desigualdad del triángulo
+$d(p',c)+d(c,H)\ge d(p',H)$, o definición si $R'=\emptyset$). Así $h_a(s)\le1+h_a(s')$; y $h_a=0$ en la meta.
+
+\emph{Ninguna domina.} Con $H=(1,1)$, robot en $H$ y monedas en $(1,2),(2,1),(2,2)$: $h_a=4>3=h_b$.
+Con $H$ en el centro de un tablero $3\times3$, robot en $H$ y monedas en los 4 vecinos: $h_a=2<4=h_b$.
+Usaría $\max(h_a,h_b)$: admisible y consistente (C4), y domina a ambas.
+\end{solucion}
+
+\begin{solucion}{C2 · Consistencia, monotonía y no-reexpansión}
+\textbf{(a)} Inducción sobre $k$, el número de acciones de un camino óptimo de $n$ a la meta. $k=0$: $n$
+es meta, $h(n)=0=h^*(n)$. Paso: si el camino óptimo es $n\to n'\to\cdots$, el de $n'$ tiene $k-1$
+acciones y es óptimo (subcamino de óptimo), así que $h(n')\le h^*(n')$ y
+$h(n)\le c(n,a,n')+h(n')\le c(n,a,n')+h^*(n')=h^*(n)$. Si no hay camino, $h^*=\infty$. $\blacksquare$
+
+\textbf{(b)} Si $n'$ es sucesor de $n$: $f(n')=g(n)+c(n,a,n')+h(n')\ge g(n)+h(n)=f(n)$. $\blacksquare$
+
+\textbf{(c)} Por inducción fuerte sobre el orden de extracción: supongamos que todo nodo extraído antes
+tuvo $g=g^*$, y que $n$ se extrae con $g(n)>g^*(n)$. Sea $P=(s=p_0,\dots,p_k=n)$ un camino óptimo a $n$
+y $p_i$ el primer nodo de $P$ aún no expandido ($i\ge1$ porque $s$ ya se expandió). Su predecesor
+$p_{i-1}$ se expandió con $g=g^*(p_{i-1})$, así que $p_i$ está en la frontera con
+$g(p_i)\le g^*(p_{i-1})+c(p_{i-1},p_i)=g^*(p_i)$, es decir, $g(p_i)=g^*(p_i)$. Si $p_i=n$ contradice
+$g(n)>g^*(n)$. Si no, aplicando la consistencia a lo largo de $P$ desde $p_i$ hasta $n$:
+\[f(p_i)=g^*(p_i)+h(p_i)\le g^*(p_i)+c(P_{p_i\to n})+h(n)=g^*(n)+h(n)<g(n)+h(n)=f(n),\]
+así que $p_i$ tendría que extraerse antes que $n$: contradicción. Por tanto todo nodo se extrae
+con $g=g^*$: ningún camino posterior puede mejorarlo, no hace falta reabrirlo y \textbf{nunca se
+reexpande}. En particular, la primera meta extraída tiene $g=g^*$; y como antes de extraerla hay en la
+frontera un nodo del camino óptimo con $f\le C^*$ (admisibilidad), la meta extraída cumple
+$g=f\le C^*$: es óptima. $\blacksquare$
+
+\textbf{(d)} $S\xrightarrow{1}A\xrightarrow{1}G$ con $h(S)=2$, $h(A)=0$: admisible ($h^*(S)=2$,
+$h^*(A)=1$) pero $h(S)=2>c(S,A)+h(A)=1$.
+\end{solucion}
+
+\begin{solucion}{C3 · Optimalidad de A* y consistencia}
+\textbf{(a)} Sea $G^*$ una meta óptima ($g=C^*$) y $G_2$ una subóptima en la frontera ($g(G_2)>C^*$).
+Mientras $G^*$ no se ha extraído, algún nodo $n$ de su camino óptimo está en la frontera (en árbol,
+el sucesor de cada nodo expandido del camino se agrega). Con $h$ admisible:
+$f(n)=g(n)+h(n)\le g(n)+h^*(n)=C^*$, y $f(G_2)=g(G_2)>C^*$. Así $f(n)<f(G_2)$: $n$ sale antes que $G_2$.
+Aplicando el argumento a cada ancestro, todos los nodos del camino óptimo y $G^*$ salen antes que
+$G_2$. $\blacksquare$
+
+\textbf{(b)} $h^*$: S=5, A=4, B=5, C=3, G=0. Admisible. \textbf{Inconsistente}: $h(A)=4>c(A,C)+h(C)=2$.
+A* en grafo:
+\begin{center}\small
+\begin{tabular}{clll}
+\toprule
+Paso & Extrae ($g$, $f$) & Frontera & Comentario\\
+\midrule
+1 & S (0, 2) & A(5), B(2) & \\
+2 & B (1, 2) & C(4), A(5) & C con $g=3$\\
+3 & C (3, 4) & A(5), G(6) & C se cierra con $g=3>g^*(C)=2$\\
+4 & A (1, 5) & G(6) & C con $g=2$, pero ya está cerrado: se descarta\\
+5 & G (6, 6) & — & \textbf{devuelve 6}\\
+\bottomrule
+\end{tabular}
+\end{center}
+El óptimo es S–A–C–G con costo \textbf{5}.
+
+\textbf{(c)} En árbol, el segundo camino a C no se descarta: tras extraer A se agrega C$(g=2,f=3)$, que sale
+de inmediato y genera G$(g=5,f=5)$, que sale antes que G$(6)$: devuelve \textbf{5}.
+
+\textbf{(d)} (1) Usar una heurística consistente (p.\,ej.\ $h(A)\le2$, o aplicar \emph{pathmax}:
+$f(n')\leftarrow\max(f(n'),f(n))$). (2) Permitir la reapertura: si se encuentra un camino más barato a
+un nodo cerrado, regresarlo a la frontera (A* con reapertura es óptimo con $h$ admisible).
+\end{solucion}
+
+\begin{solucion}{C4 · Combinar heurísticas}
+\textbf{(a) Verdadero.} $\max(h_1,h_2)(n)\le h^*(n)$ porque ambas lo son. Si ambas son consistentes y
+$h=\max(h_1,h_2)$, sea $i$ con $h(n)=h_i(n)$: $h(n)=h_i(n)\le c+h_i(n')\le c+h(n')$.
+
+\textbf{(b) Falso.} $S\xrightarrow{1}G$ con $h_1(S)=h_2(S)=1$: $h_1+h_2=2>1$.
+
+\textbf{(c) Verdadero.} $\lambda h_1+(1-\lambda)h_2\le\lambda h^*+(1-\lambda)h^*=h^*$.
+
+\textbf{(d) Falso} en general (mismo contraejemplo que (b)).
+
+\textbf{(e) Falso.} $S\xrightarrow{1}A\xrightarrow{1}G$, $h_1=h^*$ ($2,1,0$, consistente) y $h_2=(2,0,0)$ admisible:
+$\min=(2,0,0)$ y $2>1+0$. (El mínimo de dos \emph{consistentes} sí es consistente:
+$h(n)\le h_j(n)\le c+h_j(n')=c+h(n')$ con $j$ tal que $h(n')=h_j(n')$.)
+\end{solucion}
+
+\begin{solucion}{C5 · Heurísticas del $N$-puzzle}
+\textbf{(a)} Si un problema relajado tiene todas las acciones del original (y más), toda solución del
+original lo es del relajado: el óptimo relajado es $\le h^*$. \emph{Relajación 1} (una ficha salta a
+cualquier casilla): cada ficha mal colocada necesita exactamente un movimiento y los movimientos son
+independientes: óptimo $=h_1$. \emph{Relajación 2} (una ficha se mueve a una casilla adyacente aunque
+esté ocupada): las fichas se mueven independientemente y cada una necesita exactamente su distancia
+Manhattan: óptimo $=h_2$.
+
+\textbf{(b)} Cada acción desplaza una sola ficha una casilla horizontal o vertical: su distancia
+Manhattan cambia exactamente en $\pm1$ y las demás no cambian. Luego $h_2(n)\le 1+h_2(n')=c+h_2(n')$ y
+$h_2(\text{meta})=0$: consistente. Para $h_1$, una acción cambia el estado «bien/mal colocada» de a lo más
+una ficha: $h_1(n)\le1+h_1(n')$: también consistente.
+
+\textbf{(c)} Toda ficha mal colocada está a distancia Manhattan $\ge1$: $h_2\ge h_1$. Con $h$ consistente,
+A* expande todo nodo con $f<C^*$ y ninguno con $f>C^*$. Si $n$ se expande con $h_2$ (y $f_2(n)<C^*$),
+entonces $g(n)+h_1(n)\le g(n)+h_2(n)<C^*$: también se expande con $h_1$. Así, salvo nodos con $f=C^*$,
+el conjunto expandido con $h_2$ está contenido en el de $h_1$.
+
+\textbf{(d)} Si dos fichas están en su fila meta en orden invertido, en cualquier solución una de ellas
+debe salir de la fila y volver: al menos 2 movimientos verticales que Manhattan no cuenta (su componente
+vertical es 0). $lc$ cuenta el número mínimo de fichas a retirar para eliminar todos los conflictos de
+cada fila/columna; cada retiro cuesta $\ge2$ movimientos extra en la dirección perpendicular, y los
+extras por filas (verticales) y por columnas (horizontales) son movimientos distintos. Así
+$h_3=h_2+2\,lc\le h^*$.
+\end{solucion}
+
+\begin{solucion}{C6 · A* ponderada}
+Sea $P^*$ un camino óptimo de costo $C^*$. En búsqueda en árbol, mientras no se haya devuelto una meta,
+algún nodo $n$ de $P^*$ está en la frontera con $g(n)=g^*(n)$. Como $w\ge1$ y $h$ admisible:
+\[f_w(n)=g(n)+w\,h(n)\le w\,g(n)+w\,h^*(n)=w\,C^*.\]
+Cuando se extrae una meta $G$: $h(G)=0$ y $g(G)=f_w(G)\le f_w(n)\le wC^*$ (si $G$ es el extremo de $P^*$, su costo es $C^*$). $\blacksquare$
+$w=0$: UCS; $w=1$: A*; $w\to\infty$: búsqueda voraz.
+\end{solucion}
+
+\begin{solucion}{C7 · Búsqueda bidireccional}
+\textbf{(a)} Adelante expande S: M(10), A(8). Atrás expande G: M(10), B(8). Adelante expande A: B($g_F=11$).
+Atrás expande B: A($g_B=11$). Adelante expande M(10): G(20). Atrás expande M(10): M ya fue expandido
+hacia adelante: \textbf{se detiene y devuelve S–M–G = 20}. Pero $C^*=8+3+8=\mathbf{19}$.
+
+\textbf{(b)} Sea $P=(v_0=s,\dots,v_k=g)$ con $c(P)<\mu$, $a_i$ el costo del prefijo hasta $v_i$ y
+$b_i=c(P)-a_i$. En Dijkstra, todo nodo con $d(s,v)<g^F_{\min}$ ya fue expandido hacia adelante (con su
+$g_F$ exacto), y análogamente hacia atrás. Sea $i$ el mayor índice con $a_i<g^F_{\min}$ ($a_0=0$). Entonces
+$v_i$ fue expandido hacia adelante y, por maximalidad, $a_{i+1}\ge g^F_{\min}$, de modo que
+$b_{i+1}\le c(P)-g^F_{\min}<\mu-g^F_{\min}\le g^B_{\min}$: $v_{i+1}$ fue expandido hacia atrás con
+$g_B(v_{i+1})\le b_{i+1}$. Al expandir $v_i$ se generó $v_{i+1}$ con $g_F\le a_{i+1}$; en el momento en
+que $v_{i+1}$ tuvo ambos valores se actualizó $\mu\le a_{i+1}+b_{i+1}=c(P)<\mu$. Contradicción. Luego no hay
+camino más barato que $\mu$: $\mu=C^*$. $\blacksquare$
+
+\emph{Aplicación.} Al expandir A hacia adelante se genera B, que ya tiene $g_B=8$: $\mu=11+8=19$. Tras la
+cuarta expansión, $g^F_{\min}=\min(M{:}10,B{:}11)=10$ y $g^B_{\min}=\min(M{:}10,A{:}11)=10$: $19\le20$,
+\textbf{se detiene con 19} tras 4 expansiones.
+
+\textbf{(c)} $f^F$ y $f^B$ estiman \emph{cada una} el costo total de la solución; sumarlas cuenta dos veces
+el trayecto. Con heurísticas perfectas, $f^F_{\min}=f^B_{\min}=C^*$ y la condición $\mu\le2C^*$ aceptaría
+cualquier primera solución, p.\,ej.\ 20 en vez de 19. Cotas válidas: $\max(f^F_{\min},f^B_{\min})$ y
+$g^F_{\min}+g^B_{\min}+\epsilon$ ($\epsilon$ = costo mínimo de arista); MM usa el máximo de ellas.
+
+\textbf{(d)} MM: $pr_F(n)=\max(f_F(n),2g_F(n))$, análogo atrás; expande el nodo de menor prioridad entre
+ambas fronteras. Si $g_F(n)>C^*/2$ entonces $pr_F(n)>C^*$. Mientras no se haya certificado la solución, en
+alguna frontera hay un nodo del camino óptimo con $g\le C^*/2$ en su dirección (el tramo no explorado del
+camino óptimo tiene un extremo en cada mitad), con prioridad $\le\max(C^*,2\cdot C^*/2)=C^*$. Por tanto
+MM nunca expande un nodo con $g>C^*/2$: las búsquedas se encuentran en la mitad (teorema de Holte et al., 2016).
+\end{solucion}
+
+\begin{solucion}{C8 · Verdadero o falso}
+\begin{enumerate}[label=(\alph*),nosep]
+\item \textbf{F}: la torre recorre varias casillas en un movimiento; Manhattan puede valer 14 cuando
+bastan 2 movimientos. Admisible: 0, 1 (misma fila o columna) o 2.
+\item \textbf{F}: se aplica sobre discretizaciones (rejillas, grafos de visibilidad, muestreo); es estándar en planificación de trayectorias.
+\item \textbf{F}: sin consistencia puede devolver subóptimo ($G_2$, C3).
+\item \textbf{F}: IDS devuelve la solución más somera, no la más barata.
+\item \textbf{V}: si cada reinicio tiene probabilidad $p>0$ de éxito, $P(\text{fallar } r \text{ veces})=(1-p)^r\to0$.
+\item \textbf{V}: número de intentos geométrico con media $1/p\approx7.1$ (unos 6 fallos y 1 éxito).
+\item \textbf{F}: en el haz local los $k$ estados comparten información (se eligen los $k$ mejores de todos los sucesores), así que la búsqueda se concentra donde hay progreso.
+\end{enumerate}
+\end{solucion}
+
+\begin{solucion}{C9 · Reyes en un tablero}
+\textbf{(a-i)} Variables $K_1,\dots,K_k$; dominio: casillas $\{1..n\}^2$; para cada $i<j$:
+$\max(|r_i-r_j|,|c_i-c_j|)\ge2$ (implica $K_i\ne K_j$). $\binom{k}{2}$ restricciones binarias.
+
+\textbf{(a-ii)} $X_{r,c}\in\{0,1\}$; para cada par de casillas adyacentes (incluye diagonales)
+$\neg(X_a\wedge X_b)$, y la restricción global $\sum X_{r,c}=k$. Pares adyacentes:
+$2n(n-1)$ ortogonales $+\,2(n-1)^2$ diagonales $=2(n-1)(2n-1)$ restricciones binarias.
+
+\textbf{(b)} En (i) los reyes son intercambiables: $k!$ soluciones equivalentes; se rompe la simetría
+imponiendo $K_1<K_2<\dots<K_k$ (orden lexicográfico de casillas). Con $k$ pequeño, (i) con ruptura de
+simetría tiene pocas variables; (ii) tiene $n^2$ variables pero restricciones locales que la revisión
+hacia adelante propaga bien (poner un rey anula sus 8 vecinos). Ambas son defendibles; lo importante es
+argumentar tamaño del dominio, densidad del grafo de restricciones y simetría.
+
+\textbf{(c)} Estado: conjunto $S$ de casillas con rey. Acciones: agregar un rey en casilla vacía,
+quitar un rey, mover un rey a otra casilla vacía. Resultado: el conjunto modificado. Objetivo (maximizar):
+$f(S)=|S|-\lambda\cdot\text{conflictos}(S)$ con $\lambda>1$. Si hay un conflicto, quitar uno de los reyes da
+$\Delta f\ge-1+\lambda>0$, así que todo máximo local está libre de ataques. Máximo teórico
+$\lceil n/2\rceil^2$: se divide el tablero en $\lceil n/2\rceil^2$ bloques $2\times2$ (recortados en el borde),
+cada uno admite a lo más un rey, y colocar reyes en las casillas (impar, impar) alcanza la cota.
+\end{solucion}
+
+\begin{solucion}{C10 · Límites de la consistencia y estructura}
+\textbf{(a)} Triángulo $X,Y,Z$ con dominios $\{R,G\}$ y $\ne$ en cada arista: cada arco es consistente
+(para $R$ existe $G$ y viceversa), pero un triángulo no se colorea con 2 colores.
+
+\textbf{(b)} Hay $2c$ arcos. Un arco $(X_i,X_j)$ entra a la cola al inicio y cada vez que $D_j$ pierde un
+valor: a lo más $d+1$ veces. \textsc{Revise} cuesta $O(d^2)$. Total $O(2c\cdot(d+1)\cdot d^2)=O(cd^3)$.
+
+\textbf{(c)} Elegir una raíz y ordenar topológicamente $X_1,\dots,X_n$ (cada padre antes que sus hijos).
+\emph{Hacia atrás:} para $j=n,\dots,2$, $\textsc{Revise}(\textit{Padre}(X_j),X_j)$, $O(d^2)$ cada una; si un dominio
+queda vacío, no hay solución. \emph{Hacia adelante:} asignar a $X_1$ cualquier valor y a cada $X_i$ un valor
+compatible con su padre, que existe por la consistencia dirigida. Sin retrocesos. Hay $n-1$ aristas:
+$O(nd^2)$.
+
+\textbf{(d)} En $n$-reinas las soluciones están densamente distribuidas: casi cualquier estado inicial
+está cerca de una, y min-conflicts resuelve un millón de reinas en unos 50 pasos. En un Sudoku difícil hay
+una sola solución y restricciones muy apretadas: el paisaje tiene muchos mínimos locales con pocos
+conflictos, lejos de la solución; la propagación sistemática es mucho más eficaz.
+\end{solucion}
+
+\begin{solucion}{C11 · Minimax contra un MIN subóptimo}
+\textbf{(a)} Sea $V(n)$ el valor minimax y $\sigma$ cualquier estrategia de MIN. Afirmación: si MAX juega
+minimax, el resultado desde $n$ es $\ge V(n)$. Inducción en la altura. Hoja: igual. Nodo MAX: MAX elige
+$c^*$ con $V(c^*)=V(n)$; por hipótesis el resultado es $\ge V(c^*)=V(n)$. Nodo MIN: MIN elige algún $c$; el
+resultado es $\ge V(c)\ge\min_{c'}V(c')=V(n)$. $\blacksquare$
+
+\textbf{(b)} Raíz MAX con dos jugadas. Izquierda: nodo MIN con hojas $(5,5)$, valor 5. Derecha: nodo MIN con
+hojas $(0,10)$, valor 0. Minimax elige izquierda y obtiene 5. Si MIN siempre juega su acción de más a la
+derecha (subóptimo), MAX obtiene 10 jugando a la derecha, que no es la jugada minimax.
+\end{solucion}
+
+\begin{solucion}{C12 · Corrección de alfa-beta}
+\textbf{(a)} $n_1=\min(n_2,n_{21},\dots,n_{2b_2})$, $n_2=\max(n_3,n_{31},\dots,n_{3b_3})$, … Sustituyendo:
+$n_1=\min(\dots,\max(\dots,\min(\dots,n_j,\dots),\dots),\dots)$.
+
+\textbf{(b)} Sea $l_i$ el mejor valor (para el padre $n_{i-1}$) de los hermanos de $n_i$ ya evaluados a la
+izquierda y $r_i$ el de los hermanos a la derecha. Entonces $n_{i-1}=\min(l_i,n_i,r_i)$ si $n_{i-1}$ es MIN y
+$\max(l_i,n_i,r_i)$ si es MAX:
+\[n_1=\min\big(l_2,r_2,\max\big(l_3,r_3,\min\big(l_4,r_4,\dots,\min(l_j,r_j,n_j)\dots\big)\big)\big).\]
+
+\textbf{(c)} \emph{Lema.} Toda composición de funciones $y\mapsto\min(a,y)$ y $y\mapsto\max(b,y)$ es un
+«recorte» $y\mapsto\min(H,\max(L,y))$ (constante si $L\ge H$), en particular monótona no decreciente.
+
+Sea $\beta=\min\{l_i: n_{i-1}\text{ es MIN}\}$, alcanzado en el nivel $k$ ($l_k=\beta$). Escribamos
+$n_1=F(\varphi_k(g(n_j)))$, donde $g$ agrupa los niveles entre $n_k$ y $n_j$, $\varphi_k(y)=\min(\beta,r_k,y)$
+y $F$ los niveles superiores. Por el lema $g(x)=\min(H,\max(L,x))$. Para $x\ge\beta$ hay dos casos:
+si $H>\beta$, entonces $g(x)\ge\min(H,x)\ge\beta$ y $\varphi_k(g(x))=\min(\beta,r_k)$; si $H\le\beta$, entonces
+$g(x)=H$. En ambos casos $n_1$ es \textbf{constante} para $n_j\in[\beta,\infty)$: el valor exacto de $n_j$ no
+importa en cuanto $n_j\ge\beta$. Así, $n_j$ solo puede afectar a $n_1$ si $n_j<\beta$.
+
+Como $n_j$ es MAX, su valor es $\ge$ el de cualquier hijo ya evaluado; en cuanto un hijo da $v\ge\beta$,
+sabemos que $n_j\ge\beta$ y los hijos restantes no pueden cambiar $n_1$: se podan. Es el \emph{corte
+$\beta$}, y $\beta$ es exactamente el mejor valor de MIN a lo largo del camino.
+
+\textbf{(d)} Si $n_j$ es MIN, se repite el argumento con $\alpha=\max\{l_i:n_{i-1}\text{ es MAX}\}$: $n_1$ es constante
+para $n_j\in(-\infty,\alpha]$. Como $n_j$ solo puede bajar al ver más hijos, en cuanto un hijo da $v\le\alpha$ se
+podan los restantes (\emph{corte $\alpha$}).
+\end{solucion}
+
+\begin{solucion}{C13 · Transformaciones de utilidad}
+\textbf{(a)} Si $g$ es estrictamente creciente, $g(\max(a,b))=\max(g(a),g(b))$ y lo mismo con $\min$. Por
+inducción desde las hojas, el valor de cada nodo del árbol transformado es $g$(valor original), y el
+$\arg\max$ en la raíz no cambia porque $g$ preserva el orden. $\blacksquare$
+
+\textbf{(b)} Nodo de azar: $\sum_ip_i(av_i+b)=a\sum_ip_iv_i+b$ (porque $\sum p_i=1$). Max/min se preservan
+por (a) al ser $a>0$. Por inducción todos los valores se transforman afínmente y las decisiones no cambian. $\blacksquare$
+
+\textbf{(c)} Raíz MAX con dos nodos de azar: $A=[0.5{:}\,1;\ 0.5{:}\,9]$ (media 5) y $B=[0.5{:}\,4;\ 0.5{:}\,5]$
+(4.5): se elige $A$. Con $\sqrt{\cdot}$: $A=0.5\cdot1+0.5\cdot3=2$, $B=0.5\cdot2+0.5\cdot2.236=2.118$: se elige $B$.
+
+\textbf{(d)} En un nodo de azar con hijos ya evaluados, cota superior
+$\sum_{\text{vistos}}p_iv_i+(\sum_{\text{no vistos}}p_i)\,U$ y cota inferior análoga con $L$. Bajo un padre MAX con
+valor $\alpha$: si la cota superior $\le\alpha$, se podan los hijos restantes; bajo un padre MIN con $\beta$: si la
+cota inferior $\ge\beta$. Ejemplo en B17(c).
+\end{solucion}
+
+\begin{solucion}{C14 · Evaluación en el gato}
+Casillas $(f,c)$ con $f,c\in\{0,1,2\}$; O en $(0,0)$, X en $(1,1)$.
+
+\textbf{(a)} Líneas solo con X: fila 1, columna 1, antidiagonal ($X_1=3$). Solo con O: fila 0, columna 0
+($O_1=2$). La diagonal principal tiene ambas. $\textsc{Eval}=3-2=\mathbf{1}$.
+
+\textbf{(b)} La posición es simétrica respecto de la diagonal principal; jugadas distintas:
+\begin{center}\small
+\begin{tabular}{lcccc}
+\toprule
+Jugada de X & $X_2$ & $X_1$ & $O_1$ & \textsc{Eval}\\
+\midrule
+$(0,1)$ borde junto a O & 1 & 2 & 1 & 4\\
+$(0,2)$ esquina libre & 1 & 3 & 1 & \textbf{5}\\
+$(1,2)$ borde lejano & 1 & 3 & 2 & 4\\
+$(2,2)$ esquina opuesta & 0 & 5 & 2 & 3\\
+\bottomrule
+\end{tabular}
+\end{center}
+A profundidad 1, X elige la esquina $(0,2)$.
+
+\textbf{(c)} Mínimo sobre respuestas de O: $(0,1)$: respuestas valen $2,1,2,0,0,2$ $\Rightarrow$ \textbf{0} (O en
+$(2,0)$ o $(2,1)$). $(0,2)$: $\Rightarrow-1$ (O bloquea en $(2,0)$: la antidiagonal queda cerrada y la columna 0 tiene dos O, $\textsc{Eval}=3-(3+1)=-1$). $(1,2)$: $\Rightarrow-1$ (O en $(1,0)$). $(2,2)$: $\Rightarrow-1$ (O en $(0,2)$ o $(2,0)$).
+Decisión minimax a profundidad 2: \textbf{$(0,1)$} (o su simétrica $(1,0)$), con valor 0.
+
+\textbf{(d)} No coinciden. A profundidad 1 la esquina crea una amenaza (dos en línea); a profundidad 2
+se ve que O la bloquea y a la vez forma su propia línea doble. Es un ejemplo del efecto de la
+profundidad (horizonte) sobre una evaluación imperfecta.
+\end{solucion}
+
+\begin{solucion}{C15 · Vinculación, resolución y Horn}
+\textbf{(a)} ($\Rightarrow$) Si $\alpha\ent\beta$ y $m$ satisface $\alpha$, entonces satisface $\beta$, luego no satisface
+$\neg\beta$: ningún modelo satisface $\alpha\wedge\neg\beta$. ($\Leftarrow$) Si $\alpha\wedge\neg\beta$ no tiene modelos, todo
+modelo de $\alpha$ falsifica $\neg\beta$, es decir, satisface $\beta$. $\blacksquare$
+
+\textbf{(b)} Sea $m$ modelo de $\ell_1\vee\dots\vee\ell_k\vee p$ y de $\neg p\vee m_1\vee\dots\vee m_n$. Si $p$ es verdadera en $m$,
+$\neg p$ es falsa, así que algún $m_j$ es verdadero; si $p$ es falsa, algún $\ell_i$ es verdadero. En ambos casos
+el resolvente es verdadero en $m$. $\blacksquare$
+
+\textbf{(c)} $M(KB\wedge\beta)=M(KB)\cap M(\beta)\subseteq M(KB)\subseteq M(\alpha)$. $\blacksquare$
+
+\textbf{(d)} Resolver $C_1\ni p$ con $C_2\ni\neg p$: $p$ es el único positivo de $C_1$, así que $C_1\setminus\{p\}$ no
+tiene positivos; $C_2\setminus\{\neg p\}$ tiene a lo más uno. El resolvente tiene a lo más un literal positivo. $\blacksquare$
+\end{solucion}
+
+\begin{solucion}{C16 · Clases de cláusulas y complejidad}
+\textbf{(a)} Dos cláusulas no tautológicas son equivalentes sii tienen el mismo conjunto de literales
+(una cláusula es falsa exactamente cuando todos sus literales lo son). Con 3 literales sobre 3 símbolos
+distintos: $\binom{n}{3}2^3=8\binom n3$; todas las que contienen $p$ y $\neg p$ equivalen a \p{True} (1 clase más). Si se
+admiten literales repetidos ($A\vee A\vee B\equiv A\vee B$) se suman $4\binom n2+2n$. En todo caso, $O(n^3)$.
+
+\textbf{(b)} Resolver dos cláusulas de 2 literales da una de $\le2$ literales: la clausura vive en un
+conjunto de $O(n^2)$ cláusulas; cada paso agrega una nueva o no agrega nada, hay $O(n^4)$ pares por
+revisar: polinomial. Con 3-CNF, resolver dos cláusulas de 3 literales da hasta 4, y así crecen hasta $n$
+literales: el número de cláusulas posibles es $3^n$ (cada símbolo positivo, negativo o ausente) y la cota
+es exponencial. (3-SAT es NP-completo.)
+
+\textbf{(c)} Cada símbolo entra a la agenda a lo más una vez (tabla de inferidos); al procesarlo, se
+decrementa el contador de cada cláusula donde aparece como premisa, una vez por aparición. El trabajo
+total es proporcional al número de apariciones de literales: lineal en el tamaño de la KB.
+
+\textbf{(d)} No. Los modelos de un conjunto de cláusulas de Horn son cerrados bajo intersección (AND
+bit a bit). $P\vee Q$ tiene los modelos $(1,0)$ y $(0,1)$, cuya intersección $(0,0)$ no lo satisface. Se pierde
+la capacidad de expresar información disyuntiva (indefinida); se gana inferencia en tiempo lineal.
+\end{solucion}
+
+\begin{solucion}{C17 · Rudolph y Scrooge}
+\textbf{(a)} (1) $\forall x\,\p{Niño}(x)\imp\p{Ama}(x,\p{Santa})$; (2) $\forall x\,\forall y\,\p{Ama}(x,\p{Santa})\wedge\p{Reno}(y)\imp\p{Ama}(x,y)$;
+(3) $\p{Reno}(\p{Rudolph})\wedge\p{NarizRoja}(\p{Rudolph})$; (4) $\forall x\,\p{NarizRoja}(x)\imp\p{Raro}(x)\vee\p{Payaso}(x)$;
+(5) $\forall x\,\p{Reno}(x)\imp\neg\p{Payaso}(x)$; (6) $\forall x\,\p{Raro}(x)\imp\neg\p{Ama}(\p{Scrooge},x)$.
+Conclusión: $\neg\p{Niño}(\p{Scrooge})$.
+
+\textbf{(b)} C1 $\neg\p{Niño}(x_1)\vee\p{Ama}(x_1,\p{Santa})$; C2 $\neg\p{Ama}(x_2,\p{Santa})\vee\neg\p{Reno}(y_2)\vee\p{Ama}(x_2,y_2)$;
+C3 $\p{Reno}(\p{Rudolph})$; C4 $\p{NarizRoja}(\p{Rudolph})$; C5 $\neg\p{NarizRoja}(x_5)\vee\p{Raro}(x_5)\vee\p{Payaso}(x_5)$;
+C6 $\neg\p{Reno}(x_6)\vee\neg\p{Payaso}(x_6)$; C7 $\neg\p{Raro}(x_7)\vee\neg\p{Ama}(\p{Scrooge},x_7)$;
+C8 $\p{Niño}(\p{Scrooge})$ (negación de la conclusión).
+
+\textbf{(c)}
+\begin{enumerate}[nosep]
+\item C8 + C1 $\{x_1/\p{Scrooge}\}$: $\p{Ama}(\p{Scrooge},\p{Santa})$.
+\item + C2 $\{x_2/\p{Scrooge}\}$: $\neg\p{Reno}(y_2)\vee\p{Ama}(\p{Scrooge},y_2)$.
+\item + C3 $\{y_2/\p{Rudolph}\}$: $\p{Ama}(\p{Scrooge},\p{Rudolph})$.
+\item C4 + C5 $\{x_5/\p{Rudolph}\}$: $\p{Raro}(\p{Rudolph})\vee\p{Payaso}(\p{Rudolph})$.
+\item + C6 $\{x_6/\p{Rudolph}\}$: $\p{Raro}(\p{Rudolph})\vee\neg\p{Reno}(\p{Rudolph})$; + C3: $\p{Raro}(\p{Rudolph})$.
+\item + C7 $\{x_7/\p{Rudolph}\}$: $\neg\p{Ama}(\p{Scrooge},\p{Rudolph})$.
+\item Con el paso 3: $\square$. Scrooge no es un niño.
+\end{enumerate}
+\end{solucion}
+
+\begin{solucion}{C18 · ¿Mató la curiosidad al gato?}
+\textbf{LPO.} A: $\forall x\,[\forall y\,\p{Animal}(y)\imp\p{Ama}(x,y)]\imp[\exists y\,\p{Ama}(y,x)]$.
+B: $\forall x\,[\exists z\,\p{Animal}(z)\wedge\p{Mata}(x,z)]\imp[\forall y\,\neg\p{Ama}(y,x)]$.
+C: $\forall x\,\p{Animal}(x)\imp\p{Ama}(\p{Jack},x)$.
+D: $\p{Mata}(\p{Jack},\p{Tuna})\vee\p{Mata}(\p{Curiosidad},\p{Tuna})$.
+E: $\p{Gato}(\p{Tuna})$. F: $\forall x\,\p{Gato}(x)\imp\p{Animal}(x)$.
+Negación: $\neg\p{Mata}(\p{Curiosidad},\p{Tuna})$.
+
+\textbf{CNF.} A1 $\p{Animal}(F(x))\vee\p{Ama}(G(x),x)$; A2 $\neg\p{Ama}(x,F(x))\vee\p{Ama}(G(x),x)$;
+B $\neg\p{Ama}(y,x)\vee\neg\p{Animal}(z)\vee\neg\p{Mata}(x,z)$; C $\neg\p{Animal}(x)\vee\p{Ama}(\p{Jack},x)$;
+D, E como arriba; F $\neg\p{Gato}(x)\vee\p{Animal}(x)$; ¬G $\neg\p{Mata}(\p{Curiosidad},\p{Tuna})$.
+(Cada cláusula con sus propias variables.)
+
+\textbf{Refutación.}
+\begin{enumerate}[nosep]
+\item E + F $\{x/\p{Tuna}\}$: $\p{Animal}(\p{Tuna})$.
+\item D + ¬G: $\p{Mata}(\p{Jack},\p{Tuna})$.
+\item B + (1) $\{z/\p{Tuna}\}$: $\neg\p{Ama}(y,x)\vee\neg\p{Mata}(x,\p{Tuna})$.
+\item + (2) $\{x/\p{Jack}\}$: $\neg\p{Ama}(y,\p{Jack})$.
+\item A2 + C $\{x/\p{Jack},\ x'/F(\p{Jack})\}$: $\neg\p{Animal}(F(\p{Jack}))\vee\p{Ama}(G(\p{Jack}),\p{Jack})$.
+\item + A1 $\{x/\p{Jack}\}$: $\p{Ama}(G(\p{Jack}),\p{Jack})$ (factorizando el literal repetido).
+\item + (4) $\{y/G(\p{Jack})\}$: $\square$.
+\end{enumerate}
+Idea: Jack ama a todos los animales, así que alguien lo ama; pero quien mata un animal no es amado por
+nadie; luego Jack no mató a Tuna, y por D fue Curiosidad.
+\end{solucion}
+
+\begin{solucion}{C19 · Cuantificadores y la cola de un animal}
+\textbf{(a)} Si $M\models\exists y\,\forall x\,\p{Ama}(x,y)$, hay un objeto $b$ con $\p{Ama}(a,b)$ para todo $a$; entonces para
+cada $a$ basta tomar $y=b$: $M\models\forall x\,\exists y\,\p{Ama}(x,y)$. Contramodelo del recíproco: dominio $\{1,2\}$,
+$\p{Ama}=\{(1,1),(2,2)\}$: todos aman a alguien (a sí mismos) pero nadie es amado por todos.
+
+\textbf{(b)} Premisa: $\forall x\,\p{Perro}(x)\imp\p{Animal}(x)$. Conclusión:
+$\forall t\,[\exists x\,\p{Perro}(x)\wedge\p{ColaDe}(t,x)]\imp[\exists y\,\p{Animal}(y)\wedge\p{ColaDe}(t,y)]$.
+Negación: $\exists t\,[\exists x\,\p{Perro}(x)\wedge\p{ColaDe}(t,x)]\wedge[\forall y\,\neg\p{Animal}(y)\vee\neg\p{ColaDe}(t,y)]$.
+CNF (Skolem $t\to T$, $x\to D$): (1) $\neg\p{Perro}(x)\vee\p{Animal}(x)$; (2) $\p{Perro}(D)$; (3) $\p{ColaDe}(T,D)$;
+(4) $\neg\p{Animal}(y)\vee\neg\p{ColaDe}(T,y)$.
+Resolución: (2)+(1) $\{x/D\}$: $\p{Animal}(D)$; +(4) $\{y/D\}$: $\neg\p{ColaDe}(T,D)$; +(3): $\square$.
+\end{solucion}
+
+\begin{solucion}{C20 · Ensayos (puntos clave)}
+\textbf{(a)} La racionalidad está bien definida matemáticamente y es general (incluye conducta sin
+inferencia explícita); la prueba de Turing mide parecido humano, que incluye errores humanos y no es un
+criterio de diseño ingenieril (los aviones no se diseñan para engañar a las palomas).
+\textbf{(b)} Searle sigue un manual para responder en chino sin entenderlo: la sintaxis no basta para la
+semántica. Respuesta del sistema: quien entiende no es la persona sino el sistema completo (persona +
+manual + papeles); Searle replica que podría memorizar el manual y seguiría sin entender.
+\textbf{(c)} No existe algoritmo que decida si un programa arbitrario se detiene; por tanto hay preguntas
+bien planteadas que ningún agente computacional puede responder en general; la racionalidad debe ser
+\emph{acotada} por los recursos.
+\textbf{(d)} Búsqueda sistemática: importa el camino y se requieren garantías (completitud/optimalidad).
+CSP: el camino no importa, hay estructura de variables/restricciones explotable (propagación, MRV).
+Búsqueda local: espacios enormes u optimización, cuando basta una buena solución y la memoria es limitada.
+\end{solucion}
+
+\newpage
+% ============================================================
+\section{Parte D — Examen simulado: soluciones}
+
+\begin{solucion}{D1 · Jarras (12 pts)}
+\textbf{(a)} Estado $(x,y)$: litros en la jarra de 4 y en la de 3. Inicial $(0,0)$. Meta: $x=2\vee y=2$.
+Acciones: $\textit{Llenar4}$: $(4,y)$ si $x<4$; $\textit{Llenar3}$: $(x,3)$ si $y<3$; $\textit{Vaciar4}$: $(0,y)$ si $x>0$;
+$\textit{Vaciar3}$: $(x,0)$ si $y>0$; $\textit{Verter4}{\to}3$: con $t=\min(x,3-y)$, $(x-t,y+t)$ si $t>0$; $\textit{Verter3}{\to}4$:
+con $t=\min(y,4-x)$, $(x+t,y-t)$ si $t>0$. Costo 1.
+
+\textbf{(b)} $5\cdot4=20$ estados; alcanzables \textbf{14}: tras cualquier acción alguna jarra queda llena o vacía,
+así que solo son alcanzables los estados con $x\in\{0,4\}$ o $y\in\{0,3\}$ (los 6 estados con $x\in\{1,2,3\}$, $y\in\{1,2\}$ no lo son).
+
+\textbf{(c)} $(0,0)\xrightarrow{\textit{Llenar3}}(0,3)\xrightarrow{3\to4}(3,0)\xrightarrow{\textit{Llenar3}}(3,3)\xrightarrow{3\to4}(4,2)$: \textbf{4 acciones}.
+Optimalidad por BFS: nivel 1 $=\{(4,0),(0,3)\}$; nivel 2 $=\{(1,3),(4,3),(3,0)\}$; nivel 3 $=\{(1,0),(3,3)\}$.
+Ningún estado de nivel $\le3$ contiene 2 litros, así que no hay solución más corta.
+\end{solucion}
+
+\begin{solucion}{D2 · A* y consistencia (15 pts)}
+\textbf{(a)} $h^*$: S=7, A=6, B=4, C=3, G=0. Admisible ($6\le7$, $5\le6$, $2\le4$, $3\le3$). Arcos:
+S$\to$A $6\le1+5$; S$\to$B $6\le4+2$; \textbf{A$\to$B: $5>2+2$} \texttimes{}; A$\to$C $5\le5+3$; B$\to$C $2\le1+3$;
+B$\to$G $2\le6$; C$\to$G $3\le3$. \textbf{Inconsistente} por A$\to$B.
+
+\textbf{(b)}
+\begin{center}\small
+\begin{tabular}{clll}
+\toprule
+Paso & Extrae ($g$,$f$) & Frontera & Comentario\\
+\midrule
+1 & S (0,6) & A(6), B(6) & \\
+2 & A (1,6) & B(5), C(9) & B mejora a $g=3$\\
+3 & B (3,5) & C(7), G(9) & C mejora a $g=4$\\
+4 & C (4,7) & G(7) & G mejora a $g=7$\\
+5 & G (7,7) & — & costo \textbf{7} (óptimo)\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{(c)} Con B primero: S; B$(g=4,f=6)$ se cierra con $g$ subóptimo, genera C$(5,8)$ y G$(10,10)$; A$(1,6)$
+genera B con $g=3$, pero B ya está cerrado y se descarta; C vía A ($g=6$) no mejora; C$(5,8)$ genera G$(8,8)$;
+extrae G: \textbf{costo 8}, subóptimo. La inconsistencia hace que $f$ baje a lo largo de S–A–B
+($6\to6\to5$), así que B puede cerrarse antes de hallar su mejor camino; sin reapertura, el error se propaga.
+
+\textbf{(d)} Ver C4(a).
+\end{solucion}
+
+\begin{solucion}{D3 · CSP (13 pts)}
+\textbf{(a)} Ciclo de 4: $A$–$B$–$C$–$D$–$A$ (aristas $A<B$, $B<C$, $C\ne D$, $D>A$).
+
+\textbf{(b)} Una ejecución de AC-3 (cola inicial en orden alfabético de arcos):
+$A\to B$ quita 3 ($A=\{1,2\}$); $B\to A$ quita 1 ($B=\{2,3\}$); $B\to C$ quita 3 ($B=\{2\}$);
+$C\to B$ quita 1, 2 ($C=\{3\}$); $D\to A$ quita 1 ($D=\{2,3\}$); $D\to C$ quita 3 ($D=\{2\}$);
+reencolado $A\to B$ quita 2 ($A=\{1\}$). Final: $A=1$, $B=2$, $C=3$, $D=2$. Todos unitarios: es
+solución, \textbf{no hace falta buscar} (verificación: $1<2<3$, $2\ne3$, $2>1$).
+
+\textbf{(c)} Todos los dominios miden 3: MRV empata; todos tienen grado 2: empate otra vez; se toma $A$ (alfabético).
+
+\textbf{(d)} Tras $A=1$, FC solo poda los vecinos de $A$: $B=\{2,3\}$, $D=\{2,3\}$, $C=\{1,2,3\}$. AC-3 propaga en
+cadena: $C>B\ge2\Rightarrow C=\{3\}$; $B<3\Rightarrow B=\{2\}$; $D\ne3\Rightarrow D=\{2\}$: resuelve el problema.
+\end{solucion}
+
+\begin{solucion}{D4 · Alfa-beta (15 pts)}
+\textbf{(a)} MIN de nivel 3: $111=2$, $112=1$, $121=4$, $122=3$, $211=2$, $212=1$, $221=5$, $222=3$.
+MAX: $11=2$, $12=4$, $21=2$, $22=5$. MIN: $1=2$, $2=2$. Raíz \textbf{2}.
+
+\textbf{(b)}
+\begin{itemize}[nosep]
+\item $R(-\infty,\infty)\to1(-\infty,\infty)\to11(-\infty,\infty)\to111(-\infty,\infty)$: 2, 5 $\Rightarrow2$. En 11: $\alpha=2$.
+\item $112(2,\infty)$: 8, 1 $\Rightarrow v=1\le\alpha$ (corte al final). $11=2$. En 1: $\beta=2$.
+\item $12(-\infty,2)\to121(-\infty,2)$: 4, 6 $\Rightarrow4$. En 12: $v=4\ge\beta=2$ $\Rightarrow$ \textbf{se poda 122} (hojas 7, 3). $1=2$.
+\item En $R$: $\alpha=2$. $2(2,\infty)\to21(2,\infty)\to211(2,\infty)$: 9, 2 $\Rightarrow v=2\le\alpha$: devuelve 2.
+\item $212(2,\infty)$: 1 $\le\alpha$ $\Rightarrow$ \textbf{se poda la hoja 6}. $21=2$.
+\item En 2: $v=2\le\alpha=2$ $\Rightarrow$ \textbf{se poda 22} (hojas 5, 8, 3, 4). $R=2$.
+\end{itemize}
+Hojas no evaluadas: 7, 3 (de 122), 6 (de 212), 5, 8, 3, 4 (de 22): \textbf{7 de 16}; se evalúan 9.
+(Con la convención de podar solo con desigualdad estricta, el subárbol 22 sí se exploraría.)
+
+\textbf{(c)} $b^{\lceil m/2\rceil}+b^{\lfloor m/2\rfloor}-1=4+4-1=\mathbf{7}$ hojas.
+\end{solucion}
+
+\begin{solucion}{D5 · Búsqueda local (10 pts)}
+\textbf{(a)} $\Delta E=-3$: $T=5$: $e^{-0.6}\approx0.549$; $T=1$: $e^{-3}\approx0.050$. Con $T\to0$ la probabilidad
+tiende a 0: se vuelve hill climbing.
+
+\textbf{(b)} \texttt{110|10010} $\times$ \texttt{011|01101} $\Rightarrow$ \texttt{11001101} (5 unos) y \texttt{01110010}
+(4 unos); los padres tienen 4 y 5. $P(\text{sin mutación})=(7/8)^8\approx0.344$.
+
+\textbf{(c)} Tabú se mueve al mejor vecino no tabú aunque empeore y no puede regresar de inmediato, así
+que sale de la cuenca; hill climbing se detiene si ningún vecino mejora.
+\end{solucion}
+
+\begin{solucion}{D6 · Lógica proposicional (15 pts)}
+\textbf{(a)} Si el consecuente fuera falso ($Q=S=F$) con el antecedente verdadero: $P\imp Q$ fuerza $P=F$,
+$R\imp S$ fuerza $R=F$, y entonces $P\vee R$ es falso. Contradicción: no hay asignación que la falsifique; es válida.
+
+\textbf{(b)} (1) $\neg P\vee Q$, (2) $\neg R\vee S$, (3) $P\vee R$, (4) $\neg Q$, (5) $\neg S$.
+(1)+(4): $\neg P$; (2)+(5): $\neg R$; (3)+$\neg P$: $R$; $R+\neg R$: $\square$.
+
+\textbf{(c)} No: $P\vee R$ tiene dos literales positivos y la KB no es equivalente a ninguna KB de Horn
+(sus modelos $\{P,Q\}$ y $\{R,S\}$ tienen intersección vacía, que no satisface $P\vee R$). Modus ponens no
+puede concluir $Q\vee S$ porque no conoce $P$ ni $R$ por separado: se necesita razonar por casos
+(resolución).
+
+\textbf{(d)} $3\cdot2^2=\mathbf{12}$.
+\end{solucion}
+
+\begin{solucion}{D7 · Lógica de primer orden (20 pts)}
+\textbf{(a)} $\forall x\,\p{SabeLeer}(x)\imp\p{Letrado}(x)$; $\forall x\,\p{Delfin}(x)\imp\neg\p{Letrado}(x)$;
+$\exists x\,\p{Delfin}(x)\wedge\p{Inteligente}(x)$. Conclusión: $\exists x\,\p{Inteligente}(x)\wedge\neg\p{SabeLeer}(x)$.
+
+\textbf{(b)} C1 $\neg\p{SabeLeer}(x)\vee\p{Letrado}(x)$; C2 $\neg\p{Delfin}(y)\vee\neg\p{Letrado}(y)$;
+C3 $\p{Delfin}(F_1)$; C4 $\p{Inteligente}(F_1)$ ($F_1$ constante de Skolem del $\exists$). Negación de la conclusión:
+$\forall z\,\neg\p{Inteligente}(z)\vee\p{SabeLeer}(z)$ $\Rightarrow$ C5 $\neg\p{Inteligente}(z)\vee\p{SabeLeer}(z)$ (aquí no hay Skolem).
+
+\textbf{(c)} C4+C5 $\{z/F_1\}$: $\p{SabeLeer}(F_1)$; +C1 $\{x/F_1\}$: $\p{Letrado}(F_1)$; +C2 $\{y/F_1\}$: $\neg\p{Delfin}(F_1)$;
++C3: $\square$.
+
+\textbf{(d)} $\{x/\p{Padre}(y),\ z/\p{Madre}(\p{Padre}(y))\}$. $P(x,x)$ y $P(F(y),y)$: $x/F(y)$ y luego $F(y)$ vs.\ $y$:
+la verificación de ocurrencia falla.
+\end{solucion}
+
+\begin{nota}
+\textbf{Rúbrica sugerida para autocalificarte.} En cada inciso: 40\% planteamiento/definiciones,
+40\% procedimiento, 20\% resultado. Si obtuviste menos de 70 puntos, repite los ejercicios de las
+Partes B y C del tema correspondiente antes del examen.
+\end{nota}

@@ -1,0 +1,183 @@
+% =====================================================================
+\newpage
+\section{Exámenes simulados}
+% =====================================================================
+Resuelve cada simulacro en \textbf{90 minutos}, sin notas, escribiendo las demostraciones completas como si fuera el examen real. Los problemas se numeran como \textbf{10.1--10.6} (simulacro A) y \textbf{10.7--10.12} (simulacro B).
+
+\subsection*{Simulacro A}
+
+\begin{prob}[ · A1]
+Demostrar que la siguiente terna de Hoare es válida:
+\[\hoare{a\neq b}{\kw{if}\ (a>b)\ \kw{then}\ (m\asg a;\ n\asg b)\ \kw{else}\ (m\asg b;\ n\asg a)}{m>n}.\]
+\end{prob}
+\begin{sol}
+$P: a\ne b$, $B: a>b$, $Q: m>n$.
+
+\textbf{Rama verdadera} $C_1: m\asg a;\ n\asg b$. Hacia atrás: por $n\asg b$: $m>b$; por $m\asg a$: $a>b$. Así $\hoare{a>b}{C_1}{m>n}$, y $P\land B\equiv a\ne b\land a>b\Rightarrow a>b$. \checkmark
+
+\textbf{Rama falsa} $C_2: m\asg b;\ n\asg a$. Hacia atrás: por $n\asg a$: $m>a$; por $m\asg b$: $b>a$. Así $\hoare{b>a}{C_2}{m>n}$. Además $P\land\neg B\equiv a\ne b\land a\le b\equiv a<b\Rightarrow b>a$. \checkmark
+
+Por la regla condicional (y composición en cada rama), la terna es válida; sin ciclos, corrección total. Nótese que la precondición $a\ne b$ es \emph{necesaria}: con $a=b$ se obtendría $m=n$.
+\end{sol}
+
+\begin{prob}[ · A2]
+¿Qué es la corrección parcial y la corrección total de un programa? Da un ejemplo de programa parcialmente correcto que no sea totalmente correcto.
+\end{prob}
+\begin{sol}
+Parcial: $\hoare{P}{C}{Q}$ es válida: si $C$ inicia en $P$ \emph{y termina}, termina en $Q$. Total: además $C$ termina para toda entrada en $P$. Total $=$ parcial $+$ terminación.
+
+Ejemplo: $\hoare{\T}{\kw{while}\ x\ne0\ \kw{do}\ x\asg x-2}{x=0}$. Es parcialmente correcto: si el ciclo termina, es porque $x=0$ (invariante trivial $\T$, salida $\neg(x\ne0)\Rightarrow x=0$). No es totalmente correcto: con $x=3$ o $x=-2$ nunca termina. Con precondición $x\ge0\land x$ par, la variante $x$ da terminación. Otro ejemplo: \texttt{Cuadrado(A)} con $A<0$.
+\end{sol}
+
+\begin{prob}[ · A3]
+Escribe en seudocódigo un algoritmo de divide y vencerás que calcule la suma de los elementos de $A[l..r]$. Plantea su recurrencia y traza la llamada sobre $A=[4,7,1,3]$.
+\end{prob}
+\begin{sol}
+\begin{lstlisting}
+Funcion Suma( A, l, r ): entero
+Inicio
+  Si l = r entonces devolver( A[l] )          // problema simple
+  m = (l + r) div 2                           // descomponer en k = 2
+  S1 = Suma( A, l, m )
+  S2 = Suma( A, m+1, r )
+  devolver( S1 + S2 )                         // combinar
+Fin
+\end{lstlisting}
+$T(1)=\Theta(1)$, $T(n)=2T(n/2)+\Theta(1)\Rightarrow T(n)=\Theta(n)$.
+Traza: \texttt{Suma(1,4)} $\to$ \texttt{Suma(1,2)} $=$ \texttt{Suma(1,1)}$+$\texttt{Suma(2,2)} $=4+7=11$; \ \texttt{Suma(3,4)} $=1+3=4$; \ resultado $11+4=15$.
+\end{sol}
+
+\begin{prob}[ · A4]
+Demostrar que el invariante de las siguientes instrucciones es $s=2i$ y deducir el valor final de $s$ ($n\ge0$):
+\begin{lstlisting}
+int s = 0;
+for( int i = 0; i < n; i++ )
+    s = s + 2;
+\end{lstlisting}
+\end{prob}
+\begin{sol}
+Equivalente: \texttt{s:=0; i:=0; while i<n do \{ s:=s+2; i:=i+1 \}}.
+\textbf{Base:} $s_0=0=2\cdot0=2i_0$. \ \textbf{H.I.:} $s_n=2i_n$. \ \textbf{Paso:} $s_{n+1}=s_n+2=2i_n+2=2(i_n+1)=2i_{n+1}$. Por inducción, $s=2i$ es invariante.
+Además $0\le i\le n$ es invariante; al salir $i=n$ y por tanto $s=\mathbf{2n}$. Variante: $n-i$.
+\end{sol}
+
+\begin{prob}[ · A5]
+Con el programa
+\begin{lstlisting}[language=Prolog]
+progenitor(ana, bea).
+progenitor(ana, carlos).
+progenitor(carlos, diana).
+progenitor(bea, emilio).
+abuela(X, Z) :- progenitor(X, Y), progenitor(Y, Z).
+\end{lstlisting}
+(a) Escribe la derivación SLD de \texttt{?- abuela(ana, N).} y todas las respuestas que da Prolog con \texttt{;}.
+(b) ¿Qué responde \texttt{?- abuela(X, diana).}?
+\end{prob}
+\begin{sol}
+(a) Regla renombrada: $abuela(X_1,Z_1)\leftarrow progenitor(X_1,Y_1),progenitor(Y_1,Z_1)$.
+$G_0:\leftarrow abuela(ana,N)$; \ $\theta_1=\{X_1/ana,Z_1/N\}$.\\
+$G_1:\leftarrow progenitor(ana,Y_1),progenitor(Y_1,N)$. Primer hecho que unifica: $progenitor(ana,bea)$, $\theta_2=\{Y_1/bea\}$.\\
+$G_2:\leftarrow progenitor(bea,N)$; con $progenitor(bea,emilio)$: $\theta_3=\{N/emilio\}$; $G_3=\square$. \textbf{\texttt{N = emilio}}.\\
+\texttt{;}: no hay otro $progenitor(bea,\_)$; se retrocede a $G_1$ y se usa $progenitor(ana,carlos)$: $Y_1/carlos$, $G_2':\leftarrow progenitor(carlos,N)$, $N/diana$: \textbf{\texttt{N = diana}}. Otro \texttt{;}: \texttt{false}.
+
+(b) $G_1:\leftarrow progenitor(X,Y_1),progenitor(Y_1,diana)$. Se prueban los hechos en orden: $(ana,bea)\to progenitor(bea,diana)$ falla; $(ana,carlos)\to progenitor(carlos,diana)$ \checkmark: \texttt{X = ana}. Con \texttt{;} las demás ramas ($Y_1=diana$, $Y_1=emilio$) fallan: \texttt{false}.
+\end{sol}
+
+\begin{prob}[ · A6]
+En el problema de las ocho reinas, explica para qué sirven $j-k$ y $j+k$, por qué basta el vector $\mathit{sol}[k]$ y qué parte del algoritmo realiza el ``backtracking''.
+\end{prob}
+\begin{sol}
+Se coloca una reina por fila $k$ (así nunca comparten fila) y $\mathit{sol}[k]=j$ guarda su columna: esto describe completamente el tablero. Dos reinas se atacan si comparten columna ($j$), la diagonal donde $j-k$ es constante o la diagonal donde $j+k$ es constante; guardando esos tres identificadores ocupados, verificar una casilla no requiere recorrer el tablero (poda inmediata). El \emph{backtracking} es: probar columnas en orden, anotar la elegida (\texttt{push\_back}), bajar a la fila $k+1$ y, al regresar (por éxito o porque no hubo columna segura), deshacer (\texttt{pop\_back}) y probar la siguiente columna.
+\end{sol}
+
+\newpage
+\subsection*{Simulacro B}
+
+\begin{prob}[ · B1]
+Encuentra la precondición más débil $P$ tal que $\hoare{P}{x\asg 2x+1;\ y\asg x-3}{y>4}$ sea válida. ¿Es válida $\hoare{x=5}{x\asg 2x+1;\ y\asg x-3}{y>4}$?
+\end{prob}
+\begin{sol}
+Por $y\asg x-3$: $x-3>4\iff x>7$. \ Por $x\asg2x+1$: $2x+1>7\iff x>3$. \quad $P: x>3$.
+
+Composición: $\hoare{x>3}{x\asg2x+1}{x>7}$ y $\hoare{x>7}{y\asg x-3}{y>4}$. Como $x=5\Rightarrow x>3$, por fortalecimiento de la precondición la segunda terna es \textbf{válida} (de hecho $x=11$, $y=8$).
+\end{sol}
+
+\begin{prob}[ · B2]
+Describe el algoritmo de backtracking para encontrar \emph{todas} las soluciones de un problema. Aplícalo al problema de las 4 reinas: ¿cuáles son las soluciones?
+\end{prob}
+\begin{sol}
+\begin{lstlisting}
+Funcion Backtracking( Etapa i, solucionesCompletas ) devuelve: boolean
+Inicio
+  Éxito = falso;
+  IniciarOpciones( i, GrupoOpciones o );
+  Repetir
+    SeleccionarNuevaOpcion( o, Opcion n );
+    Si ( Aceptable( n ) ) entonces
+      AnotarOpcion( i, n );
+      Si SolucionCompleta( i ) entonces
+        Éxito = verdadero;
+        ApuntarSoluciónCompleta( i, solucionesCompletas );
+      Sino
+        Éxito = Backtracking( i+1 );
+        Si Éxito = false entonces cancelamosAnotacion( i, n ); finsi;
+      Finsi;
+    Finsi;
+  Hasta ( NoQuedanOpciones( o ) );
+  Retorna Éxito;
+Fin
+\end{lstlisting}
+A diferencia de ``una solución'', el ciclo no se detiene con el primer éxito: termina solo cuando no quedan opciones, y cada solución completa se agrega a la colección.
+
+4 reinas (etapa $=$ fila, opción $=$ columna, aceptable $=$ columna y diagonales libres): soluciones $\mathit{sol}=[2,4,1,3]$ y $[3,1,4,2]$, es decir, casillas $(0,2),(1,4),(2,1),(3,3)$ y $(0,3),(1,1),(2,4),(3,2)$.
+\end{sol}
+
+\begin{prob}[ · B3]
+Suponiendo demostrado que $A(1,z)=z+2$, demuestra que $A(2,z)=2z+3$ para todo $z\ge0$, calcula $A(2,5)$ y demuestra $\hoare{x=1}{w\asg A(x,y)}{w=y+2}$.
+\end{prob}
+\begin{sol}
+Base: $A(2,0)=A(1,1)=3=2\cdot0+3$. H.I.: $A(2,n)=2n+3$. Paso: $A(2,n+1)=A(1,A(2,n))=A(1,2n+3)=2n+5=2(n+1)+3$. Por inducción, $A(2,z)=2z+3$. \ $A(2,5)=13$.
+
+Terna: por asignación, $\hoare{A(x,y)=y+2}{w\asg A(x,y)}{w=y+2}$. Como $x=1\Rightarrow A(x,y)=A(1,y)=y+2$, por la regla de consecuencia $\hoare{x=1}{w\asg A(x,y)}{w=y+2}$. $\blacksquare$
+\end{sol}
+
+\begin{prob}[ · B4]
+Para el ciclo de división entera por restas ($a\ge0$, $b>0$)
+\begin{lstlisting}
+q := 0; r := a;
+while r (*$\geq$*) b do  { r := r - b; q := q + 1 }
+\end{lstlisting}
+encuentra el invariante, demuéstralo por inducción y prueba la corrección total respecto de $Q: a=qb+r\land0\le r<b$.
+\end{prob}
+\begin{sol}
+Ver problema 7.6. Resumen: $I: a=qb+r\land r\ge0$. Base: $a=0\cdot b+a$, $a\ge0$. Paso: con $r_n\ge b$, $r_{n+1}=r_n-b\ge0$ y $q_{n+1}b+r_{n+1}=q_nb+b+r_n-b=a$. Salida: $I\land r<b\Rightarrow Q$. Terminación: variante $r\ge0$ que decrece en $b\ge1$.
+\end{sol}
+
+\begin{prob}[ · B5]
+(a) ¿Qué responde Prolog a \texttt{?- max(3, 5, 3).} con \texttt{max(X,Y,Y) :- X < Y, !.} y \texttt{max(X,\_,X).}? Explica y corrige. (b) ¿Qué diferencia hay entre \texttt{X = 3*2}, \texttt{X is 3*2} y \texttt{3*2 =:= 6}?
+\end{prob}
+\begin{sol}
+(a) Responde \texttt{true} (incorrecto): la primera cláusula falla al unificar el tercer argumento ($3$ con $Y=5$) antes de llegar al corte, y la segunda acepta cualquier caso. Es un \emph{corte rojo} mal usado. Corrección: \texttt{max(X,Y,Z) :- X < Y, !, Z = Y.} \ \texttt{max(X,\_,X).} (ver problema 9.8).
+
+(b) \texttt{X = 3*2} liga \texttt{X} al \emph{término} \texttt{3*2} sin evaluar; \texttt{X is 3*2} evalúa y liga \texttt{X = 6}; \texttt{3*2 =:= 6} compara valores aritméticos: \texttt{true}.
+\end{sol}
+
+\begin{prob}[ · B6]
+Demuestra con el principio de inducción modificado que la función 91 de McCarthy cumple $f(x)=91$ para todo entero $x\le100$.
+\end{prob}
+\begin{sol}
+Ver la demostración completa del problema 8.2 (paso básico $f(100)=91$; hipótesis sobre todo $m\in(x,100]$; casos $x+11>100$ y $x+11\le100$). En el examen escribe los tres elementos explícitamente: \emph{principio usado, paso básico, hipótesis, paso inductivo por casos y conclusión}, verificando en cada uso de la hipótesis que el argumento cae en $(x,100]$.
+\end{sol}
+
+\vspace{1em}
+\begin{consejo}[Lista de verificación antes del examen]
+\begin{itemize}[leftmargin=*]
+\item Sé escribir de memoria: esquema de divide y vencerás; backtracking para una, todas y la mejor solución.
+\item Sé enunciar: axioma de asignación, consecuencia, composición, \textbf{if} con y sin \textbf{else}, obligaciones del \textbf{while}, inducción ordinaria y modificada.
+\item Reconozco una rama inalcanzable ($P\land B\equiv\bot$) y sé justificarla.
+\item Sé encontrar un invariante trazando 3--4 iteraciones y eliminando $n$; siempre incluyo salida y variante.
+\item Sé derivar $A(1,z)$, $A(2,z)$, $A(3,z)$ y la prueba de $f(x)=91$.
+\item Sé pasar reglas de Prolog a cláusulas, unificar, hacer una derivación SLD y predecir la consola (\texttt{;}, \texttt{!}, \texttt{\textbackslash+}, \texttt{is}, mayúsculas).
+\item Sé definir cohesión, acoplamiento y métricas de eficiencia (tiempo, memoria).
+\end{itemize}
+\end{consejo}

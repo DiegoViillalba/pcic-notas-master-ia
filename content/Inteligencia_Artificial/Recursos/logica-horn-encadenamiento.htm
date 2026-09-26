@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio: encadenamiento hacia adelante</title>
+<style>
+:root{color-scheme:light dark;--bg:#f6f8fc;--panel:#fff;--ink:#182337;--muted:#506075;--line:#c7d2e2;--accent:#174ea6;--soft:#e9f1ff;--done:#e3f4e9;--done-ink:#125c34;--warn:#fff1d6}
+*{box-sizing:border-box}body{margin:0;padding:18px;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,sans-serif}main{max-width:900px;margin:auto}h1{font-size:1.35rem;margin:0 0 4px}h2{font-size:1.05rem;margin:0 0 8px}p{margin:6px 0 12px}.muted{color:var(--muted)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}.controls,.facts,.buttons{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.controls label{display:flex;gap:7px;align-items:center;padding:7px 10px;background:var(--soft);border-radius:8px}.controls input{width:18px;height:18px}.buttons{margin-top:12px}button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer}button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}button:disabled{opacity:.5;cursor:default}.fact{display:inline-flex;padding:5px 10px;border-radius:999px;background:var(--done);color:var(--done-ink);font-weight:600}.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:9px}.rule{border-left:4px solid var(--line);padding:8px 10px;background:var(--bg);border-radius:5px}.rule.ready{border-color:var(--accent);background:var(--soft)}.rule.fired{border-color:var(--done-ink);background:var(--done)}.rule b,.rule small{display:block}.rule small{color:var(--muted)}ol{margin:0;padding-left:25px}li{margin:4px 0}.message{background:var(--warn);border-left:4px solid #ad6d00;padding:10px 12px;border-radius:4px;min-height:46px}@media(prefers-color-scheme:dark){:root{--bg:#172130;--panel:#232f40;--ink:#f0f5fb;--muted:#bdcadd;--line:#607086;--accent:#427ddb;--soft:#233d64;--done:#214b38;--done-ink:#bdffd7;--warn:#443923}}@media(max-width:480px){body{padding:10px}.controls label{width:100%}.buttons button{flex:1}}
+</style>
+</head>
+<body>
+<main>
+<h1>De hechos a consecuencias</h1>
+<p class="muted">Las letras representan: R = llueve, D = día laboral, M = mojado, S = resbaloso, T = tráfico, L = retraso. Cada avance dispara una regla cuya premisa ya es verdadera.</p>
+<section class="panel" aria-labelledby="start-title">
+<h2 id="start-title">1. Elige los hechos observados</h2>
+<div class="controls">
+<label><input type="checkbox" id="rain" checked> Llueve (R)</label>
+<label><input type="checkbox" id="day" checked> Día laboral (D)</label>
+</div>
+<div class="buttons">
+<button class="primary" id="next" type="button">Aplicar siguiente regla</button>
+<button id="all" type="button">Llegar al punto fijo</button>
+<button id="reset" type="button">Reiniciar</button>
+</div>
+</section>
+<section class="panel" aria-labelledby="facts-title">
+<h2 id="facts-title">2. Hechos que ya podemos afirmar</h2>
+<div class="facts" id="facts" aria-live="polite"></div>
+</section>
+<section class="panel" aria-labelledby="rules-title">
+<h2 id="rules-title">3. Reglas y premisas pendientes</h2>
+<div class="rules" id="rules"></div>
+</section>
+<section class="panel" aria-labelledby="proof-title">
+<h2 id="proof-title">4. Justificación construida</h2>
+<ol id="proof"></ol>
+<p class="message" id="message" aria-live="polite"></p>
+</section>
+</main>
+<script>
+const names={R:"Llueve (R)",D:"Día laboral (D)",M:"Mojado (M)",S:"Resbaloso (S)",T:"Tráfico (T)",L:"Retraso (L)"};
+const rules=[
+  {prem:["R"],out:"M",label:"R → M"},
+  {prem:["M"],out:"S",label:"M → S"},
+  {prem:["M","D"],out:"T",label:"M ∧ D → T"},
+  {prem:["S","T"],out:"L",label:"S ∧ T → L"}
+];
+const $=id=>document.getElementById(id);
+let facts=new Set(),used=new Set(),proof=[];
+function initial(){
+  facts=new Set();if($("rain").checked)facts.add("R");if($("day").checked)facts.add("D");
+  used=new Set();proof=[];render();
+}
+function candidate(){return rules.findIndex((r,i)=>!used.has(i)&&r.prem.every(p=>facts.has(p))&&!facts.has(r.out))}
+function step(){
+  const i=candidate();
+  if(i<0){render();return false}
+  const r=rules[i];used.add(i);facts.add(r.out);
+  proof.push(r.label+"; "+r.prem.join(" y ")+" ya estaban demostradas, por eso añadimos "+r.out+".");
+  render();return true;
+}
+function render(){
+  $("facts").replaceChildren();
+  if(facts.size===0){const x=document.createElement("span");x.textContent="Ninguno. No hay una regla sin premisas que pueda arrancar."; $("facts").append(x)}
+  Object.keys(names).filter(k=>facts.has(k)).forEach(k=>{const x=document.createElement("span");x.className="fact";x.textContent=names[k];$("facts").append(x)});
+  $("rules").replaceChildren();
+  rules.forEach((r,i)=>{
+    const missing=r.prem.filter(p=>!facts.has(p)),ready=!used.has(i)&&missing.length===0&&!facts.has(r.out);
+    const div=document.createElement("div");div.className="rule"+(used.has(i)?" fired":ready?" ready":"");
+    const title=document.createElement("b");title.textContent=r.label;div.append(title);
+    const detail=document.createElement("small");
+    detail.textContent=used.has(i)?"Aplicada: ya derivó "+r.out:ready?"Lista para aplicar":facts.has(r.out)?"Conclusión ya conocida":"Falta: "+missing.join(", ");
+    div.append(detail);$("rules").append(div);
+  });
+  $("proof").replaceChildren();
+  if(proof.length===0){const li=document.createElement("li");li.textContent="Aún no se aplicó ninguna regla."; $("proof").append(li)}
+  proof.forEach(x=>{const li=document.createElement("li");li.textContent=x;$("proof").append(li)});
+  const done=candidate()<0;$("next").disabled=done;$("all").disabled=done;
+  $("message").textContent=done?
+    "Punto fijo: ninguna regla puede añadir un hecho nuevo. Lo no derivado queda sin demostrar; no por eso es falso.":
+    proof.length?"Hay al menos una regla lista. Elige el siguiente paso o completa todas las consecuencias.":"Busca una regla cuyas premisas ya estén entre los hechos.";
+}
+$("next").addEventListener("click",step);
+$("all").addEventListener("click",()=>{while(step()){}});
+$("reset").addEventListener("click",initial);
+$("rain").addEventListener("change",initial);
+$("day").addEventListener("change",initial);
+initial();
+</script>
+</body>
+</html>

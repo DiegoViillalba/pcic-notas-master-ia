@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bipartición y Conectividad Fuerte en Grafos</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #cbd5e1;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --blue-node: #2563eb;
+  --white-node: #f1f5f9;
+  --white-border: #475569;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --ink: #f1f5f9;
+    --muted: #94a3b8;
+    --line: #334155;
+    --accent: #3b82f6;
+    --accent-soft: #1e3a8a;
+    --blue-node: #3b82f6;
+    --white-node: #334155;
+    --white-border: #94a3b8;
+    --danger: #ef4444;
+    --danger-soft: #7f1d1d;
+    --success: #22c55e;
+    --success-soft: #14532d;
+    --warning: #f59e0b;
+    --warning-soft: #78350f;
+    --card-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  padding: 16px;
+}
+main { max-width: 1040px; margin: 0 auto; }
+header { margin-bottom: 16px; }
+h1 { font-size: 1.35rem; margin-bottom: 4px; }
+.subtitle { font-size: 0.88rem; color: var(--muted); }
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 8px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.tab-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.panel {
+  display: none;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 16px;
+}
+.panel.active { display: block; }
+.grid-2col {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+}
+@media (max-width: 840px) {
+  .grid-2col { grid-template-columns: 1fr; }
+}
+.box {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+.box-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+.control-group { margin-bottom: 12px; }
+.control-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+select, button {
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+}
+button { cursor: pointer; font-weight: 600; }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.svg-canvas {
+  width: 100%;
+  height: 320px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: block;
+}
+.result-banner {
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+}
+.result-banner.success { border-left-color: var(--success); background: var(--success-soft); }
+.result-banner.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+.legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 8px;
+}
+.legend-item { display: flex; align-items: center; gap: 4px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Laboratorio: Bipartición y Conectividad Fuerte</h1>
+    <p class="subtitle">Explora cómo las capas de BFS certifican la 2-colorabilidad (o aíslan ciclos impares) y cómo 2 recorridos BFS determinan la conectividad fuerte en digrafos.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="setTab('bipartite')">1. Prueba de Bipartición y Ciclos Impares</button>
+    <button class="tab-btn" onclick="setTab('strong')">2. Conectividad Fuerte en Digrafos (2 BFS)</button>
+  </div>
+
+  <!-- PESTAÑA 1: BIPARTICIÓN -->
+  <section id="tab-bipartite" class="panel active">
+    <div class="grid-2col">
+      <div>
+        <div class="box">
+          <div class="box-title">
+            <span>Configuración del Grafo</span>
+          </div>
+          <div class="control-group">
+            <label>Seleccionar Grafo:</label>
+            <select id="bipartite-graph-select" onchange="loadBipartiteGraph()">
+              <option value="bipartite_slide27">Grafo Bipartito (Diapositiva 27)</option>
+              <option value="odd_cycle_c5">Pentágono C5 (Ciclo impar no 2-coloreable)</option>
+              <option value="triangle">Triángulo C3 con cola</option>
+              <option value="bipartite_tree">Árbol (Siempre bipartito)</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>Modo de visualización:</label>
+            <select id="bipartite-view-select" onchange="renderBipartite()">
+              <option value="layers">Organizado por capas BFS (L0, L1, L2...)</option>
+              <option value="bipartition">Agrupado en conjuntos Blue vs White</option>
+            </select>
+          </div>
+          <button class="btn-primary" onclick="runBipartitenessTest()">Ejecutar Prueba de Bipartición</button>
+        </div>
+
+        <div id="bipartite-result" class="result-banner">
+          Haz clic en "Ejecutar Prueba" para inspeccionar aristas entre capas contiguas o dentro de la misma capa.
+        </div>
+
+        <div class="box" style="margin-top: 12px; font-size: 0.82rem;">
+          <strong>Teorema de Bipartición (BFS):</strong>
+          <ul style="margin-left: 16px; margin-top: 4px;">
+            <li><strong>Caso (i):</strong> No hay aristas entre nodos de la misma capa $\implies G$ es bipartito (capas pares azules, impares blancas).</li>
+            <li><strong>Caso (ii):</strong> Existe arista $(x, y)$ con $x,y \in L_j \implies$ se forma un ciclo impar de longitud $1 + 2(j-i)$ mediante su $\text{lca}(x,y)$.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div>
+        <svg class="svg-canvas" id="bipartite-svg" viewBox="0 0 620 320"></svg>
+        <div class="legend">
+          <div class="legend-item"><span class="dot" style="background:var(--blue-node)"></span> Capa par (Azul)</div>
+          <div class="legend-item"><span class="dot" style="background:#fff; border:1px solid #475569"></span> Capa impar (Blanco)</div>
+          <div class="legend-item"><span class="dot" style="background:var(--danger)"></span> Arista en misma capa (Ciclo impar)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 2: CONECTIVIDAD FUERTE -->
+  <section id="tab-strong" class="panel">
+    <div class="grid-2col">
+      <div>
+        <div class="box">
+          <div class="box-title">
+            <span>Configuración del Digrafo</span>
+          </div>
+          <div class="control-group">
+            <label>Seleccionar Digrafo:</label>
+            <select id="strong-graph-select" onchange="loadStrongGraph()">
+              <option value="strong_yes">Digrafo Fuertemente Conexo (Diapositiva 42 izq)</option>
+              <option value="strong_no">Digrafo NO Fuertemente Conexo (Diapositiva 42 der)</option>
+              <option value="scc_3">3 Componentes Fuertes (Diapositiva 43)</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>Vértice Testigo (s):</label>
+            <select id="witness-select" onchange="updateWitness()"></select>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn-primary" onclick="runBFS1()">1. BFS en G (desde s)</button>
+            <button class="btn-primary" onclick="runBFS2()">2. BFS en G_rev (hacia s)</button>
+            <button onclick="resetStrong()">Reiniciar</button>
+          </div>
+        </div>
+
+        <div id="strong-result" class="result-banner">
+          Selecciona un nodo testigo $s$ y ejecuta los dos recorridos BFS en tiempo $O(m+n)$.
+        </div>
+
+        <div class="box" style="margin-top: 12px; font-size: 0.82rem;">
+          <strong>Lema del Nodo Testigo:</strong>
+          <p style="margin-top: 4px;">Un digrafo $G$ es fuertemente conexo si y solo si desde un nodo cualquiera $s$ se alcanzan todos los demás en $G$, y todos los nodos alcanzan a $s$ (verificado mediante BFS en $G^{rev}$).</p>
+        </div>
+      </div>
+
+      <div>
+        <svg class="svg-canvas" id="strong-svg" viewBox="0 0 620 320"></svg>
+        <div class="legend">
+          <div class="legend-item"><span class="dot" style="background:var(--accent)"></span> Testigo (s)</div>
+          <div class="legend-item"><span class="dot" style="background:var(--success)"></span> Alcanzado en BFS</div>
+          <div class="legend-item"><span class="dot" style="background:var(--danger)"></span> No alcanzable (Contraejemplo)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const BIPARTITE_GRAPHS = {
+  bipartite_slide27: {
+    nodes: ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'],
+    edges: [['v1','v2'], ['v1','v4'], ['v1','v5'], ['v1','v7'], ['v2','v3'], ['v2','v6'], ['v3','v4'], ['v3','v5'], ['v3','v7'], ['v5','v6'], ['v6','v7']],
+    root: 'v1'
+  },
+  odd_cycle_c5: {
+    nodes: ['1', '2', '3', '4', '5'],
+    edges: [['1','2'], ['2','3'], ['3','4'], ['4','5'], ['5','1']],
+    root: '1'
+  },
+  triangle: {
+    nodes: ['1', '2', '3', '4'],
+    edges: [['1','2'], ['2','3'], ['3','1'], ['3','4']],
+    root: '1'
+  },
+  bipartite_tree: {
+    nodes: ['1', '2', '3', '4', '5', '6'],
+    edges: [['1','2'], ['1','3'], ['2','4'], ['2','5'], ['3','6']],
+    root: '1'
+  }
+};
+
+const STRONG_GRAPHS = {
+  strong_yes: {
+    nodes: ['1', '2', '3', '4', '5'],
+    edges: [['1','2'], ['2','3'], ['3','4'], ['4','5'], ['5','1'], ['2','5'], ['4','2']],
+    pos: { '1':[120, 220], '2':[200, 100], '3':[380, 100], '4':[460, 220], '5':[290, 260] }
+  },
+  strong_no: {
+    nodes: ['1', '2', '3', '4', '5'],
+    edges: [['1','2'], ['2','3'], ['3','4'], ['5','4'], ['1','5'], ['2','5']],
+    pos: { '1':[120, 220], '2':[200, 100], '3':[380, 100], '4':[460, 220], '5':[290, 260] }
+  },
+  scc_3: {
+    nodes: ['A', 'B', 'C', 'D'],
+    edges: [['A','B'], ['B','A'], ['B','C'], ['C','D'], ['D','C']],
+    pos: { 'A':[120, 160], 'B':[240, 160], 'C':[380, 160], 'D':[500, 160] }
+  }
+};
+
+let curBip = null;
+let curStrong = null;
+let strongState = { step: 0, witness: '1', reached1: [], reached2: [], mode: 'normal' };
+
+function setTab(t) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[onclick="setTab('${t}')"]`).classList.add('active');
+  document.getElementById(`tab-${t}`).classList.add('active');
+}
+
+// BIPARTITE MODULE
+function loadBipartiteGraph() {
+  const k = document.getElementById('bipartite-graph-select').value;
+  curBip = BIPARTITE_GRAPHS[k];
+  runBipartitenessTest();
+}
+
+function runBipartitenessTest() {
+  const root = curBip.root;
+  const adj = {};
+  curBip.nodes.forEach(u => adj[u] = []);
+  curBip.edges.forEach(([u, v]) => { adj[u].push(v); adj[v].push(u); });
+
+  // BFS Layers
+  const layer = {};
+  const parent = {};
+  const Q = [root];
+  layer[root] = 0;
+  parent[root] = null;
+
+  while (Q.length > 0) {
+    const u = Q.shift();
+    for (const v of adj[u]) {
+      if (layer[v] === undefined) {
+        layer[v] = layer[u] + 1;
+        parent[v] = u;
+        Q.push(v);
+      }
+    }
+  }
+
+  // Buscar arista interna en la misma capa
+  let conflictEdge = null;
+  for (const [u, v] of curBip.edges) {
+    if (layer[u] === layer[v]) {
+      conflictEdge = [u, v];
+      break;
+    }
+  }
+
+  const resEl = document.getElementById('bipartite-result');
+  if (!conflictEdge) {
+    resEl.className = 'result-banner success';
+    resEl.innerHTML = `<strong>¡El grafo es Bipartito!</strong> No existe ninguna arista que conecte nodos de la misma capa. Se puede 2-colorear: Capas pares = Azul, Capas impares = Blanco.`;
+  } else {
+    const [x, y] = conflictEdge;
+    const j = layer[x];
+    // Encontrar LCA
+    const pathX = [x], pathY = [y];
+    let currX = x, currY = y;
+    while (currX !== null) { currX = parent[currX]; if (currX !== null) pathX.push(currX); }
+    while (currY !== null) { currY = parent[currY]; if (currY !== null) pathY.push(currY); }
+    let lca = root;
+    for (const n of pathX) { if (pathY.includes(n)) { lca = n; break; } }
+    const i = layer[lca];
+    const cycleLen = 1 + 2 * (j - i);
+
+    resEl.className = 'result-banner danger';
+    resEl.innerHTML = `<strong>El grafo NO es Bipartito (Obstrucción detectada).</strong> La arista (${x}, ${y}) une dos nodos de la misma capa L_${j}. Tienen ancestro común lca=${lca} en L_${i}. Esto forma un <strong>ciclo de longitud impar (${cycleLen})</strong>: 1 + 2(${j}-${i}) = ${cycleLen}. Imposible 2-colorear.`;
+  }
+
+  renderBipartite(layer, conflictEdge);
+}
+
+function renderBipartite(layer, conflictEdge) {
+  const svg = document.getElementById('bipartite-svg');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+  const viewMode = document.getElementById('bipartite-view-select').value;
+
+  if (!layer) return;
+  const maxL = Math.max(...Object.values(layer));
+  const nodesByL = {};
+  for (let l = 0; l <= maxL; l++) nodesByL[l] = [];
+  curBip.nodes.forEach(u => nodesByL[layer[u]].push(u));
+
+  const coords = {};
+  if (viewMode === 'layers') {
+    const colW = 540 / (maxL + 1);
+    for (let l = 0; l <= maxL; l++) {
+      const list = nodesByL[l];
+      const x = 50 + l * colW;
+      const rowH = 260 / (list.length + 1);
+      list.forEach((u, idx) => {
+        coords[u] = [x, 30 + (idx + 1) * rowH];
+      });
+
+      // Línea de capa
+      const t = document.createElementNS(ns, 'text');
+      t.setAttribute('x', x); t.setAttribute('y', 20);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('font-size', '11');
+      t.setAttribute('font-weight', '700');
+      t.setAttribute('fill', 'var(--muted)');
+      t.textContent = `L_${l}`;
+      svg.appendChild(t);
+    }
+  } else {
+    // Vista agrupada Bipartita (Izquierda pares, Derecha impares)
+    const blues = curBip.nodes.filter(u => layer[u] % 2 === 0);
+    const whites = curBip.nodes.filter(u => layer[u] % 2 !== 0);
+    blues.forEach((u, i) => coords[u] = [160, 40 + (i + 1) * (240 / (blues.length + 1))]);
+    whites.forEach((u, i) => coords[u] = [440, 40 + (i + 1) * (240 / (whites.length + 1))]);
+  }
+
+  // Dibujar aristas
+  curBip.edges.forEach(([u, v]) => {
+    const isConflict = conflictEdge && ((conflictEdge[0]===u && conflictEdge[1]===v) || (conflictEdge[0]===v && conflictEdge[1]===u));
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', coords[u][0]); line.setAttribute('y1', coords[u][1]);
+    line.setAttribute('x2', coords[v][0]); line.setAttribute('y2', coords[v][1]);
+    line.setAttribute('stroke', isConflict ? 'var(--danger)' : 'var(--line)');
+    line.setAttribute('stroke-width', isConflict ? '3.5' : '2');
+    if (isConflict) line.setAttribute('stroke-dasharray', '4 2');
+    svg.appendChild(line);
+  });
+
+  // Dibujar nodos
+  curBip.nodes.forEach(u => {
+    const isBlue = (layer[u] % 2 === 0);
+    const [x, y] = coords[u];
+
+    const circle = document.createElementNS(ns, 'circle');
+    circle.setAttribute('cx', x); circle.setAttribute('cy', y);
+    circle.setAttribute('r', '18');
+    circle.setAttribute('fill', isBlue ? 'var(--blue-node)' : 'var(--white-node)');
+    circle.setAttribute('stroke', isBlue ? 'var(--blue-node)' : 'var(--white-border)');
+    circle.setAttribute('stroke-width', '2.5');
+    svg.appendChild(circle);
+
+    const txt = document.createElementNS(ns, 'text');
+    txt.setAttribute('x', x); txt.setAttribute('y', y + 4);
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('font-size', '12');
+    txt.setAttribute('font-weight', '700');
+    txt.setAttribute('fill', isBlue ? '#ffffff' : 'var(--ink)');
+    txt.textContent = u;
+    svg.appendChild(txt);
+  });
+}
+
+// STRONG CONNECTIVITY MODULE
+function loadStrongGraph() {
+  const k = document.getElementById('strong-graph-select').value;
+  curStrong = STRONG_GRAPHS[k];
+  const sel = document.getElementById('witness-select');
+  sel.innerHTML = '';
+  curStrong.nodes.forEach(n => {
+    const opt = document.createElement('option');
+    opt.value = n; opt.textContent = `Nodo ${n}`;
+    sel.appendChild(opt);
+  });
+  strongState.witness = curStrong.nodes[0];
+  resetStrong();
+}
+
+function updateWitness() {
+  strongState.witness = document.getElementById('witness-select').value;
+  resetStrong();
+}
+
+function resetStrong() {
+  strongState.step = 0;
+  strongState.reached1 = [];
+  strongState.reached2 = [];
+  strongState.mode = 'normal';
+  document.getElementById('strong-result').className = 'result-banner';
+  document.getElementById('strong-result').innerHTML = `Vértice testigo seleccionado: <strong>s = ${strongState.witness}</strong>. Ejecuta BFS 1 para ver qué nodos alcanza s en G.`;
+  renderStrong();
+}
+
+function getAdj(edges, reverse) {
+  const adj = {};
+  curStrong.nodes.forEach(u => adj[u] = []);
+  edges.forEach(([u, v]) => {
+    if (!reverse) adj[u].push(v);
+    else adj[v].push(u);
+  });
+  return adj;
+}
+
+function runBFS1() {
+  const s = strongState.witness;
+  const adj = getAdj(curStrong.edges, false);
+  const visited = [s];
+  const Q = [s];
+  while (Q.length > 0) {
+    const u = Q.shift();
+    for (const v of adj[u]) {
+      if (!visited.includes(v)) { visited.push(v); Q.push(v); }
+    }
+  }
+  strongState.reached1 = visited;
+  strongState.step = 1;
+  strongState.mode = 'normal';
+
+  const allIn = (visited.length === curStrong.nodes.length);
+  const resEl = document.getElementById('strong-result');
+  if (allIn) {
+    resEl.className = 'result-banner success';
+    resEl.innerHTML = `<strong>Paso 1 exitoso:</strong> Desde el testigo <em>${s}</em> se alcanzan TODOS los nodos en G (${visited.join(', ')}). Ahora ejecuta el Paso 2 (BFS en G_rev).`;
+  } else {
+    const missed = curStrong.nodes.filter(n => !visited.includes(n));
+    resEl.className = 'result-banner danger';
+    resEl.innerHTML = `<strong>Fallo en Paso 1:</strong> El nodo <em>${s}</em> NO alcanza a: <strong>${missed.join(', ')}</strong>. Conclusión inmediata: <strong>El digrafo NO es fuertemente conexo</strong>.`;
+  }
+  renderStrong();
+}
+
+function runBFS2() {
+  if (strongState.step < 1) { runBFS1(); }
+  const s = strongState.witness;
+  const adjRev = getAdj(curStrong.edges, true);
+  const visited = [s];
+  const Q = [s];
+  while (Q.length > 0) {
+    const u = Q.shift();
+    for (const v of adjRev[u]) {
+      if (!visited.includes(v)) { visited.push(v); Q.push(v); }
+    }
+  }
+  strongState.reached2 = visited;
+  strongState.step = 2;
+  strongState.mode = 'reverse';
+
+  const all1 = (strongState.reached1.length === curStrong.nodes.length);
+  const all2 = (visited.length === curStrong.nodes.length);
+  const resEl = document.getElementById('strong-result');
+
+  if (all1 && all2) {
+    resEl.className = 'result-banner success';
+    resEl.innerHTML = `<strong>¡TEOREMA CONFIRMADO: DIGRAFO FUERTEMENTE CONEXO!</strong><br>1. Desde <em>${s}</em> se alcanza todo nodo en G.<br>2. Todo nodo alcanza a <em>${s}</em> (alcanzados en G_rev). Por transitividad, cualquier par u, v es mutuamente alcanzable: u ⇝ s ⇝ v. Complejidad: 2 × O(m+n) = O(m+n).`;
+  } else {
+    const missed = curStrong.nodes.filter(n => !visited.includes(n));
+    resEl.className = 'result-banner danger';
+    resEl.innerHTML = `<strong>El digrafo NO es fuertemente conexo.</strong> Los nodos [${missed.join(', ')}] no pueden alcanzar al nodo testigo <em>${s}</em>.`;
+  }
+  renderStrong();
+}
+
+function renderStrong() {
+  const svg = document.getElementById('strong-svg');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // Marcador de flecha
+  const defs = document.createElementNS(ns, 'defs');
+  const marker = document.createElementNS(ns, 'marker');
+  marker.setAttribute('id', 'arr'); marker.setAttribute('viewBox', '0 0 10 10');
+  marker.setAttribute('refX', '24'); marker.setAttribute('refY', '5');
+  marker.setAttribute('markerWidth', '6'); marker.setAttribute('markerHeight', '6');
+  marker.setAttribute('orient', 'auto-start-reverse');
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+  path.setAttribute('fill', 'var(--muted)');
+  marker.appendChild(path);
+  defs.appendChild(marker);
+  svg.appendChild(defs);
+
+  // Aristas
+  const rev = (strongState.mode === 'reverse');
+  curStrong.edges.forEach(([origU, origV]) => {
+    const u = rev ? origV : origU;
+    const v = rev ? origU : origV;
+    const p1 = curStrong.pos[u], p2 = curStrong.pos[v];
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', p1[0]); line.setAttribute('y1', p1[1]);
+    line.setAttribute('x2', p2[0]); line.setAttribute('y2', p2[1]);
+    line.setAttribute('stroke', 'var(--line)');
+    line.setAttribute('stroke-width', '2');
+    line.setAttribute('marker-end', 'url(#arr)');
+    svg.appendChild(line);
+  });
+
+  // Nodos
+  curStrong.nodes.forEach(n => {
+    const [x, y] = curStrong.pos[n];
+    const isWitness = (n === strongState.witness);
+    let fill = 'var(--panel)';
+    let stroke = 'var(--line)';
+
+    if (isWitness) { fill = 'var(--accent-soft)'; stroke = 'var(--accent)'; }
+    else if (strongState.step === 1 && strongState.reached1.includes(n)) { fill = 'var(--success-soft)'; stroke = 'var(--success)'; }
+    else if (strongState.step === 2 && strongState.reached2.includes(n)) { fill = 'var(--success-soft)'; stroke = 'var(--success)'; }
+    else if (strongState.step > 0) { fill = 'var(--danger-soft)'; stroke = 'var(--danger)'; }
+
+    const c = document.createElementNS(ns, 'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y);
+    c.setAttribute('r', '18');
+    c.setAttribute('fill', fill);
+    c.setAttribute('stroke', stroke);
+    c.setAttribute('stroke-width', isWitness ? '3' : '2');
+    svg.appendChild(c);
+
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', x); t.setAttribute('y', y + 4);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', '12');
+    t.setAttribute('font-weight', '700');
+    t.setAttribute('fill', 'var(--ink)');
+    t.textContent = n;
+    svg.appendChild(t);
+  });
+}
+
+window.onload = () => {
+  loadBipartiteGraph();
+  loadStrongGraph();
+};
+</script>
+</body>
+</html>

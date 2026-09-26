@@ -1,0 +1,773 @@
+\input{preambulo}
+\input{figuras}
+\fancyhead[L]{\small\textcolor{gris}{Inteligencia Artificial 2027-I · Guía para el Examen 1}}
+\fancyhead[R]{\small\textcolor{verde}{Respuestas}}
+\fancyfoot[C]{\small\thepage}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vspace*{1.5cm}
+{\color{verde}\rule{\linewidth}{1.2pt}}\\[0.6cm]
+{\Huge\bfseries\color{verde} Guía para el Examen 1}\\[0.3cm]
+{\LARGE Respuestas y soluciones desarrolladas}\\[0.2cm]
+{\large Inteligencia Artificial · PCIC, UNAM · 2027-I}\\[0.4cm]
+{\color{verde}\rule{\linewidth}{1.2pt}}\\[1.2cm]
+\begin{minipage}{0.84\linewidth}\large
+Este documento acompaña a la \emph{Guía de estudio para el Examen 1}. La numeración coincide
+(A1–A8, B1–B32, C1–C20, D1–D7). En los ejercicios de procedimiento se muestran las trazas
+completas; en los de demostración se dan pruebas autocontenidas, como se pidió en las tareas.
+
+\vspace{0.5cm}
+Todas las trazas numéricas (búsquedas, AC-3, alfa-beta, tablas de verdad, conteos) se
+verificaron con programas independientes.
+
+\vspace{0.5cm}
+\textbf{Consejo:} usa estas soluciones para \emph{corregir}, no para leer. Si una respuesta no
+coincide con la tuya, identifica en qué paso se separan.
+\end{minipage}
+\vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{Parte A — Conceptos}
+
+\begin{solucion}{A1 · Agentes e introducción}
+\textbf{1.} Un agente racional, para cada secuencia posible de percepciones, elige la acción que se
+espera maximice su medida de desempeño, dada la evidencia de las percepciones y su conocimiento
+previo. No es omnisciencia: el omnisciente conoce el resultado \emph{real} de sus acciones; el
+racional maximiza el resultado \emph{esperado}. Ejemplo: cruzar la calle tras mirar a ambos lados
+es racional aunque después caiga un objeto del cielo; el mal resultado no vuelve irracional la decisión.
+
+\textbf{2.} Pensar como humano (modelado cognitivo), pensar racionalmente (leyes del pensamiento,
+lógica), actuar como humano (prueba de Turing), actuar racionalmente (agente racional). El curso
+adopta el \emph{agente racional}: es más general que las «leyes del pensamiento» (inferir
+correctamente es solo una forma de actuar bien; a veces hay que actuar sin prueba, p.\,ej.\ un
+reflejo), y es más apto para el desarrollo científico que imitar humanos, porque la racionalidad
+está definida matemáticamente (maximizar utilidad esperada).
+
+\textbf{3.} La prueba de Turing evalúa si un interrogador, conversando por texto, distingue a la
+máquina de un humano: mide conducta (actuar como humano). Requiere lenguaje natural, representación
+de conocimiento, razonamiento y aprendizaje. La habitación china (Searle) sostiene que manipular
+símbolos según reglas (sintaxis) no produce comprensión (semántica): una persona que sigue un
+manual para responder en chino no entiende chino; por tanto pasar la prueba no implica tener
+mente. Va contra la \emph{IA fuerte} (las máquinas que actúan inteligentemente de verdad piensan y
+tienen mente); la \emph{IA débil} solo afirma que pueden actuar \emph{como si} fueran inteligentes.
+
+\textbf{4.} (a) \textbf{F}: la racionalidad es relativa a lo percibido; la aspiradora con sensor
+local es racional. (b) \textbf{V}: si la acción correcta depende de percepciones pasadas que ya no
+son visibles, un agente sin memoria no puede actuar bien (p.\,ej.\ detenerse cuando ambas celdas
+estén limpias si solo percibe su celda). (c) \textbf{V}: un entorno donde todas las acciones
+reciben el mismo desempeño (o solo existe una acción). (d) \textbf{F}: la función de agente
+recibe la \emph{historia} completa de percepciones; el programa recibe la percepción actual.
+(e) \textbf{F}: hay funciones no computables (p.\,ej.\ decidir la parada) o que exigen memoria
+ilimitada. (f) \textbf{V}: si todas las acciones son igual de buenas, elegir al azar es óptimo.
+(g) \textbf{F}: maximiza lo esperado; puede perder por mala suerte (cartas).
+
+\textbf{5.} El agente reflejo elige con reglas condición–acción sobre la percepción actual (a lo
+más, con un modelo del estado actual); no evalúa consecuencias. El que planea se pregunta «¿qué
+pasaría si…?», necesita un modelo de cómo evoluciona el mundo y una meta o utilidad. Un reflejo
+\emph{puede} ser racional cuando el entorno es totalmente observable y la mejor acción depende solo
+de la percepción actual (la aspiradora de dos celdas de AIMA §2.2 lo es bajo sus supuestos).
+\end{solucion}
+
+\begin{solucion}{A2 · Búsqueda no informada}
+\textbf{1.} Estado inicial, $\textsc{Acciones}(s)$, modelo de transición $\textsc{Resultado}(s,a)$,
+prueba de meta y costo de acción $c(s,a,s')$. Solución: secuencia de acciones del inicial a una
+meta. Óptima: la de menor costo de camino entre todas.
+
+\textbf{2.} Un \emph{estado} es una configuración del mundo; un \emph{nodo} es una estructura del
+árbol: estado, padre, acción, costo $g$ y profundidad. Varios nodos pueden contener el mismo estado
+(caminos distintos). El grafo de estados tiene cada estado una vez; el árbol tiene un nodo por
+\emph{camino}. Un ciclo $A\to B\to A$ genera caminos arbitrariamente largos: árbol infinito.
+
+\textbf{3.} El algoritmo es el mismo; cambia la disciplina de la frontera: DFS pila (LIFO), BFS cola
+(FIFO), UCS prioridad $g$, voraz prioridad $h$, A* prioridad $g+h$.
+
+\textbf{4.} (a) \textbf{V} si todos los costos son iguales (UCS expande por profundidad). (b)
+\textbf{V}: primero-el-mejor con $f(n)=-\text{profundidad}(n)$. (c) \textbf{V}: $h\equiv0$.
+(d) \textbf{V}: BFS ignora costos; su completitud solo requiere $b$ finito (lo que se pierde es la
+optimalidad). (e) \textbf{F}: DFS puede tener suerte y hallar la meta en su primera rama.
+
+\textbf{5.} El primer camino a la meta que se \emph{genera} puede no ser el más barato: en Rumania,
+de Sibiu se genera Bucarest vía Fagaras con $g=310$ antes de hallarla vía Pitesti con $g=278$. Al
+\emph{extraer} con prioridad $g$ (costos $\ge0$) el $g$ del nodo extraído ya es mínimo.
+
+\textbf{6.} La mayoría de los nodos está en el último nivel: $b^d\ge 1+b+\dots+b^{d-1}$. IDS genera
+$d\,b+(d-1)b^2+\dots+1\cdot b^d=O(b^d)$. Con $b=10,d=5$: 123\,450 frente a 111\,110 de BFS ($\approx$11\% más).
+
+\textbf{7.} UCS expande todo nodo con $g<C^*$. Cada acción cuesta $\ge\epsilon$, así que esos nodos
+están a profundidad $\le\lfloor C^*/\epsilon\rfloor$; contando el nivel donde se genera la meta,
+$O(b^{1+\lfloor C^*/\epsilon\rfloor})$. Si $\epsilon\to0$ la cota explota; con costos cero puede haber
+caminos infinitos de costo 0 y UCS pierde la completitud.
+\end{solucion}
+
+\begin{solucion}{A3 · Heurísticas}
+\textbf{1.} Admisible: $0\le h(n)\le h^*(n)$. Consistente: $h(n)\le c(n,a,n')+h(n')$ para todo
+sucesor y $h(\text{meta})=0$. Consistente $\Rightarrow$ admisible (C2a), no al revés. Ejemplo: en
+$G_2$, $h(A)=4=h^*(A)$ pero $h(A)>c(A,C)+h(C)=2$.
+
+\textbf{2.} Un problema relajado tiene menos restricciones en las acciones (supergrafo de aristas);
+su costo óptimo es una heurística admisible (y consistente) del original. En el 8-puzzle: «una ficha
+se mueve de $A$ a $B$ si $A$ es adyacente a $B$ y $B$ está vacía». Quitando ambas condiciones
+(teletransporte) se obtiene $h_1$; quitando solo «$B$ vacía» se obtiene $h_2$.
+
+\textbf{3.} $h_2$ domina a $h_1$ si $h_2(n)\ge h_1(n)$ para todo $n$ (ambas admisibles). A* expande
+seguro todo nodo con $g(n)+h(n)<C^*$; con $h_2$ ese conjunto está contenido en el de $h_1$, así que
+expande menos (salvo empates). Conviene si calcular $h_2$ no es mucho más caro.
+
+\textbf{4.} No es óptima (Arad$\to$Bucarest: 450 frente a 418). En árbol es incompleta (puede ciclar:
+Iasi–Neamt). En grafo finito es completa.
+
+\textbf{5.} Con $h\equiv0$, A* es UCS. Con $h=h^*$ (y desempates hacia mayor $g$) expande solo nodos de
+un camino óptimo.
+
+\textbf{6.} Si A* genera $N$ nodos y la solución está a profundidad $d$, $b^*$ satisface
+$N+1=1+b^*+\dots+(b^*)^d$. Lo ideal es $b^*\approx1$.
+\end{solucion}
+
+\begin{solucion}{A4 · CSP}
+\textbf{1.} $X=\{X_1,\dots,X_n\}$, dominios $D_i$, restricciones $C$ (alcance + relación).
+Consistente: no viola restricciones; completa: asigna todas las variables; solución: consistente y
+completa.
+
+\textbf{2.} Unaria: $SA\ne\text{verde}$; binaria: $SA\ne WA$; global: $\textit{Alldiff}(F,T,U,W,R,O)$
+o una fila de Sudoku; suave (preferencia/costo): «el profesor prefiere dar clase en la mañana».
+
+\textbf{3.} Revisión hacia adelante: al asignar $X$, borra valores inconsistentes solo de los vecinos
+no asignados de $X$ (un paso). Consistencia de arcos (AC-3/MAC): propaga en cadena; si el dominio
+de $Y$ cambia, revisa los arcos que apuntan a $Y$. AC detecta más fallos: con $WA=R$, $Q=G$, FC deja
+$NT=\{B\}$ y $SA=\{B\}$ adyacentes sin notar el conflicto; AC sí. AC cuesta más por nodo.
+
+\textbf{4.} MRV elige la variable con menos valores legales (\emph{falla primero}: si el fallo es
+inevitable, descubrirlo pronto poda más). Grado: desempata con la variable con más restricciones con
+variables no asignadas. LCV elige el valor que quita menos opciones a los vecinos (\emph{falla al
+último}). Asimetría: \emph{todas} las variables deben asignarse, así que empezar por la difícil no
+cuesta nada; de los valores basta que \emph{uno} funcione, así que conviene probar primero el más
+prometedor. (Si se buscaran todas las soluciones, el orden de valores no importaría.)
+
+\textbf{5.} En el nivel $\ell$ se puede elegir cualquiera de las $n-\ell$ variables y cualquiera de
+$d$ valores: $\prod_\ell (n-\ell)d=n!\,d^n$ hojas. Como las asignaciones conmutan, basta fijar una
+variable por nivel: $d^n$ hojas.
+
+\textbf{6.} (i) Algún dominio vacío: no hay solución. (ii) Todos los dominios con un valor: es
+solución. (iii) Dominios con varios valores: puede haber 0, 1 o muchas soluciones; hay que buscar.
+\end{solucion}
+
+\begin{solucion}{A5 · Búsqueda local y metaheurísticas}
+\textbf{1.} Trabaja con estados completos y guarda solo el estado actual (o unos pocos); el camino no
+importa; memoria constante. Es incompleta: puede atorarse en óptimos locales/mesetas y no explora
+sistemáticamente, así que no puede probar que no hay solución.
+
+\textbf{2.} Máximo local: pico más alto que sus vecinos pero no global. Meseta: región plana
+(máximo plano u hombro); el algoritmo vaga sin dirección. Cresta: secuencia de máximos locales no
+conectados directamente; todo movimiento individual baja.
+
+\textbf{3.} $T$ alta: $e^{\Delta E/T}\approx1$, acepta casi todo (caminata aleatoria, exploración).
+$T$ baja: casi nunca acepta empeorar (hill climbing, explotación). Con enfriamiento suficientemente
+lento converge al óptimo global con probabilidad $\to1$ (tiempo infinito).
+
+\textbf{4.} La lista tabú prohíbe regresar a estados (o atributos) recientes; evita ciclos y permite
+aceptar movimientos peores para salir de óptimos locales. Muy corta: ciclos. Muy larga: prohíbe
+demasiado y bloquea buenos movimientos.
+
+\textbf{5.} Representación (cromosoma, gen, alelo), población, aptitud, selección (proporcional o
+torneo), cruza, mutación, reemplazo y criterio de paro. $P_m$ muy alta: búsqueda aleatoria que
+destruye bloques buenos. $P_m=0$: no aparecen alelos nuevos; convergencia prematura.
+
+\textbf{6.} Promediado sobre \emph{todas} las funciones objetivo posibles, todos los algoritmos de
+optimización de caja negra rinden igual. Consecuencia: la ventaja de un algoritmo proviene de
+explotar la estructura del problema; hay que elegir y ajustar el método por clase de problemas.
+\end{solucion}
+
+\begin{solucion}{A6 · Adversarios y utilidad}
+\textbf{1.} $S_0$, $\textsc{ToMove}(s)$, $\textsc{Acciones}(s)$, $\textsc{Resultado}(s,a)$,
+$\textsc{EsTerminal}(s)$, $\textsc{Utilidad}(s,p)$; una solución es una estrategia $S\to A$. Suma cero:
+la suma de utilidades es constante (lo que gana uno lo pierde el otro). Información perfecta: el
+estado es totalmente observable (ajedrez sí; póker no).
+
+\textbf{2.} Tiempo $O(b^m)$, espacio $O(bm)$. En ajedrez $b\approx35$, $m\approx 80$–100: del orden de
+$10^{123}$ nodos o más; imposible.
+
+\textbf{3.} $\alpha$: mejor valor (mayor) que MAX ya tiene asegurado en el camino actual; $\beta$: mejor
+(menor) para MIN. Se poda un subárbol cuando se demuestra que un jugador nunca permitiría llegar ahí;
+la raíz no cambia, pero el valor devuelto por un nodo podado es solo una cota (p.\,ej.\ «$\le 2$»).
+
+\textbf{4.} Mejor primero: $O(b^{m/2})$ (factor efectivo $\sqrt b$; duplica la profundidad alcanzable);
+orden aleatorio: $\approx O(b^{3m/4})$; peor orden: sin poda, $O(b^m)$.
+
+\textbf{5.} Ordenar los terminales igual que la utilidad; ser rápida; en no terminales, correlacionar
+con la probabilidad real de ganar. Efecto horizonte: un evento dañino inevitable queda más allá de la
+profundidad de búsqueda y maniobras dilatorias lo «esconden», dando una evaluación engañosa.
+
+\textbf{6.} Cuando hay azar (dados) o el oponente no es óptimo y se modela probabilísticamente.
+Minimax solo compara (max/min), así que cualquier transformación creciente de las hojas preserva la
+decisión; expectimax promedia, y los promedios dependen de las diferencias de magnitud: solo es
+invariante ante transformaciones afines positivas (C13).
+
+\textbf{7.} Ordenabilidad, transitividad, continuidad, sustituibilidad, monotonicidad (y
+descomponibilidad). Teorema de von Neumann–Morgenstern: existe $U$ con $U(A)\ge U(B)\iff A\succeq B$
+y $U([p_1,S_1;\dots;p_n,S_n])=\sum_i p_iU(S_i)$. Principio: elegir la acción de máxima utilidad esperada.
+\end{solucion}
+
+\begin{solucion}{A7 · Lógica proposicional}
+\textbf{1.} Sintaxis: qué oraciones están bien formadas. Semántica: valor de verdad de cada oración en
+cada modelo. Teoría de pruebas: reglas sintácticas para derivar oraciones.
+
+\textbf{2.} Modelo: asignación de verdad a cada símbolo. $KB\ent\alpha$: $\alpha$ es verdadera en todo
+modelo de $KB$ ($M(KB)\subseteq M(\alpha)$). Válida: verdadera en todo modelo. Satisfacible: verdadera
+en alguno. Equivalentes: mismos modelos.
+
+\textbf{3.} $\alpha\ent\beta$ $\iff$ no hay modelo con $\alpha$ verdadera y $\beta$ falsa $\iff$
+$\alpha\wedge\neg\beta$ no tiene modelos $\iff$ $\neg\alpha\vee\beta$ es verdadera en todo modelo $\iff$
+$\alpha\imp\beta$ es válida.
+
+\textbf{4.} $\textsc{Tell}(f)$: «ya lo sabía» si $M(KB)\subseteq M(f)$; «no lo creo» si
+$M(KB)\cap M(f)=\emptyset$; «aprendí algo» si $\emptyset\subsetneq M(KB)\cap M(f)\subsetneq M(KB)$ (y
+$M(KB)$ se reduce a esa intersección). $\textsc{Ask}(f)$: «sí» si $KB\ent f$, «no» si $KB\ent\neg f$,
+«no sé» si es contingente.
+
+\textbf{5.} Correcto: $\{f:KB\der f\}\subseteq\{f:KB\ent f\}$. Completo: $\supseteq$. Modus ponens es
+correcto pero no completo: $\{A\vee B,\ A\imp C,\ B\imp C\}\ent C$ y MP no lo deriva. Con KB de
+cláusulas definidas y consultas atómicas, el encadenamiento con MP es completo.
+
+\textbf{6.} Horn: disyunción con a lo más un literal positivo. Definida: exactamente uno
+($p_1\wedge\dots\wedge p_k\imp q$ o un hecho $q$). Meta: ninguno ($p_1\wedge\dots\wedge p_k\imp\p{False}$).
+$A\vee B$ tiene dos positivos: no es Horn.
+
+\textbf{7.} La resolución no genera todas las consecuencias (no deriva $A\vee\neg A$ de una KB vacía),
+pero es \emph{completa por refutación}: si $KB\wedge\neg\alpha$ es insatisfacible, deriva la cláusula
+vacía. Como $KB\ent\alpha$ sii $KB\wedge\neg\alpha$ es insatisfacible, se niega la consulta y se busca $\square$.
+\end{solucion}
+
+\begin{solucion}{A8 · Lógica de primer orden}
+\textbf{1.} Objetos, relaciones (predicados), funciones, variables y cuantificadores. Términos:
+constantes, variables, funciones aplicadas a términos. Fórmulas: atómicas (predicado sobre términos,
+igualdad), compuestas con conectivos, cuantificadas.
+
+\textbf{2.} $\forall x\,(\p{Est}(x)\wedge\p{Listo}(x))$ afirma que \emph{todo objeto} es estudiante y
+listo (demasiado fuerte). $\exists x\,(\p{Est}(x)\imp\p{Listo}(x))$ es verdadera en cuanto exista
+\emph{un} no estudiante (implicación vacuamente verdadera): demasiado débil.
+
+\textbf{3.} Eliminar $\exists$ sustituyendo la variable por un término nuevo; preserva la
+satisfacibilidad (no la equivalencia). El testigo puede depender de las variables universales
+externas: en $\forall x\,\exists y\,\p{Madre}(y,x)$ cada $x$ tiene su madre, $y=M(x)$; una constante
+diría que todos tienen la misma madre.
+
+\textbf{4.} $\theta$ tal que $p\theta=q\theta$; el MGU es aquel del cual cualquier otro unificador es una
+instancia (único salvo renombres). La verificación de ocurrencia impide unificar $x$ con un término
+que contenga a $x$ (como $F(x)$), lo cual requeriría un término infinito y sería incorrecto.
+
+\textbf{5.} Resolución SLD sobre cláusulas de Horn: encadenamiento hacia atrás en profundidad, reglas
+de arriba abajo y submetas de izquierda a derecha (sin verificación de ocurrencia). Puede ciclar
+porque DFS es incompleta en espacios infinitos: una regla recursiva por la izquierda se reinvoca a sí
+misma antes de probar otras alternativas, aunque la respuesta sea derivable.
+\end{solucion}
+
+\newpage
+% ============================================================
+\section{Parte B — Procedimientos}
+
+\begin{solucion}{B1 · PEAS y propiedades}
+\renewcommand{\arraystretch}{1.15}
+{\small
+\begin{tabularx}{\linewidth}{>{\raggedright}p{2.1cm}>{\raggedright\arraybackslash}X}
+\toprule
+\textbf{Fútbol} & P: goles a favor/en contra, ganar. E: cancha, balón, compañeros, rivales. A: piernas
+(correr, patear, pasar). S: cámaras, sensores de contacto, acelerómetros. \emph{Parcial, multiagente
+(cooperativo y competitivo), estocástico, secuencial, dinámico, continuo.}\\
+\textbf{Libros por internet} & P: conseguir los libros deseados al menor costo. E: sitios web,
+vendedores. A: seguir ligas, llenar formularios, pagar. S: páginas web. \emph{Parcial, un agente
+(o multi si hay otros compradores), casi determinista, secuencial, estático (semi: cambian precios),
+discreto.}\\
+\textbf{Partido de tenis} & P: ganar. E: cancha, pelota, rival. A: moverse, golpear. S: cámaras,
+tacto. \emph{Parcial, multiagente, estocástico, secuencial, dinámico, continuo.}\\
+\textbf{Tenis contra pared} & P: mejorar desempeño (golpes seguidos). E: pared, pelota, cancha. A y S
+como arriba. \emph{Parcial, un agente, estocástico, secuencial (casi episódico por golpe),
+dinámico, continuo.}\\
+\textbf{Diagnóstico médico} & P: paciente sano, costos bajos. E: paciente, hospital, personal. A:
+preguntas, pruebas, diagnósticos, tratamientos. S: síntomas y hallazgos capturados. \emph{Parcial,
+un agente, estocástico, secuencial, dinámico, continuo.}\\
+\textbf{Subasta} & P: obtener artículos valiosos al menor precio. E: casa de subastas, otros postores.
+A: pujar. S: anuncios y pujas de otros. \emph{Totalmente observable (subasta abierta), multiagente
+(competitivo), estratégico, secuencial, dinámico, discreto.}\\
+\bottomrule
+\end{tabularx}}
+
+\smallskip
+Varias clasificaciones son discutibles; en el examen lo importante es \emph{justificar}.
+\end{solucion}
+
+\begin{solucion}{B2 · Misioneros y caníbales}
+\textbf{(a)} Estado $(m,c,b)$: misioneros y caníbales en la orilla inicial, $b=1$ si el bote está
+ahí. Inicial $(3,3,1)$; meta $(0,0,0)$. Acciones: llevar $(i,j)\in\{(1,0),(2,0),(0,1),(0,2),(1,1)\}$.
+Transición: si $b=1$, $(m-i,c-j,0)$; si $b=0$, $(m+i,c+j,1)$. Precondiciones: conteos en $[0,3]$ y
+seguridad en ambas orillas: $(m=0\vee m\ge c)$ y $(3-m=0\vee 3-m\ge 3-c)$. Costo 1 por cruce.
+
+\textbf{(b)} $4\cdot4\cdot2=32$ estados; los pares $(m,c)$ seguros son 10 ($m\in\{0,3\}$ con cualquier
+$c$, más $(1,1)$ y $(2,2)$), así que hay 20 estados legales, de los cuales 16 son alcanzables desde el
+inicial (p.\,ej.\ $(3,3,0)$ y $(0,0,1)$ no lo son).
+
+\textbf{(c)} 11 cruces, por ejemplo:
+$(3,3,1)\xrightarrow{CC}(3,1,0)\xrightarrow{C}(3,2,1)\xrightarrow{CC}(3,0,0)\xrightarrow{C}(3,1,1)
+\xrightarrow{MM}(1,1,0)\xrightarrow{MC}(2,2,1)\xrightarrow{MM}(0,2,0)\xrightarrow{C}(0,3,1)
+\xrightarrow{CC}(0,1,0)\xrightarrow{M}(1,1,1)\xrightarrow{MC}(0,0,0)$.
+BFS, IDS o UCS garantizan la óptima (costos unitarios).
+
+\textbf{(d)} Porque hay que hacer movimientos que parecen retroceder (regresar dos personas a la
+orilla inicial en el paso 6); las heurísticas humanas de «progreso monótono» engañan.
+\end{solucion}
+
+\begin{solucion}{B3 · Tamaños de espacios}
+\textbf{(a)} $9!/2=181\,440$ (el libro imprime 181\,400 por errata) y $16!/2\approx1.05\times10^{13}$.
+Las permutaciones se dividen en dos clases de paridad; los movimientos preservan un invariante de
+paridad, así que solo la mitad es alcanzable desde un estado dado.
+
+\textbf{(b)} Colocar 8 reinas en casillas vacías en secuencia: $64\cdot63\cdots57\approx1.8\times10^{14}$
+secuencias. La formulación por columnas, sin ataques, reduce a 2\,057 estados.
+
+\textbf{(c)} Cota simple: $9!=362\,880$ secuencias de jugadas (el número real de partidas, que terminan
+antes al ganar alguien, es 255\,168). Hay 5\,478 posiciones legales alcanzables (765 salvo simetrías).
+\end{solucion}
+
+\begin{solucion}{B4 · Trazas en $G_1$}
+\textbf{(a) BFS.} S $\to$ fr.\,[A,B]; A $\to$ [B,C,D]; B $\to$ [C,D,G] (D ya estaba); C; D; G.
+Orden: S, A, B, C, D, G. Camino \textbf{S–B–G}, costo \textbf{10} (menos acciones, no menor costo).
+
+\textbf{(b) DFS.} S (apila B, A); A (apila D, C); C (apila G); G. Orden: S, A, C, G. Camino
+\textbf{S–A–C–G}, costo \textbf{8}.
+
+\textbf{(c) IDS.} $L=0$: S. $L=1$: S, A, B. $L=2$: S, A, C, D, B, D, G $\Rightarrow$ camino
+\textbf{S–B–G}, costo \textbf{10}.
+
+\textbf{(d) UCS.}
+\begin{center}\small
+\begin{tabular}{clll}
+\toprule
+Paso & Extrae ($g$) & Frontera después & Comentario\\
+\midrule
+1 & S (0) & A(2), B(1) & \\
+2 & B (1) & A(2), D(2), G(10) & \\
+3 & A (2) & D(2), C(4) & D vía A costaría 6: no mejora\\
+4 & D (2) & C(4), G(5) & G mejora de 10 a 5\\
+5 & C (4) & G(5) & G vía C = 8: no mejora\\
+6 & G (5) & — & meta\\
+\bottomrule
+\end{tabular}
+\end{center}
+Camino \textbf{S–B–D–G}, costo \textbf{5} (óptimo).
+\end{solucion}
+
+\begin{solucion}{B5 · Voraz, A* y propiedades de $h$}
+\textbf{(a)} $h^*$: S=5, A=6, B=4, C=4, D=3, G=0.
+
+\textbf{(b)} Admisible: $4\le5$, $2\le6$, $3\le4$, $1\le4$, $2\le3$, $0\le0$. Consistente:
+S$\to$A: $4\le2+2$; S$\to$B: $4\le1+3$; A$\to$C: $2\le2+1$; A$\to$D: $2\le4+2$; B$\to$D: $3\le1+2$;
+B$\to$G: $3\le9$; C$\to$G: $1\le4$; D$\to$G: $2\le3$. \textbf{Sí es consistente} (con igualdad en tres arcos).
+
+\textbf{(c) Voraz:} S(4) $\to$ A(2), B(3); extrae A $\to$ C(1), D(2); extrae C $\to$ G(0); extrae G.
+Camino S–A–C–G, costo 8: \textbf{no óptimo}.
+
+\textbf{A*:}
+\begin{center}\small
+\begin{tabular}{clll}
+\toprule
+Paso & Extrae ($g$, $f$) & Frontera después ($f$) & Comentario\\
+\midrule
+1 & S (0, 4) & A(4), B(4) & \\
+2 & A (2, 4) & B(4), C(5), D(8) & empate A/B: alfabético\\
+3 & B (1, 4) & D(4), C(5), G(10) & D mejora: $g=2$, $f=4$\\
+4 & D (2, 4) & C(5), G(5) & G mejora: $g=5$\\
+5 & C (4, 5) & G(5) & G vía C: $g=8$, no mejora\\
+6 & G (5, 5) & — & meta\\
+\bottomrule
+\end{tabular}
+\end{center}
+Camino S–B–D–G, costo \textbf{5}: óptimo, como garantiza la consistencia. Observa que los valores
+$f$ extraídos nunca decrecen: $4,4,4,4,5,5$.
+\end{solucion}
+
+\begin{solucion}{B6 · Rumania}
+\textbf{(a)} Extracciones UCS: Sibiu 0, Rimnicu 80, Fagaras 99, Arad 140, Oradea 151, Pitesti 177,
+Zerind 215, Craiova 226, Timisoara 258, \textbf{Bucarest 278}. Bucarest se genera primero al expandir
+Fagaras con $g=310$; si se probara la meta al generar, se devolvería 310. Al expandir Pitesti se
+encuentra $177+101=278<310$.
+
+\textbf{(b) A* desde Lugoj:}
+\begin{center}\small
+\begin{tabular}{llll}
+\toprule
+Extrae & $g+h=f$ & Genera\\
+\midrule
+Lugoj & $0+244=244$ & Mehadia $70+241=311$, Timisoara $111+329=440$\\
+Mehadia & $70+241=311$ & Drobeta $145+242=387$\\
+Drobeta & $145+242=387$ & Craiova $265+160=425$\\
+Craiova & $265+160=425$ & Pitesti $403+100=503$, Rimnicu $411+193=604$\\
+Timisoara & $111+329=440$ & Arad $229+366=595$\\
+Pitesti & $403+100=503$ & Bucarest $504+0=504$ (Rimnicu vía Pitesti 693: no mejora)\\
+Bucarest & $504+0=504$ & meta\\
+\bottomrule
+\end{tabular}
+\end{center}
+Camino Lugoj–Mehadia–Drobeta–Craiova–Pitesti–Bucarest, costo \textbf{504}.
+
+\textbf{(c)} Voraz desde Timisoara: Timisoara(329) $\to$ Lugoj(244) $\to$ Mehadia(241) $\to$ Drobeta(242)
+$\to$ Craiova(160) $\to$ Pitesti(100) $\to$ Bucarest(0). Costo $111+70+75+120+138+101=\mathbf{615}$ frente
+al óptimo 536 (Timisoara–Arad–Sibiu–Rimnicu–Pitesti–Bucarest).
+
+\textbf{(d)} Con la distancia en línea recta \emph{a Fagaras}, Neamt parece más cercana que Vaslui, así que
+se expande Neamt, que es un callejón sin salida; su único sucesor es Iasi, que vuelve a generar Neamt:
+la búsqueda en árbol oscila Iasi–Neamt para siempre (incompleta). La ruta real pasa por Vaslui, que
+«se aleja» primero.
+\end{solucion}
+
+\begin{solucion}{B7 · 8-puzzle, IDS y $b^*$}
+\textbf{(a)} Inicio 1: todas las fichas fuera de lugar, $h_1=8$; $h_2=3+1+2+2+2+3+3+2=18$ (fichas 1 a 8).
+Óptimo 26: $h_1$ captura el 31\% y $h_2$ el 69\% del costo real.
+
+\textbf{(b)} Inicio 2: fuera de lugar 1–6 ($h_1=6$); Manhattan: $1+1+3+1+1+3+0+0=10$; costo óptimo \textbf{22}
+(calculado por BFS). Nótese que un estado «casi ordenado» para el ojo humano está lejos de esta meta.
+
+\textbf{(c)} BFS: $10+10^2+10^3+10^4+10^5=111\,110$. IDS: $5\cdot10+4\cdot10^2+3\cdot10^3+2\cdot10^4+10^5=123\,450$.
+
+\textbf{(d)} $53=1+b^*+(b^*)^2+\dots+(b^*)^5$. Con $b^*=1.92$: $1+1.92+3.69+7.08+13.59+26.09\approx53.4$ \checkmark{}.
+\end{solucion}
+
+\begin{solucion}{B8 · Criptoaritmética}
+Variables $F,T,U,W,R,O\in\{0,\dots,9\}$ y acarreos $C_1,C_2,C_3\in\{0,1\}$. Restricciones:
+$\textit{Alldiff}(F,T,U,W,R,O)$; $O+O=R+10C_1$; $C_1+W+W=U+10C_2$; $C_2+T+T=O+10C_3$; $C_3=F$;
+$T\ne0$, $F\ne0$.
+
+Razonamiento: $F=C_3\le1$ y $F\ne0\Rightarrow F=1$, $C_3=1$, así que $2T+C_2\ge10\Rightarrow T\ge5$.
+Probando $T=7$, $C_2=0$: $O=4$, luego $R=8$, $C_1=0$ y $U=2W$ con $W\notin\{1,4,7,8\}$ y $U$ distinto:
+$W=2\Rightarrow U=4$ (choca con $O$); $W=3\Rightarrow U=6$ \checkmark{}. Solución: $734+734=1468$.
+(Otra: $938+938=1876$.)
+\end{solucion}
+
+\begin{solucion}{B9 · AC-3 en Australia}
+Dominios iniciales: $WA=\{G\}$, $V=\{R\}$, el resto $\{R,G,B\}$. Llamadas a \textsc{Revise} que borran:
+\begin{enumerate}[nosep]
+\item $NT\to WA$: borra $G$ $\Rightarrow NT=\{R,B\}$.
+\item $SA\to WA$: borra $G$ $\Rightarrow SA=\{R,B\}$.
+\item $SA\to V$: borra $R$ $\Rightarrow SA=\{B\}$.
+\item $Q\to SA$: borra $B$ $\Rightarrow Q=\{R,G\}$.
+\item $NSW\to SA$: borra $B$ $\Rightarrow NSW=\{R,G\}$.
+\item $NSW\to V$: borra $R$ $\Rightarrow NSW=\{G\}$.
+\item $NT\to SA$: borra $B$ $\Rightarrow NT=\{R\}$.
+\item $Q\to NSW$: borra $G$ $\Rightarrow Q=\{R\}$.
+\item $Q\to NT$: borra $R$ $\Rightarrow Q=\emptyset$: \textbf{inconsistencia detectada}.
+\end{enumerate}
+El orden exacto depende de la cola, pero el resultado (dominio vacío) no. Número de soluciones con 3
+colores: $SA$ tiene 3 opciones; el anillo $WA$–$NT$–$Q$–$NSW$–$V$ es un camino que debe alternar los otros
+2 colores (2 formas); $T$ es libre (3): $3\cdot2\cdot3=\mathbf{18}$.
+\end{solucion}
+
+\begin{solucion}{B10 · Revisión hacia adelante en 4 reinas}
+\begin{enumerate}[nosep]
+\item $Q_1=1$: $D_2=\{3,4\}$, $D_3=\{2,4\}$, $D_4=\{2,3\}$.
+\item \quad $Q_2=3$: $D_3=\emptyset$ (3 está en diagonal, 2 y 4 también) $\Rightarrow$ fallo.
+\item \quad $Q_2=4$: $D_3=\{2\}$, $D_4=\{3\}$.
+\item \qquad $Q_3=2$: $D_4=\emptyset$ $\Rightarrow$ fallo. Sin más valores: retroceder hasta $Q_1$.
+\item $Q_1=2$: $D_2=\{4\}$, $D_3=\{1,3\}$, $D_4=\{1,3,4\}$.
+\item \quad $Q_2=4$: $D_3=\{1\}$, $D_4=\{1,3\}$.
+\item \qquad $Q_3=1$: $D_4=\{3\}$.
+\item \qquad\quad $Q_4=3$: \textbf{solución} $(2,4,1,3)$.
+\end{enumerate}
+\end{solucion}
+
+\begin{solucion}{B11 · Ordenamiento}
+\textbf{(a)} Todos los dominios tienen 3 valores: MRV empata. Por grado gana $SA$ (grado 5).
+\textbf{(b)} $SA=\{B\}$ (vecino de $WA$ y $NT$), $Q=\{R,B\}$, los demás 3 valores: MRV elige $SA$.
+\textbf{(c)} $Q\in\{R,B\}$. Con $Q=R$: $SA=\{B\}$, $NSW=\{G,B\}$ (3 valores restantes). Con $Q=B$: $SA=\emptyset$.
+LCV elige \textbf{$Q=R$}.
+\end{solucion}
+
+\begin{solucion}{B12 · Hill climbing en 4 reinas}
+\textbf{(a)} Pares que se atacan en $(2,1,4,4)$: (1,2) diagonal, (1,3) diagonal, (3,4) misma fila:
+$h=3$.
+
+\textbf{(b)} $h$ de los sucesores (fila nueva de la reina de cada columna):
+\begin{center}\small
+\begin{tabular}{c|cccc}
+ & fila 1 & fila 2 & fila 3 & fila 4\\\hline
+col.\,1 & 3 & * & \textbf{1} & 3\\
+col.\,2 & * & 4 & 4 & 4\\
+col.\,3 & 2 & 3 & 2 & *\\
+col.\,4 & 3 & 3 & 4 & *
+\end{tabular}
+\end{center}
+Mejor: mover la reina de la columna 1 a la fila 3: $(3,1,4,4)$ con $h=1$.
+
+\textbf{(c)} En $(3,1,4,4)$ el único conflicto es (3,4); mover la reina de la columna 4 a la fila 2 da
+$h=0$: $(3,1,4,2)$ es solución. Aquí hill climbing sí llega, en 2 pasos.
+\end{solucion}
+
+\begin{solucion}{B13 · Paisaje unidimensional}
+\textbf{(a)} Desde 0: $0\to1\to2$ ($f=6$, máximo local). Desde 4: $4\to5\to6\to7$ ($f=9$, \textbf{óptimo
+global}). Desde 10: $10\to11\to12$ ($f=7$, local). Desde 13: $13\to12$ ($f=7$).
+
+\textbf{(b)} Tabú desde 2: vecinos 1 y 3 empatan con 5; desempate a la derecha: 3. Luego 2 es tabú,
+se va a 4 (aunque empeora a 4); 3 tabú $\to$ 5; $\to6\to7\to8$. Recorrido $2,3,4,5,6,7,8$; mejor visto:
+estado 7 con $f=9$. Hill climbing se habría detenido en 2.
+
+\textbf{(c)} $\Delta E=7-9=-2$: $T=10$: $e^{-0.2}=0.819$; $T=1$: $e^{-2}=0.135$; $T=0.1$: $e^{-20}\approx2\times10^{-9}$.
+\end{solucion}
+
+\begin{solucion}{B14 · Genético en 8 reinas}
+\textbf{(a)} \texttt{24748552}: pares atacados (1,8) misma fila, (2,4), (3,8), (6,7) diagonales: 4, así que
+$28-4=24$. \texttt{32543213}: 17 pares atacados, $28-17=11$.
+
+\textbf{(b)} Total $=78$: $24/78=30.8\%$, $23/78=29.5\%$, $20/78=25.6\%$, $11/78=14.1\%$.
+
+\textbf{(c)} \texttt{327|52411} $\times$ \texttt{247|48552} $\Rightarrow$ \texttt{32748552} (aptitud 23) y
+\texttt{24752411} (aptitud 22).
+
+\textbf{(d)} El peor gana un torneo de 2 solo si ambos elegidos son él: $(1/4)^2=1/16=0.0625$.
+
+\textbf{(e)} $(7/8)^8\approx0.344$.
+\end{solucion}
+
+\begin{solucion}{B15 · Minimax y alfa-beta en $T_1$}
+\textbf{(a)} $A1=7$, $A2=9$, $A=7$; $B1=6$, $B2=8$, $B=6$; $C1=10$, $C2=12$, $C=10$; $R=10$: MAX juega hacia $C$.
+
+\textbf{(b)}
+\begin{itemize}[nosep]
+\item $R(-\infty,\infty)\to A(-\infty,\infty)\to A1(-\infty,\infty)$: 4, 7 $\Rightarrow7$. En $A$: $\beta=7$.
+\item $A2(-\infty,7)$: 2 ($v=2$, $\alpha=2$), 9 ($v=9\ge7$: corte, aunque ya no quedan hijos) $\Rightarrow A=7$. En $R$: $\alpha=7$.
+\item $B(7,\infty)\to B1(7,\infty)$: 6, 1 $\Rightarrow 6$. En $B$: $v=6\le\alpha=7$ $\Rightarrow$ \textbf{se poda $B2$} (hojas 3 y 8).
+\item $C(7,\infty)\to C1(7,\infty)$: 5, 10 $\Rightarrow 10$; en $C$: $\beta=10$. $C2(7,10)$: 12 $\ge10$ $\Rightarrow$ \textbf{se poda la hoja 2}.
+\item $C=10$, $R=10$.
+\end{itemize}
+Hojas no evaluadas: \textbf{3, 8} (de $B2$) y \textbf{2} (de $C2$).
+\end{solucion}
+
+\begin{solucion}{B16 · Alfa-beta y orden}
+\textbf{(a)} $A=3$, $B=2$, $C=2$, raíz 3. Tras $A$, $\alpha=3$. En $B$ la primera hoja da 2 $\le3$: se podan
+\textbf{4 y 6}. En $C$ se ven 14, 5, 2 (el corte llega con la última). Se evalúan 7 de 9 hojas.
+
+\textbf{(b)} Poner el mínimo de cada nodo MIN primero en $B$ y $C$: $C=(2,5,14)$ (y $B$ ya empieza con 2).
+Se evalúan $3+1+1=\mathbf{5}$ hojas. Coincide con la cota de Knuth–Moore para orden perfecto:
+$b^{\lceil m/2\rceil}+b^{\lfloor m/2\rfloor}-1=3+3-1=5$, es decir $O(b^{m/2})$. (Dentro del primer nodo MIN
+no se puede ahorrar: con $\alpha=-\infty$ hay que ver todas sus hojas.)
+\end{solucion}
+
+\begin{solucion}{B17 · Expectiminimax}
+\textbf{(a)} MIN: $\min(3,9)=3$, $\min(6,4)=4$, $\min(2,10)=2$, $\min(20,15)=15$, $\min(7,8)=7$, $\min(4,5)=4$.
+$c_1=0.5\cdot3+0.5\cdot4=3.5$; $c_2=0.5\cdot2+0.5\cdot15=\mathbf{8.5}$; $c_3=0.3\cdot7+0.7\cdot4=4.9$. MAX elige $c_2$.
+
+\textbf{(b)} Tratando el azar como MIN: $c_1=3$, $c_2=2$, $c_3=4$: elegiría $c_3$. La decisión cambia porque
+el pesimista ignora que el resultado malo de $c_2$ es solo 50\% probable.
+
+\textbf{(c)} Tras $c_1,c_2$, $\alpha=8.5$. En $c_3$, el primer nodo MIN vale 7; la cota superior es
+$0.3\cdot7+0.7\cdot20=16.1>8.5$: no se poda. En el segundo nodo MIN, tras ver la hoja 4 sabemos que
+vale $\le4$, así que $c_3\le0.3\cdot7+0.7\cdot4=4.9<8.5$: \textbf{se poda la hoja 5}.
+\end{solucion}
+
+\begin{solucion}{B18 · Tres jugadores}
+Nodos del jugador 3 (maximiza $u_3$): $(1,2,6)$, $(6,1,2)$, $(3,5,2)$, $(5,4,5)$.
+Nodos del jugador 2 (maximiza $u_2$): izquierda $(1,2,6)$ [2 > 1]; derecha $(3,5,2)$ [5 > 4].
+Raíz (jugador 1): $(1,2,6)$ vs.\ $(3,5,2)$ $\Rightarrow$ \textbf{$(3,5,2)$}: obtienen 3, 5 y 2.
+
+Alianzas: en juegos que no son de suma cero, dos jugadores pueden preferir el mismo resultado; p.\,ej.\
+$(7,7,1)$ es mucho mejor para 1 y 2 que el resultado de equilibrio, pero el jugador 3 lo impide. Si 1 y 2
+coordinaran (o si uno es fuerte, los débiles se unen contra él) aparecen alianzas, que pueden romperse
+cuando dejan de convenir.
+\end{solucion}
+
+\begin{solucion}{B19 · Loterías}
+\textbf{(a)} $EU(A)=0.8\sqrt4=1.6$; $EU(B)=\sqrt3\approx1.732$ $\Rightarrow B\succ A$. Equivalente cierto de $A$:
+$\sqrt x=1.6\Rightarrow x=2.56$ (\$2\,560 $<$ valor esperado \$3\,200: aversión al riesgo).
+
+\textbf{(b)} Con $U(\$0)=0$: $B\succ A\Rightarrow U(3k)>0.8\,U(4k)$. $C\succ D\Rightarrow0.2\,U(4k)>0.25\,U(3k)$;
+multiplicando por 4, $0.8\,U(4k)>U(3k)$. Contradicción: ninguna $U$ explica ambas preferencias.
+
+\textbf{(c)} Continuidad. $p\cdot10+(1-p)\cdot0=4\Rightarrow p=0.4$.
+\end{solucion}
+
+\begin{solucion}{B20 · Validez}
+\begin{enumerate}[label=(\alph*),nosep]
+\item \textbf{Válida}: es la contrapositiva, $(H\imp F)\equiv(\neg F\imp\neg H)$.
+\item \textbf{Válida}: el antecedente es siempre falso.
+\item \textbf{Insatisfacible}: $(A\imp B)\wedge(B\imp A)\equiv A\sii B$, conjuntada con su negación.
+\item \textbf{Válida}: es la corrección de la regla de resolución.
+\item \textbf{Válida} (ley de Peirce): si $A$ es falso, $A\imp B$ es verdadero, así que $(A\imp B)\imp A$ es falso y la implicación externa es verdadera; si $A$ es verdadero, el consecuente es verdadero.
+\item \textbf{Contingente}: falsa con $A=F,B=T$; verdadera con $A=B=T$.
+\item \textbf{Válida} (exportación): $\neg A\vee\neg B\vee C$ en ambos lados.
+\item \textbf{Contingente}: falsa con $P=F,Q=T$ (es la «falacia de negar el antecedente»).
+\end{enumerate}
+\end{solucion}
+
+\begin{solucion}{B21 · ¿Vinculación correcta?}
+\begin{enumerate}[label=(\alph*),nosep]
+\item \textbf{Sí}: \p{False} no tiene modelos. (b) \textbf{No}: \p{True} tiene modelos y \p{False} ninguno.
+\setcounter{enumi}{2}
+\item \textbf{Sí}: el único modelo ($A=B=T$) cumple $A\sii B$.
+\item \textbf{No}: $A=B=F$ cumple $A\sii B$ y no $A\vee B$.
+\item \textbf{Sí}: $A\sii B$ implica $A\imp B\equiv\neg A\vee B$.
+\item \textbf{Sí}: de hecho son equivalentes: $(A\imp C)\vee(B\imp C)\equiv\neg A\vee\neg B\vee C$.
+\item \textbf{Sí}: $(A\imp C)\wedge(B\imp C)\equiv(\neg A\vee C)\wedge(\neg B\vee C)\equiv C\vee(\neg A\wedge\neg B)$.
+\item \textbf{Sí}: eliminación de la conjunción.
+\item \textbf{No}: $A=T$, $C=F$, $D=T$, $E=F$ satisface la izquierda y falsifica $\neg D\vee E$.
+\item \textbf{Sí}: $A=T,B=F$.
+\item \textbf{Sí}: $A=B=T$.
+\item \textbf{Sí}: para cada asignación de $A,B$ hay exactamente un valor de $C$ que satisface $(A\sii B)\sii C$; así que tiene la mitad de los modelos, igual que $A\sii B$ (4 de 8 sobre $A,B,C$).
+\end{enumerate}
+\end{solucion}
+
+\begin{solucion}{B22 · Conteo de modelos}
+(a) $B\vee C$ falla solo con $B=C=F$: $3\cdot4=\mathbf{12}$. (b) Falla solo con todo verdadero: $\mathbf{15}$.
+(c) $A\wedge\neg B$ contradice $A\imp B$: $\mathbf{0}$. (d) $(A\wedge B)\vee(B\wedge C)\equiv B\wedge(A\vee C)$:
+$1\cdot3\cdot2=\mathbf{6}$.
+\end{solucion}
+
+\begin{solucion}{B23 · Wumpus por revisión de modelos}
+\textbf{(a)} $R_1:\neg P_{1,1}$; $R_2: B_{1,1}\sii(P_{1,2}\vee P_{2,1})$; $R_3: B_{2,1}\sii(P_{1,1}\vee P_{2,2}\vee P_{3,1})$;
+$R_4:\neg B_{1,1}$; $R_5: B_{2,1}$. (Además $\neg P_{2,1}$, porque el agente estuvo ahí.)
+
+\textbf{(b)} De $R_2,R_4$: $\neg P_{1,2}$. De $R_3,R_5,R_1$: $P_{2,2}\vee P_{3,1}$. Modelos $(P_{1,2},P_{2,2},P_{3,1})$:
+$(F,T,F)$, $(F,F,T)$, $(F,T,T)$: \textbf{3 modelos} de 8.
+
+\textbf{(c)} $\neg P_{1,2}$ se cumple en los 3: $KB\ent\neg P_{1,2}$ ([1,2] es segura).
+$\neg P_{2,2}$ falla en 2 de ellos: \textbf{no} se sigue (tampoco su negación: es desconocido).
+\end{solucion}
+
+\begin{solucion}{B24 · CNF}
+\textbf{(a)} $(B\imp(P_{12}\vee P_{21}))\wedge((P_{12}\vee P_{21})\imp B)$ $\to$
+$(\neg B\vee P_{12}\vee P_{21})\wedge(\neg(P_{12}\vee P_{21})\vee B)$ $\to$
+$(\neg B\vee P_{12}\vee P_{21})\wedge((\neg P_{12}\wedge\neg P_{21})\vee B)$ $\to$
+$(\neg B_{11}\vee P_{12}\vee P_{21})\wedge(\neg P_{12}\vee B_{11})\wedge(\neg P_{21}\vee B_{11})$.
+
+\textbf{(b)} $\neg(A\wedge B)\vee((\neg C\vee D)\wedge(\neg D\vee C))$ $\to$
+$(\neg A\vee\neg B\vee\neg C\vee D)\wedge(\neg A\vee\neg B\vee\neg D\vee C)$.
+
+\textbf{(c)} $\neg(\neg P\vee(Q\wedge R))\to P\wedge\neg(Q\wedge R)\to P\wedge(\neg Q\vee\neg R)$.
+
+\textbf{(d)} $\neg V\vee(\neg N\vee R)$: una sola cláusula $\neg V\vee\neg N\vee R$.
+
+\textbf{(e)} $\neg(\neg V\vee N)\vee R\to(V\wedge\neg N)\vee R\to(V\vee R)\wedge(\neg N\vee R)$.
+No son equivalentes: con $V=F$, $N=F$, $R=F$, (d) es verdadera y (e) es falsa. La implicación no es asociativa.
+\end{solucion}
+
+\begin{solucion}{B25 · Resolución proposicional}
+\textbf{(a)} Cláusulas: (1) $\neg B_{11}\vee P_{12}\vee P_{21}$, (2) $\neg P_{12}\vee B_{11}$, (3) $\neg P_{21}\vee B_{11}$,
+(4) $\neg B_{11}$, (5) $P_{12}$ (consulta negada). (5)+(2): $B_{11}$; con (4): $\square$.
+
+\textbf{(b)} (1) $\neg A\vee B\vee C$, (2) $A$, (3) $\neg B$, (4) $\neg C$. (1)+(2): $B\vee C$; +(3): $C$; +(4): $\square$.
+La KB es insatisfacible (y por ello vincula cualquier cosa).
+
+\textbf{(c)} Símbolos $L$ (llueve), $P$ (paraguas), $M$ (me mojo), $E$ (me enfermo). Cláusulas:
+(1) $\neg L\vee P\vee M$, (2) $\neg M\vee E$, (3) $L$, (4) $\neg E$, (5) $\neg P$ (negación).
+(2)+(4): $\neg M$; (1)+$\neg M$: $\neg L\vee P$; +(3): $P$; +(5): $\square$.
+
+\textbf{(d)} Símbolos $My$ (mítico), $Im$, $Ma$ (mamífero), $Ho$ (cuerno), $Mg$ (mágico). CNF:
+(1) $\neg My\vee Im$, (2) $My\vee\neg Im$, (3) $My\vee Ma$, (4) $\neg Im\vee Ho$, (5) $\neg Ma\vee Ho$, (6) $\neg Ho\vee Mg$.
+\emph{Cuerno:} añadir $\neg Ho$: con (4) $\neg Im$; con (5) $\neg Ma$; $\neg Im$+(1): $\neg My$; $\neg My$+(3): $Ma$; $Ma+\neg Ma$: $\square$.
+\emph{Mágico:} añadir $\neg Mg$: con (6) $\neg Ho$ y se repite lo anterior. \emph{Mítico:} no se sigue: el modelo
+$My=F,Im=F,Ma=T,Ho=T,Mg=T$ satisface la KB (y $My=T,Im=T,Ma=F,Ho=T,Mg=T$ también, así que tampoco se sigue que no sea mítico).
+\end{solucion}
+
+\begin{solucion}{B26 · Encadenamiento}
+\textbf{(a)} Contadores iniciales: $P\imp Q$:1, $L\wedge M\imp P$:2, $B\wedge L\imp M$:2, $A\wedge P\imp L$:2,
+$A\wedge B\imp L$:2. Agenda $[A,B]$.
+\begin{itemize}[nosep]
+\item $A$: $A\wedge P\imp L\to1$, $A\wedge B\imp L\to1$.
+\item $B$: $B\wedge L\imp M\to1$, $A\wedge B\imp L\to0$ $\Rightarrow$ agenda $+L$.
+\item $L$: $L\wedge M\imp P\to1$, $B\wedge L\imp M\to0$ $\Rightarrow +M$.
+\item $M$: $L\wedge M\imp P\to0$ $\Rightarrow +P$.
+\item $P$: $P\imp Q\to0\Rightarrow+Q$; $A\wedge P\imp L\to0$ ($L$ ya inferido).
+\item $Q$: es la consulta. $KB\der Q$.
+\end{itemize}
+\textbf{(b)} $Q\leftarrow P\leftarrow L\wedge M$. Para $L$: la regla $A\wedge P\imp L$ pide $P$, que ya está en la
+pila de metas: \emph{ciclo}, se descarta; la regla $A\wedge B\imp L$ se cumple con los hechos. Para $M$:
+$B\wedge L\imp M$ con $B$ hecho y $L$ ya probado. Luego $P$ y $Q$. Hay que detectar metas repetidas en la pila.
+\end{solucion}
+
+\begin{solucion}{B27 · DPLL}
+Cláusulas: (1) $A\vee\neg B$, (2) $\neg A\vee C\vee D$, (3) $B\vee\neg C$, (4) $\neg D\vee\neg A$, (5) $E\vee A$,
+(6) $E\vee\neg C$, (7) $\neg A\vee\neg B\vee\neg C$.
+\begin{enumerate}[nosep]
+\item No hay unitarias. \textbf{Símbolo puro:} $E$ solo aparece positivo $\Rightarrow E=T$; se satisfacen (5), (6).
+\item Ningún otro símbolo es puro ni hay unitarias: \textbf{ramificar} $A=T$.
+\begin{itemize}[nosep]
+\item Quedan $C\vee D$, $B\vee\neg C$, $\neg D$, $\neg B\vee\neg C$. Unitaria $\neg D\Rightarrow D=F$.
+\item Queda $C$: unitaria $\Rightarrow C=T$. Quedan $B$ y $\neg B$: $B=T$ viola (7). \textbf{Fallo.}
+\end{itemize}
+\item \textbf{Ramificar} $A=F$: quedan (1) $\neg B$ y (3) $B\vee\neg C$. $C$ es puro (solo negativo) $\Rightarrow C=F$;
+luego $\neg B$: $B=F$. Todas las cláusulas satisfechas: \textbf{terminación temprana}.
+\end{enumerate}
+Modelo: $A=F$, $B=F$, $C=F$, $E=T$, $D$ arbitrario.
+\end{solucion}
+
+\begin{solucion}{B28 · Traducciones}
+\begin{enumerate}[label=(\alph*),nosep]
+\item $\neg\forall x\,[\p{Est}(x)\imp(\p{Toma}(x,\p{Frances},\p{P2001})\wedge\p{Toma}(x,\p{Griego},\p{P2001}))]$.
+\item $\exists x\,[\p{Est}(x)\wedge\p{Toma}(x,\p{Griego},\p{P2001})\wedge\neg\p{Aprueba}(x,\p{Griego},\p{P2001})
+\wedge\forall y\,((\p{Est}(y)\wedge\p{Toma}(y,\p{Griego},\p{P2001})\wedge\neg\p{Aprueba}(y,\p{Griego},\p{P2001}))\imp y=x)]$.
+\item $\forall x\,\exists y\,\p{Ama}(x,y)$ \;y\; $\exists y\,\forall x\,\p{Ama}(x,y)$. No son equivalentes: la segunda implica la primera, no al revés (C19).
+\item $\forall x\,\forall y\,[(\p{Persona}(x)\wedge\p{Poliza}(y)\wedge\p{Cara}(y))\imp\neg\p{Compra}(x,y)]$.
+\item $\exists x\,[\p{Barbero}(x)\wedge\forall y\,((\p{Hombre}(y)\wedge\neg\p{Afeita}(y,y))\imp\p{Afeita}(x,y))]$.
+\item $\forall x\,\p{Politico}(x)\imp\big[\exists y\,(\p{Persona}(y)\wedge\forall t\,(\p{Tiempo}(t)\imp\p{Engaña}(x,y,t)))\wedge
+\forall y\,(\p{Persona}(y)\imp\exists t\,(\p{Tiempo}(t)\wedge\p{Engaña}(x,y,t)))\wedge
+\neg\forall y\,\forall t\,((\p{Persona}(y)\wedge\p{Tiempo}(t))\imp\p{Engaña}(x,y,t))\big]$.
+(«A todas algún tiempo» también admite la lectura $\exists t\,\forall y$; conviene declararla.)
+\item $\forall x\,\forall y\,(\neg\p{Ama}(y,y)\imp\neg\p{Ama}(x,y))$.
+\end{enumerate}
+\end{solucion}
+
+\begin{solucion}{B29 · CNF en primer orden}
+\begin{enumerate}[label=(\alph*),nosep]
+\item $\neg\p{Persona}(x)\vee\p{Madre}(M(x),x)$ \quad ($M$ de Skolem, depende de $x$).
+\item $\p{Ama}(y,C)$ \quad ($C$ constante de Skolem: el $\exists$ no está dentro de ningún $\forall$).
+\item $\forall x\,[\neg\exists y\,P(x,y)\vee Q(x)]\to\forall x\,[\forall y\,\neg P(x,y)\vee Q(x)]\to\neg P(x,y)\vee Q(x)$.
+¡No hay Skolem!: el $\exists$ en el antecedente se vuelve $\forall$.
+\item $\forall x\,[\exists y\,\neg P(x,y)\vee\exists z\,Q(x,z)]\to\neg P(x,F(x))\vee Q(x,G(x))$.
+\item $\forall x\,[\neg\p{Est}(x)\vee\exists y\,(\p{Curso}(y)\wedge\neg\p{Aprueba}(x,y))]$ $\to$
+$(\neg\p{Est}(x)\vee\p{Curso}(F(x)))\wedge(\neg\p{Est}(x)\vee\neg\p{Aprueba}(x,F(x)))$.
+\item $(\p{Animal}(F(x))\vee\p{Ama}(G(x),x))\wedge(\neg\p{Ama}(x,F(x))\vee\p{Ama}(G(x),x))$.
+\end{enumerate}
+\end{solucion}
+
+\begin{solucion}{B30 · Unificación}
+\begin{enumerate}[label=(\alph*),nosep]
+\item $\{y/\p{Juan},\ x/\p{Madre}(\p{Juan})\}$.
+\item Falla: $x/\p{Juan}$ y luego $\p{Juan}$ vs.\ $\p{Isabel}$. Estandarizando $\p{Conoce}(x_2,\p{Isabel})$: $\{x_2/\p{Juan},\ x/\p{Isabel}\}$.
+\item Falla: $x/F(y)$, luego $F(F(y))$ vs.\ $y$: la verificación de ocurrencia lo impide.
+\item $\{x/F(A),\ y/A,\ z/A\}$.
+\item $\{x/\p{Padre}(y),\ z/\p{Padre}(\p{Padre}(y))\}$.
+\item $\{z/A,\ x/F(A),\ u/G(y)\}$.
+\item Falla: $x/F(y)$ y luego $F(y)$ vs.\ $G(z)$ (símbolos de función distintos).
+\item Falla: $x/G(z)$; $z/G(y)$ (así $x=G(G(y))$); después $G(G(y))$ vs.\ $A$.
+\end{enumerate}
+\end{solucion}
+
+\begin{solucion}{B31 · Prolog}
+\textbf{(a)} \texttt{r(Z)} $\to$ \texttt{p(Z), q(Z)}. \texttt{p(Z)} unifica con \texttt{p(a)}: \texttt{q(a)} falla
+$\Rightarrow$ retroceso; \texttt{p(b)}: \texttt{q(b)} tiene éxito. Respuesta \texttt{Z = b}; al pedir más, falla.
+
+\textbf{(b)} Regla 1: \texttt{W = maria}. Regla 2 con \texttt{Z = maria}: \texttt{ancestro(maria,W)} da
+\texttt{W = luis} y, recursivamente, \texttt{W = ana}. Orden: \texttt{maria}, \texttt{luis}, \texttt{ana}; luego \texttt{false}.
+
+\textbf{(c)} \texttt{ancestro(ana,W)}: la regla 1 falla (\texttt{ana} no es progenitora); la regla 2 llama
+primero a \texttt{ancestro(ana,Z)}, idéntica a la meta original $\Rightarrow$ recursión infinita
+(desbordamiento de pila). La semántica lógica es la misma; la procedural (DFS, izquierda a derecha) no.
+\end{solucion}
+
+\begin{solucion}{B32 · El coronel West}
+\textbf{(a)} (1) $\p{American}(x)\wedge\p{Weapon}(y)\wedge\p{Sells}(x,y,z)\wedge\p{Hostile}(z)\imp\p{Criminal}(x)$;
+(2) $\p{Owns}(\p{Nono},M_1)$, (3) $\p{Missile}(M_1)$ (instanciación existencial);
+(4) $\p{Missile}(x)\wedge\p{Owns}(\p{Nono},x)\imp\p{Sells}(\p{West},x,\p{Nono})$;
+(5) $\p{Missile}(x)\imp\p{Weapon}(x)$; (6) $\p{Enemy}(x,\p{America})\imp\p{Hostile}(x)$;
+(7) $\p{American}(\p{West})$; (8) $\p{Enemy}(\p{Nono},\p{America})$.
+
+\textbf{(b)} Iteración 1: (4) con $\{x/M_1\}$: $\p{Sells}(\p{West},M_1,\p{Nono})$; (5) con $\{x/M_1\}$: $\p{Weapon}(M_1)$;
+(6) con $\{x/\p{Nono}\}$: $\p{Hostile}(\p{Nono})$. Iteración 2: (1) con
+$\{x/\p{West},y/M_1,z/\p{Nono}\}$: $\p{Criminal}(\p{West})$. Punto fijo alcanzado.
+\end{solucion}
+
+\input{respuestas_cd}
+
+\end{document}

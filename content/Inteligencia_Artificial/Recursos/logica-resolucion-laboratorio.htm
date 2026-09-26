@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio: resolución proposicional</title>
+<style>
+:root{color-scheme:light dark;--bg:#f7f9fc;--panel:#fff;--ink:#172337;--muted:#526277;--line:#c9d4e2;--blue:#174ea6;--soft:#eaf2ff;--success:#e5f5e8;--success-ink:#165c30;--warning:#fff3d9}
+*{box-sizing:border-box}body{margin:0;padding:18px;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,sans-serif}main{max-width:930px;margin:auto}h1{font-size:1.35rem;margin:0 0 4px}h2{font-size:1.05rem;margin:0 0 8px}p{margin:6px 0 12px}.muted{color:var(--muted)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}.formula{font-weight:650}.sources{display:flex;gap:12px;flex-wrap:wrap}.source{padding:7px 10px;background:var(--soft);border-radius:8px}.layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:12px}.controls label{display:block;margin:8px 0}.controls select{display:block;margin-top:4px;width:100%;padding:8px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font:inherit}.buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}button{font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer}button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}button:disabled{opacity:.5;cursor:default}.list{display:grid;gap:7px}.clause{display:flex;gap:8px;align-items:baseline;justify-content:space-between;border-left:4px solid var(--line);padding:7px 9px;background:var(--bg);border-radius:5px}.clause.new{border-color:var(--blue);background:var(--soft)}.clause.empty{border-color:var(--success-ink);background:var(--success)}.clause .why{color:var(--muted);font-size:.85em}.status{padding:10px 12px;border-left:4px solid #aa6d00;background:var(--warning);border-radius:4px;min-height:54px}.success{background:var(--success);border-color:var(--success-ink);color:var(--success-ink)}.help{padding-left:20px;margin:8px 0}@media(max-width:700px){.layout{grid-template-columns:1fr}}@media(prefers-color-scheme:dark){:root{--bg:#172130;--panel:#233042;--ink:#f0f5fb;--muted:#bbcadb;--line:#61748a;--blue:#477ed1;--soft:#263f63;--success:#244b37;--success-ink:#b4f1c6;--warning:#463923}}
+</style>
+</head>
+<body>
+<main>
+<h1>Resolución: refutar la negación de una consulta</h1>
+<p class="muted">Queremos probar C desde KB = {A → (B ∨ C), A, ¬B}. Añadimos ¬C como hipótesis provisional. Si llegamos a la cláusula vacía □, entonces KB ⊨ C.</p>
+<section class="panel" aria-labelledby="origin">
+<h2 id="origin">De fórmulas a cláusulas</h2>
+<div class="sources">
+<span class="source">A → (B ∨ C) ⇔ <strong>¬A ∨ B ∨ C</strong></span>
+<span class="source">Hecho <strong>A</strong></span>
+<span class="source">Hecho <strong>¬B</strong></span>
+<span class="source">Consulta C → añadir <strong>¬C</strong></span>
+</div>
+</section>
+<div class="layout">
+<section class="panel" aria-labelledby="clauses-title">
+<h2 id="clauses-title">Cláusulas disponibles</h2>
+<div id="clauses" class="list" aria-live="polite"></div>
+</section>
+<section class="panel controls" aria-labelledby="work-title">
+<h2 id="work-title">Forma un resolvente</h2>
+<p class="muted">Elige dos cláusulas y un átomo que aparezca en positivo en una y negado en la otra.</p>
+<label>Primera cláusula<select id="first"></select></label>
+<label>Segunda cláusula<select id="second"></select></label>
+<label>Átomo que se cancela<select id="pivot"></select></label>
+<div class="buttons">
+<button class="primary" type="button" id="resolve">Resolver</button>
+<button type="button" id="hint">Pista</button>
+<button type="button" id="reset">Reiniciar</button>
+</div>
+</section>
+</div>
+<section class="panel" aria-labelledby="explain-title">
+<h2 id="explain-title">Qué acaba de pasar</h2>
+<p id="status" class="status" aria-live="polite"></p>
+<ol class="help">
+<li>Cancela un par como A y ¬A. Copia los demás literales al resolvente.</li>
+<li>Si un resolvente contiene P y ¬P a la vez, es una tautología y no ayuda a cerrar la prueba.</li>
+<li>La cláusula vacía □ es falsa bajo cualquier asignación: señala contradicción.</li>
+</ol>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const initial=[
+  {l:["-A","B","C"],why:"De A → (B ∨ C)"},
+  {l:["A"],why:"Hecho de KB"},
+  {l:["-B"],why:"Hecho de KB"},
+  {l:["-C"],why:"Negación de la consulta"}
+];
+let clauses=[];
+const neg=x=>x.startsWith("-")?x.slice(1):"-"+x;
+const atom=x=>x.replace("-","");
+const fmt=x=>x.length?x.map(y=>y.startsWith("-")?"¬"+y.slice(1):y).join(" ∨ "):"□";
+const key=x=>[...new Set(x)].sort().join(",");
+function pivots(a,b){
+  const out=[];
+  for(const x of a){if(b.includes(neg(x))&&!out.includes(atom(x)))out.push(atom(x))}
+  return out.sort();
+}
+function hasClause(l){return clauses.some(c=>key(c.l)===key(l))}
+function updatePivots(){
+  const a=Number($("first").value),b=Number($("second").value);
+  const values=Number.isInteger(a)&&Number.isInteger(b)&&a!==b?pivots(clauses[a].l,clauses[b].l):[];
+  const old=$("pivot").value;$("pivot").replaceChildren();
+  if(values.length===0){const o=new Option("Sin par complementario","");$("pivot").add(o)}
+  values.forEach(x=>$("pivot").add(new Option(x,x)));
+  if(values.includes(old))$("pivot").value=old;
+  $("resolve").disabled=values.length===0||hasClause([]);
+}
+function render(){
+  $("clauses").replaceChildren();
+  clauses.forEach((c,i)=>{
+    const row=document.createElement("div");row.className="clause"+(i>=4?" new":"")+(c.l.length===0?" empty":"");
+    const f=document.createElement("span");f.className="formula";f.textContent=(i+1)+". "+fmt(c.l);
+    const why=document.createElement("span");why.className="why";why.textContent=c.why;
+    row.append(f,why);$("clauses").append(row);
+  });
+  const a=$("first").value,b=$("second").value;
+  $("first").replaceChildren();$("second").replaceChildren();
+  clauses.forEach((c,i)=>{
+    const label=(i+1)+": "+fmt(c.l);
+    $("first").add(new Option(label,String(i)));$("second").add(new Option(label,String(i)));
+  });
+  $("first").value=a&&Number(a)<clauses.length?a:"0";
+  $("second").value=b&&Number(b)<clauses.length?b:"1";
+  updatePivots();
+}
+function setStatus(msg,ok=false){$("status").textContent=msg;$("status").classList.toggle("success",ok)}
+function resolution(a,b,p){
+  const left=clauses[a].l,right=clauses[b].l;
+  const pos=p,negative="-"+p;
+  if(!((left.includes(pos)&&right.includes(negative))||(left.includes(negative)&&right.includes(pos))))return null;
+  const result=[...new Set([...left,...right].filter(x=>x!==pos&&x!==negative))].sort();
+  if(result.some(x=>result.includes(neg(x))))return "tautology";
+  return result;
+}
+function resolve(){
+  const a=Number($("first").value),b=Number($("second").value),p=$("pivot").value;
+  if(a===b||!p){setStatus("Selecciona dos cláusulas distintas con un par complementario.");return}
+  const result=resolution(a,b,p);
+  if(result===null){setStatus("Ese átomo no aparece como par complementario en las dos cláusulas.");return}
+  if(result==="tautology"){setStatus("El resolvente contiene un átomo y su negación: es tautológico. Prueba otro par.");return}
+  if(hasClause(result)){setStatus("Ese resolvente ya está en la lista. Elige otro par para avanzar.");return}
+  clauses.push({l:result,why:"Resolver "+(a+1)+" y "+(b+1)+" sobre "+p});
+  render();
+  if(result.length===0)setStatus("Apareció □: KB ∧ ¬C es insatisfactible. Por refutación, KB ⊨ C.",true);
+  else setStatus("Se cancelaron "+p+" y ¬"+p+". Los literales restantes forman "+fmt(result)+". Sigue resolviendo.");
+}
+function choose(a,b,p){
+  $("first").value=String(a);$("second").value=String(b);updatePivots();$("pivot").value=p;
+  setStatus("Pista: resuelve las cláusulas "+(a+1)+" y "+(b+1)+" sobre "+p+". Luego pulsa Resolver.");
+}
+function hint(){
+  if(hasClause([])){setStatus("La prueba ya terminó: se obtuvo □.",true);return}
+  const bc=clauses.findIndex(c=>key(c.l)===key(["B","C"]));
+  const c=clauses.findIndex(x=>key(x.l)===key(["C"]));
+  if(bc<0){choose(0,1,"A");return}
+  if(c<0){choose(bc,2,"B");return}
+  choose(c,3,"C");
+}
+function reset(){
+  clauses=initial.map(c=>({l:[...c.l],why:c.why}));
+  $("first").value="0";$("second").value="1";render();
+  setStatus("Empieza con 1 y 2: ¬A ∨ B ∨ C junto con A. También puedes probar otras parejas.");
+}
+$("first").addEventListener("change",updatePivots);
+$("second").addEventListener("change",updatePivots);
+$("resolve").addEventListener("click",resolve);
+$("hint").addEventListener("click",hint);
+$("reset").addEventListener("click",reset);
+reset();
+</script>
+</body>
+</html>

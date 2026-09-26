@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador AC-3: Consistencia de Arcos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .log-container { scrollbar-width: thin; }
+        .log-container::-webkit-scrollbar { width: 6px; }
+        .log-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+
+        .log-item {
+            padding: 9px 12px;
+            border-radius: 6px;
+            border-left-width: 4px;
+            font-size: 13px;
+            line-height: 1.45;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            margin-bottom: 8px;
+        }
+        .log-normal {
+            background: #ffffff;
+            border-color: #94a3b8;
+            color: #334155;
+        }
+        .log-info {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+        .log-prune {
+            background: #fff7ed;
+            border-color: #f97316;
+            color: #9a3412;
+            font-weight: 500;
+        }
+        .log-success {
+            background: #f0fdf4;
+            border-color: #22c55e;
+            color: #166534;
+            font-weight: 600;
+        }
+        .log-error {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #991b1b;
+            font-weight: 600;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #161820 !important;
+                color: #e2e8f0 !important;
+            }
+            header h1 { color: #f8fafc !important; }
+            header p { color: #94a3b8 !important; }
+            .bg-white { background-color: #1e222d !important; border-color: #2f3646 !important; }
+            .bg-slate-50 { background-color: #141720 !important; border-color: #2f3646 !important; }
+            .text-slate-900 { color: #f8fafc !important; }
+            .text-slate-800 { color: #f1f5f9 !important; }
+            .text-slate-700 { color: #e2e8f0 !important; }
+            .text-slate-600 { color: #cbd5e1 !important; }
+            .border-slate-200 { border-color: #2f3646 !important; }
+            .border-slate-300 { border-color: #40485a !important; }
+            #btnReset {
+                background-color: #262b39 !important;
+                color: #e2e8f0 !important;
+            }
+            #btnReset:hover { background-color: #313749 !important; }
+            .log-container { scrollbar-color: #475569 #141720; }
+            .log-container::-webkit-scrollbar-thumb { background-color: #475569; }
+            .log-normal {
+                background: #191c26 !important;
+                border-color: #64748b !important;
+                color: #e2e8f0 !important;
+            }
+            .log-info {
+                background: #1a2436 !important;
+                border-color: #60a5fa !important;
+                color: #dbeafe !important;
+            }
+            .log-prune {
+                background: #381d14 !important;
+                border-color: #fb923c !important;
+                color: #ffedd5 !important;
+            }
+            .log-success {
+                background: #143521 !important;
+                border-color: #4ade80 !important;
+                color: #dcfce7 !important;
+            }
+            .log-error {
+                background: #3a1717 !important;
+                border-color: #f87171 !important;
+                color: #fecaca !important;
+            }
+            .queue-badge-default {
+                background: #262b39 !important;
+                border-color: #40485a !important;
+                color: #cbd5e1 !important;
+            }
+            .queue-badge-next {
+                background: #381d14 !important;
+                border-color: #f97316 !important;
+                color: #fed7aa !important;
+            }
+        }
+        :root[style*="color-scheme: dark"],
+        :root[style*="--obsidian-color-scheme: dark"] {
+            body {
+                background-color: var(--obsidian-bg, #161820) !important;
+                color: var(--obsidian-text, #e2e8f0) !important;
+            }
+            header h1 { color: var(--obsidian-text, #f8fafc) !important; }
+            header p { color: var(--obsidian-text-muted, #94a3b8) !important; }
+            .bg-white { background-color: var(--obsidian-bg-2, #1e222d) !important; border-color: var(--obsidian-border, #2f3646) !important; }
+            .bg-slate-50 { background-color: #141720 !important; border-color: var(--obsidian-border, #2f3646) !important; }
+            .text-slate-900 { color: #f8fafc !important; }
+            .text-slate-800 { color: #f1f5f9 !important; }
+            .text-slate-700 { color: #e2e8f0 !important; }
+            .text-slate-600 { color: #cbd5e1 !important; }
+            .border-slate-200 { border-color: var(--obsidian-border, #2f3646) !important; }
+            .border-slate-300 { border-color: #40485a !important; }
+            #btnReset {
+                background-color: #262b39 !important;
+                color: #e2e8f0 !important;
+            }
+            #btnReset:hover { background-color: #313749 !important; }
+            .log-normal {
+                background: #191c26 !important;
+                border-color: #64748b !important;
+                color: #e2e8f0 !important;
+            }
+            .log-info {
+                background: #1a2436 !important;
+                border-color: #60a5fa !important;
+                color: #dbeafe !important;
+            }
+            .log-prune {
+                background: #381d14 !important;
+                border-color: #fb923c !important;
+                color: #ffedd5 !important;
+            }
+            .log-success {
+                background: #143521 !important;
+                border-color: #4ade80 !important;
+                color: #dcfce7 !important;
+            }
+            .log-error {
+                background: #3a1717 !important;
+                border-color: #f87171 !important;
+                color: #fecaca !important;
+            }
+            .queue-badge-default {
+                background: #262b39 !important;
+                border-color: #40485a !important;
+                color: #cbd5e1 !important;
+            }
+            .queue-badge-next {
+                background: #381d14 !important;
+                border-color: #f97316 !important;
+                color: #fed7aa !important;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 box-border text-slate-800">
+
+    <header class="mb-4">
+        <h1 class="text-3xl font-bold text-slate-900 mb-2">Algoritmo de Consistencia de Arcos (AC-3)</h1>
+        <p class="text-sm text-slate-600 max-w-4xl">
+            Esta visualización sigue el caso de estudio de coloreo de mapas con variables: 
+            <strong>SA</strong> (South Australia), <strong>V</strong> (Victoria), <strong>NSW</strong> (New South Wales) y <strong>NT</strong> (Northern Territory).
+            Según el ejemplo, SA ya tiene asignado el color <em>Azul</em>. Observa cómo el algoritmo evalúa los arcos dirigidos, 
+            poda colores inconsistentes y agrega nuevos arcos a la cola si es necesario.
+        </p>
+    </header>
+
+    <main class="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
+        
+        <!-- Panel Izquierdo: Canvas -->
+        <div class="flex-1 flex flex-col bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
+            <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex justify-between items-center">
+                <h2 class="font-semibold text-slate-700">Grafo de Restricciones (Canvas)</h2>
+                <div class="flex gap-2">
+                    <button id="btnReset" class="px-3 py-1.5 text-sm bg-slate-200 hover:bg-slate-300 rounded text-slate-700 font-medium transition-colors">Reiniciar</button>
+                    <button id="btnStep" class="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 rounded text-white font-medium shadow-sm transition-colors">Siguiente Paso</button>
+                    <button id="btnPlay" class="px-3 py-1.5 text-sm bg-emerald-600 hover:bg-emerald-700 rounded text-white font-medium shadow-sm transition-colors">Reproducir</button>
+                </div>
+            </div>
+            <!-- Canvas responsivo -->
+            <div class="flex-1 w-full h-full relative" id="canvasContainer">
+                <canvas id="cspCanvas" class="absolute top-0 left-0 w-full h-full" role="img" aria-label="Grafo de restricciones y dominios actuales del ejemplo de AC-3"></canvas>
+            </div>
+        </div>
+
+        <!-- Panel Derecho: Cola y Logs -->
+        <div class="w-full lg:w-96 flex flex-col gap-4 min-h-0">
+            
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col max-h-64 h-1/3">
+                <div class="bg-slate-50 border-b border-slate-200 px-4 py-2">
+                    <h2 class="font-semibold text-slate-700 text-sm">Cola de Arcos (Q)</h2>
+                </div>
+                <div class="p-3 overflow-y-auto flex-1 flex flex-wrap gap-2 items-start content-start" id="queueContainer" aria-label="Cola de arcos pendientes">
+                    <!-- Los badges de la cola se renderizarán aquí -->
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 flex flex-col min-h-0 h-2/3">
+                <div class="bg-slate-50 border-b border-slate-200 px-4 py-2">
+                    <h2 class="font-semibold text-slate-700 text-sm">Registro de Ejecución (Logs)</h2>
+                </div>
+                <div class="p-4 overflow-y-auto flex-1 log-container text-sm space-y-3" id="logContainer" aria-live="polite">
+                    <!-- Los logs se renderizarán aquí -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Configuración de visualización de colores
+        const COLOR_MAP = {
+            'R': { hex: '#ef4444', name: 'Rojo' },
+            'G': { hex: '#22c55e', name: 'Verde' },
+            'B': { hex: '#3b82f6', name: 'Azul' }
+        };
+
+        // Estado inicial de las variables y grafo
+        const INITIAL_NODES = {
+            'SA':  { x: 150, y: 250, initialDomain: ['B'] }, // Según el texto, SA empieza limitando
+            'NT':  { x: 250, y: 100, initialDomain: ['R', 'G', 'B'] },
+            'NSW': { x: 350, y: 200, initialDomain: ['R', 'G', 'B'] },
+            'V':   { x: 250, y: 350, initialDomain: ['R', 'G', 'B'] }
+        };
+
+        const EDGES = [
+            ['SA', 'V'], ['SA', 'NSW'], ['SA', 'NT'], ['V', 'NSW'] // (NT-NSW y V-NT omitidos o simplificados según el ejemplo de la cola)
+        ];
+
+        // Cola de arcos dictada por el texto de ejemplo
+        const INITIAL_QUEUE = [
+            ['SA', 'V'], ['V', 'SA'], 
+            ['SA', 'NSW'], ['NSW', 'SA'], 
+            ['SA', 'NT'], ['NT', 'SA'], 
+            ['V', 'NSW'], ['NSW', 'V']
+        ];
+
+        // Variables de estado dinámico
+        let domains = {};
+        let queue = [];
+        let currentArc = null;
+        let isFinished = false;
+        let isPlaying = false;
+        let playInterval = null;
+
+        // Elementos del DOM
+        const canvas = document.getElementById('cspCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvasContainer');
+        const queueContainer = document.getElementById('queueContainer');
+        const logContainer = document.getElementById('logContainer');
+        const btnStep = document.getElementById('btnStep');
+        const btnReset = document.getElementById('btnReset');
+        const btnPlay = document.getElementById('btnPlay');
+
+        function resizeCanvas() {
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            draw(); // Redibujar al cambiar tamaño
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function log(message, type = 'normal') {
+            const el = document.createElement('div');
+            el.className = `log-item log-${type}`;
+            el.innerHTML = message;
+            logContainer.appendChild(el);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function init() {
+            // Reiniciar dominios
+            for (let key in INITIAL_NODES) {
+                domains[key] = [...INITIAL_NODES[key].initialDomain];
+            }
+            // Reiniciar cola (copia profunda)
+            queue = INITIAL_QUEUE.map(arc => [...arc]);
+            currentArc = null;
+            isFinished = false;
+            
+            // UI Resets
+            logContainer.innerHTML = '';
+            btnStep.disabled = false;
+            btnStep.classList.remove('opacity-50');
+            
+            log('<strong>AC-3 Inicializado.</strong> Arcos cargados en la cola Q.', 'info');
+            
+            resizeCanvas();
+            updateUI();
+        }
+
+        function getNeighbors(nodeId) {
+            let neighbors = [];
+            EDGES.forEach(edge => {
+                if (edge[0] === nodeId) neighbors.push(edge[1]);
+                if (edge[1] === nodeId) neighbors.push(edge[0]);
+            });
+            return neighbors;
+        }
+
+        function step() {
+            if (isFinished || queue.length === 0) {
+                if(!isFinished) {
+                    log('Cola vacía. <strong>El algoritmo terminó exitosamente</strong> y es consistente.', 'success');
+                    isFinished = true;
+                }
+                stopPlay();
+                updateUI();
+                return;
+            }
+
+            // Pop del primer arco
+            currentArc = queue.shift();
+            const [xi, xj] = currentArc;
+            
+            let revised = false;
+            let newDomain = [];
+            let prunedValues = [];
+
+            // Evaluando Xi -> Xj
+            log(`Analizando arco: <strong>${xi} &rarr; ${xj}</strong>`, 'normal');
+
+            // Enforce arc consistency: Por cada valor x en el dominio de Xi
+            for (let x of domains[xi]) {
+                // ¿Hay algún valor y en Xj tal que x != y?
+                let isValid = domains[xj].some(y => x !== y);
+                
+                if (isValid) {
+                    newDomain.push(x);
+                } else {
+                    prunedValues.push(x);
+                    revised = true;
+                }
+            }
+
+            domains[xi] = newDomain;
+
+            if (revised) {
+                const colors = prunedValues.map(v => `<span style="color:${COLOR_MAP[v].hex}; font-weight:bold">${COLOR_MAP[v].name}</span>`).join(', ');
+                log(`Se eliminó ${colors} del dominio de <strong>${xi}</strong> porque no tiene correspondencia válida en ${xj}.`, 'prune');
+
+                if (domains[xi].length === 0) {
+                    log(`¡El dominio de <strong>${xi}</strong> quedó vacío! Se desencadena <strong>Backtrack</strong>.`, 'error');
+                    isFinished = true;
+                    stopPlay();
+                } else {
+                    // Agregar vecinos a la cola (Xk -> Xi)
+                    let neighbors = getNeighbors(xi);
+                    let addedArcs = [];
+                    for (let nk of neighbors) {
+                        if (nk !== xj) {
+                            // Validar si el arco ya está en la cola
+                            let arcExists = queue.some(arc => arc[0] === nk && arc[1] === xi);
+                            if (!arcExists) {
+                                queue.push([nk, xi]);
+                                addedArcs.push(`${nk}&rarr;${xi}`);
+                            }
+                        }
+                    }
+                    if(addedArcs.length > 0) {
+                        log(`Se encolaron arcos incidentes a ${xi}: [${addedArcs.join(', ')}]`, 'info');
+                    }
+                }
+            } else {
+                log(`El arco <strong>${xi} &rarr; ${xj}</strong> es consistente. No hubo cambios.`, 'normal');
+            }
+
+            if (!isFinished && queue.length === 0) {
+                isFinished = true;
+                log('Cola vacía. <strong>El algoritmo terminó exitosamente</strong> y el problema es consistente por arcos.', 'success');
+                stopPlay();
+            }
+
+            draw();
+            updateUI();
+        }
+
+        function drawArrow(fromX, fromY, toX, toY) {
+            const headlen = 12; // length of head in pixels
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            
+            // Arrowhead
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.fill();
+        }
+
+        function isDark() {
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ||
+                   document.documentElement.style.cssText.includes('dark') ||
+                   (document.documentElement.getAttribute('style') || '').includes('dark');
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const dark = isDark();
+            
+            // Centrar el grafo en el canvas responsivo
+            const scaleX = canvas.width / 500;
+            const scaleY = canvas.height / 450;
+            const scale = Math.min(scaleX, scaleY) * 0.9;
+            const offsetX = (canvas.width - (500 * scale)) / 2;
+            const offsetY = (canvas.height - (450 * scale)) / 2;
+
+            ctx.save();
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(scale, scale);
+
+            // Dibujar Aristas base (no dirigidas)
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = dark ? '#475569' : '#cbd5e1';
+            EDGES.forEach(edge => {
+                let n1 = INITIAL_NODES[edge[0]];
+                let n2 = INITIAL_NODES[edge[1]];
+                ctx.beginPath();
+                ctx.moveTo(n1.x, n1.y);
+                ctx.lineTo(n2.x, n2.y);
+                ctx.stroke();
+            });
+
+            // Dibujar Arco Actual Evaluándose
+            if (currentArc) {
+                let [xi, xj] = currentArc;
+                let n1 = INITIAL_NODES[xi];
+                let n2 = INITIAL_NODES[xj];
+                
+                // Mover el punto final un poco hacia atrás para que la flecha no tape el centro del nodo
+                const dx = n2.x - n1.x;
+                const dy = n2.y - n1.y;
+                const angle = Math.atan2(dy, dx);
+                const targetX = n2.x - 30 * Math.cos(angle);
+                const targetY = n2.y - 30 * Math.sin(angle);
+                const startX = n1.x + 30 * Math.cos(angle);
+                const startY = n1.y + 30 * Math.sin(angle);
+
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#f97316'; // Naranja activo
+                ctx.fillStyle = '#f97316';
+                drawArrow(startX, startY, targetX, targetY);
+            }
+
+            // Dibujar Nodos y Dominios
+            for (let key in INITIAL_NODES) {
+                let node = INITIAL_NODES[key];
+                const isActive = currentArc && (currentArc[0] === key || currentArc[1] === key);
+                
+                // Círculo del nodo
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 24, 0, 2 * Math.PI);
+                ctx.fillStyle = isActive ? (dark ? '#3c2415' : '#fff7ed') : (dark ? '#222733' : '#ffffff');
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = isActive ? (currentArc[0] === key ? '#f97316' : '#60a5fa') : (dark ? '#5a6478' : '#64748b');
+                ctx.stroke();
+
+                // Texto del nodo
+                ctx.fillStyle = dark ? '#f8fafc' : '#0f172a';
+                ctx.font = 'bold 16px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(key, node.x, node.y);
+
+                // Dibujar el Dominio debajo del nodo
+                const dom = domains[key];
+                if (dom.length === 0) {
+                    ctx.fillStyle = '#ef4444';
+                    ctx.font = 'bold 14px Inter, sans-serif';
+                    ctx.fillText('Vacío!', node.x, node.y + 40);
+                } else {
+                    const dotRadius = 6;
+                    const spacing = 16;
+                    const startX = node.x - ((dom.length - 1) * spacing) / 2;
+                    
+                    dom.forEach((val, index) => {
+                        ctx.beginPath();
+                        ctx.arc(startX + index * spacing, node.y + 40, dotRadius, 0, 2 * Math.PI);
+                        ctx.fillStyle = COLOR_MAP[val].hex;
+                        ctx.fill();
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = '#00000033';
+                        ctx.stroke();
+                    });
+                }
+            }
+            ctx.restore();
+        }
+
+        function updateUI() {
+            // Actualizar vista de la cola
+            queueContainer.innerHTML = '';
+            if (queue.length === 0 && !isFinished) {
+                queueContainer.innerHTML = '<span class="text-sm text-slate-400 italic">Cola vacía</span>';
+            } else {
+                queue.forEach((arc, i) => {
+                    const isNext = (i === 0);
+                    const el = document.createElement('span');
+                    el.className = `px-2 py-1 text-xs font-mono rounded border ${
+                        isNext ? 'queue-badge-next bg-orange-100 border-orange-300 text-orange-800 shadow-sm' : 'queue-badge-default bg-white border-slate-300 text-slate-600'
+                    }`;
+                    el.innerHTML = `${arc[0]} &rarr; ${arc[1]}`;
+                    queueContainer.appendChild(el);
+                });
+            }
+
+            // Actualizar botones
+            if (isFinished || queue.length === 0) {
+                btnStep.disabled = true;
+                btnStep.classList.add('opacity-50', 'cursor-not-allowed');
+                btnPlay.disabled = true;
+                btnPlay.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                btnStep.disabled = false;
+                btnStep.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnPlay.disabled = false;
+                btnPlay.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            
+            btnPlay.textContent = isPlaying ? 'Pausar' : 'Reproducir';
+            btnPlay.className = isPlaying 
+                ? 'px-3 py-1.5 text-sm bg-amber-500 hover:bg-amber-600 rounded text-white font-medium shadow-sm transition-colors' 
+                : 'px-3 py-1.5 text-sm bg-emerald-600 hover:bg-emerald-700 rounded text-white font-medium shadow-sm transition-colors';
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                stopPlay();
+            } else {
+                isPlaying = true;
+                updateUI();
+                step(); // Dar un paso inmediato
+                playInterval = setInterval(() => {
+                    if (!isFinished && queue.length > 0) {
+                        step();
+                    } else {
+                        stopPlay();
+                    }
+                }, 1500); // 1.5 segundos por paso automático
+            }
+        }
+
+        function stopPlay() {
+            isPlaying = false;
+            clearInterval(playInterval);
+            updateUI();
+        }
+
+        // Asignación de Eventos
+        btnStep.addEventListener('click', () => {
+            if(isPlaying) stopPlay();
+            step();
+        });
+        btnReset.addEventListener('click', () => {
+            stopPlay();
+            init();
+        });
+        btnPlay.addEventListener('click', togglePlay);
+
+        // Inicializar al cargar
+        window.onload = () => {
+            init();
+        };
+
+    </script>
+</body>
+</html>

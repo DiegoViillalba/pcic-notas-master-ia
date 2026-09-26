@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dos punteros: conservar soluciones</title>
+<style>
+:root{color-scheme:light dark;font-family:system-ui,sans-serif;background:transparent;color:light-dark(#202530,#e6e8ed)}
+body{margin:0;padding:18px;line-height:1.55}h2{font-size:1.2rem;margin:0 0 12px}.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}button,select{font:inherit;padding:9px;border:1px solid light-dark(#aab0bc,#6f7889);border-radius:6px;color:inherit;background:light-dark(#f5f6f9,#242b38)}button:disabled{opacity:.45}.array{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}.cell{min-width:66px;text-align:center;padding:10px 4px;border:1px solid light-dark(#aab0bc,#6f7889);border-radius:6px}.value{font-size:1.4rem;font-weight:600}.small{font-size:.8rem}.active{background:light-dark(#e6f1ff,#1a3655)}.discarded{background:light-dark(#eeeeef,#303139)}.result{min-height:100px}p{margin:10px 0}output{font-variant-numeric:tabular-nums} @media(max-width:400px){body{padding:10px}.cell{min-width:56px}select{max-width:100%}}
+</style>
+<h2>Dos punteros, paso a paso</h2>
+<div class="controls"><label for="example">Ejemplo</label><select id="example"><option value="0">Diapositivas · objetivo 60</option><option value="1">Sin solución · objetivo 10</option><option value="2">Valores repetidos · objetivo 6</option></select></div>
+<div id="array" class="array" aria-label="Arreglo y posiciones de los punteros"></div>
+<div class="result" aria-live="polite"><output id="status"></output><p id="decision"></p><p id="invariant"></p></div>
+<div class="controls"><button id="prev" type="button">← Anterior</button><button id="next" type="button">Siguiente →</button></div>
+<script>
+(()=>{
+const examples=[{a:[-20,10,20,30,35,40,60,70],t:60},{a:[1,4,8],t:10},{a:[3,3],t:6}];
+const el=id=>document.getElementById(id);
+let frames=[],step=0,current;
+function trace(a,t){let lo=0,hi=a.length-1,x=1,out=[];while(lo<hi){let sum=a[lo]+a[hi];out.push({lo,hi,x,sum,kind:sum===t?'found':sum<t?'low':'high'});if(sum===t)return out;if(sum<t)lo++;else hi--;x++;}out.push({lo,hi,x,kind:'none'});return out;}
+function draw(){const f=frames[step],a=current.a;el('array').innerHTML=a.map((v,i)=>{const outside=i<f.lo||i>f.hi;let mark=outside?'Descartado':i===f.lo&&i===f.hi?'lo = hi':i===f.lo?'lo':i===f.hi?'hi':'Activo';return `<div class="cell ${outside?'discarded':'active'}"><div class="small">Índice ${i+1}</div><div class="value">${v}</div><div class="small">${mark}</div></div>`;}).join('');
+el('status').textContent=`Cabecera ${f.x} · lo = ${f.lo+1} · hi = ${f.hi+1} · distancia = ${f.hi-f.lo} = n − x`;
+let message;if(f.kind==='none')message='NO SE PUEDE: queda una sola posición. No hay dos índices distintos en el intervalo.';else if(f.kind==='found')message=`${a[f.lo]} + ${a[f.hi]} = ${f.sum}. Devolver (${f.lo+1}, ${f.hi+1}): índices distintos y suma correcta.`;else if(f.kind==='low')message=`${a[f.lo]} + ${a[f.hi]} = ${f.sum} < ${current.t}. Descartar índice ${f.lo+1}: con cualquier otro valor del intervalo la suma es igual o menor.`;else message=`${a[f.lo]} + ${a[f.hi]} = ${f.sum} > ${current.t}. Descartar índice ${f.hi+1}: con cualquier otro valor del intervalo la suma es igual o mayor.`;
+el('decision').textContent=message;el('invariant').textContent='Invariante: toda pareja que sume el objetivo conserva ambos índices dentro del intervalo activo.';el('prev').disabled=step===0;el('next').disabled=step===frames.length-1;}
+function start(){current=examples[Number(el('example').value)];frames=trace(current.a,current.t);step=0;draw();}
+el('example').addEventListener('change',start);el('prev').addEventListener('click',()=>{if(step>0){step--;draw();}});el('next').addEventListener('click',()=>{if(step<frames.length-1){step++;draw();}});start();
+})();
+</script>
+</html>

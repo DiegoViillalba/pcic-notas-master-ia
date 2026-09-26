@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Búsqueda bidireccional: Dijkstra ingenuo y MM</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f4ee;
+      --card: #fffdf8;
+      --ink: #22262e;
+      --muted: #68707d;
+      --line: #a7adb7;
+      --f: #2563eb;
+      --b: #ea580c;
+      --both: #7c3aed;
+      --good: #16803a;
+      --bad: #c0262d;
+      --edge: #596171;
+      --button: #202938;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #12161d;
+        --card: #1b212b;
+        --ink: #edf1f7;
+        --muted: #aeb7c5;
+        --line: #596374;
+        --f: #60a5fa;
+        --b: #fb923c;
+        --both: #c084fc;
+        --good: #4ade80;
+        --bad: #fb7185;
+        --edge: #aeb7c5;
+        --button: #e5e7eb;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 20px; }
+    h1 { margin: 0 0 6px; font-size: clamp(1.35rem, 3vw, 2rem); }
+    .lead { margin: 0 0 16px; color: var(--muted); }
+    .tabs, .controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    button {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 8px 12px;
+      background: var(--card);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 650;
+    }
+    button:hover { border-color: var(--both); }
+    button.active { background: var(--button); color: var(--bg); border-color: var(--button); }
+    .grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 14px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+    svg { width: 100%; height: auto; min-height: 380px; display: block; }
+    .edge { stroke: var(--edge); stroke-width: 3; }
+    .edge.optimal { stroke: var(--good); stroke-width: 5; }
+    .weight-bg { fill: var(--card); stroke: var(--line); }
+    .weight { fill: var(--ink); font-weight: 750; font-size: 16px; text-anchor: middle; dominant-baseline: central; }
+    .node { stroke: var(--line); stroke-width: 3; fill: var(--card); transition: .2s ease; }
+    .node.f { stroke: var(--f); fill: color-mix(in srgb, var(--f) 16%, var(--card)); }
+    .node.b { stroke: var(--b); fill: color-mix(in srgb, var(--b) 16%, var(--card)); }
+    .node.both { stroke: var(--both); fill: color-mix(in srgb, var(--both) 20%, var(--card)); }
+    .node.closed { stroke-width: 7; }
+    .node-label { fill: var(--ink); font-weight: 800; font-size: 19px; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+    .node-cost { fill: var(--muted); font-size: 13px; text-anchor: middle; pointer-events: none; }
+    .legend { display: flex; flex-wrap: wrap; gap: 12px; color: var(--muted); font-size: .9rem; }
+    .dot { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 4px; }
+    .f-dot { background: var(--f); } .b-dot { background: var(--b); } .both-dot { background: var(--both); }
+    .status { font-size: 1.02rem; margin: 0 0 12px; }
+    .math { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92rem; }
+    .metrics { display: grid; gap: 8px; }
+    .metric { border-left: 4px solid var(--line); padding: 7px 9px; background: color-mix(in srgb, var(--line) 8%, transparent); }
+    .metric strong { display: block; font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    .verdict { margin-top: 12px; padding: 10px; border-radius: 8px; font-weight: 700; }
+    .verdict.bad { color: var(--bad); background: color-mix(in srgb, var(--bad) 10%, transparent); }
+    .verdict.good { color: var(--good); background: color-mix(in srgb, var(--good) 10%, transparent); }
+    .explain { margin-top: 14px; color: var(--muted); }
+    .cost-line { margin-top: 16px; position: relative; height: 58px; }
+    .cost-track { position: absolute; left: 2%; right: 2%; top: 21px; height: 8px; background: var(--line); border-radius: 4px; }
+    .half { position: absolute; left: 50%; top: 5px; width: 2px; height: 40px; background: var(--both); }
+    .half-label { position: absolute; left: 50%; top: 43px; transform: translateX(-50%); color: var(--both); font-size: .82rem; }
+    .cost-start, .cost-goal { position: absolute; top: 2px; font-weight: 800; }
+    .cost-start { left: 1%; color: var(--f); } .cost-goal { right: 1%; color: var(--b); }
+    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } svg { min-height: 300px; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Dijkstra bidireccional ingenuo frente a MM</h1>
+    <p class="lead">Avanza paso a paso sobre la misma gráfica. El camino verde es óptimo (costo 8); la rama superior produce primero una conexión de costo 10.</p>
+
+    <div class="tabs" role="tablist" aria-label="Algoritmo">
+      <button id="tabNaive" class="active" type="button">Dijkstra ingenuo</button>
+      <button id="tabMM" type="button">MM con heurística</button>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <svg viewBox="0 0 760 430" role="img" aria-label="Gráfica ponderada con dos caminos entre s y g">
+          <line class="edge" x1="75" y1="115" x2="225" y2="80"/><line class="edge" x1="225" y1="80" x2="380" y2="80"/>
+          <line class="edge" x1="380" y1="80" x2="535" y2="80"/><line class="edge" x1="535" y1="80" x2="685" y2="115"/>
+          <line class="edge optimal" x1="75" y1="115" x2="250" y2="310"/><line class="edge optimal" x1="250" y1="310" x2="510" y2="310"/>
+          <line class="edge optimal" x1="510" y1="310" x2="685" y2="115"/>
+
+          <g transform="translate(150 93)"><rect class="weight-bg" x="-14" y="-13" width="28" height="26" rx="7"/><text class="weight">1</text></g>
+          <g transform="translate(302 80)"><rect class="weight-bg" x="-14" y="-13" width="28" height="26" rx="7"/><text class="weight">4</text></g>
+          <g transform="translate(458 80)"><rect class="weight-bg" x="-14" y="-13" width="28" height="26" rx="7"/><text class="weight">4</text></g>
+          <g transform="translate(610 93)"><rect class="weight-bg" x="-14" y="-13" width="28" height="26" rx="7"/><text class="weight">1</text></g>
+          <g transform="translate(157 213)"><rect class="weight-bg" x="-14" y="-13" width="28" height="26" rx="7"/><text class="weight">2</text></g>
+          <g transform="translate(380 310)"><rect class="weight-bg" x="-14" y="-13" width="28" height="26" rx="7"/><text class="weight">4</text></g>
+          <g transform="translate(603 213)"><rect class="weight-bg" x="-14" y="-13" width="28" height="26" rx="7"/><text class="weight">2</text></g>
+
+          <g data-node="s"><circle class="node" cx="75" cy="115" r="34"/><text class="node-label" x="75" y="111">s</text><text class="node-cost" x="75" y="144"></text></g>
+          <g data-node="a"><circle class="node" cx="225" cy="80" r="34"/><text class="node-label" x="225" y="76">a</text><text class="node-cost" x="225" y="109"></text></g>
+          <g data-node="x"><circle class="node" cx="380" cy="80" r="34"/><text class="node-label" x="380" y="76">x</text><text class="node-cost" x="380" y="109"></text></g>
+          <g data-node="b"><circle class="node" cx="535" cy="80" r="34"/><text class="node-label" x="535" y="76">b</text><text class="node-cost" x="535" y="109"></text></g>
+          <g data-node="g"><circle class="node" cx="685" cy="115" r="34"/><text class="node-label" x="685" y="111">g</text><text class="node-cost" x="685" y="144"></text></g>
+          <g data-node="c"><circle class="node" cx="250" cy="310" r="34"/><text class="node-label" x="250" y="306">c</text><text class="node-cost" x="250" y="339"></text></g>
+          <g data-node="d"><circle class="node" cx="510" cy="310" r="34"/><text class="node-label" x="510" y="306">d</text><text class="node-cost" x="510" y="339"></text></g>
+        </svg>
+        <div class="legend">
+          <span><i class="dot f-dot"></i>frente desde s</span>
+          <span><i class="dot b-dot"></i>frente desde g</span>
+          <span><i class="dot both-dot"></i>descubierto por ambos</span>
+          <span>borde grueso = expandido</span>
+        </div>
+        <div class="cost-line" aria-label="Mitad del costo óptimo">
+          <div class="cost-track"></div><div class="half"></div>
+          <span class="cost-start">s, costo 0</span><span class="cost-goal">g, costo 8</span><span class="half-label">mitad métrica C*/2 = 4</span>
+        </div>
+      </section>
+
+      <aside class="card">
+        <p id="status" class="status"></p>
+        <div class="metrics">
+          <div class="metric"><strong>Paso</strong><span id="stepText"></span></div>
+          <div class="metric"><strong>OPEN hacia adelante</strong><span id="openF" class="math"></span></div>
+          <div class="metric"><strong>OPEN hacia atrás</strong><span id="openB" class="math"></span></div>
+          <div class="metric"><strong>Mejor conexión μ</strong><span id="mu" class="math"></span></div>
+          <div class="metric"><strong>Prueba de paro</strong><span id="bound" class="math"></span></div>
+        </div>
+        <div id="verdict" class="verdict"></div>
+        <p id="explain" class="explain"></p>
+        <div class="controls">
+          <button id="prev" type="button">← Anterior</button>
+          <button id="next" type="button">Siguiente →</button>
+          <button id="reset" type="button">Reiniciar</button>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const naive = [
+      {msg:"Se inicializan los dos frentes.", f:{s:[0,"open"]}, b:{g:[0,"open"]}, of:"s:0", ob:"g:0", mu:"∞", bound:"Todavía no hay solución", verdict:"Los extremos son las únicas fronteras.", tone:"good", why:"Dijkstra ordena por g: costo ya recorrido."},
+      {msg:"Se expande s.", f:{s:[0,"closed"],a:[1,"open"],c:[2,"open"]}, b:{g:[0,"open"]}, of:"a:1, c:2", ob:"g:0", mu:"∞", bound:"1 + 0 = 1", verdict:"Aún no hay conexión.", tone:"good", why:"La rama a parece barata localmente, aunque no conduce al camino óptimo."},
+      {msg:"Se expande g.", f:{s:[0,"closed"],a:[1,"open"],c:[2,"open"]}, b:{g:[0,"closed"],b:[1,"open"],d:[2,"open"]}, of:"a:1, c:2", ob:"b:1, d:2", mu:"∞", bound:"1 + 1 = 2", verdict:"Los frentes todavía son disjuntos.", tone:"good", why:"La búsqueda hacia atrás es Dijkstra sobre las aristas invertidas; aquí la gráfica es no dirigida."},
+      {msg:"Se expande a y se genera x con gF(x)=5.", f:{s:[0,"closed"],a:[1,"closed"],c:[2,"open"],x:[5,"open"]}, b:{g:[0,"closed"],b:[1,"open"],d:[2,"open"]}, of:"c:2, x:5", ob:"b:1, d:2", mu:"∞", bound:"2 + 1 = 3", verdict:"x solo pertenece al frente azul.", tone:"good", why:"Que x haya sido descubierto no demuestra que su etiqueta 5 participe en una solución óptima."},
+      {msg:"Se expande b y x queda en ambos OPEN.", f:{s:[0,"closed"],a:[1,"closed"],c:[2,"open"],x:[5,"open"]}, b:{g:[0,"closed"],b:[1,"closed"],d:[2,"open"],x:[5,"open"]}, of:"c:2, x:5", ob:"d:2, x:5", mu:"5 + 5 = 10", bound:"gminF + gminB = 2 + 2 = 4", verdict:"Parar por la primera intersección devuelve 10: es subóptimo.", tone:"bad", why:"El camino verde cuesta 2+4+2=8. La intersección solo aporta una cota superior μ, no un certificado de optimalidad."},
+      {msg:"La versión correcta no se detiene: expande c.", f:{s:[0,"closed"],a:[1,"closed"],c:[2,"closed"],x:[5,"open"],d:[6,"open"]}, b:{g:[0,"closed"],b:[1,"closed"],d:[2,"open"],x:[5,"open"]}, of:"x:5, d:6", ob:"d:2, x:5", mu:"min(10, 6+2) = 8", bound:"5 + 2 = 7", verdict:"Ya se conoce el óptimo 8, pero la cota básica todavía vale 7.", tone:"good", why:"Al relajar c—d, d ya estaba en el frente opuesto y aparece la conexión de costo 8."},
+      {msg:"Tras avanzar el frente naranja, la cota certifica μ=8.", f:{s:[0,"closed"],a:[1,"closed"],c:[2,"closed"],x:[5,"open"],d:[6,"open"]}, b:{g:[0,"closed"],b:[1,"closed"],d:[2,"closed"],x:[5,"open"],c:[6,"open"]}, of:"x:5, d:6", ob:"x:5, c:6", mu:"8", bound:"5 + 5 = 10; 8 ≤ 10", verdict:"Ahora sí: ninguna solución pendiente puede costar menos de 8.", tone:"good", why:"La suma de los mínimos g es una cota inferior para toda conexión todavía no certificada."}
+    ];
+
+    const mm = [
+      {msg:"MM usa pr(n)=max(f(n),2g(n)).", f:{s:["pr8","open"]}, b:{g:["pr8","open"]}, of:"s: pr=8", ob:"g: pr=8", mu:"∞", bound:"C=min(prminF,prminB)=8", verdict:"C coincide con C*=8 en este ejemplo.", tone:"good", why:"Los valores h usados son consistentes y admisibles; no revelan el camino por arte de magia, pero sí dan f≤8 sobre el camino óptimo."},
+      {msg:"Se expande s; a y c tienen prioridad 8.", f:{s:["g0","closed"],a:["g1·pr8","open"],c:["g2·pr8","open"]}, b:{g:["g0·pr8","open"]}, of:"a:8, c:8", ob:"g:8", mu:"∞", bound:"C=8", verdict:"El desempate puede escoger a; la garantía no depende de acertar el ramal.", tone:"good", why:"MM tolera explorar nodos poco prometedores mientras su prioridad no exceda C*."},
+      {msg:"Se expande g; b y d tienen prioridad 8.", f:{s:["g0","closed"],a:["g1·pr8","open"],c:["g2·pr8","open"]}, b:{g:["g0","closed"],b:["g1·pr8","open"],d:["g2·pr8","open"]}, of:"a:8, c:8", ob:"b:8, d:8", mu:"∞", bound:"C=8", verdict:"Ambos lados conservan un nodo del camino óptimo con pr≤8.", tone:"good", why:"Admisibilidad da f≤C* en los prefijos óptimos; 2g≤C* antes de la mitad."},
+      {msg:"Se expande a; x se genera con gF=5.", f:{s:["g0","closed"],a:["g1","closed"],c:["g2·pr8","open"],x:["g5·pr10","open"]}, b:{g:["g0","closed"],b:["g1·pr8","open"],d:["g2·pr8","open"]}, of:"c:8, x:10", ob:"b:8, d:8", mu:"∞", bound:"C=8", verdict:"x ya pasó la mitad desde s, por eso 2gF(x)=10.", tone:"good", why:"La penalización 2g impide expandir x hacia adelante mientras sobreviva una alternativa óptima de prioridad 8."},
+      {msg:"Se expande b; x queda en ambos frentes y μ=10.", f:{s:["g0","closed"],a:["g1","closed"],c:["g2·pr8","open"],x:["g5·pr10","open"]}, b:{g:["g0","closed"],b:["g1","closed"],d:["g2·pr8","open"],x:["g5·pr10","open"]}, of:"c:8, x:10", ob:"d:8, x:10", mu:"10", bound:"C=8; 10≤8 es falso", verdict:"MM no confunde una conexión encontrada con una prueba de optimalidad.", tone:"good", why:"A diferencia del algoritmo ingenuo, MM conserva μ como cota superior y sigue buscando mientras exista una cota inferior menor."},
+      {msg:"Se expande c y se conecta con d.", f:{s:["g0","closed"],a:["g1","closed"],c:["g2","closed"],x:["g5·pr10","open"],d:["g6·pr12","open"]}, b:{g:["g0","closed"],b:["g1","closed"],d:["g2·pr8","open"],x:["g5·pr10","open"]}, of:"x:10, d:12", ob:"d:8, x:10", mu:"min(10,6+2)=8", bound:"C=8; 8≤8", verdict:"MM termina óptimamente sin expandir x desde ningún lado.", tone:"good", why:"Todo nodo expandido tuvo g≤4 desde su extremo. Los nodos con g>4 pueden generarse, pero no se expanden antes de certificar el óptimo."}
+    ];
+
+    let mode = "naive", index = 0;
+    const nodes = [...document.querySelectorAll("[data-node]")];
+    const el = id => document.getElementById(id);
+    function render() {
+      const steps = mode === "naive" ? naive : mm;
+      const s = steps[index];
+      nodes.forEach(group => {
+        const name = group.dataset.node, circle = group.querySelector("circle"), cost = group.querySelector(".node-cost");
+        circle.setAttribute("class", "node"); cost.textContent = "";
+        const fv = s.f[name], bv = s.b[name];
+        if (fv && bv) circle.classList.add("both"); else if (fv) circle.classList.add("f"); else if (bv) circle.classList.add("b");
+        if ((fv && fv[1] === "closed") || (bv && bv[1] === "closed")) circle.classList.add("closed");
+        const labels = []; if (fv) labels.push("F:"+fv[0]); if (bv) labels.push("B:"+bv[0]); cost.textContent = labels.join(" · ");
+      });
+      el("status").textContent = s.msg;
+      el("stepText").textContent = `${index} de ${steps.length - 1}`;
+      el("openF").textContent = s.of; el("openB").textContent = s.ob; el("mu").textContent = s.mu; el("bound").textContent = s.bound;
+      el("verdict").textContent = s.verdict; el("verdict").className = `verdict ${s.tone}`; el("explain").textContent = s.why;
+      el("prev").disabled = index === 0; el("next").disabled = index === steps.length - 1;
+    }
+    function setMode(nextMode) {
+      mode = nextMode; index = 0; el("tabNaive").classList.toggle("active", mode === "naive"); el("tabMM").classList.toggle("active", mode === "mm"); render();
+    }
+    el("tabNaive").addEventListener("click", () => setMode("naive")); el("tabMM").addEventListener("click", () => setMode("mm"));
+    el("prev").addEventListener("click", () => { if (index > 0) index--; render(); });
+    el("next").addEventListener("click", () => { const max=(mode === "naive" ? naive : mm).length-1; if (index < max) index++; render(); });
+    el("reset").addEventListener("click", () => { index = 0; render(); });
+    render();
+  </script>
+</body>
+</html>

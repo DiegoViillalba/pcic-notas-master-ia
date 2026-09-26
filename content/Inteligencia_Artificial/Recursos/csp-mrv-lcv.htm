@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSP: Heurísticas MRV y LCV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        canvas { display: block; width: 100%; height: 100%; }
+        
+        /* Custom scrollbar for log */
+        .log-container::-webkit-scrollbar { width: 6px; }
+        .log-container::-webkit-scrollbar-track { background: #f1f5f9; }
+        .log-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .log-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .log-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.4;
+            transition: background 0.1s;
+        }
+        .log-item:hover { background: rgba(0,0,0,0.03); }
+        .log-info { color: #475569; }
+        .log-success { color: #16a34a; font-weight: bold; }
+        .log-error { color: #dc2626; font-weight: 600; }
+        .log-warn { color: #d97706; }
+        .log-highlight { color: #2563eb; font-weight: bold; }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #12151d !important;
+                color: #e2e8f0 !important;
+            }
+            header {
+                background-color: #1a1d26 !important;
+                border-color: #2e3544 !important;
+            }
+            header h1 { color: #f8fafc !important; }
+            header p { color: #94a3b8 !important; }
+            .bg-white { background-color: #1a1d26 !important; border-color: #2e3544 !important; }
+            .bg-slate-50 { background-color: #141720 !important; border-color: #2e3544 !important; }
+            .bg-slate-100 { background-color: #12151d !important; }
+            .text-slate-900 { color: #f8fafc !important; }
+            .text-slate-800 { color: #f1f5f9 !important; }
+            .text-slate-700 { color: #e2e8f0 !important; }
+            .text-slate-600 { color: #cbd5e1 !important; }
+            .text-slate-500 { color: #94a3b8 !important; }
+            .border-slate-200 { border-color: #2e3544 !important; }
+            .border-slate-300 { border-color: #40485a !important; }
+            #btnStep { background-color: #334155 !important; }
+            #btnStep:hover { background-color: #475569 !important; }
+            #btnReset {
+                background-color: #3a1c1e !important;
+                color: #fca5a5 !important;
+                border-color: #7f1d1d !important;
+            }
+            #btnReset:hover { background-color: #4c2225 !important; }
+            .tree-legend {
+                background: rgba(26, 29, 38, 0.92) !important;
+                border-color: #333d4e !important;
+                color: #e2e8f0 !important;
+            }
+            .tree-legend h3 {
+                border-color: #333d4e !important;
+                color: #f8fafc !important;
+            }
+            .log-container {
+                scrollbar-color: #475569 #141720;
+                background-color: #141720 !important;
+            }
+            .log-container::-webkit-scrollbar-track { background: #141720; }
+            .log-container::-webkit-scrollbar-thumb { background: #475569; }
+            .log-item:hover { background: rgba(255,255,255,0.05); }
+            .log-info { color: #cbd5e1 !important; }
+            .log-success { color: #4ade80 !important; }
+            .log-error { color: #f87171 !important; }
+            .log-warn { color: #fbbf24 !important; }
+            .log-highlight { color: #60a5fa !important; }
+            #statusText { color: #60a5fa !important; }
+        }
+
+        :root[style*="color-scheme: dark"],
+        :root[style*="--obsidian-color-scheme: dark"] {
+            body {
+                background-color: var(--obsidian-bg, #12151d) !important;
+                color: var(--obsidian-text, #e2e8f0) !important;
+            }
+            header {
+                background-color: var(--obsidian-bg-2, #1a1d26) !important;
+                border-color: var(--obsidian-border, #2e3544) !important;
+            }
+            header h1 { color: var(--obsidian-text, #f8fafc) !important; }
+            header p { color: var(--obsidian-text-muted, #94a3b8) !important; }
+            .bg-white { background-color: var(--obsidian-bg-2, #1a1d26) !important; border-color: var(--obsidian-border, #2e3544) !important; }
+            .bg-slate-50 { background-color: #141720 !important; border-color: var(--obsidian-border, #2e3544) !important; }
+            .bg-slate-100 { background-color: var(--obsidian-bg, #12151d) !important; }
+            .text-slate-900 { color: #f8fafc !important; }
+            .text-slate-800 { color: #f1f5f9 !important; }
+            .text-slate-700 { color: #e2e8f0 !important; }
+            .text-slate-600 { color: #cbd5e1 !important; }
+            .text-slate-500 { color: #94a3b8 !important; }
+            .border-slate-200 { border-color: var(--obsidian-border, #2e3544) !important; }
+            .border-slate-300 { border-color: #40485a !important; }
+            #btnStep { background-color: #334155 !important; }
+            #btnStep:hover { background-color: #475569 !important; }
+            #btnReset {
+                background-color: #3a1c1e !important;
+                color: #fca5a5 !important;
+                border-color: #7f1d1d !important;
+            }
+            #btnReset:hover { background-color: #4c2225 !important; }
+            .tree-legend {
+                background: rgba(26, 29, 38, 0.92) !important;
+                border-color: var(--obsidian-border, #333d4e) !important;
+                color: #e2e8f0 !important;
+            }
+            .tree-legend h3 {
+                border-color: var(--obsidian-border, #333d4e) !important;
+                color: #f8fafc !important;
+            }
+            .log-container {
+                scrollbar-color: #475569 #141720;
+                background-color: #141720 !important;
+            }
+            .log-container::-webkit-scrollbar-track { background: #141720; }
+            .log-container::-webkit-scrollbar-thumb { background: #475569; }
+            .log-item:hover { background: rgba(255,255,255,0.05); }
+            .log-info { color: #cbd5e1 !important; }
+            .log-success { color: #4ade80 !important; }
+            .log-error { color: #f87171 !important; }
+            .log-warn { color: #fbbf24 !important; }
+            .log-highlight { color: #60a5fa !important; }
+            #statusText { color: #60a5fa !important; }
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col text-slate-800">
+
+    <header class="bg-white shadow-sm border-b border-slate-200 px-6 py-4 flex justify-between items-center z-10 shrink-0">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Visualizador CSP: MRV & LCV</h1>
+            <p class="text-sm text-slate-500">Coloreo de Mapas (Constraint Satisfaction Problem)</p>
+        </div>
+        <div class="flex gap-4">
+            <div class="flex items-center gap-2 bg-slate-100 p-2 rounded-lg border border-slate-200">
+                <label class="flex items-center gap-2 cursor-pointer font-semibold text-sm">
+                    <input type="checkbox" id="toggleMRV" class="w-4 h-4 text-blue-600 rounded" checked>
+                    Usar MRV (Variables)
+                </label>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-100 p-2 rounded-lg border border-slate-200">
+                <label class="flex items-center gap-2 cursor-pointer font-semibold text-sm">
+                    <input type="checkbox" id="toggleLCV" class="w-4 h-4 text-emerald-600 rounded" checked>
+                    Usar LCV (Valores)
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden">
+        
+        <section class="w-1/3 min-w-[400px] border-r border-slate-200 bg-white flex flex-col relative z-0">
+            <div class="flex-1 relative p-4">
+                <h2 class="font-bold text-slate-700 mb-2">Mapa (Grafo de Restricciones)</h2>
+                <div class="absolute inset-4 top-10 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden shadow-inner">
+                    <canvas id="mapCanvas"></canvas>
+                </div>
+            </div>
+            
+            <div class="h-64 border-t border-slate-200 bg-slate-50 p-4 flex flex-col">
+                <h2 class="font-bold text-slate-700 mb-3">Controles de Simulación</h2>
+                
+                <div class="flex gap-2 mb-4">
+                    <button id="btnPlay" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow transition-colors">
+                        ▶ Reproducir
+                    </button>
+                    <button id="btnPause" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-lg shadow transition-colors hidden">
+                        ⏸ Pausar
+                    </button>
+                    <button id="btnStep" class="flex-1 bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg shadow transition-colors">
+                        ⏭ Paso a Paso
+                    </button>
+                    <button id="btnReset" class="flex-1 bg-red-100 hover:bg-red-200 text-red-700 font-bold py-2 px-4 rounded-lg shadow transition-colors border border-red-200">
+                        ↻ Reiniciar
+                    </button>
+                </div>
+
+                <div class="mb-2">
+                    <label class="text-xs font-semibold text-slate-500 uppercase">Velocidad</label>
+                    <input type="range" id="speedSlider" min="50" max="2000" value="500" class="w-full mt-1 accent-blue-600" dir="rtl">
+                </div>
+
+                <div class="mt-auto bg-white p-3 rounded-lg border border-slate-200 text-sm shadow-sm">
+                    <span class="font-bold text-slate-700">Estado Actual: </span>
+                    <span id="statusText" class="text-blue-600 font-semibold">Esperando para iniciar...</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="flex-1 bg-slate-100 flex flex-col relative">
+            
+            <div class="tree-legend absolute top-4 left-4 z-10 bg-white/90 backdrop-blur p-3 rounded-xl shadow-md border border-slate-200 max-w-sm pointer-events-none">
+                <h3 class="font-bold text-sm mb-2 border-b pb-1">Leyenda del Árbol</h3>
+                <ul class="text-xs space-y-2">
+                    <li class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-slate-400 border border-slate-500"></div> Raíz / Inicio</li>
+                    <li class="flex items-center gap-2"><div class="w-3 h-3 rounded-full border border-slate-400 bg-slate-100" style="border-style: dashed;"></div> Candidato (Por explorar)</li>
+                    <li class="flex items-center gap-2"><div class="w-3 h-3 rounded-full border-2 border-amber-500 bg-white animate-pulse"></div> Probando asignación...</li>
+                    <li class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-500 border border-slate-800 shadow-sm"></div> Asignación Válida</li>
+                    <li class="flex items-center gap-2"><div class="w-3 h-3 rounded-full border-2 border-red-500 flex items-center justify-center bg-white"><span class="text-[8px] font-bold text-red-500">X</span></div> Fallo (Backtrack)</li>
+                </ul>
+            </div>
+
+            <div class="flex-1 relative overflow-hidden">
+                <canvas id="treeCanvas"></canvas>
+            </div>
+            
+            <div class="h-48 bg-white border-t border-slate-200 p-4 flex flex-col">
+                <h2 class="font-bold text-slate-700 mb-2">Registro de Decisiones (Log)</h2>
+                <div id="logContainer" class="log-container flex-1 overflow-y-auto bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm font-mono space-y-1">
+                    <!-- Logs go here -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Constants & Definitions
+        const COLORS = {
+            RED: '#EF4444',
+            GREEN: '#22C55E',
+            BLUE: '#3B82F6'
+        };
+        const COLOR_NAMES = { [COLORS.RED]: 'Rojo', [COLORS.GREEN]: 'Verde', [COLORS.BLUE]: 'Azul' };
+        const ALL_COLORS = [COLORS.RED, COLORS.GREEN, COLORS.BLUE];
+
+        // Australia Map Graph Data
+        const REGIONS = {
+            WA:  { id: 'WA', name: 'Western Australia', x: 0.25, y: 0.5 },
+            NT:  { id: 'NT', name: 'Northern Territory', x: 0.5, y: 0.3 },
+            SA:  { id: 'SA', name: 'South Australia', x: 0.55, y: 0.65 },
+            Q:   { id: 'Q', name: 'Queensland', x: 0.75, y: 0.4 },
+            NSW: { id: 'NSW', name: 'New South Wales', x: 0.8, y: 0.7 },
+            V:   { id: 'V', name: 'Victoria', x: 0.75, y: 0.85 },
+            T:   { id: 'T', name: 'Tasmania', x: 0.8, y: 0.95 }
+        };
+
+        const ADJACENCIES = {
+            WA:  ['NT', 'SA'],
+            NT:  ['WA', 'SA', 'Q'],
+            SA:  ['WA', 'NT', 'Q', 'NSW', 'V'],
+            Q:   ['NT', 'SA', 'NSW'],
+            NSW: ['Q', 'SA', 'V'],
+            V:   ['SA', 'NSW'],
+            T:   [] // Tasmania no comparte frontera terrestre
+        };
+
+        // DOM Elements
+        const mapCanvas = document.getElementById('mapCanvas');
+        const mapCtx = mapCanvas.getContext('2d');
+        const treeCanvas = document.getElementById('treeCanvas');
+        const treeCtx = treeCanvas.getContext('2d');
+        const logContainer = document.getElementById('logContainer');
+        const statusText = document.getElementById('statusText');
+        
+        // Settings
+        let speedMs = parseInt(document.getElementById('speedSlider').value);
+        let useMRV = document.getElementById('toggleMRV').checked;
+        let useLCV = document.getElementById('toggleLCV').checked;
+
+        // Listeners for UI
+        document.getElementById('speedSlider').addEventListener('input', e => speedMs = e.target.value);
+        document.getElementById('toggleMRV').addEventListener('change', e => useMRV = e.target.checked);
+        document.getElementById('toggleLCV').addEventListener('change', e => useLCV = e.target.checked);
+
+        class TreeNode {
+            constructor(variable, color, status, parent) {
+                this.id = Math.random().toString(36).substr(2, 9);
+                this.variable = variable;
+                this.color = color;
+                this.status = status; // 'root', 'candidate', 'testing', 'valid', 'failed'
+                this.parent = parent;
+                this.children = [];
+                // Layout properties
+                this.x = 0;
+                this.y = 0;
+                this.width = 0;
+            }
+        }
+
+        let state = {
+            isRunning: false,
+            timer: null,
+            assignment: {}, // { WA: '#EF4444' }
+            domains: {},    // { WA: ['#EF...', ...], ... }
+            unassigned: [], // ['WA', 'NT', ...]
+            
+            treeRoot: null,
+            currentNode: null,
+            
+            phase: 'INIT', // INIT, SELECT_VAR, EVAL_CANDIDATES, TEST_COLOR, BACKTRACK, DONE
+            selectedVar: null
+        };
+
+        function isDark() {
+            return Boolean(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ||
+                   Boolean(document.documentElement.getAttribute('style')?.includes('color-scheme: dark')) ||
+                   Boolean(document.documentElement.getAttribute('style')?.includes('--obsidian-color-scheme: dark'));
+        }
+
+        function initLog() {
+            logContainer.innerHTML = '';
+        }
+
+        function addLog(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log-item log-${type}`;
+            div.innerHTML = `<span class="opacity-50 select-none mr-2 font-mono">›</span><span>${msg}</span>`;
+            logContainer.appendChild(div);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function setStatus(msg) {
+            statusText.innerText = msg;
+        }
+
+        function countValidRemainingValues(variable, currentAssignment) {
+            let validColors = 0;
+            for (let color of ALL_COLORS) {
+                if (isSafe(variable, color, currentAssignment)) {
+                    validColors++;
+                }
+            }
+            return validColors;
+        }
+
+        function isSafe(variable, color, currentAssignment) {
+            for (let neighbor of ADJACENCIES[variable]) {
+                if (currentAssignment[neighbor] === color) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function getMRV() {
+            if (state.unassigned.length === 0) return null;
+            if (!useMRV) return state.unassigned[0]; // Sin MRV: Orden estático (alfabético o definido)
+
+            let minRemaining = Infinity;
+            let bestVar = null;
+            let ties = [];
+
+            for (let v of state.unassigned) {
+                let remaining = countValidRemainingValues(v, state.assignment);
+                if (remaining < minRemaining) {
+                    minRemaining = remaining;
+                    bestVar = v;
+                    ties = [v];
+                } else if (remaining === minRemaining) {
+                    ties.push(v);
+                }
+            }
+            
+            // Romper empates por grado (Degree heuristic) simplificado u orden alfabético
+            if (ties.length > 1) {
+                addLog(`Empate MRV entre [${ties.join(', ')}] con ${minRemaining} valores.`, 'info');
+            }
+            return bestVar;
+        }
+
+        function countConstrainedNeighbors(variable, color) {
+            let constrainedCount = 0;
+            let tempAssignment = { ...state.assignment, [variable]: color };
+            
+            for (let neighbor of ADJACENCIES[variable]) {
+                if (!state.assignment[neighbor]) {
+                    const before = countValidRemainingValues(neighbor, state.assignment);
+                    const after = countValidRemainingValues(neighbor, tempAssignment);
+                    constrainedCount += before - after;
+                }
+            }
+            return constrainedCount;
+        }
+
+        function getOrderedValues(variable) {
+            let validColors = ALL_COLORS.filter(c => isSafe(variable, c, state.assignment));
+            
+            if (!useLCV) return validColors; // Orden estático
+
+            // LCV: Ordenar por menor restricción a vecinos
+            validColors.sort((c1, c2) => {
+                let cost1 = countConstrainedNeighbors(variable, c1);
+                let cost2 = countConstrainedNeighbors(variable, c2);
+                return cost1 - cost2; // Menor costo primero
+            });
+
+            return validColors;
+        }
+
+        function initializeSim() {
+            state.assignment = {};
+            state.unassigned = Object.keys(REGIONS);
+            
+            state.treeRoot = new TreeNode('START', null, 'root', null);
+            state.currentNode = state.treeRoot;
+            
+            state.phase = 'SELECT_VAR';
+            state.selectedVar = null;
+            
+            initLog();
+            addLog("Simulación iniciada. Grafo vacío.", 'info');
+            setStatus("Iniciando...");
+            drawAll();
+        }
+
+        function step() {
+            switch(state.phase) {
+                case 'SELECT_VAR':
+                    if (state.unassigned.length === 0) {
+                        state.phase = 'DONE';
+                        setStatus("¡Solución Encontrada!");
+                        addLog("Todas las regiones coloreadas correctamente.", 'success');
+                        document.getElementById('btnPause').classList.add('hidden');
+                        document.getElementById('btnPlay').classList.remove('hidden');
+                        state.isRunning = false;
+                        drawAll();
+                        return;
+                    }
+
+                    state.selectedVar = getMRV();
+                    state.phase = 'EVAL_CANDIDATES';
+                    
+                    let mrvMsg = useMRV ? `(Heurística MRV activada)` : `(Orden estándar)`;
+                    addLog(`Seleccionada variable: ${state.selectedVar} ${mrvMsg}`, 'highlight');
+                    setStatus(`Buscando valores para ${state.selectedVar}...`);
+                    break;
+
+                case 'EVAL_CANDIDATES':
+                    let orderedColors = getOrderedValues(state.selectedVar);
+                    
+                    if (orderedColors.length === 0) {
+                        addLog(`No hay colores válidos para ${state.selectedVar}. Dead-end.`, 'error');
+                        setStatus(`Fallo en ${state.selectedVar}. Se requiere Backtrack.`);
+                        
+                        // Añadir un nodo fallo para representar el dead-end visualmente
+                        let failNode = new TreeNode(state.selectedVar, null, 'failed', state.currentNode);
+                        state.currentNode.children.push(failNode);
+                        
+                        state.phase = 'BACKTRACK';
+                    } else {
+                        let lcvMsg = useLCV ? `(Ordenados por LCV)` : ``;
+                        addLog(`Generando candidatos para ${state.selectedVar}: ${orderedColors.map(c => COLOR_NAMES[c]).join(', ')} ${lcvMsg}`);
+                        
+                        // Generar nodos hijos transparentes (Candidatos)
+                        for (let color of orderedColors) {
+                            let candidateNode = new TreeNode(state.selectedVar, color, 'candidate', state.currentNode);
+                            state.currentNode.children.push(candidateNode);
+                        }
+                        
+                        state.phase = 'TEST_COLOR';
+                        setStatus(`Evaluando candidatos de ${state.selectedVar}...`);
+                    }
+                    break;
+
+                case 'TEST_COLOR':
+                    // Buscar el primer candidato no evaluado en los hijos del nodo actual
+                    let candidate = state.currentNode.children.find(c => c.status === 'candidate');
+                    
+                    if (candidate) {
+                        candidate.status = 'testing';
+                        setStatus(`Probando color ${COLOR_NAMES[candidate.color]} en ${state.selectedVar}...`);
+                        
+                        // Simulamos delay visual dejando el estado testing antes de validar
+                        state.phase = 'VALIDATE_COLOR'; 
+                        
+                    } else {
+                        // No quedan candidatos por probar en este nivel. Backtrack.
+                        addLog(`Agotadas todas las opciones para ${state.currentNode.variable || 'Raíz'}. Retrocediendo.`, 'warn');
+                        state.phase = 'BACKTRACK';
+                    }
+                    break;
+
+                case 'VALIDATE_COLOR':
+                    // Encontramos el nodo que está en 'testing'
+                    let testingNode = state.currentNode.children.find(c => c.status === 'testing');
+                    
+                    if (isSafe(testingNode.variable, testingNode.color, state.assignment)) {
+                        // Asignación válida
+                        testingNode.status = 'valid';
+                        state.assignment[testingNode.variable] = testingNode.color;
+                        
+                        // Quitar de unassigned
+                        state.unassigned = state.unassigned.filter(v => v !== testingNode.variable);
+                        
+                        // Avanzar el puntero del árbol
+                        state.currentNode = testingNode;
+                        
+                        addLog(`Asignado ${COLOR_NAMES[testingNode.color]} a ${testingNode.variable}.`);
+                        state.phase = 'SELECT_VAR';
+                    } else {
+                        // Aunque solo generamos válidos, si implementáramos Forward Checking completo, 
+                        // aquí podríamos fallar si el dominio de un vecino se vacía.
+                        // Por robustez, si llegara a fallar, lo marcamos:
+                        testingNode.status = 'failed';
+                        addLog(`Conflicto detectado con ${COLOR_NAMES[testingNode.color]} en ${testingNode.variable}.`, 'error');
+                        state.phase = 'TEST_COLOR'; // Intentar el siguiente candidato
+                    }
+                    break;
+
+                case 'BACKTRACK':
+                    if (state.currentNode.status === 'root') {
+                        state.phase = 'DONE';
+                        setStatus("Problema sin solución.");
+                        addLog("Exploración completa. No se encontró solución.", 'error');
+                        state.isRunning = false;
+                        drawAll();
+                        return;
+                    }
+
+                    // Deshacer asignación
+                    let varToUnassign = state.currentNode.variable;
+                    delete state.assignment[varToUnassign];
+                    if (!state.unassigned.includes(varToUnassign)) {
+                        state.unassigned.unshift(varToUnassign); // Devolver al pool
+                    }
+                    
+                    // Marcar nodo actual como fallido
+                    state.currentNode.status = 'failed';
+                    
+                    // Retroceder en el árbol
+                    state.currentNode = state.currentNode.parent;
+                    state.selectedVar = state.currentNode.variable || null; // variable padre o null si es root
+                    
+                    addLog(`Backtracking: Deshaciendo asignación de ${varToUnassign}.`, 'warn');
+                    setStatus(`Backtracking a nivel superior...`);
+                    
+                    state.phase = 'TEST_COLOR'; // Probar el siguiente candidato del padre
+                    break;
+            }
+            drawAll();
+        }
+
+        function runLoop() {
+            if (!state.isRunning) return;
+            step();
+            if (state.phase !== 'DONE' && state.isRunning) {
+                state.timer = setTimeout(runLoop, speedMs);
+            }
+        }
+
+        function resizeCanvases() {
+            const mapContainer = mapCanvas.parentElement;
+            mapCanvas.width = mapContainer.clientWidth;
+            mapCanvas.height = mapContainer.clientHeight;
+            
+            const treeContainer = treeCanvas.parentElement;
+            treeCanvas.width = treeContainer.clientWidth;
+            treeCanvas.height = treeContainer.clientHeight;
+            
+            drawAll();
+        }
+        window.addEventListener('resize', resizeCanvases);
+
+        function drawMap() {
+            const w = mapCanvas.width;
+            const h = mapCanvas.height;
+            mapCtx.clearRect(0, 0, w, h);
+            const dark = isDark();
+
+            // Calcular escala base
+            const margin = 40;
+            const usableW = w - margin * 2;
+            const usableH = h - margin * 2;
+
+            // Helper to get coordinates
+            const getCoords = (region) => {
+                return {
+                    x: margin + region.x * usableW,
+                    y: margin + region.y * usableH
+                };
+            };
+
+            // 1. Dibujar aristas (Adyacencias)
+            mapCtx.lineWidth = 2;
+            for (const [r1, neighbors] of Object.entries(ADJACENCIES)) {
+                const p1 = getCoords(REGIONS[r1]);
+                for (const r2 of neighbors) {
+                    const p2 = getCoords(REGIONS[r2]);
+                    
+                    // Solo dibujar una vez
+                    if (r1 < r2) {
+                        mapCtx.beginPath();
+                        mapCtx.moveTo(p1.x, p1.y);
+                        mapCtx.lineTo(p2.x, p2.y);
+                        mapCtx.strokeStyle = dark ? '#475569' : '#CBD5E1';
+                        mapCtx.stroke();
+                    }
+                }
+            }
+
+            // 2. Dibujar Nodos (Regiones)
+            const nodeRadius = 24;
+            for (const [id, region] of Object.entries(REGIONS)) {
+                const pos = getCoords(region);
+                
+                mapCtx.beginPath();
+                mapCtx.arc(pos.x, pos.y, nodeRadius, 0, Math.PI * 2);
+                
+                // Fill color based on assignment
+                if (state.assignment[id]) {
+                    mapCtx.fillStyle = state.assignment[id];
+                    mapCtx.strokeStyle = dark ? '#0f172a' : '#1E293B'; // Dark outline when filled
+                    mapCtx.lineWidth = 3;
+                } else {
+                    mapCtx.fillStyle = dark ? '#1e293b' : '#F1F5F9';
+                    mapCtx.strokeStyle = dark ? '#64748b' : '#94A3B8';
+                    mapCtx.lineWidth = 2;
+                }
+                
+                // Highlight si es la variable seleccionada actualmente
+                if (state.selectedVar === id && state.phase !== 'DONE') {
+                    mapCtx.strokeStyle = '#F59E0B'; // amber-500 pulse
+                    mapCtx.lineWidth = 4;
+                }
+
+                mapCtx.fill();
+                mapCtx.stroke();
+
+                // Text
+                if (state.assignment[id]) {
+                    mapCtx.fillStyle = '#FFFFFF';
+                } else {
+                    mapCtx.fillStyle = dark ? '#f1f5f9' : '#1E293B';
+                }
+                mapCtx.font = 'bold 14px Inter, system-ui, sans-serif';
+                mapCtx.textAlign = 'center';
+                mapCtx.textBaseline = 'middle';
+                mapCtx.fillText(id, pos.x, pos.y);
+            }
+        }
+
+        const TREE_CONFIG = {
+            NODE_RADIUS: 18,
+            X_SPACING: 45,
+            Y_SPACING: 70
+        };
+
+        function calculateTreeLayout(node) {
+            // Calcula el ancho requerido por cada subárbol (Post-orden)
+            if (!node) return 0;
+            if (node.children.length === 0) {
+                node.width = TREE_CONFIG.X_SPACING;
+                return node.width;
+            }
+
+            let totalWidth = 0;
+            for (let child of node.children) {
+                totalWidth += calculateTreeLayout(child);
+            }
+            node.width = totalWidth;
+            return totalWidth;
+        }
+
+        function assignTreePositions(node, startX, y) {
+            // Asigna X, Y (Pre-orden)
+            if (!node) return;
+            
+            // X central de este nodo respecto a su ancho
+            node.x = startX + (node.width / 2);
+            node.y = y;
+
+            let currentX = startX;
+            for (let child of node.children) {
+                assignTreePositions(child, currentX, y + TREE_CONFIG.Y_SPACING);
+                currentX += child.width; // Mover el inicio para el siguiente hijo
+            }
+        }
+
+        // Transformar color Hex a RGBA para transparencias
+        function hexToRgba(hex, alpha) {
+            if (hex === COLORS.RED) return `rgba(239, 68, 68, ${alpha})`;
+            if (hex === COLORS.GREEN) return `rgba(34, 197, 94, ${alpha})`;
+            if (hex === COLORS.BLUE) return `rgba(59, 130, 246, ${alpha})`;
+            return `rgba(148, 163, 184, ${alpha})`;
+        }
+
+        function drawTreeEdges(node) {
+            if (!node) return;
+            const dark = isDark();
+            
+            for (let child of node.children) {
+                treeCtx.beginPath();
+                treeCtx.moveTo(node.x, node.y);
+                treeCtx.lineTo(child.x, child.y);
+                
+                treeCtx.lineWidth = 2;
+                
+                // Estilo de línea según estado del hijo
+                if (child.status === 'failed') {
+                    treeCtx.strokeStyle = dark ? '#f87171' : '#FCA5A5'; // red
+                    treeCtx.setLineDash([4, 4]);
+                } else if (child.status === 'testing') {
+                    treeCtx.strokeStyle = dark ? '#fbbf24' : '#FCD34D'; // amber
+                    treeCtx.setLineDash([4, 4]);
+                } else if (child.status === 'candidate') {
+                    treeCtx.strokeStyle = dark ? '#475569' : '#CBD5E1'; // slate
+                    treeCtx.setLineDash([2, 4]);
+                } else {
+                    treeCtx.strokeStyle = dark ? '#64748b' : '#94A3B8'; // default
+                    treeCtx.setLineDash([]);
+                }
+                
+                treeCtx.stroke();
+                treeCtx.setLineDash([]); // Reset
+                
+                // Recursión
+                drawTreeEdges(child);
+            }
+        }
+
+        function drawTreeNodes(node) {
+            if (!node) return;
+            const dark = isDark();
+
+            treeCtx.beginPath();
+            treeCtx.arc(node.x, node.y, TREE_CONFIG.NODE_RADIUS, 0, Math.PI * 2);
+
+            // Estilos del nodo
+            if (node.status === 'root') {
+                treeCtx.fillStyle = dark ? '#64748b' : '#94A3B8';
+                treeCtx.fill();
+            } 
+            else if (node.status === 'candidate') {
+                treeCtx.fillStyle = hexToRgba(node.color, dark ? 0.25 : 0.15);
+                treeCtx.fill();
+                treeCtx.strokeStyle = hexToRgba(node.color, dark ? 0.8 : 0.5);
+                treeCtx.setLineDash([3, 3]);
+                treeCtx.lineWidth = 2;
+                treeCtx.stroke();
+                treeCtx.setLineDash([]);
+            }
+            else if (node.status === 'testing') {
+                treeCtx.fillStyle = node.color;
+                treeCtx.fill();
+                treeCtx.strokeStyle = '#F59E0B'; // Pulse color
+                treeCtx.lineWidth = 3;
+                treeCtx.setLineDash([4, 2]);
+                treeCtx.stroke();
+                treeCtx.setLineDash([]);
+            }
+            else if (node.status === 'failed') {
+                // Fondo pálido
+                treeCtx.fillStyle = hexToRgba(node.color, dark ? 0.35 : 0.3);
+                treeCtx.fill();
+                treeCtx.strokeStyle = '#EF4444'; // Red
+                treeCtx.lineWidth = 2;
+                treeCtx.stroke();
+                
+                // Cruz
+                treeCtx.beginPath();
+                treeCtx.moveTo(node.x - 8, node.y - 8);
+                treeCtx.lineTo(node.x + 8, node.y + 8);
+                treeCtx.moveTo(node.x + 8, node.y - 8);
+                treeCtx.lineTo(node.x - 8, node.y + 8);
+                treeCtx.strokeStyle = '#EF4444';
+                treeCtx.lineWidth = 3;
+                treeCtx.stroke();
+            }
+            else if (node.status === 'valid') {
+                treeCtx.fillStyle = node.color;
+                treeCtx.fill();
+                treeCtx.strokeStyle = dark ? '#0f172a' : '#1E293B';
+                treeCtx.lineWidth = 2;
+                treeCtx.stroke();
+            }
+
+            // Texto (Nombre variable)
+            if (node.status !== 'failed' && node.status !== 'root') {
+                if (node.status === 'candidate') {
+                    treeCtx.fillStyle = dark ? '#94a3b8' : '#64748B';
+                } else {
+                    treeCtx.fillStyle = '#FFFFFF';
+                }
+                treeCtx.font = 'bold 12px Inter, system-ui, sans-serif';
+                treeCtx.textAlign = 'center';
+                treeCtx.textBaseline = 'middle';
+                treeCtx.fillText(node.variable, node.x, node.y);
+            } else if (node.status === 'root') {
+                treeCtx.fillStyle = '#FFFFFF';
+                treeCtx.font = 'bold 10px Inter, system-ui, sans-serif';
+                treeCtx.textAlign = 'center';
+                treeCtx.textBaseline = 'middle';
+                treeCtx.fillText('R', node.x, node.y);
+            }
+
+            // Indicador de nodo actual (puntero del algoritmo)
+            if (state.currentNode === node && state.phase !== 'DONE') {
+                treeCtx.beginPath();
+                treeCtx.arc(node.x, node.y, TREE_CONFIG.NODE_RADIUS + 6, 0, Math.PI * 2);
+                treeCtx.strokeStyle = dark ? 'rgba(96, 165, 250, 0.7)' : 'rgba(59, 130, 246, 0.5)';
+                treeCtx.lineWidth = 4;
+                treeCtx.stroke();
+            }
+
+            // Recursión
+            for (let child of node.children) {
+                drawTreeNodes(child);
+            }
+        }
+
+        function drawTree() {
+            const w = treeCanvas.width;
+            const h = treeCanvas.height;
+            treeCtx.clearRect(0, 0, w, h);
+
+            if (!state.treeRoot) return;
+
+            // 1. Recalcular layout
+            let totalTreeWidth = calculateTreeLayout(state.treeRoot);
+            
+            // 2. Escalar y centrar
+            treeCtx.save();
+            
+            // Escala para que el árbol no se salga horizontalmente (min 1 = no zoom in, solo zoom out)
+            const margin = 40;
+            let scale = 1;
+            if (totalTreeWidth > w - margin * 2) {
+                scale = (w - margin * 2) / totalTreeWidth;
+            }
+            
+            // Limitamos que tan pequeño se puede hacer para no perder detalle extremo
+            scale = Math.max(0.4, scale); 
+
+            // Aplicamos escala y centramos la raíz
+            // El inicio en X es 0, por lo que el ancho total va de 0 a totalTreeWidth.
+            // Para centrar en el canvas:
+            let startX = 0;
+            let startY = 40; // Top margin
+
+            assignTreePositions(state.treeRoot, startX, startY);
+
+            // Centrar la vista en el medio del árbol
+            let xOffset = (w - (totalTreeWidth * scale)) / 2;
+            
+            treeCtx.translate(xOffset, 20); // 20px extra padding superior
+            treeCtx.scale(scale, scale);
+
+            // 3. Dibujar
+            drawTreeEdges(state.treeRoot);
+            drawTreeNodes(state.treeRoot);
+            
+            treeCtx.restore();
+        }
+
+        function drawAll() {
+            drawMap();
+            drawTree();
+        }
+
+        document.getElementById('btnPlay').addEventListener('click', () => {
+            if (state.phase === 'DONE') initializeSim();
+            state.isRunning = true;
+            document.getElementById('btnPlay').classList.add('hidden');
+            document.getElementById('btnPause').classList.remove('hidden');
+            runLoop();
+        });
+
+        document.getElementById('btnPause').addEventListener('click', () => {
+            state.isRunning = false;
+            clearTimeout(state.timer);
+            document.getElementById('btnPause').classList.add('hidden');
+            document.getElementById('btnPlay').classList.remove('hidden');
+        });
+
+        document.getElementById('btnStep').addEventListener('click', () => {
+            if (state.phase === 'DONE') initializeSim();
+            state.isRunning = false; // Pausar simulación automática
+            clearTimeout(state.timer);
+            document.getElementById('btnPause').classList.add('hidden');
+            document.getElementById('btnPlay').classList.remove('hidden');
+            step();
+        });
+
+        document.getElementById('btnReset').addEventListener('click', () => {
+            state.isRunning = false;
+            clearTimeout(state.timer);
+            document.getElementById('btnPause').classList.add('hidden');
+            document.getElementById('btnPlay').classList.remove('hidden');
+            initializeSim();
+        });
+
+        // Initialize on load
+        window.onload = () => {
+            resizeCanvases();
+            initializeSim();
+        };
+
+    </script>
+</body>
+</html>

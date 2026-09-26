@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Max-n con tuplas paso a paso</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fb;--panel:#fff;--ink:#172033;--muted:#5f6b7a;--line:#aeb8c8;--p1:#dc2626;--p2:#2563eb;--p3:#16a34a;--leaf:#7c3aed;--active:#f59e0b;--chosen:#111827}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,sans-serif}main{max-width:1040px;margin:auto}h2{font-size:21px;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 12px}.controls,.legend{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.controls{padding:10px;background:var(--panel);border:1px solid #d7dce6;border-radius:10px;margin-bottom:10px}.controls button{font:inherit;color:inherit;background:var(--panel);border:1px solid #aeb8c8;border-radius:8px;padding:7px 10px;cursor:pointer}.controls button:disabled{opacity:.35;cursor:default}.counter{min-width:86px;text-align:center}.canvas{width:100%;display:block;background:var(--panel);border:1px solid #d7dce6;border-radius:12px}.edge{stroke:var(--line);stroke-width:2.5}.edge.chosen{stroke:var(--chosen);stroke-width:5}.node text{text-anchor:middle;dominant-baseline:central;font-weight:800;fill:var(--ink)}.node .shape{fill:var(--panel);stroke-width:3}.node.p1 .shape{stroke:var(--p1);fill:#fee2e2}.node.p2 .shape{stroke:var(--p2);fill:#dbeafe}.node.p3 .shape{stroke:var(--p3);fill:#dcfce7}.node.leaf .shape{stroke:var(--leaf);fill:#ede9fe}.node.active .shape{stroke:var(--active);stroke-width:6}.node.chosen .shape{stroke:var(--chosen);stroke-width:6}.role{font-size:13px;font-weight:800;fill:var(--muted);text-anchor:middle}.tuple{font-size:13px}.tuple .u1{fill:var(--p1)}.tuple .u2{fill:var(--p2)}.tuple .u3{fill:var(--p3)}.legend{margin:9px 2px;color:var(--muted);font-size:13px}.dot{width:12px;height:12px;border-radius:50%;display:inline-block}.dot.p1{background:var(--p1)}.dot.p2{background:var(--p2)}.dot.p3{background:var(--p3)}.status{margin-top:10px;padding:12px 14px;min-height:90px;border-left:5px solid var(--active);border-radius:8px;background:#fff7df}.formula{font:700 14px ui-monospace,SFMono-Regular,monospace}.mobile{display:none}.tip{margin-top:8px;color:var(--muted);font-size:13px}@media(max-width:650px){body{padding:10px}.canvas{display:none}.mobile{display:block}.mobile table{width:100%;border-collapse:collapse;background:var(--panel)}.mobile th,.mobile td{padding:7px;border-bottom:1px solid var(--line);text-align:left}.status{min-height:130px}}@media(prefers-color-scheme:dark){:root{--bg:#1d222d;--panel:#282e3a;--ink:#eef2f7;--muted:#b8c0cd;--line:#687386;--chosen:#f8fafc}.node.p1 .shape{fill:#5a292d}.node.p2 .shape{fill:#1e3a5f}.node.p3 .shape{fill:#214c36}.node.leaf .shape{fill:#3c2b64}.status{background:#3c3521}.controls,.canvas{border-color:#4f596b}}
+</style>
+</head>
+<body>
+<main>
+  <h2>Tres agentes: propagar tuplas con Maxⁿ</h2>
+  <p class="sub">El árbol reproduce la diapositiva 12. Cada color identifica al jugador que mueve; ese jugador compara solo su propia coordenada, pero propaga la tupla completa.</p>
+  <div class="controls"><button id="prev">← Atrás</button><span class="counter" id="counter"></span><button id="next">Siguiente →</button><button id="reset">Reiniciar</button></div>
+  <svg class="canvas" viewBox="0 0 1040 520" role="img" aria-label="Árbol de tres jugadores con ocho tuplas de utilidad terminal">
+    <g id="edges"></g><g id="nodes"></g>
+  </svg>
+  <div class="mobile" id="mobile"></div>
+  <div class="legend"><span class="dot p1"></span> J1 maximiza u₁ <span class="dot p2"></span> J2 maximiza u₂ <span class="dot p3"></span> J3 maximiza u₃</div>
+  <div class="status" id="status" aria-live="polite"></div>
+  <div class="tip">La coordenada que no pertenece al jugador actual no se optimiza en ese turno. Si hay empate en la coordenada relevante, hace falta una regla de desempate.</div>
+</main>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const leaves=[[1,6,6],[7,1,2],[6,1,2],[7,2,1],[5,1,7],[1,5,2],[7,7,1],[5,2,5]];
+const pos={R:[520,55],B0:[270,170],B1:[770,170],G0:[145,290],G1:[395,290],G2:[645,290],G3:[895,290],L0:[85,440],L1:[205,440],L2:[335,440],L3:[455,440],L4:[585,440],L5:[705,440],L6:[835,440],L7:[955,440]};
+const green=['G0','G1','G2','G3'],blue=['B0','B1'];let step=0;
+const statusEl=document.getElementById('status');
+function svg(tag,attrs={}){const e=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);return e}
+function tupleText(parent,value){const t=svg('text',{class:'tuple'});value.forEach((v,i)=>{const s=svg('tspan',{class:`u${i+1}`});s.textContent=(i?',':'(')+v+(i===2?')':'');t.append(s)});parent.append(t)}
+function decision(id,cls){const p=pos[id],g=svg('g',{class:`node ${cls}`,id:`n-${id}`,transform:`translate(${p[0]} ${p[1]})`});g.append(svg('circle',{class:'shape',r:34}));const t=svg('text');t.textContent='?';g.append(t);nodes.append(g);const r=svg('text',{class:'role',x:p[0],y:p[1]-48});r.textContent=cls==='p1'?'J1':cls==='p2'?'J2':'J3';nodes.append(r)}
+function build(){
+  const connections=[['R','B0'],['R','B1'],['B0','G0'],['B0','G1'],['B1','G2'],['B1','G3'],['G0','L0'],['G0','L1'],['G1','L2'],['G1','L3'],['G2','L4'],['G2','L5'],['G3','L6'],['G3','L7']];
+  connections.forEach(([a,b])=>edges.append(svg('line',{x1:pos[a][0],y1:pos[a][1]+31,x2:pos[b][0],y2:pos[b][1]-28,class:'edge',id:`e-${a}-${b}`})));
+  decision('R','p1');blue.forEach(id=>decision(id,'p2'));green.forEach(id=>decision(id,'p3'));
+  leaves.forEach((value,i)=>{const p=pos[`L${i}`],g=svg('g',{class:'node leaf',id:`n-L${i}`,transform:`translate(${p[0]} ${p[1]})`});g.append(svg('rect',{class:'shape',x:-46,y:-24,width:92,height:48,rx:7}));tupleText(g,value);nodes.append(g)});
+}
+const gValues=[[1,6,6],[6,1,2],[5,1,7],[5,2,5]],gChoice=[0,2,4,7];
+const bValues=[[1,6,6],[5,2,5]],bChoice=[0,3];const rootValue=[5,2,5];
+function setTuple(id,value,visible){const n=document.querySelector(`#n-${id}`);n.querySelectorAll('text').forEach(x=>x.remove());if(visible)tupleText(n,value);else{const t=svg('text');t.textContent='?';n.append(t)}}
+function mark(parent,child){document.querySelector(`#n-${child}`).classList.add('chosen');document.querySelector(`#e-${parent}-${child}`).classList.add('chosen')}
+function draw(){
+  document.querySelectorAll('.node').forEach(n=>n.classList.remove('active','chosen'));document.querySelectorAll('.edge').forEach(e=>e.classList.remove('chosen'));
+  green.forEach((id,i)=>{setTuple(id,gValues[i],step>i);if(step===i+1){document.querySelector(`#n-${id}`).classList.add('active');mark(id,`L${gChoice[i]}`)}});
+  blue.forEach((id,i)=>{setTuple(id,bValues[i],step>4+i);if(step===5+i){document.querySelector(`#n-${id}`).classList.add('active');mark(id,green[bChoice[i]])}});
+  setTuple('R',rootValue,step===7);if(step===7){document.querySelector('#n-R').classList.add('active');mark('R','B1')}
+  const messages=[
+    `<span class="formula">Paso 0.</span> Cada hoja contiene (u₁,u₂,u₃). Las tres cifras describen el mismo resultado desde las perspectivas de J1, J2 y J3.`,
+    `<span class="formula">J3: max₍u₃₎{(1,6,6),(7,1,2)}=(1,6,6)</span><br>J3 compara 6 contra 2 y conserva toda la primera tupla.`,
+    `<span class="formula">J3: max₍u₃₎{(6,1,2),(7,2,1)}=(6,1,2)</span><br>Compara la tercera coordenada: 2 contra 1.`,
+    `<span class="formula">J3: max₍u₃₎{(5,1,7),(1,5,2)}=(5,1,7)</span><br>Aunque la segunda hoja favorece a J2, quien decide aquí es J3.`,
+    `<span class="formula">J3: max₍u₃₎{(7,7,1),(5,2,5)}=(5,2,5)</span><br>J3 acepta u₁=5 y u₂=2 porque su propia utilidad sube de 1 a 5.`,
+    `<span class="formula">J2: max₍u₂₎{(1,6,6),(6,1,2)}=(1,6,6)</span><br>En el subárbol izquierdo J2 compara 6 contra 1.`,
+    `<span class="formula">J2: max₍u₂₎{(5,1,7),(5,2,5)}=(5,2,5)</span><br>En el subárbol derecho J2 compara 1 contra 2.`,
+    `<span class="formula">J1: max₍u₁₎{(1,6,6),(5,2,5)}=(5,2,5)</span><br>Finalmente J1 compara 1 contra 5 y elige la rama derecha.`
+  ];
+  statusEl.innerHTML=messages[step];counter.textContent=`Paso ${step}/7`;prev.disabled=step===0;next.disabled=step===7;
+  mobile.innerHTML=`<table><thead><tr><th>Nodo</th><th>Jugador</th><th>Valor al resolverse</th></tr></thead><tbody><tr><td>G0–G3</td><td>J3 / u₃</td><td>${gValues.map(x=>`(${x})`).join(' · ')}</td></tr><tr><td>B0–B1</td><td>J2 / u₂</td><td>${bValues.map(x=>`(${x})`).join(' · ')}</td></tr><tr><td>Raíz</td><td>J1 / u₁</td><td>(${rootValue})</td></tr></tbody></table>`;
+}
+prev.onclick=()=>{if(step>0)step--;draw()};next.onclick=()=>{if(step<7)step++;draw()};reset.onclick=()=>{step=0;draw()};build();draw();
+</script>
+</body>
+</html>

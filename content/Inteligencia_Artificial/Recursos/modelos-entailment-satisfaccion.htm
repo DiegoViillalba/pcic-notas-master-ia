@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Espacio de Modelos, Vinculación y Satisfacibilidad</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #cbd5e1;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --kb-color: #16a34a;
+  --kb-soft: #dcfce7;
+  --query-color: #9333ea;
+  --query-soft: #f3e8ff;
+  --both-color: #0284c7;
+  --both-soft: #e0f2fe;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --ink: #f1f5f9;
+    --muted: #94a3b8;
+    --line: #334155;
+    --accent: #3b82f6;
+    --accent-soft: #1e3a8a;
+    --kb-color: #22c55e;
+    --kb-soft: #14532d;
+    --query-color: #a855f7;
+    --query-soft: #581c87;
+    --both-color: #38bdf8;
+    --both-soft: #075985;
+    --danger: #ef4444;
+    --danger-soft: #7f1d1d;
+    --warning: #f59e0b;
+    --warning-soft: #78350f;
+    --card-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  padding: 16px;
+}
+main {
+  max-width: 1060px;
+  margin: 0 auto;
+}
+header {
+  margin-bottom: 16px;
+}
+h1 {
+  font-size: 1.35rem;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.subtitle {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 8px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.tab-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.tab-btn:hover:not(.active) {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.panel {
+  display: none;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 16px;
+}
+.panel.active { display: block; }
+.grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 800px) {
+  .grid-2col { grid-template-columns: 1fr; }
+}
+.box {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+.box-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.formula-badge {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.control-group {
+  margin-bottom: 12px;
+}
+.control-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+select, button, input {
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+}
+button {
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-secondary {
+  background: var(--panel);
+  color: var(--ink);
+}
+.btn-secondary:hover { background: var(--bg); }
+.pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.pill {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pill button {
+  padding: 0 4px;
+  line-height: 1;
+  border: none;
+  background: transparent;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 1rem;
+}
+.models-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: center;
+}
+.models-table th, .models-table td {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+}
+.models-table th {
+  background: var(--panel);
+  font-weight: 700;
+}
+.row-in-kb {
+  background: var(--kb-soft);
+  font-weight: 600;
+}
+.row-in-q {
+  background: var(--query-soft);
+}
+.row-in-both {
+  background: var(--both-soft);
+  font-weight: 700;
+}
+.row-eliminated {
+  opacity: 0.45;
+}
+.badge-kb {
+  background: var(--kb-color);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+}
+.badge-q {
+  background: var(--query-color);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+}
+.result-banner {
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 12px;
+  font-size: 0.88rem;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+}
+.result-banner.entailment {
+  border-left-color: var(--kb-color);
+  background: var(--kb-soft);
+}
+.result-banner.contradiction {
+  border-left-color: var(--danger);
+  background: var(--danger-soft);
+}
+.result-banner.contingent {
+  border-left-color: var(--warning);
+  background: var(--warning-soft);
+}
+.legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 8px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.tree-node {
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-family: ui-monospace, monospace;
+}
+.tree-node.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.tree-node.yes {
+  border-color: var(--kb-color);
+  background: var(--kb-soft);
+}
+.tree-node.no {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+.svg-canvas {
+  width: 100%;
+  height: 240px;
+  display: block;
+}
+.explanation-callout {
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: var(--bg);
+  border-left: 4px solid var(--accent);
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  margin-top: 12px;
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Laboratorio: Espacio de Modelos, Vinculación y Satisfacibilidad</h1>
+    <p class="subtitle">Explora cómo una Base de Conocimiento ($KB$) restringe mundos posibles, cómo se evalúa $KB \models f$ y cómo se reducen las operaciones <code>Ask</code> y <code>Tell</code> a pruebas SAT.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="setTab('mundos')">1. Modelos e Intersección M(KB)</button>
+    <button class="tab-btn" onclick="setTab('relaciones')">2. Vinculación, Contradicción y Contingencia</button>
+    <button class="tab-btn" onclick="setTab('decision')">3. Reducción a SAT (Árbol de Decisión)</button>
+    <button class="tab-btn" onclick="setTab('csp')">4. Formulación SAT como CSP</button>
+  </div>
+
+  <!-- PESTAÑA 1: MUNDOS E INTERSECCIÓN -->
+  <section id="tab-mundos" class="panel active">
+    <div class="grid-2col">
+      <div>
+        <div class="box">
+          <div class="box-title">
+            <span>Configuración de la Base de Conocimiento (KB)</span>
+            <span class="formula-badge">M(KB) = ⋂ M(f)</span>
+          </div>
+          <div class="control-group">
+            <label>Escenario:</label>
+            <select id="scenario-select" onchange="loadScenario()">
+              <option value="rain">Clima: Rain, Wet, Snow (Diapositivas 15-17)</option>
+              <option value="abc">Proposiciones abstractas: A, B, C (Diapositiva 23)</option>
+              <option value="wumpus">Mundo del Wumpus: P12, P21, B11</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>Añadir fórmula a KB (KB ⇐ KB ∪ {f}):</label>
+            <div style="display: flex; gap: 6px;">
+              <select id="quick-formula" style="flex: 1;"></select>
+              <button class="btn-primary" onclick="addFormulaToKB()">+ Añadir Tell[f]</button>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:0.8rem; font-weight:600; color:var(--muted)">Fórmulas activas en KB:</label>
+            <div id="kb-pills" class="pill-list"></div>
+            <div style="margin-top: 8px;">
+              <button class="btn-secondary" style="font-size:0.75rem; padding:3px 8px;" onclick="resetKB()">Vaciar KB (M = todos)</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="explanation-callout" id="tab1-explain">
+          Cada fórmula añadida a la KB actúa como un filtro: <strong>descarta mundos imposibles</strong>. Inicialmente hay $2^3 = 8$ modelos. A medida que aprendes hechos, el conjunto $M(KB)$ se reduce y el conocimiento del agente es más preciso.
+        </div>
+      </div>
+
+      <div>
+        <div class="box">
+          <div class="box-title">
+            <span>Espacio de Mundos Posibles (Modelos w)</span>
+            <span id="model-count-badge" class="formula-badge">Modelos válidos: 8/8</span>
+          </div>
+          <div style="max-height: 280px; overflow-y: auto;">
+            <table class="models-table">
+              <thead>
+                <tr id="models-header"></tr>
+              </thead>
+              <tbody id="models-body"></tbody>
+            </table>
+          </div>
+          <div class="legend">
+            <div class="legend-item"><span class="dot" style="background:var(--kb-color)"></span> Modelo compatible con KB</div>
+            <div class="legend-item"><span class="dot" style="background:var(--line)"></span> Modelo descartado</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 2: VINCULACIÓN, CONTRADICCIÓN Y CONTINGENCIA -->
+  <section id="tab-relaciones" class="panel">
+    <div class="grid-2col">
+      <div>
+        <div class="box">
+          <div class="box-title">
+            <span>Consulta al Sistema Lógico</span>
+            <span class="formula-badge">Ask[f] / Tell[f]</span>
+          </div>
+          <div class="control-group">
+            <label>Selecciona una fórmula a consultar (f):</label>
+            <select id="query-formula-select" onchange="evaluateQuery()"></select>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn-primary" onclick="runAsk()">Ejecutar Ask[f]</button>
+            <button class="btn-secondary" onclick="runTell()">Ejecutar Tell[f]</button>
+          </div>
+
+          <div id="query-result-banner" class="result-banner">
+            Selecciona una consulta para evaluar la relación semántica con la KB actual.
+          </div>
+
+          <div class="explanation-callout">
+            <strong>Relaciones fundamentales:</strong>
+            <ul style="margin-left: 18px; margin-top: 4px; font-size: 0.82rem;">
+              <li><strong>Vinculación ($KB \models f$):</strong> $M(KB) \subseteq M(f)$. En todo mundo compatible con KB, $f$ es verdadera.</li>
+              <li><strong>Contradicción ($KB \models \neg f$):</strong> $M(KB) \cap M(f) = \emptyset$. Imposible que ocurran juntos.</li>
+              <li><strong>Contingencia:</strong> $f$ es verdadera en algunos modelos de KB y falsa en otros. Ni $f$ ni $\neg f$ se pueden asegurar.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="box">
+          <div class="box-title">
+            <span>Visualización de Inclusión de Modelos</span>
+            <span id="venn-summary" class="formula-badge">M(KB) vs M(f)</span>
+          </div>
+          <svg class="svg-canvas" id="venn-svg" viewBox="0 0 460 220">
+            <!-- Renderizado dinámico -->
+          </svg>
+          <div class="legend">
+            <div class="legend-item"><span class="dot" style="background:var(--kb-color)"></span> M(KB)</div>
+            <div class="legend-item"><span class="dot" style="background:var(--query-color)"></span> M(f)</div>
+            <div class="legend-item"><span class="dot" style="background:var(--both-color)"></span> Intersección M(KB) ∩ M(f)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 3: REDUCCIÓN A SAT -->
+  <section id="tab-decision" class="panel">
+    <div class="box" style="margin-bottom: 12px;">
+      <div class="box-title">
+        <span>Árbol de Decisión: Reducción de Inferencia a Satisfactibilidad (Diapositiva 22)</span>
+        <span class="formula-badge">¿Es KB ∪ {¬f} satisfactible?</span>
+      </div>
+      <p style="font-size:0.83rem; color:var(--muted); margin-bottom:12px;">
+        En lugar de generar todas las combinaciones de la tabla de verdad, podemos delegar cualquier pregunta lógica <code>Ask[f]</code> o <code>Tell[f]</code> a un solucionador de satisfactibilidad (SAT solver).
+      </p>
+
+      <svg class="svg-canvas" id="decision-svg" viewBox="0 0 760 210" style="height:210px;">
+        <!-- Árbol dibujado dinámicamente -->
+      </svg>
+
+      <div id="decision-status" class="result-banner" style="margin-top:12px;">
+        Haz clic en "Evaluar en árbol" o cambia la consulta en la pestaña anterior para ver la ruta tomada.
+      </div>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 4: CSP -->
+  <section id="tab-csp" class="panel">
+    <div class="box">
+      <div class="box-title">
+        <span>Formulación de Lógica Proposicional como CSP (Diapositiva 23)</span>
+        <span class="formula-badge">Variables booleanas + Restricciones de arcos</span>
+      </div>
+      <p style="font-size:0.83rem; color:var(--muted); margin-bottom:12px;">
+        Ejemplo de la diapositiva 23: $KB = \{A \vee B, B \leftrightarrow \neg C\}$. Cada símbolo proposicional es una variable CSP con dominio $\{0, 1\}$. Las fórmulas lógicas se convierten en restricciones binarias entre nodos.
+      </p>
+
+      <svg class="svg-canvas" id="csp-svg" viewBox="0 0 680 180" style="height:180px;">
+        <!-- Grafo CSP -->
+      </svg>
+
+      <div class="grid-2col" style="margin-top:12px;">
+        <div class="box">
+          <strong>Restricciones de arco:</strong>
+          <ul style="font-size:0.82rem; margin-left:18px; margin-top:4px;">
+            <li><strong>Arco (A, B):</strong> $A \vee B \equiv \text{No }(A=0 \wedge B=0)$. Pares válidos: $(0,1), (1,0), (1,1)$.</li>
+            <li><strong>Arco (B, C):</strong> $B \leftrightarrow \neg C \equiv B \neq C$. Pares válidos: $(0,1), (1,0)$.</li>
+          </ul>
+        </div>
+        <div class="box">
+          <strong>Soluciones del CSP (Modelos de KB):</strong>
+          <div id="csp-solutions" style="font-family:ui-monospace, monospace; font-size:0.85rem; margin-top:6px;">
+            Calculando...
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const SCENARIOS = {
+  rain: {
+    vars: ['Rain', 'Wet', 'Snow'],
+    formulas: [
+      { id: 'rain', label: 'Rain', fn: w => w.Rain === 1 },
+      { id: 'rain_to_wet', label: 'Rain → Wet', fn: w => (w.Rain === 0 || w.Wet === 1) },
+      { id: 'wet', label: 'Wet', fn: w => w.Wet === 1 },
+      { id: 'snow', label: 'Snow', fn: w => w.Snow === 1 },
+      { id: 'not_snow', label: '¬Snow', fn: w => w.Snow === 0 },
+      { id: 'rain_and_snow', label: 'Rain ∧ Snow', fn: w => w.Rain === 1 && w.Snow === 1 },
+      { id: 'rain_or_snow', label: 'Rain ∨ Snow', fn: w => w.Rain === 1 || w.Snow === 1 }
+    ],
+    defaultKB: ['rain', 'rain_to_wet']
+  },
+  abc: {
+    vars: ['A', 'B', 'C'],
+    formulas: [
+      { id: 'a_or_b', label: 'A ∨ B', fn: w => w.A === 1 || w.B === 1 },
+      { id: 'b_iff_not_c', label: 'B ↔ ¬C', fn: w => w.B !== w.C },
+      { id: 'a', label: 'A', fn: w => w.A === 1 },
+      { id: 'not_a', label: '¬A', fn: w => w.A === 0 },
+      { id: 'b', label: 'B', fn: w => w.B === 1 },
+      { id: 'c', label: 'C', fn: w => w.C === 1 },
+      { id: 'not_c', label: '¬C', fn: w => w.C === 0 }
+    ],
+    defaultKB: ['a_or_b', 'b_iff_not_c']
+  },
+  wumpus: {
+    vars: ['P12', 'P21', 'B11'],
+    formulas: [
+      { id: 'b11_iff_p12_or_p21', label: 'B11 ↔ (P12 ∨ P21)', fn: w => (w.B11 === 1) === (w.P12 === 1 || w.P21 === 1) },
+      { id: 'not_b11', label: '¬B11 (Sin brisa en [1,1])', fn: w => w.B11 === 0 },
+      { id: 'not_p12', label: '¬P12 ([1,2] seguro)', fn: w => w.P12 === 0 },
+      { id: 'p12', label: 'P12 (Pozo en [1,2])', fn: w => w.P12 === 1 },
+      { id: 'b11', label: 'B11 (Brisa en [1,1])', fn: w => w.B11 === 1 }
+    ],
+    defaultKB: ['b11_iff_p12_or_p21', 'not_b11']
+  }
+};
+
+let currentScenarioKey = 'rain';
+let currentKB = [];
+let allWorlds = [];
+
+function init() {
+  loadScenario();
+  drawCSP();
+}
+
+function setTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[onclick="setTab('${tabId}')"]`).classList.add('active');
+  document.getElementById(`tab-${tabId}`).classList.add('active');
+  if (tabId === 'relaciones' || tabId === 'decision') {
+    evaluateQuery();
+  }
+}
+
+function loadScenario() {
+  currentScenarioKey = document.getElementById('scenario-select').value;
+  const sc = SCENARIOS[currentScenarioKey];
+  
+  const numVars = sc.vars.length;
+  allWorlds = [];
+  const total = 1 << numVars;
+  for (let i = 0; i < total; i++) {
+    const world = {};
+    for (let v = 0; v < numVars; v++) {
+      const bit = (i >> (numVars - 1 - v)) & 1;
+      world[sc.vars[v]] = bit;
+    }
+    allWorlds.push(world);
+  }
+
+  const quickSel = document.getElementById('quick-formula');
+  quickSel.innerHTML = '';
+  const querySel = document.getElementById('query-formula-select');
+  querySel.innerHTML = '';
+
+  sc.formulas.forEach(f => {
+    const o1 = document.createElement('option');
+    o1.value = f.id;
+    o1.textContent = f.label;
+    quickSel.appendChild(o1);
+
+    const o2 = document.createElement('option');
+    o2.value = f.id;
+    o2.textContent = f.label;
+    querySel.appendChild(o2);
+  });
+
+  currentKB = [...sc.defaultKB];
+  renderKB();
+  evaluateQuery();
+}
+
+function addFormulaToKB() {
+  const fid = document.getElementById('quick-formula').value;
+  if (!currentKB.includes(fid)) {
+    currentKB.push(fid);
+    renderKB();
+    evaluateQuery();
+  }
+}
+
+function removeFormulaFromKB(fid) {
+  currentKB = currentKB.filter(id => id !== fid);
+  renderKB();
+  evaluateQuery();
+}
+
+function resetKB() {
+  currentKB = [];
+  renderKB();
+  evaluateQuery();
+}
+
+function isWorldInKB(w) {
+  const sc = SCENARIOS[currentScenarioKey];
+  for (const fid of currentKB) {
+    const fObj = sc.formulas.find(f => f.id === fid);
+    if (fObj && !fObj.fn(w)) return false;
+  }
+  return true;
+}
+
+function renderKB() {
+  const sc = SCENARIOS[currentScenarioKey];
+  const pillsEl = document.getElementById('kb-pills');
+  pillsEl.innerHTML = '';
+  if (currentKB.length === 0) {
+    pillsEl.innerHTML = '<span style="font-size:0.8rem; color:var(--muted); font-style:italic;">KB vacía (todos los mundos son posibles)</span>';
+  } else {
+    currentKB.forEach(fid => {
+      const fObj = sc.formulas.find(f => f.id === fid);
+      const pill = document.createElement('span');
+      pill.className = 'pill';
+      pill.innerHTML = `<span>${fObj ? fObj.label : fid}</span><button onclick="removeFormulaFromKB('${fid}')" title="Quitar">&times;</button>`;
+      pillsEl.appendChild(pill);
+    });
+  }
+
+  const headerEl = document.getElementById('models-header');
+  headerEl.innerHTML = '<th>Mundo (w)</th>' + sc.vars.map(v => `<th>${v}</th>`).join('') + '<th>¿Satisface KB?</th>';
+
+  const bodyEl = document.getElementById('models-body');
+  bodyEl.innerHTML = '';
+
+  let countKB = 0;
+  allWorlds.forEach((w, idx) => {
+    const inKB = isWorldInKB(w);
+    if (inKB) countKB++;
+
+    const tr = document.createElement('tr');
+    tr.className = inKB ? 'row-in-kb' : 'row-eliminated';
+    const varCols = sc.vars.map(v => `<td>${w[v]}</td>`).join('');
+    tr.innerHTML = `<td>w${idx + 1}</td>${varCols}<td>${inKB ? '<span class="badge-kb">✓ En M(KB)</span>' : '✕ Descartado'}</td>`;
+    bodyEl.appendChild(tr);
+  });
+
+  document.getElementById('model-count-badge').textContent = `Modelos válidos: ${countKB}/${allWorlds.length}`;
+}
+
+function evaluateQuery() {
+  const qid = document.getElementById('query-formula-select').value;
+  const sc = SCENARIOS[currentScenarioKey];
+  const qObj = sc.formulas.find(f => f.id === qid);
+  if (!qObj) return;
+
+  const kbModels = allWorlds.filter(w => isWorldInKB(w));
+  const qModels = allWorlds.filter(w => qObj.fn(w));
+  const bothModels = kbModels.filter(w => qObj.fn(w));
+
+  const totalKB = kbModels.length;
+  const totalBoth = bothModels.length;
+
+  let relType = '';
+  let msg = '';
+  let bannerClass = '';
+
+  if (totalKB === 0) {
+    relType = 'inconsistent';
+    msg = `<strong>KB es insatisfactible (M(KB) = ∅).</strong> La base contiene contradicciones internas.`;
+    bannerClass = 'contradiction';
+  } else if (totalBoth === totalKB) {
+    relType = 'entailment';
+    msg = `<strong>Vinculación lógica (Entailment: KB ⊨ ${qObj.label}):</strong> Sí. En TODOS los mundos posibles de la KB (${totalKB} mundos), la fórmula "${qObj.label}" es verdadera (M(KB) ⊆ M(f)).`;
+    bannerClass = 'entailment';
+  } else if (totalBoth === 0) {
+    relType = 'contradiction';
+    msg = `<strong>Contradicción (KB contradice ${qObj.label}):</strong> No. La fórmula "${qObj.label}" es FALSA en todos los mundos de la KB (M(KB) ∩ M(f) = ∅). Equivale a KB ⊨ ¬(${qObj.label}).`;
+    bannerClass = 'contradiction';
+  } else {
+    relType = 'contingent';
+    msg = `<strong>Contingencia (Información incompleta):</strong> No se sabe. La fórmula "${qObj.label}" es verdadera en ${totalBoth} modelo(s) y falsa en ${totalKB - totalBoth} modelo(s) de la KB. No se puede afirmar ni negar con certeza.`;
+    bannerClass = 'contingent';
+  }
+
+  const banner = document.getElementById('query-result-banner');
+  banner.className = `result-banner ${bannerClass}`;
+  banner.innerHTML = msg;
+
+  drawVenn(totalKB, qModels.length, totalBoth, relType, qObj.label);
+  drawDecisionTree(relType, qObj.label);
+}
+
+function runAsk() {
+  const qid = document.getElementById('query-formula-select').value;
+  const sc = SCENARIOS[currentScenarioKey];
+  const qObj = sc.formulas.find(f => f.id === qid);
+  const kbModels = allWorlds.filter(w => isWorldInKB(w));
+  const bothModels = kbModels.filter(w => qObj.fn(w));
+
+  let resp = '';
+  if (kbModels.length === 0) resp = 'Error: KB contradictoria';
+  else if (bothModels.length === kbModels.length) resp = 'SÍ (Demostrado lógicamente)';
+  else if (bothModels.length === 0) resp = 'NO (Falso en todo modelo de KB)';
+  else resp = 'NO LO SÉ (Contingente / Indecidible con la información actual)';
+
+  alert(`Ask[${qObj.label}]\nRespuesta del sistema: ${resp}`);
+}
+
+function runTell() {
+  const qid = document.getElementById('query-formula-select').value;
+  const sc = SCENARIOS[currentScenarioKey];
+  const qObj = sc.formulas.find(f => f.id === qid);
+  const kbModels = allWorlds.filter(w => isWorldInKB(w));
+  const bothModels = kbModels.filter(w => qObj.fn(w));
+
+  let resp = '';
+  if (kbModels.length > 0 && bothModels.length === kbModels.length) {
+    resp = 'YA LO SABÍA (Redundante, no recorta más mundos)';
+  } else if (kbModels.length > 0 && bothModels.length === 0) {
+    resp = '¡NO LO CREO! (Contradice los hechos conocidos en KB)';
+  } else {
+    resp = 'APRENDÍ ALGO NUEVO (Se reducen los mundos posibles)';
+    if (!currentKB.includes(qid)) {
+      currentKB.push(qid);
+      renderKB();
+      evaluateQuery();
+    }
+  }
+
+  alert(`Tell[${qObj.label}]\nRespuesta del sistema: ${resp}`);
+}
+
+function drawVenn(kbCount, qCount, bothCount, relType, qLabel) {
+  const svg = document.getElementById('venn-svg');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const rect = document.createElementNS(ns, 'rect');
+  rect.setAttribute('x', '10');
+  rect.setAttribute('y', '10');
+  rect.setAttribute('width', '440');
+  rect.setAttribute('height', '200');
+  rect.setAttribute('rx', '8');
+  rect.setAttribute('fill', 'none');
+  rect.setAttribute('stroke', 'var(--line)');
+  rect.setAttribute('stroke-dasharray', '4 4');
+  svg.appendChild(rect);
+
+  const uLabel = document.createElementNS(ns, 'text');
+  uLabel.setAttribute('x', '24');
+  uLabel.setAttribute('y', '32');
+  uLabel.setAttribute('font-size', '12');
+  uLabel.setAttribute('fill', 'var(--muted)');
+  uLabel.textContent = `Universo de modelos (Total: ${allWorlds.length})`;
+  svg.appendChild(uLabel);
+
+  if (relType === 'entailment') {
+    const cF = document.createElementNS(ns, 'ellipse');
+    cF.setAttribute('cx', '230'); cF.setAttribute('cy', '120');
+    cF.setAttribute('rx', '150'); cF.setAttribute('ry', '75');
+    cF.setAttribute('fill', 'var(--query-soft)');
+    cF.setAttribute('stroke', 'var(--query-color)');
+    cF.setAttribute('stroke-width', '2');
+    svg.appendChild(cF);
+
+    const cKB = document.createElementNS(ns, 'ellipse');
+    cKB.setAttribute('cx', '230'); cKB.setAttribute('cy', '125');
+    cKB.setAttribute('rx', '80'); cKB.setAttribute('ry', '45');
+    cKB.setAttribute('fill', 'var(--kb-soft)');
+    cKB.setAttribute('stroke', 'var(--kb-color)');
+    cKB.setAttribute('stroke-width', '2.5');
+    svg.appendChild(cKB);
+
+    const txtKB = document.createElementNS(ns, 'text');
+    txtKB.setAttribute('x', '230'); txtKB.setAttribute('y', '128');
+    txtKB.setAttribute('text-anchor', 'middle');
+    txtKB.setAttribute('font-size', '13');
+    txtKB.setAttribute('font-weight', '700');
+    txtKB.setAttribute('fill', 'var(--kb-color)');
+    txtKB.textContent = `M(KB) [${kbCount} mundos]`;
+    svg.appendChild(txtKB);
+
+    const txtF = document.createElementNS(ns, 'text');
+    txtF.setAttribute('x', '230'); txtF.setAttribute('y', '68');
+    txtF.setAttribute('text-anchor', 'middle');
+    txtF.setAttribute('font-size', '13');
+    txtF.setAttribute('font-weight', '700');
+    txtF.setAttribute('fill', 'var(--query-color)');
+    txtF.textContent = `M(f): ${qLabel} [${qCount} mundos]`;
+    svg.appendChild(txtF);
+  } else if (relType === 'contradiction') {
+    const cKB = document.createElementNS(ns, 'ellipse');
+    cKB.setAttribute('cx', '140'); cKB.setAttribute('cy', '120');
+    cKB.setAttribute('rx', '85'); cKB.setAttribute('ry', '55');
+    cKB.setAttribute('fill', 'var(--kb-soft)');
+    cKB.setAttribute('stroke', 'var(--kb-color)');
+    cKB.setAttribute('stroke-width', '2');
+    svg.appendChild(cKB);
+
+    const cF = document.createElementNS(ns, 'ellipse');
+    cF.setAttribute('cx', '320'); cF.setAttribute('cy', '120');
+    cF.setAttribute('rx', '85'); cF.setAttribute('ry', '55');
+    cF.setAttribute('fill', 'var(--danger-soft)');
+    cF.setAttribute('stroke', 'var(--danger)');
+    cF.setAttribute('stroke-width', '2');
+    svg.appendChild(cF);
+
+    const txtKB = document.createElementNS(ns, 'text');
+    txtKB.setAttribute('x', '140'); txtKB.setAttribute('y', '124');
+    txtKB.setAttribute('text-anchor', 'middle');
+    txtKB.setAttribute('font-size', '12');
+    txtKB.setAttribute('font-weight', '700');
+    txtKB.setAttribute('fill', 'var(--kb-color)');
+    txtKB.textContent = `M(KB) [${kbCount}]`;
+    svg.appendChild(txtKB);
+
+    const txtF = document.createElementNS(ns, 'text');
+    txtF.setAttribute('x', '320'); txtF.setAttribute('y', '124');
+    txtF.setAttribute('text-anchor', 'middle');
+    txtF.setAttribute('font-size', '12');
+    txtF.setAttribute('font-weight', '700');
+    txtF.setAttribute('fill', 'var(--danger)');
+    txtF.textContent = `M(f) [${qCount}] (Disjuntos)`;
+    svg.appendChild(txtF);
+  } else {
+    const cKB = document.createElementNS(ns, 'ellipse');
+    cKB.setAttribute('cx', '180'); cKB.setAttribute('cy', '120');
+    cKB.setAttribute('rx', '95'); cKB.setAttribute('ry', '60');
+    cKB.setAttribute('fill', 'var(--kb-soft)');
+    cKB.setAttribute('stroke', 'var(--kb-color)');
+    cKB.setAttribute('stroke-width', '2');
+    cKB.setAttribute('opacity', '0.7');
+    svg.appendChild(cKB);
+
+    const cF = document.createElementNS(ns, 'ellipse');
+    cF.setAttribute('cx', '280'); cF.setAttribute('cy', '120');
+    cF.setAttribute('rx', '95'); cF.setAttribute('ry', '60');
+    cF.setAttribute('fill', 'var(--query-soft)');
+    cF.setAttribute('stroke', 'var(--query-color)');
+    cF.setAttribute('stroke-width', '2');
+    cF.setAttribute('opacity', '0.7');
+    svg.appendChild(cF);
+
+    const txt = document.createElementNS(ns, 'text');
+    txt.setAttribute('x', '230'); txt.setAttribute('y', '124');
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('font-size', '11');
+    txt.setAttribute('font-weight', '700');
+    txt.setAttribute('fill', 'var(--ink)');
+    txt.textContent = `∩ = ${bothCount}`;
+    svg.appendChild(txt);
+  }
+}
+
+function drawDecisionTree(relType, qLabel) {
+  const svg = document.getElementById('decision-svg');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function box(x, y, w, h, text, isActive, isSuccess, isFail) {
+    const g = document.createElementNS(ns, 'g');
+    const r = document.createElementNS(ns, 'rect');
+    r.setAttribute('x', x); r.setAttribute('y', y);
+    r.setAttribute('width', w); r.setAttribute('height', h);
+    r.setAttribute('rx', '6');
+
+    let stroke = 'var(--line)';
+    let fill = 'var(--panel)';
+    if (isActive) { stroke = 'var(--accent)'; fill = 'var(--accent-soft)'; }
+    if (isSuccess) { stroke = 'var(--kb-color)'; fill = 'var(--kb-soft)'; }
+    if (isFail) { stroke = 'var(--danger)'; fill = 'var(--danger-soft)'; }
+
+    r.setAttribute('stroke', stroke);
+    r.setAttribute('stroke-width', isActive || isSuccess || isFail ? '2.5' : '1.5');
+    r.setAttribute('fill', fill);
+    g.appendChild(r);
+
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', x + w / 2);
+    t.setAttribute('y', y + h / 2 + 4);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', '12');
+    t.setAttribute('font-weight', '700');
+    t.setAttribute('fill', 'var(--ink)');
+    t.textContent = text;
+    g.appendChild(t);
+    svg.appendChild(g);
+    return g;
+  }
+
+  function line(x1, y1, x2, y2, label, active) {
+    const l = document.createElementNS(ns, 'line');
+    l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+    l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+    l.setAttribute('stroke', active ? 'var(--accent)' : 'var(--line)');
+    l.setAttribute('stroke-width', active ? '3' : '1.5');
+    svg.appendChild(l);
+
+    if (label) {
+      const t = document.createElementNS(ns, 'text');
+      t.setAttribute('x', (x1 + x2) / 2 + (x2 > x1 ? 8 : -14));
+      t.setAttribute('y', (y1 + y2) / 2);
+      t.setAttribute('font-size', '11');
+      t.setAttribute('font-weight', '800');
+      t.setAttribute('fill', active ? 'var(--accent)' : 'var(--muted)');
+      t.textContent = label;
+      svg.appendChild(t);
+    }
+  }
+
+  box(80, 20, 220, 40, '¿KB ∪ {¬f} es satisfactible?', true, false, false);
+
+  const isEntail = (relType === 'entailment');
+  line(140, 60, 100, 130, 'NO', isEntail);
+  box(30, 130, 140, 40, 'Entailment (KB ⊨ f)', false, isEntail, false);
+
+  const notEntail = (relType === 'contradiction' || relType === 'contingent');
+  line(240, 60, 360, 100, 'SÍ', notEntail);
+  box(260, 100, 210, 40, '¿KB ∪ {f} es satisfactible?', notEntail, false, false);
+
+  const isContrad = (relType === 'contradiction');
+  line(310, 140, 260, 175, 'NO', isContrad);
+  box(190, 170, 140, 35, 'Contradicción (KB ⊨ ¬f)', false, false, isContrad);
+
+  const isContin = (relType === 'contingent');
+  line(410, 140, 480, 175, 'SÍ', isContin);
+  box(440, 170, 140, 35, 'Contingente (No lo sé)', false, isContin, false);
+
+  const statEl = document.getElementById('decision-status');
+  if (isEntail) {
+    statEl.className = 'result-banner entailment';
+    statEl.innerHTML = `<strong>Ruta de deducción para "${qLabel}":</strong> KB ∪ {¬f} es INSATISFACTIBLE (devuelve NO). Conclusión: <strong>Entailment directo (KB ⊨ ${qLabel})</strong>. No fue necesario evaluar la segunda pregunta.`;
+  } else if (isContrad) {
+    statEl.className = 'result-banner contradiction';
+    statEl.innerHTML = `<strong>Ruta de deducción para "${qLabel}":</strong> KB ∪ {¬f} es satisfactible (SÍ), pero KB ∪ {f} es INSATISFACTIBLE (NO). Conclusión: <strong>Contradicción (KB ⊨ ¬${qLabel})</strong>.`;
+  } else {
+    statEl.className = 'result-banner contingent';
+    statEl.innerHTML = `<strong>Ruta de deducción para "${qLabel}":</strong> Ambas ramas KB ∪ {¬f} y KB ∪ {f} son satisfactibles (SÍ, SÍ). Conclusión: <strong>Contingente (No lo sé / Información insuficiente)</strong>.`;
+  }
+}
+
+function drawCSP() {
+  const svg = document.getElementById('csp-svg');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const nodes = [
+    { id: 'A', x: 100, y: 90, label: 'A ∈ {0, 1}' },
+    { id: 'B', x: 340, y: 90, label: 'B ∈ {0, 1}' },
+    { id: 'C', x: 580, y: 90, label: 'C ∈ {0, 1}' }
+  ];
+
+  function edge(x1, y1, x2, y2, label) {
+    const l = document.createElementNS(ns, 'line');
+    l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+    l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+    l.setAttribute('stroke', 'var(--line)');
+    l.setAttribute('stroke-width', '3');
+    svg.appendChild(l);
+
+    const mx = (x1 + x2) / 2;
+    const my = (y1 + y2) / 2;
+
+    const r = document.createElementNS(ns, 'rect');
+    r.setAttribute('x', mx - 45); r.setAttribute('y', my - 14);
+    r.setAttribute('width', '90'); r.setAttribute('height', '28');
+    r.setAttribute('rx', '4');
+    r.setAttribute('fill', 'var(--panel)');
+    r.setAttribute('stroke', 'var(--accent)');
+    svg.appendChild(r);
+
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', mx); t.setAttribute('y', my + 4);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', '11');
+    t.setAttribute('font-weight', '700');
+    t.setAttribute('fill', 'var(--accent)');
+    t.textContent = label;
+    svg.appendChild(t);
+  }
+
+  edge(100, 90, 340, 90, 'A ∨ B');
+  edge(340, 90, 580, 90, 'B ↔ ¬C');
+
+  nodes.forEach(n => {
+    const c = document.createElementNS(ns, 'circle');
+    c.setAttribute('cx', n.x); c.setAttribute('cy', n.y);
+    c.setAttribute('r', '32');
+    c.setAttribute('fill', 'var(--accent-soft)');
+    c.setAttribute('stroke', 'var(--accent)');
+    c.setAttribute('stroke-width', '2.5');
+    svg.appendChild(c);
+
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', n.x); t.setAttribute('y', n.y + 4);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', '14');
+    t.setAttribute('font-weight', '800');
+    t.setAttribute('fill', 'var(--ink)');
+    t.textContent = n.id;
+    svg.appendChild(t);
+
+    const d = document.createElementNS(ns, 'text');
+    d.setAttribute('x', n.x); d.setAttribute('y', n.y + 48);
+    d.setAttribute('text-anchor', 'middle');
+    d.setAttribute('font-size', '11');
+    d.setAttribute('fill', 'var(--muted)');
+    d.textContent = '{0, 1}';
+    svg.appendChild(d);
+  });
+
+  const solEl = document.getElementById('csp-solutions');
+  const valid = [];
+  for (let a of [0, 1]) {
+    for (let b of [0, 1]) {
+      for (let c of [0, 1]) {
+        if ((a === 1 || b === 1) && (b !== c)) {
+          valid.push(`{A: ${a}, B: ${b}, C: ${c}}`);
+        }
+      }
+    }
+  }
+  solEl.innerHTML = valid.map((s, i) => `<div><strong>Solución ${i+1}:</strong> ${s}</div>`).join('');
+}
+
+window.onload = init;
+</script>
+</body>
+</html>

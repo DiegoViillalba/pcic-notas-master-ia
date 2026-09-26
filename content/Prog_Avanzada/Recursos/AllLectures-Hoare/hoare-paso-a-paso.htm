@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lógica de Hoare paso a paso</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f7fb;
+      --panel: #ffffff;
+      --text: #20212a;
+      --muted: #656978;
+      --line: #d8dbe6;
+      --accent: #5b4bc4;
+      --accent-soft: #ece9ff;
+      --ok: #177448;
+      --ok-soft: #e5f6ed;
+      --warn: #965d00;
+      --warn-soft: #fff3d6;
+      --code: #f0f1f6;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #18191f;
+        --panel: #23242d;
+        --text: #f2f2f5;
+        --muted: #b4b6c2;
+        --line: #3c3e4a;
+        --accent: #b7aaff;
+        --accent-soft: #332e55;
+        --ok: #7fdaa9;
+        --ok-soft: #203b2e;
+        --warn: #ffd181;
+        --warn-soft: #4b381c;
+        --code: #2b2d37;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main { max-width: 920px; margin: 0 auto; padding: 22px; }
+    h1 { margin: 0 0 6px; font-size: clamp(1.45rem, 4vw, 2rem); }
+    h2 { margin: 0; font-size: 1.15rem; }
+    p { margin: 8px 0; }
+    .intro { color: var(--muted); margin-bottom: 18px; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    button {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 13px;
+      color: var(--text);
+      background: var(--panel);
+      font: inherit;
+      font-weight: 650;
+    }
+    button:hover { border-color: var(--accent); }
+    button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    button[aria-selected="true"], .primary {
+      color: #fff;
+      background: #5b4bc4;
+      border-color: #5b4bc4;
+    }
+    @media (prefers-color-scheme: dark) {
+      button[aria-selected="true"], .primary { color: #16131f; background: #b7aaff; border-color: #b7aaff; }
+    }
+    .lesson { display: none; }
+    .lesson.active { display: block; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, .8fr); gap: 16px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .program {
+      white-space: pre-wrap;
+      margin: 12px 0 0;
+      padding: 12px;
+      border-radius: 9px;
+      background: var(--code);
+      font: 0.95rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .rule { margin: 12px 0 0; padding: 10px 12px; border-left: 4px solid var(--accent); background: var(--accent-soft); }
+    .progress { display: flex; gap: 6px; margin: 14px 0; }
+    .dot { height: 7px; flex: 1; border-radius: 10px; background: var(--line); }
+    .dot.done { background: var(--accent); }
+    .step-label { color: var(--muted); font-size: .9rem; }
+    .step-title { margin: 4px 0 8px; font-size: 1.08rem; font-weight: 700; }
+    .formula {
+      overflow-wrap: anywhere;
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 9px;
+      background: var(--code);
+      font: 0.98rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .meaning { padding: 10px 12px; border-radius: 9px; background: var(--ok-soft); color: var(--ok); }
+    .warning { padding: 10px 12px; border-radius: 9px; background: var(--warn-soft); color: var(--warn); }
+    .controls { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
+    .controls button { flex: 1; }
+    .checklist { padding-left: 21px; }
+    .checklist li { margin: 7px 0; }
+    .state-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+    .state { text-align: center; padding: 9px; border-radius: 9px; background: var(--code); }
+    .state strong { display: block; font-size: 1.15rem; }
+    label { display: block; font-weight: 650; margin-top: 12px; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (max-width: 680px) {
+      main { padding: 14px; }
+      .layout { grid-template-columns: 1fr; }
+      .tabs button { flex: 1 1 145px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Lógica de Hoare · práctica guiada</h1>
+  <p class="intro">Elige un tipo de programa y avanza un paso a la vez. La ejecución va hacia adelante; la verificación de asignaciones suele construirse hacia atrás.</p>
+
+  <div class="tabs" role="tablist" aria-label="Tipo de ejercicio">
+    <button id="tab-seq" role="tab" aria-selected="true" aria-controls="seq">1 · Secuencia</button>
+    <button id="tab-if" role="tab" aria-selected="false" aria-controls="if">2 · Condicional</button>
+    <button id="tab-loop" role="tab" aria-selected="false" aria-controls="loop">3 · Ciclo</button>
+  </div>
+
+  <section id="seq" class="lesson active" role="tabpanel" aria-labelledby="tab-seq">
+    <div class="layout">
+      <div class="card">
+        <h2>Precondición más débil de una secuencia</h2>
+        <pre class="program">x := x + 1;
+y := 2 * x
+
+Postcondición: y ≥ 10</pre>
+        <div class="rule"><strong>Regla:</strong> wp(V := E, Q) = Q[E/V]. Se comienza por la última instrucción.</div>
+      </div>
+      <div class="card step-card" data-lesson="seq" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section id="if" class="lesson" role="tabpanel" aria-labelledby="tab-if">
+    <div class="layout">
+      <div class="card">
+        <h2>Las dos ramas deben llegar a la misma meta</h2>
+        <pre class="program">if x ≥ 0 then
+    y := x
+else
+    y := -x
+
+Postcondición: y ≥ 0</pre>
+        <div class="rule"><strong>Regla:</strong> se prueba la rama verdadera con P ∧ B y la falsa con P ∧ ¬B.</div>
+      </div>
+      <div class="card step-card" data-lesson="if" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section id="loop" class="lesson" role="tabpanel" aria-labelledby="tab-loop">
+    <div class="layout">
+      <div class="card">
+        <h2>Suma de 1 hasta n</h2>
+        <pre class="program">i := 0; s := 0;
+while i &lt; n do
+    i := i + 1;
+    s := s + i
+
+Post: s = n(n+1)/2</pre>
+        <label for="n-value">Prueba una entrada: n = <output id="n-output">5</output></label>
+        <input id="n-value" type="range" min="0" max="10" value="5">
+        <div class="state-grid" aria-live="polite">
+          <div class="state">Iteración<strong id="it-value">0</strong></div>
+          <div class="state">i<strong id="i-value">0</strong></div>
+          <div class="state">s<strong id="s-value">0</strong></div>
+        </div>
+        <button id="iterate" class="primary" style="width:100%;margin-top:10px">Ejecutar una iteración</button>
+      </div>
+      <div class="card step-card" data-lesson="loop" aria-live="polite"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const lessons = {
+    seq: [
+      {t:"1. Fijar la meta", f:"Q ≡ y ≥ 10", m:"Todavía no ejecutamos nada: escribimos con precisión qué debe ser cierto al final."},
+      {t:"2. Retroceder por la última asignación", f:"wp(y := 2x, y ≥ 10) = 2x ≥ 10", m:"Sustituimos y por 2x porque ese será el nuevo valor de y."},
+      {t:"3. Simplificar", f:"2x ≥ 10  ⇔  x ≥ 5", m:"Esta es la condición intermedia justo antes de asignar y."},
+      {t:"4. Retroceder por la primera asignación", f:"wp(x := x+1, x ≥ 5) = x+1 ≥ 5", m:"El x de la expresión x+1 es el valor anterior a la asignación."},
+      {t:"5. Obtener la entrada mínima", f:"x+1 ≥ 5  ⇔  x ≥ 4", m:"Resultado: {x ≥ 4} x:=x+1; y:=2x {y ≥ 10}."}
+    ],
+    if: [
+      {t:"1. Nombrar guarda y meta", f:"B ≡ x ≥ 0     Q ≡ y ≥ 0", m:"Las guardas B y ¬B cubren todos los estados posibles."},
+      {t:"2. Rama verdadera", f:"{x ≥ 0} y := x {y ≥ 0}", m:"Sustituir y por x en Q produce x ≥ 0, exactamente la hipótesis de esta rama."},
+      {t:"3. Rama falsa", f:"{x < 0} y := -x {y ≥ 0}", m:"Sustituir y por −x produce −x ≥ 0, que se deduce de x < 0."},
+      {t:"4. Unir las ramas", f:"{⊤} if x≥0 then y:=x else y:=-x {y≥0}", m:"Como ambas ramas garantizan la misma Q, la regla condicional cierra la prueba."},
+      {t:"5. Garantía más precisa", f:"Post más fuerte: y = |x₀|", m:"Una prueba puede conservar el valor inicial x₀ para describir no solo el signo, sino el resultado exacto."}
+    ],
+    loop: [
+      {t:"1. Proponer el invariante", f:"I ≡ s = i(i+1)/2  ∧  0 ≤ i ≤ n", m:"s resume lo hecho; los términos desde i+1 hasta n son lo que falta."},
+      {t:"2. Inicialización", f:"i=0, s=0  ⇒  s=0(0+1)/2", m:"I es verdadero antes de entrar al ciclo."},
+      {t:"3. Mantenimiento", f:"s' = s+(i+1) = (i+1)(i+2)/2", m:"Tras i':=i+1 y s':=s+i', la misma fórmula vale con los valores nuevos."},
+      {t:"4. Salida", f:"I ∧ ¬(i<n)  ⇒  i=n  ⇒  s=n(n+1)/2", m:"El invariante no basta solo: se combina con la negación de la guarda."},
+      {t:"5. Terminación", f:"Variante E = n−i ≥ 0; cada vuelta la reduce en 1", m:"Una cantidad entera no negativa no puede descender para siempre. Esto añade corrección total."},
+      {t:"6. Condiciones de verificación", f:"P⇒I;  I∧¬B⇒Q;  {I∧B} C {I};  E≥0 y E disminuye", m:"El programa desaparece y quedan obligaciones lógicas que se pueden comprobar una por una."}
+    ]
+  };
+
+  const positions = {seq:0, if:0, loop:0};
+
+  function renderStep(name) {
+    const box = document.querySelector(`.step-card[data-lesson="${name}"]`);
+    const items = lessons[name];
+    const index = positions[name];
+    const step = items[index];
+    box.innerHTML = `
+      <div class="step-label">Paso ${index + 1} de ${items.length}</div>
+      <div class="progress" aria-hidden="true">${items.map((_,i)=>`<span class="dot ${i<=index?'done':''}"></span>`).join('')}</div>
+      <div class="step-title">${step.t}</div>
+      <div class="formula">${step.f}</div>
+      <div class="meaning">${step.m}</div>
+      <div class="controls">
+        <button data-action="prev" ${index===0?'disabled':''}>← Anterior</button>
+        <button data-action="next" class="${index<items.length-1?'primary':''}" ${index===items.length-1?'disabled':''}>Siguiente →</button>
+      </div>`;
+    box.querySelectorAll('button[data-action]').forEach(btn => btn.addEventListener('click', () => {
+      positions[name] += btn.dataset.action === 'next' ? 1 : -1;
+      renderStep(name);
+    }));
+  }
+
+  document.querySelectorAll('[role="tab"]').forEach(tab => tab.addEventListener('click', () => {
+    document.querySelectorAll('[role="tab"]').forEach(t => t.setAttribute('aria-selected', 'false'));
+    document.querySelectorAll('.lesson').forEach(p => p.classList.remove('active'));
+    tab.setAttribute('aria-selected', 'true');
+    document.getElementById(tab.getAttribute('aria-controls')).classList.add('active');
+  }));
+
+  let iteration = 0;
+  const slider = document.getElementById('n-value');
+  const iterate = document.getElementById('iterate');
+  function updateRun(reset=false) {
+    const n = Number(slider.value);
+    if (reset) iteration = 0;
+    if (iteration > n) iteration = n;
+    document.getElementById('n-output').value = n;
+    document.getElementById('it-value').textContent = iteration;
+    document.getElementById('i-value').textContent = iteration;
+    document.getElementById('s-value').textContent = iteration * (iteration + 1) / 2;
+    iterate.textContent = iteration < n ? 'Ejecutar una iteración' : 'Reiniciar ejecución';
+  }
+  slider.addEventListener('input', () => updateRun(true));
+  iterate.addEventListener('click', () => {
+    const n = Number(slider.value);
+    iteration = iteration < n ? iteration + 1 : 0;
+    updateRun();
+  });
+
+  Object.keys(lessons).forEach(renderStep);
+  updateRun();
+</script>
+</body>
+</html>

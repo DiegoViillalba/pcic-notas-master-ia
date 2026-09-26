@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A*: consistencia y reaperturas</title>
+<style>
+:root{color-scheme:light dark;--bg:#f7f8fc;--panel:#fff;--ink:#202536;--muted:#657087;--line:#aab1c3;--blue:#2563eb;--blue-bg:#dbeafe;--amber:#d97706;--amber-bg:#fef3c7;--green:#16a34a;--green-bg:#dcfce7;--red:#dc2626;--red-bg:#fee2e2;--purple:#7c3aed;--purple-bg:#ede9fe}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font:15px/1.42 system-ui,-apple-system,sans-serif}main{max-width:920px;margin:auto}h2{font-size:20px;margin:0}.modes,.stepbar,.facts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.modes{margin:10px 0}button{border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:var(--panel);color:var(--ink);cursor:pointer}button[aria-pressed=true]{background:var(--blue-bg);border-color:var(--blue);font-weight:750}button:disabled{opacity:.38}.facts{margin-bottom:10px}.fact{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 9px;font-size:13px}.fact strong{margin-left:3px}.yes strong{color:var(--green)}.no strong{color:var(--red)}.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(265px,.8fr);gap:12px}svg{width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}.edge{stroke:var(--line);stroke-width:3;fill:none}.edge-label{fill:var(--ink);font-size:14px;font-weight:800;paint-order:stroke;stroke:var(--panel);stroke-width:5px}.node circle{fill:var(--panel);stroke:var(--line);stroke-width:3}.node text{text-anchor:middle;fill:var(--ink);font-size:13px;font-weight:750}.node.frontier circle{fill:var(--amber-bg);stroke:var(--amber)}.node.closed circle{fill:#e5e7eb}.node.current circle{fill:var(--blue-bg);stroke:var(--blue)}.node.reopened circle{fill:var(--purple-bg);stroke:var(--purple);stroke-dasharray:5 3}.node.goal circle{fill:var(--green-bg);stroke:var(--green)}.side{display:flex;flex-direction:column;gap:9px}.box,.status{border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:9px 11px}.box h3{font-size:13px;margin:0 0 6px;color:var(--muted)}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}th,td{text-align:center;padding:3px 4px;border-bottom:1px solid color-mix(in srgb,var(--line) 45%,transparent)}th{font-size:11px;color:var(--muted)}tbody tr:first-child td{font-weight:800;color:var(--amber)}.closed-list{font-family:ui-monospace,monospace;font-weight:750}.status{border-left:4px solid var(--amber);min-height:98px}.calc{margin-top:6px;font-family:ui-monospace,monospace;font-size:13px}.bad{color:var(--red);font-weight:800}.good{color:var(--green);font-weight:800}.purple{color:var(--purple);font-weight:800}.stepbar{justify-content:center;margin-top:10px}.counter{min-width:90px;text-align:center;color:var(--muted);font-weight:700}
+@media(max-width:700px){body{padding:10px}.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.status{grid-column:1/-1}}
+@media(prefers-color-scheme:dark){:root{--bg:#20232c;--panel:#292d38;--ink:#eef0f5;--muted:#b3bac9;--line:#596173;--blue:#78aef5;--blue-bg:#284b75;--amber:#f2b84b;--amber-bg:#4b3c1d;--green:#63d58a;--green-bg:#28583b;--red:#ff8585;--red-bg:#663838;--purple:#c5a3ff;--purple-bg:#4b376f}.node.closed circle{fill:#444955}}
+</style>
+<main>
+  <h2>La misma heurística, tres políticas de A*</h2>
+  <div class="modes" id="modes">
+    <button type="button" data-mode="closed" aria-pressed="true">Inconsistente · sin reabrir</button>
+    <button type="button" data-mode="reopen" aria-pressed="false">Inconsistente · reabrir</button>
+    <button type="button" data-mode="consistent" aria-pressed="false">Consistente · sin reabrir</button>
+  </div>
+  <div class="facts">
+    <span class="fact yes">Admisible:<strong>Sí</strong></span>
+    <span class="fact" id="consistent-fact">Consistente:<strong></strong></span>
+    <span class="fact" id="reopen-fact">Reaperturas:<strong></strong></span>
+    <span class="fact" id="edge-fact"></span>
+  </div>
+  <div class="layout">
+    <svg viewBox="0 0 700 390" role="img" aria-label="Grafo del contraejemplo de consistencia de A estrella">
+      <defs><marker id="arrow-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+      <path class="edge" d="M108 180 Q175 85 245 88" marker-end="url(#arrow-c)"/><text class="edge-label" x="166" y="116">1</text>
+      <path class="edge" d="M108 220 Q175 310 245 302" marker-end="url(#arrow-c)"/><text class="edge-label" x="166" y="286">1</text>
+      <path class="edge" d="M310 100 Q410 105 470 180" marker-end="url(#arrow-c)"/><text class="edge-label" x="395" y="118">1</text>
+      <path class="edge" d="M310 290 Q410 282 470 220" marker-end="url(#arrow-c)"/><text class="edge-label" x="395" y="278">2</text>
+      <path class="edge" d="M530 200 L630 200" marker-end="url(#arrow-c)"/><text class="edge-label" x="578" y="183">3</text>
+      <g class="node" data-node="S" transform="translate(75 200)"><circle r="37"/><text><tspan x="0" dy="-7">S</tspan><tspan class="h" x="0" dy="18"></tspan></text></g>
+      <g class="node" data-node="A" transform="translate(278 88)"><circle r="37"/><text><tspan x="0" dy="-7">A</tspan><tspan class="h" x="0" dy="18"></tspan></text></g>
+      <g class="node" data-node="B" transform="translate(278 302)"><circle r="37"/><text><tspan x="0" dy="-7">B</tspan><tspan class="h" x="0" dy="18"></tspan></text></g>
+      <g class="node" data-node="C" transform="translate(500 200)"><circle r="37"/><text><tspan x="0" dy="-7">C</tspan><tspan class="h" x="0" dy="18"></tspan></text></g>
+      <g class="node" data-node="G" transform="translate(662 200)"><circle r="30"/><text><tspan x="0" dy="-7">G</tspan><tspan class="h" x="0" dy="18">h=0</tspan></text></g>
+    </svg>
+    <div class="side">
+      <div class="box"><h3>Frontera ordenada por f</h3><table><thead><tr><th>Nodo</th><th>g</th><th>h</th><th>f</th></tr></thead><tbody id="frontier-body"></tbody></table><div id="empty">∅</div></div>
+      <div class="box"><h3>Estados cerrados</h3><div class="closed-list" id="closed-list">∅</div></div>
+      <div class="status" id="status" aria-live="polite"></div>
+    </div>
+  </div>
+  <div class="stepbar"><button type="button" id="prev">← Atrás</button><span class="counter" id="counter"></span><button type="button" id="next">Siguiente →</button></div>
+</main>
+<script>
+const base={S:2,B:1,C:1,G:0};
+const cases={
+ closed:{h:{...base,A:4},consistent:false,reopen:false,steps:[
+  {cur:'S',front:[['S',0]],closed:[],text:'Inicio: S es el único nodo de la frontera.'},
+  {cur:'B',front:[['B',1],['A',1]],closed:['S'],text:'Tras expandir S: f(B)=2 y f(A)=5. B sale primero.'},
+  {cur:'C',front:[['C',3],['A',1]],closed:['S','B'],text:'B genera C con g=3 y f=4; C todavía parece mejor que A.'},
+  {cur:'A',front:[['A',1],['G',6]],closed:['S','B','C'],text:'C se cierra con g=3 y genera G con costo 6. Después sale A.'},
+  {cur:null,front:[['G',6]],closed:['S','B','C','A'],text:'A encuentra un camino mejor a C: g=2. Como C ya está cerrado, se descarta. <span class="bad">La mejora no llega a G.</span>'},
+  {cur:'G',front:[],closed:['S','B','C','A'],goal:true,text:'G sale con g=6. <span class="bad">Resultado subóptimo: S → B → C → G.</span>'}
+ ]},
+ reopen:{h:{...base,A:4},consistent:false,reopen:true,steps:[
+  {cur:'S',front:[['S',0]],closed:[],text:'Inicio con la misma heurística admisible pero inconsistente.'},
+  {cur:'B',front:[['B',1],['A',1]],closed:['S'],text:'B sale primero porque f(B)=2 < f(A)=5.'},
+  {cur:'C',front:[['C',3],['A',1]],closed:['S','B'],text:'C se alcanza primero por B con g=3 y f=4.'},
+  {cur:'A',front:[['A',1],['G',6]],closed:['S','B','C'],text:'C se cierra y genera G con costo 6. Después se expande A.'},
+  {cur:null,front:[['C',2],['G',6]],closed:['S','B','A'],reopened:'C',text:'A mejora C a g=2. Esta política lo saca de cerrados y lo <span class="purple">reabre</span> con f=3.'},
+  {cur:'C',front:[['G',6]],closed:['S','B','A'],reopened:'C',text:'C se expande de nuevo, ahora con g=2, y mejora G de 6 a 5.'},
+  {cur:'G',front:[],closed:['S','B','A','C'],goal:true,text:'G sale con g=5. <span class="good">Resultado óptimo, a costa de reexpandir C.</span>'}
+ ]},
+ consistent:{h:{...base,A:2},consistent:true,reopen:false,steps:[
+  {cur:'S',front:[['S',0]],closed:[],text:'Inicio con h(A)=2. Todas las desigualdades de consistencia se cumplen.'},
+  {cur:'B',front:[['B',1],['A',1]],closed:['S'],text:'B sigue saliendo primero: f(B)=2 y f(A)=3.'},
+  {cur:'A',front:[['A',1],['C',3]],closed:['S','B'],text:'B genera C con g=3 y f=4. A sale antes, con f=3.'},
+  {cur:'C',front:[['C',2]],closed:['S','B','A'],text:'A mejora C mientras todavía está en la frontera: g baja de 3 a 2 y f baja de 4 a 3.'},
+  {cur:null,front:[['G',5]],closed:['S','B','A','C'],text:'C se expande una sola vez, ya con su mejor g, y genera G con costo 5.'},
+  {cur:'G',front:[],closed:['S','B','A','C'],goal:true,text:'G sale con g=5. <span class="good">Resultado óptimo sin reabrir ningún estado.</span>'}
+ ]}
+};
+const nodeEls=[...document.querySelectorAll('[data-node]')],tbody=document.getElementById('frontier-body'),empty=document.getElementById('empty'),closedList=document.getElementById('closed-list'),status=document.getElementById('status'),counter=document.getElementById('counter'),prev=document.getElementById('prev'),next=document.getElementById('next');let mode='closed',index=0;
+function draw(){const c=cases[mode],s=c.steps[index];nodeEls.forEach(el=>{const id=el.dataset.node;el.querySelector('.h').textContent='h='+c.h[id];let cls='node';if(s.closed.includes(id))cls+=' closed';if(s.front.some(r=>r[0]===id))cls+=' frontier';if(s.reopened===id)cls+=' reopened';if(s.cur===id)cls+=' current';if(s.goal&&id==='G')cls+=' goal';el.setAttribute('class',cls)});tbody.innerHTML=s.front.map(([n,g])=>`<tr><td>${n}</td><td>${g}</td><td>${c.h[n]}</td><td>${g+c.h[n]}</td></tr>`).join('');empty.hidden=s.front.length>0;closedList.textContent=s.closed.length?s.closed.join(' · '):'∅';status.innerHTML=s.text+`<div class="calc">A→C: ${c.h.A} ≤ 1 + ${c.h.C} &nbsp; ${c.consistent?'<span class="good">✓</span>':'<span class="bad">✗</span>'}</div>`;counter.textContent=`Paso ${index+1}/${c.steps.length}`;prev.disabled=index===0;next.disabled=index===c.steps.length-1;const cf=document.getElementById('consistent-fact');cf.className='fact '+(c.consistent?'yes':'no');cf.querySelector('strong').textContent=c.consistent?'Sí':'No';const rf=document.getElementById('reopen-fact');rf.className='fact '+(c.reopen?'yes':'no');rf.querySelector('strong').textContent=c.reopen?'Sí':'No';document.getElementById('edge-fact').innerHTML=`A→C: <strong>${c.h.A} ≤ 1+${c.h.C}</strong>`;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)))}
+prev.addEventListener('click',()=>{index--;draw()});next.addEventListener('click',()=>{index++;draw()});document.getElementById('modes').addEventListener('click',e=>{if(!e.target.dataset.mode)return;mode=e.target.dataset.mode;index=0;draw()});draw();
+</script>
+</html>

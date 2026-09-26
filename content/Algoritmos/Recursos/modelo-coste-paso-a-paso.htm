@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Del problema a la cota asintótica</title>
+<style>
+:root{color-scheme:light dark;--bg:#f7f8fc;--panel:#fff;--ink:#202536;--muted:#667085;--line:#c7cddd;--blue:#2563eb;--blue-soft:#dbeafe;--green:#16834a;--green-soft:#dcfce7;--amber:#b76b08;--amber-soft:#fef3c7}
+*{box-sizing:border-box}body{margin:0;padding:18px;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:900px;margin:auto}h2{margin:0 0 4px;font-size:21px}p{margin:0}.subtitle{color:var(--muted)}.path{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:8px;margin:18px 0 12px}.stage{position:relative;min-height:98px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);text-align:left;cursor:pointer}.stage:not(:last-child)::after{content:"→";position:absolute;right:-9px;top:37px;z-index:2;color:var(--muted);font-weight:800}.stage[aria-pressed="true"]{border-color:var(--blue);background:var(--blue-soft)}.stage.done{border-color:var(--green)}.number{display:block;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}.stage strong{display:block;margin:3px 0;font-size:15px}.stage code{font-size:13px}.detail{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(230px,.75fr);gap:12px;align-items:stretch}.explain,.result{padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}.eyebrow{color:var(--blue);font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}.explain h3{margin:3px 0 7px;font-size:18px}.example{margin-top:10px;padding:10px;border-radius:9px;background:var(--amber-soft);color:var(--ink);font-variant-numeric:tabular-nums}.result{display:flex;flex-direction:column;justify-content:center;text-align:center}.result .label{color:var(--muted);font-size:13px}.result .formula{margin:8px 0;color:var(--green);font-size:22px;font-weight:800}.result .meaning{font-size:13px}.nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px}.nav button{min-height:38px;padding:7px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer}.nav button:disabled{opacity:.4;cursor:default}.counter{min-width:92px;text-align:center;color:var(--muted);font-weight:700}
+@media(max-width:700px){body{padding:12px}.path{grid-template-columns:1fr}.stage{min-height:auto}.stage:not(:last-child)::after{content:"↓";right:14px;top:auto;bottom:-15px}.detail{grid-template-columns:1fr}}
+@media(prefers-color-scheme:dark){:root{--bg:#1f232c;--panel:#292e39;--ink:#f0f2f7;--muted:#b5bdcd;--line:#596274;--blue:#7fb1ff;--blue-soft:#28496f;--green:#75d99b;--green-soft:#254d37;--amber:#f1be62;--amber-soft:#4c3b1d}}
+</style>
+<main id="analysis-path">
+  <h2>Del problema a la cota asintótica</h2>
+  <p class="subtitle">Cada respuesta depende de la decisión anterior.</p>
+  <div class="path" role="group" aria-label="Etapas del análisis">
+    <button class="stage" type="button" data-step="0" aria-pressed="true"><span class="number">Paso 1</span><strong>Definir la entrada</strong><code>n = tamaño</code></button>
+    <button class="stage" type="button" data-step="1" aria-pressed="false"><span class="number">Paso 2</span><strong>Fijar el modelo</strong><code>operación = 1 paso</code></button>
+    <button class="stage" type="button" data-step="2" aria-pressed="false"><span class="number">Paso 3</span><strong>Elegir el caso</strong><code>peor / esperado / amortizado</code></button>
+    <button class="stage" type="button" data-step="3" aria-pressed="false"><span class="number">Paso 4</span><strong>Contar</strong><code>T(n)</code></button>
+    <button class="stage" type="button" data-step="4" aria-pressed="false"><span class="number">Paso 5</span><strong>Simplificar</strong><code>O, Ω o Θ</code></button>
+  </div>
+  <section class="detail" aria-live="polite">
+    <div class="explain">
+      <div class="eyebrow" id="question"></div>
+      <h3 id="title"></h3>
+      <p id="description"></p>
+      <div class="example" id="example"></div>
+    </div>
+    <div class="result">
+      <span class="label">Resultado acumulado</span>
+      <div class="formula" id="formula"></div>
+      <div class="meaning" id="meaning"></div>
+    </div>
+  </section>
+  <div class="nav">
+    <button type="button" id="prev">← Atrás</button>
+    <span class="counter" id="counter"></span>
+    <button type="button" id="next">Siguiente →</button>
+  </div>
+</main>
+<script>
+const steps=[
+ {q:'¿Qué crece?',t:'Define el tamaño de la entrada',d:'El símbolo n debe medir la información recibida, no algo incidental. En un arreglo puede ser el número de elementos; para un entero suele ser su número de bits.',e:'Ejemplo: A = [4, 7, 1, 9, 2, 8, 5, 3]  →  n = 8 elementos',f:'n',m:'Ya sabemos con respecto a qué variable mediremos el crecimiento.'},
+ {q:'¿Qué cuesta una unidad?',t:'Declara el modelo de cómputo',d:'En word RAM, leer A[i], sumar palabras, seguir un apuntador o evaluar una condición cuentan como operaciones constantes. Cambiar el modelo puede cambiar el costo.',e:'Ejemplo: acceso aleatorio A[i] = Θ(1) en word RAM.',f:'costo(op) = 1',m:'Las operaciones primitivas quedan fijadas antes de contar.'},
+ {q:'¿Qué garantía buscamos?',t:'Elige el tipo de análisis',d:'El peor caso acota cualquier entrada de tamaño n. El esperado usa el azar del algoritmo y el amortizado distribuye el costo de una secuencia completa.',e:'Ejemplo: Tₘáₓ(n) = max{ T(x) : |x| = n }.',f:'Tₘáₓ(n)',m:'La función de costo ya tiene una interpretación precisa.'},
+ {q:'¿Cuántas veces ocurre?',t:'Cuenta operaciones primitivas',d:'Se suman los bloques consecutivos y se multiplican las repeticiones anidadas. Todavía se conservan constantes y términos menores.',e:'Ejemplo de las diapositivas: f(n) = 32n² + 17n + 1.',f:'T(n)=32n²+17n+1',m:'Esta expresión describe un conteo concreto dentro del modelo.'},
+ {q:'¿Cómo escala?',t:'Conserva el orden de crecimiento',d:'Las constantes multiplicativas y los términos de menor orden no cambian el comportamiento para entradas grandes. Se selecciona la cota que responda la pregunta.',e:'Para n ≥ 1: 32n² ≤ T(n) ≤ 50n².',f:'T(n) ∈ Θ(n²)',m:'Techo y piso coinciden: el crecimiento es cuadrático.'}
+];
+const root=document.getElementById('analysis-path'),question=document.getElementById('question'),title=document.getElementById('title'),description=document.getElementById('description'),example=document.getElementById('example'),formula=document.getElementById('formula'),meaning=document.getElementById('meaning'),counter=document.getElementById('counter'),prev=document.getElementById('prev'),next=document.getElementById('next');let index=0;
+function draw(){const s=steps[index];question.textContent=s.q;title.textContent=s.t;description.textContent=s.d;example.textContent=s.e;formula.textContent=s.f;meaning.textContent=s.m;counter.textContent=`Paso ${index+1} de ${steps.length}`;prev.disabled=index===0;next.disabled=index===steps.length-1;root.querySelectorAll('.stage').forEach((b,i)=>{b.setAttribute('aria-pressed',String(i===index));b.classList.toggle('done',i<index)})}
+root.querySelector('.path').addEventListener('click',e=>{const b=e.target.closest('[data-step]');if(!b)return;index=Number(b.dataset.step);draw()});prev.addEventListener('click',()=>{if(index>0){index--;draw()}});next.addEventListener('click',()=>{if(index<steps.length-1){index++;draw()}});draw();
+</script>
+</html>

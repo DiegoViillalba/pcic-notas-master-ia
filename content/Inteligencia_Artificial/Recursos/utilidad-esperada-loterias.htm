@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Utilidad esperada y loterías</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fb;--panel:#fff;--ink:#172033;--muted:#5f6b7a;--line:#d7dce6;--blue:#2563eb;--purple:#7c3aed;--green:#16a34a;--orange:#d97706;--red:#dc2626;--soft:#eef2ff}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,sans-serif}main{max-width:980px;margin:auto}h2{font-size:21px;margin:0 0 4px}h3{font-size:17px;margin:0 0 9px}.sub{color:var(--muted);margin:0 0 12px}.layout{display:grid;grid-template-columns:.85fr 1.4fr;gap:12px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}.control{display:grid;grid-template-columns:1fr 60px;gap:8px;align-items:center}.control input{grid-column:1/-1;width:100%}.control output{text-align:right;font:700 14px ui-monospace,SFMono-Regular,monospace}.lotteries{display:grid;grid-template-columns:1fr 1fr;gap:10px}.lottery{padding:10px;border:1px solid var(--line);border-radius:9px}.lottery.selected{outline:3px solid var(--green)}.lottery h4{display:flex;justify-content:space-between;margin:0 0 7px}.lottery p{margin:4px 0}.eu{font:700 14px ui-monospace,SFMono-Regular,monospace;color:var(--purple)}.money{color:var(--muted);font-size:13px}.pair{margin-bottom:10px}.pair:last-child{margin-bottom:0}.controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:12px}.controls button{font:inherit;color:inherit;background:var(--panel);border:1px solid #aeb8c8;border-radius:8px;padding:7px 10px;cursor:pointer}.controls button:disabled{opacity:.35;cursor:default}.counter{min-width:84px;text-align:center}.status{margin-top:10px;padding:12px 14px;min-height:86px;border-left:5px solid var(--orange);border-radius:8px;background:#fff7df}.formula{font:700 14px ui-monospace,SFMono-Regular,monospace}.logic{margin-top:12px;padding:12px 14px;background:var(--soft);border-radius:9px}.logic.ok{border-left:5px solid var(--green)}.logic.bad{border-left:5px solid var(--red)}.bars{margin-top:12px}.barrow{display:grid;grid-template-columns:24px 1fr 54px;gap:8px;align-items:center;margin:7px 0}.track{height:16px;background:#e5e7eb;border-radius:8px;overflow:hidden}.fill{height:100%;background:var(--blue);transition:width .2s}.barrow output{font:700 13px ui-monospace,SFMono-Regular,monospace;text-align:right}.tip{margin-top:9px;color:var(--muted);font-size:13px}@media(max-width:720px){.layout,.lotteries{grid-template-columns:1fr}.status{min-height:120px}}@media(prefers-color-scheme:dark){:root{--bg:#1d222d;--panel:#282e3a;--ink:#eef2f7;--muted:#b8c0cd;--line:#4f596b;--soft:#25395b}.status{background:#3c3521}.track{background:#414958}}
+</style>
+</head>
+<body>
+<main>
+  <h2>Máxima utilidad esperada: las loterías de la diapositiva 17</h2>
+  <p class="sub">Normalizamos U($0)=0 y U($4 000)=1. Cambia U($3 000) para ver qué preferencias puede representar una sola función de utilidad esperada.</p>
+  <div class="layout">
+    <section class="panel">
+      <h3>1 · Escala de utilidad</h3>
+      <div class="control">
+        <label for="u3">U($3 000)</label><output id="u3out"></output>
+        <input id="u3" type="range" min="0" max="1" step="0.01" value="0.80">
+      </div>
+      <p class="tip">La utilidad mide preferencia, no pesos. La normalización facilita comparar, pero no afirma que “1 unidad de utilidad” sea un dólar.</p>
+      <div class="bars" aria-label="Utilidades esperadas de A, B, C y D">
+        <div class="barrow"><strong>A</strong><div class="track"><div class="fill" id="barA"></div></div><output id="outA"></output></div>
+        <div class="barrow"><strong>B</strong><div class="track"><div class="fill" id="barB"></div></div><output id="outB"></output></div>
+        <div class="barrow"><strong>C</strong><div class="track"><div class="fill" id="barC"></div></div><output id="outC"></output></div>
+        <div class="barrow"><strong>D</strong><div class="track"><div class="fill" id="barD"></div></div><output id="outD"></output></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="pair">
+        <h3>2 · Primera elección</h3>
+        <div class="lotteries">
+          <article class="lottery" id="cardA"><h4>A <span id="badgeA"></span></h4><p>80 % → $4 000<br>20 % → $0</p><p class="eu" id="euA"></p><p class="money">Valor monetario esperado: $3 200</p></article>
+          <article class="lottery" id="cardB"><h4>B <span id="badgeB"></span></h4><p>100 % → $3 000<br>0 % → $0</p><p class="eu" id="euB"></p><p class="money">Valor monetario esperado: $3 000</p></article>
+        </div>
+      </div>
+      <div class="pair">
+        <h3>3 · Segunda elección</h3>
+        <div class="lotteries">
+          <article class="lottery" id="cardC"><h4>C <span id="badgeC"></span></h4><p>20 % → $4 000<br>80 % → $0</p><p class="eu" id="euC"></p><p class="money">Valor monetario esperado: $800</p></article>
+          <article class="lottery" id="cardD"><h4>D <span id="badgeD"></span></h4><p>25 % → $3 000<br>75 % → $0</p><p class="eu" id="euD"></p><p class="money">Valor monetario esperado: $750</p></article>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="controls">
+    <button id="prev">← Atrás</button><span class="counter" id="counter"></span><button id="next">Siguiente →</button><button id="reset">Punto crítico</button>
+  </div>
+  <div class="status" id="status" aria-live="polite"></div>
+  <div class="logic" id="logic" aria-live="polite"></div>
+</main>
+<script>
+let step=0;
+const statusEl=document.getElementById('status');
+function nice(x){return Number(x.toFixed(3)).toString()}
+function preference(x,y,left,right){return x>y?`${left} ≻ ${right}`:x<y?`${right} ≻ ${left}`:`${left} ~ ${right}`}
+function update(){
+  const x=+u3.value,values={A:.8,B:x,C:.2,D:.25*x};u3out.value=nice(x);
+  for(const id of ['A','B','C','D']){document.querySelector(`#eu${id}`).textContent=`UE(${id}) = ${nice(values[id])}`;document.querySelector(`#out${id}`).value=nice(values[id]);document.querySelector(`#bar${id}`).style.width=`${values[id]*100}%`;document.querySelector(`#card${id}`).classList.remove('selected');document.querySelector(`#badge${id}`).textContent=''}
+  const choose=(a,b)=>{if(values[a]>values[b]){card(a)}else if(values[b]>values[a]){card(b)}};const card=id=>{document.querySelector(`#card${id}`).classList.add('selected');document.querySelector(`#badge${id}`).textContent='preferida'};choose('A','B');choose('C','D');
+  const p1=preference(values.A,values.B,'A','B'),p2=preference(values.C,values.D,'C','D');
+  const messages=[
+    `<span class="formula">Paso 0.</span> Una lotería enumera resultados y probabilidades. Primero fijamos una misma escala: U($0)=0, U($4k)=1 y U($3k)=${nice(x)}.`,
+    `<span class="formula">UE(A)=0.8·1+0.2·0=0.8; UE(B)=1·${nice(x)}=${nice(x)}</span><br>Por tanto, con esta utilidad: <strong>${p1}</strong>.`,
+    `<span class="formula">UE(C)=0.2·1+0.8·0=0.2; UE(D)=0.25·${nice(x)}=${nice(values.D)}</span><br>Con la misma escala: <strong>${p2}</strong>.`,
+    `<span class="formula">B ≻ A ⇒ U($3k)&gt;0.8; C ≻ D ⇒ 0.2&gt;0.25U($3k) ⇒ U($3k)&lt;0.8.</span><br>Las dos desigualdades estrictas exigen que el mismo número sea a la vez mayor y menor que 0.8.`,
+    `<span class="formula">Conclusión.</span> Maximizar utilidad esperada exige preferencias coherentes con los axiomas. Si una persona elige B sobre A y C sobre D, este conjunto concreto no puede representarse mediante una sola función de utilidad esperada sobre los premios monetarios.`
+  ];
+  statusEl.innerHTML=messages[step];counter.textContent=`Paso ${step}/4`;prev.disabled=step===0;next.disabled=step===4;
+  const both=(values.B>values.A&&values.C>values.D);logic.className=`logic ${both?'bad':'ok'}`;
+  logic.innerHTML=`Preferencias inducidas ahora: <strong>${p1}</strong> y <strong>${p2}</strong>. ${x===.8?'En el punto 0.8 hay indiferencia en ambos pares; no aparecen las dos preferencias estrictas de la diapositiva.':'Mover U($3k) a un lado de 0.8 invierte un par, pero mantiene el otro del lado opuesto.'}`;
+}
+u3.oninput=update;prev.onclick=()=>{if(step>0)step--;update()};next.onclick=()=>{if(step<4)step++;update()};reset.onclick=()=>{u3.value=.8;step=0;update()};update();
+</script>
+</body>
+</html>

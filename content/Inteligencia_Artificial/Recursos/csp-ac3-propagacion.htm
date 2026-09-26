@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AC-3: propagación mediante una cola de arcos</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: var(--obsidian-bg, #f7f8fc);
+      --fg: var(--obsidian-text, #202536);
+      --muted: var(--obsidian-text-muted, #646b79);
+      --panel: var(--obsidian-bg-2, #ffffff);
+      --line: var(--obsidian-border, #c9cedb);
+      --blue: #2563eb;
+      --blue-soft: #dbeafe;
+      --green: #15803d;
+      --green-soft: #dcfce7;
+      --red: #b91c1c;
+      --red-soft: #fee2e2;
+      --amber: #d97706;
+      --amber-soft: #fff8dc;
+      --step-badge-bg: #e2e8f0;
+      --step-badge-fg: #334155;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1e222d;
+        --fg: #eef0f5;
+        --muted: #9aa2b2;
+        --panel: #272c39;
+        --line: #3d4455;
+        --blue: #60a5fa;
+        --blue-soft: #1e3557;
+        --green: #4ade80;
+        --green-soft: #1a3d28;
+        --red: #f87171;
+        --red-soft: #663838;
+        --amber: #f59e0b;
+        --amber-soft: #2c2414;
+        --step-badge-bg: #323949;
+        --step-badge-fg: #cbd5e1;
+      }
+    }
+    :root[style*="color-scheme: dark"],
+    :root[style*="--obsidian-color-scheme: dark"] {
+      --bg: var(--obsidian-bg, #1e222d);
+      --fg: var(--obsidian-text, #eef0f5);
+      --muted: var(--obsidian-text-muted, #9aa2b2);
+      --panel: var(--obsidian-bg-2, #272c39);
+      --line: var(--obsidian-border, #3d4455);
+      --blue: #60a5fa;
+      --blue-soft: #1e3557;
+      --green: #4ade80;
+      --green-soft: #1a3d28;
+      --red: #f87171;
+      --red-soft: #663838;
+      --amber: #f59e0b;
+      --amber-soft: #2c2414;
+      --step-badge-bg: #323949;
+      --step-badge-fg: #cbd5e1;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--fg);
+      font: 15px/1.45 system-ui, -apple-system, sans-serif;
+    }
+    main { max-width: 820px; margin: auto; }
+    .top, .controls, .domains, .values {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .top { justify-content: space-between; margin-bottom: 4px; }
+    h2 { font-size: 21px; margin: 0; }
+    .sub { color: var(--muted); margin: 3px 0 0; }
+    .controls button {
+      font: inherit;
+      color: var(--fg);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 13px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all .15s ease;
+    }
+    .controls button:hover:not(:disabled) { filter: brightness(1.08); }
+    .controls button:disabled { opacity: .35; cursor: not-allowed; }
+    #count {
+      font-weight: 700;
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--step-badge-bg);
+      color: var(--step-badge-fg);
+      border: 1px solid var(--line);
+    }
+    .domains { justify-content: center; margin: 16px 0; gap: 10px; }
+    .variable {
+      min-width: 180px;
+      text-align: center;
+      background: var(--panel);
+      padding: 12px;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+    }
+    .name { font-weight: 700; margin-bottom: 8px; }
+    .values { justify-content: center; gap: 8px; }
+    .value {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 2px solid var(--line);
+      border-radius: 50%;
+      font-weight: 700;
+      background: var(--panel);
+      color: var(--fg);
+      transition: all .2s ease;
+    }
+    .removed { opacity: .35; text-decoration: line-through; color: var(--muted); }
+    .checked { border-color: var(--blue) !important; background: var(--blue-soft) !important; color: var(--fg) !important; }
+    .supported { border-color: var(--green) !important; background: var(--green-soft) !important; color: var(--fg) !important; }
+    .arc {
+      text-align: center;
+      font: 700 19px ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin: 10px 0;
+      color: var(--fg);
+    }
+    .queue {
+      background: var(--panel);
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      overflow-wrap: anywhere;
+      color: var(--fg);
+    }
+    .status {
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--amber);
+      background: var(--amber-soft);
+      color: var(--fg);
+      border-radius: 0 8px 8px 0;
+      min-height: 50px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .legend { text-align: center; color: var(--muted); font-size: 12px; margin-top: 9px; }
+    @media (max-width: 620px) {
+      .variable { min-width: 140px; flex: 1; }
+      .domains { align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div><h2>AC-3: un cambio puede viajar por la red</h2><p class="sub">Restricciones: X &lt; Y &lt; Z · dominio inicial de Z: {3}</p></div>
+    <div class="controls"><button id="prev" type="button">← Atrás</button><span id="count" aria-live="polite"></span><button id="next" type="button">Siguiente →</button></div>
+  </div>
+  <div class="domains" id="domains" aria-label="Dominios actuales de X, Y y Z"></div>
+  <div class="arc" id="arc"></div>
+  <div class="queue" id="queue"></div>
+  <div class="status" id="status" aria-live="polite"></div>
+  <div class="legend">Azul: valor revisado · Verde: soporte · Tachado: valor eliminado</div>
+</main>
+<script>
+  const domains=document.getElementById('domains');
+  const arc=document.getElementById('arc');
+  const queue=document.getElementById('queue');
+  const status=document.getElementById('status');
+  const count=document.getElementById('count');
+  const prev=document.getElementById('prev');
+  const next=document.getElementById('next');
+  const steps=[
+    {d:{X:[1,2,3],Y:[1,2,3],Z:[3]},arc:'Inicio',q:['X→Y','Y→Z','Z→Y','Y→X'],t:'La cola contiene los dos sentidos de cada restricción. Extraemos X→Y.',check:null,support:null},
+    {d:{X:[1,2],Y:[1,2,3],Z:[3]},arc:'X → Y',q:['Y→Z','Z→Y','Y→X'],t:'x=3 no tiene un valor y mayor que 3. Se elimina 3 de D(X).',check:['X',3],support:null},
+    {d:{X:[1,2],Y:[1,2],Z:[3]},arc:'Y → Z',q:['Z→Y','Y→X','X→Y'],t:'y=3 no tiene soporte en D(Z)={3}. D(Y) cambia y X→Y, que ya se había revisado, vuelve a la cola.',check:['Y',3],support:null},
+    {d:{X:[1,2],Y:[1,2],Z:[3]},arc:'Z → Y',q:['Y→X','X→Y'],t:'z=3 conserva soporte: y=1 o y=2 satisface Y<Z. No cambia ningún dominio.',check:['Z',3],support:['Y',2]},
+    {d:{X:[1,2],Y:[2],Z:[3]},arc:'Y → X',q:['X→Y','Z→Y'],t:'y=1 no tiene un x menor que 1. Se elimina 1 de D(Y), por lo que Z→Y debe revisarse otra vez.',check:['Y',1],support:null},
+    {d:{X:[1],Y:[2],Z:[3]},arc:'X → Y',q:['Z→Y'],t:'Tras el cambio en D(Y), x=2 perdió su soporte. Se elimina y queda D(X)={1}.',check:['X',2],support:null},
+    {d:{X:[1],Y:[2],Z:[3]},arc:'Z → Y',q:[],t:'z=3 mantiene el soporte y=2. La cola queda vacía.',check:['Z',3],support:['Y',2]},
+    {d:{X:[1],Y:[2],Z:[3]},arc:'Punto fijo',q:[],t:'Todos los arcos son consistentes y los dominios son unitarios: X=1, Y=2, Z=3.',check:null,support:null}
+  ];
+  const names=['X','Y','Z'];
+  let index=0;
+  function draw(){
+    const s=steps[index];
+    domains.innerHTML=names.map(name=>`<section class="variable"><div class="name">D(${name})</div><div class="values">${[1,2,3].map(value=>{const present=s.d[name].includes(value);const check=s.check&&s.check[0]===name&&s.check[1]===value;const support=s.support&&s.support[0]===name&&s.support[1]===value;return `<span class="value ${present?'':'removed'} ${check?'checked':''} ${support?'supported':''}">${value}</span>`}).join('')}</div></section>`).join('');
+    arc.textContent=`Arco actual: ${s.arc}`;
+    queue.textContent=`Cola pendiente: [${s.q.join(', ')}]`;
+    status.textContent=s.t;
+    count.textContent=`Paso ${index+1}/${steps.length}`;
+    prev.disabled=index===0;
+    next.disabled=index===steps.length-1;
+  }
+  prev.addEventListener('click',()=>{index--;draw()});
+  next.addEventListener('click',()=>{index++;draw()});
+  draw();
+</script>
+</body>
+</html>

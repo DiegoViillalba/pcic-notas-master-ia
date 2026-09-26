@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Poda alfa-beta paso a paso</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fb;--panel:#fff;--ink:#172033;--muted:#667085;--line:#aeb8c8;--max:#2563eb;--min:#dc2626;--leaf:#7c3aed;--active:#f59e0b;--pruned:#94a3b8;--good:#16a34a}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font:15px/1.42 system-ui,-apple-system,sans-serif}main{max-width:1040px;margin:auto}.header,.controls,.metrics,.legend{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.header{justify-content:space-between;margin-bottom:10px}h2{font-size:21px;margin:0}.controls,.metrics{padding:9px 11px;background:var(--panel);border:1px solid #d7dce6;border-radius:10px}label{font-weight:700}select,button{font:inherit;color:inherit;background:var(--panel);border:1px solid #aeb8c8;border-radius:8px;padding:7px 10px}button{cursor:pointer}button:disabled{opacity:.35}.counter{min-width:92px;text-align:center}.canvas{width:100%;display:block;background:var(--panel);border:1px solid #d7dce6;border-radius:12px}.edge{stroke:var(--line);stroke-width:3}.edge.pruned{stroke:var(--pruned);stroke-dasharray:7 7;opacity:.45}.node text{text-anchor:middle;dominant-baseline:central;font-weight:800;fill:var(--ink)}.node .shape{fill:var(--panel);stroke-width:3}.node.max .shape{stroke:var(--max);fill:#dbeafe}.node.min .shape{stroke:var(--min);fill:#fee2e2}.node.leaf .shape{stroke:var(--leaf);fill:#ede9fe}.node.active .shape{stroke:var(--active);stroke-width:6}.node.pruned{opacity:.28}.node.pruned .shape{stroke:var(--pruned)}.value{font-size:14px}.bounds{font-size:12px;fill:var(--muted)!important}.status{margin-top:10px;padding:12px 14px;min-height:78px;border-left:5px solid var(--active);border-radius:8px;background:#fff7df}.code{font:700 15px ui-monospace,SFMono-Regular,monospace}.metrics{margin-top:9px}.metric strong{font-variant-numeric:tabular-nums}.legend{color:var(--muted);font-size:13px;margin:8px 2px}.chip{padding:3px 7px;border-radius:6px;background:#e8edf5}.tip{color:var(--muted);font-size:13px}@media(prefers-color-scheme:dark){:root{--bg:#1d222d;--panel:#282e3a;--ink:#eef2f7;--muted:#b9c1ce;--line:#687386}.node.max .shape{fill:#1e3a5f}.node.min .shape{fill:#5a292d}.node.leaf .shape{fill:#3c2b64}.status{background:#3c3521}.controls,.metrics,.canvas{border-color:#4f596b}.chip{background:#343d4d}}
+</style>
+</head>
+<body>
+<main>
+  <div class="header">
+    <h2>Alfa–beta: mismo valor, menos hojas</h2>
+    <div class="controls">
+      <label for="order">Orden</label>
+      <select id="order"><option value="ltr">Izquierda → derecha</option><option value="rtl">Derecha → izquierda</option></select>
+      <button id="prev">← Atrás</button><span class="counter" id="counter"></span><button id="next">Siguiente →</button>
+      <button id="play">▶ Reproducir</button>
+    </div>
+  </div>
+  <svg class="canvas" viewBox="0 0 1000 490" role="img" aria-label="Árbol para ejecutar poda alfa-beta">
+    <g id="edges"></g><g id="nodes"></g>
+  </svg>
+  <div class="metrics">
+    <span class="metric">Raíz: <strong id="rootValue">?</strong></span>
+    <span class="metric">Hojas visitadas: <strong id="visitedCount">0</strong>/8</span>
+    <span class="metric">Hojas podadas: <strong id="prunedCount">0</strong>/8</span>
+    <span class="chip">α = mejor garantía de MAX</span><span class="chip">β = mejor garantía de MIN</span>
+  </div>
+  <div class="status" id="status" aria-live="polite"></div>
+  <div class="legend">Azul: MAX · rojo: MIN · morado: utilidad · gris discontinuo: región podada</div>
+  <div class="tip">El orden cambia el trabajo, no el resultado minimax. Recorre ambos órdenes y compara el número de hojas evaluadas.</div>
+</main>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const tree={id:'R',kind:'max',children:[
+  {id:'A',kind:'min',children:[{id:'B',kind:'max',children:[{id:'C',value:10},{id:'D',value:6}]},{id:'E',kind:'max',children:[{id:'F',value:100},{id:'G',value:8}]}]},
+  {id:'H',kind:'min',children:[{id:'I',kind:'max',children:[{id:'J',value:1},{id:'K',value:2}]},{id:'L',kind:'max',children:[{id:'M',value:20},{id:'N',value:4}]}]}
+]};
+const pos={R:[500,55],A:[260,155],H:[740,155],B:[140,270],E:[380,270],I:[620,270],L:[860,270],C:[80,410],D:[200,410],F:[320,410],G:[440,410],J:[560,410],K:[680,410],M:[800,410],N:[920,410]};
+const labels={R:'MAX',A:'MIN',H:'MIN',B:'MAX',E:'MAX',I:'MAX',L:'MAX'};
+let snapshots=[],index=0,timer=null,mode='ltr';
+function svg(tag,attrs={}){const e=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);return e}
+function fmt(v){if(v===Infinity)return '+∞';if(v===-Infinity)return '−∞';return String(v)}
+function walk(n,fn){fn(n);(n.children||[]).forEach(c=>walk(c,fn))}
+function find(id){let out;walk(tree,n=>{if(n.id===id)out=n});return out}
+function descendants(n){let a=[];walk(n,x=>a.push(x.id));return a}
+
+function build(){
+  edges.replaceChildren();nodes.replaceChildren();
+  walk(tree,n=>{
+    (n.children||[]).forEach(c=>{const p=pos[n.id],q=pos[c.id];edges.append(svg('line',{id:`edge-${n.id}-${c.id}`,x1:p[0],y1:p[1]+28,x2:q[0],y2:q[1]-28,class:'edge'}))});
+  });
+  walk(tree,n=>{
+    const p=pos[n.id],leaf=n.value!==undefined;
+    const g=svg('g',{id:`node-${n.id}`,class:`node ${leaf?'leaf':n.kind}`,transform:`translate(${p[0]} ${p[1]})`});
+    if(leaf)g.append(svg('rect',{class:'shape',x:-31,y:-23,width:62,height:46,rx:8}));else g.append(svg('circle',{class:'shape',r:30}));
+    const value=svg('text',{class:'value'});value.textContent=leaf?n.value:'?';g.append(value);
+    if(!leaf){const bounds=svg('text',{class:'bounds',y:45});bounds.textContent=labels[n.id];g.append(bounds)}
+    nodes.append(g);
+  });
+}
+
+function compute(){
+  snapshots=[];const values={},visited=new Set(),pruned=new Set();
+  const save=(active,msg,a,b)=>snapshots.push({values:{...values},visited:[...visited],pruned:[...pruned],active,msg,a,b});
+  save('R','Estado inicial: α = −∞ y β = +∞. Se explora en profundidad.',-Infinity,Infinity);
+  const ordered=a=>mode==='ltr'?a:[...a].reverse();
+  function ab(n,alpha,beta){
+    if(n.value!==undefined){values[n.id]=n.value;visited.add(n.id);save(n.id,`Se evalúa la hoja ${n.id}: utilidad ${n.value}.`,alpha,beta);return n.value}
+    let v=n.kind==='max'?-Infinity:Infinity;
+    const children=ordered(n.children);
+    for(let i=0;i<children.length;i++){
+      const child=children[i],cv=ab(child,alpha,beta);
+      if(n.kind==='max'){
+        v=Math.max(v,cv);values[n.id]=v;alpha=Math.max(alpha,v);
+        save(n.id,`MAX actualiza ${n.id}: v = ${v}, α = max(α, v) = ${fmt(alpha)}.`,alpha,beta);
+        if(alpha>=beta){
+          const rest=children.slice(i+1);rest.forEach(x=>descendants(x).forEach(id=>pruned.add(id)));
+          if(rest.length)save(n.id,`Corte β en ${n.id}: α = ${fmt(alpha)} ≥ β = ${fmt(beta)}. Lo restante no puede mejorar la decisión de MIN.`,alpha,beta);
+          break;
+        }
+      }else{
+        v=Math.min(v,cv);values[n.id]=v;beta=Math.min(beta,v);
+        save(n.id,`MIN actualiza ${n.id}: v = ${v}, β = min(β, v) = ${fmt(beta)}.`,alpha,beta);
+        if(beta<=alpha){
+          const rest=children.slice(i+1);rest.forEach(x=>descendants(x).forEach(id=>pruned.add(id)));
+          if(rest.length)save(n.id,`Corte α en ${n.id}: β = ${fmt(beta)} ≤ α = ${fmt(alpha)}. MAX ya dispone de una alternativa al menos tan buena.`,alpha,beta);
+          break;
+        }
+      }
+    }
+    return v;
+  }
+  const result=ab(tree,-Infinity,Infinity);
+  values.R=result;save('R',`Termina: la raíz vale ${result}. Alfa–beta devuelve exactamente la misma jugada y valor que minimax.`,result,Infinity);
+}
+
+function draw(){
+  const s=snapshots[index],pruned=new Set(s.pruned),visited=new Set(s.visited);
+  document.querySelectorAll('.node').forEach(n=>n.classList.remove('active','pruned'));
+  document.querySelectorAll('.edge').forEach(e=>e.classList.remove('pruned'));
+  walk(tree,n=>{
+    const g=document.querySelector(`#node-${n.id}`),t=g.querySelector('.value');
+    if(n.value===undefined)t.textContent=s.values[n.id]??'?';
+    if(pruned.has(n.id))g.classList.add('pruned');
+    if(n.id===s.active)g.classList.add('active');
+    (n.children||[]).forEach(c=>{if(pruned.has(c.id))document.querySelector(`#edge-${n.id}-${c.id}`).classList.add('pruned')});
+    if(n.value===undefined){const b=g.querySelector('.bounds');b.textContent=n.id===s.active?`α=${fmt(s.a)} · β=${fmt(s.b)}`:labels[n.id]}
+  });
+  const leaves=['C','D','F','G','J','K','M','N'];
+  rootValue.textContent=s.values.R??'?';visitedCount.textContent=leaves.filter(x=>visited.has(x)).length;prunedCount.textContent=leaves.filter(x=>pruned.has(x)).length;
+  status.innerHTML=`<span class="code">Paso ${index}/${snapshots.length-1}.</span> ${s.msg}`;counter.textContent=`${index}/${snapshots.length-1}`;prev.disabled=index===0;next.disabled=index===snapshots.length-1;
+}
+function stop(){if(timer){clearInterval(timer);timer=null;play.textContent='▶ Reproducir'}}
+function restart(){stop();mode=order.value;compute();index=0;draw()}
+order.onchange=restart;prev.onclick=()=>{stop();if(index>0)index--;draw()};next.onclick=()=>{stop();if(index<snapshots.length-1)index++;draw()};
+play.onclick=()=>{if(timer){stop();return}if(index===snapshots.length-1)index=0;play.textContent='⏸ Pausar';timer=setInterval(()=>{if(index<snapshots.length-1){index++;draw()}else stop()},850)};
+build();restart();
+</script>
+</body>
+</html>
