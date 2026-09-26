@@ -19,10 +19,21 @@
 // El tema abecedarium redefine --highlight a un rojo intenso, y la regla
 // base "a.internal { background-color: var(--highlight) }" lo usa como
 // fondo de todo wikilink interno. Se ve mal. Aquí fijamos ese fondo a un
-// azul claro directamente, sin tocar --highlight (el tema lo sigue usando
-// para otras cosas, como resaltar coincidencias de búsqueda).
+// azul claro directamente.
 a.internal {
   background-color: rgba(62, 147, 216, 0.18) !important;
+}
+
+// El script de diagramas Mermaid (obsidian-flavored-markdown) lee --highlight
+// en tiempo real para usarlo como fondo de las etiquetas de arista
+// (edgeLabelBackground), lo que también se veía rojo. Sobreescribimos la
+// variable misma —no solo la regla de arriba— para que Mermaid, que la lee
+// directo del DOM, tome el nuevo valor azul sin tocar su código.
+:root {
+  --highlight: #269dff40;
+}
+:root[saved-theme="dark"] {
+  --highlight: #3e93d840;
 }
 
 // El tema abecedarium fuerza font-family: var(--font-text) (la fuente de
