@@ -2,7 +2,7 @@
 
 Sitio de apuntes del Posgrado en Ciencias e Ingeniería de la Computación (UNAM), generado con [Quartz](https://quartz.jzhao.xyz/) v5 a partir de mis notas en Obsidian.
 
-Publicado en <https://diego-villalba.com/pcic-notas/>.
+Publicado en <https://diego-villalba.com/pcic-notas-master-ia/>.
 
 ## Alcance del contenido
 

@@ -7,7 +7,7 @@ configuration:
   analytics:
     provider: null
   locale: es-ES
-  baseUrl: diego-villalba.com/pcic-notas
+  baseUrl: diego-villalba.com/pcic-notas-master-ia
   ignorePatterns:
     - private
     - templates
@@ -203,7 +203,7 @@ plugins:
     enabled: true
     options:
       links:
-        GitHub: https://github.com/DiegoViillalba/pcic-notas
+        GitHub: https://github.com/DiegoViillalba/pcic-notas-master-ia
     layout:
       position: footer
       priority: 50
