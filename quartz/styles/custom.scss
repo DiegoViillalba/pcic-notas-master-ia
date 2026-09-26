@@ -1,3 +1,16 @@
+@use "sass:map";
 @use "./variables.scss" as *;
 
 // put your custom CSS here!
+
+// Página más ancha: el layout base limita todo el bloque (sidebars + centro)
+// a "desktop breakpoint + 300px". Le sumamos ~350px extra, que van a parar
+// casi por completo a la columna central (las sidebars son de ancho fijo).
+.page {
+  max-width: calc(#{map.get($breakpoints, desktop)} + 650px);
+}
+
+// Un punto más de tamaño de fuente en el cuerpo del artículo.
+.center > article {
+  font-size: calc(1em + 1pt);
+}

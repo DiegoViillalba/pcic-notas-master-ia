@@ -10,6 +10,10 @@ Uso:
 
 Qué hace, en orden:
   1. Copia Clases/ y Recursos/ de cada materia desde el vault a content/.
+     Clases/ se aplana directo a la raíz de la materia (content/<Materia>/,
+     sin subcarpeta) para que en el explorador y la tabla de contenidos las
+     clases aparezcan de inmediato al abrir la materia. Recursos/ se
+     mantiene como subcarpeta aparte.
   2. Limpia basura (.DS_Store, *.log, *.aux, *.out) en el contenido copiado.
   3. Normaliza nombres de archivo y texto de notas a NFC (evita que archivos
      con acentos en forma NFD, comunes en iCloud Drive, dejen de resolverse).
@@ -58,8 +62,6 @@ MATERIAS = [
     "Seminario_Orientacion",
 ]
 
-SUBFOLDERS_TO_PUBLISH = ["Clases", "Recursos"]
-
 JUNK_PATTERNS = [".DS_Store", "*.log", "*.aux", "*.out"]
 
 WIKILINK_RE = re.compile(r"(!?)\[\[([^\]|#]+)((?:#[^\]|]*)?)(\|[^\]]*)?\]\]")
@@ -81,6 +83,10 @@ def run(cmd, cwd=REPO_ROOT, check=True, capture=False):
 
 
 def copy_from_vault(dry_run: bool) -> None:
+    """Copia Clases/ y Recursos/ de cada materia. Clases/ se aplana directo a
+    la raíz de la materia (sin subcarpeta) para que en el explorador/TOC las
+    clases aparezcan de inmediato al abrir la materia, no un nivel más abajo.
+    Recursos/ sigue siendo una subcarpeta aparte."""
     if not VAULT_MATERIAS_DIR.is_dir():
         raise SystemExit(f"No se encontró el vault en: {VAULT_MATERIAS_DIR}")
 
@@ -92,17 +98,22 @@ def copy_from_vault(dry_run: bool) -> None:
             log(f"[aviso] {materia}: no existe en el vault, se omite")
             continue
 
-        for sub in SUBFOLDERS_TO_PUBLISH:
-            src = vault_materia / sub
-            dst = dest_materia / sub
-            if not src.is_dir():
-                continue
-            log(f"Copiando {materia}/{sub}")
-            if dry_run:
-                continue
-            if dst.exists():
-                shutil.rmtree(dst)
-            shutil.copytree(src, dst)
+        log(f"Copiando {materia}")
+        if dry_run:
+            continue
+
+        if dest_materia.exists():
+            shutil.rmtree(dest_materia)
+        dest_materia.mkdir(parents=True, exist_ok=True)
+
+        vault_clases = vault_materia / "Clases"
+        if vault_clases.is_dir():
+            for md in vault_clases.glob("*.md"):
+                shutil.copy2(md, dest_materia / md.name)
+
+        vault_recursos = vault_materia / "Recursos"
+        if vault_recursos.is_dir():
+            shutil.copytree(vault_recursos, dest_materia / "Recursos")
 
 
 def clean_junk(dry_run: bool) -> None:
