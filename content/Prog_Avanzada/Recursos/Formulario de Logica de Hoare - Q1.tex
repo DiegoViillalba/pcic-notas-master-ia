@@ -1,0 +1,295 @@
+\documentclass[10pt,letterpaper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage[landscape,margin=0.25in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{array,tabularx}
+
+\definecolor{azul}{HTML}{173B63}
+\definecolor{azulclaro}{HTML}{E8F0F7}
+\definecolor{rojo}{HTML}{9A2C2C}
+\definecolor{gris}{HTML}{454B52}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.65pt}
+\setlength{\columnsep}{0.20in}
+\setlength{\columnseprule}{0.25pt}
+\setlength{\abovedisplayskip}{1.4pt}
+\setlength{\belowdisplayskip}{1.4pt}
+\setlength{\abovedisplayshortskip}{0.8pt}
+\setlength{\belowdisplayshortskip}{0.8pt}
+\setlist[itemize]{leftmargin=9pt,itemsep=0.3pt,topsep=0.7pt,parsep=0pt}
+\setlist[enumerate]{leftmargin=12pt,itemsep=0.3pt,topsep=0.7pt,parsep=0pt}
+
+\newcommand{\Htriple}[3]{\{#1\}\,#2\,\{#3\}}
+\newcommand{\topic}[1]{%
+  \vspace{1.0pt}\colorbox{azulclaro}{%
+    \parbox{\dimexpr\linewidth-2\fboxsep\relax}{\color{azul}\bfseries #1}}\vspace{0.5pt}}
+\newcommand{\alerta}[1]{\textcolor{rojo}{\bfseries #1}}
+\newcommand{\prof}{\textsuperscript{\scriptsize Prof.}}
+
+\begin{document}
+\fontsize{6.85}{7.55}\selectfont
+
+\begin{center}
+  {\fontsize{13.2}{14}\selectfont\bfseries\color{azul} FORMULARIO DE LÓGICA DE HOARE --- Q1}\\[-1pt]
+  {\small Programación Avanzada \(\cdot\) Prof. Gustavo Márquez Flores \(\cdot\) Notas 4--6}
+\end{center}
+\vspace{-5pt}
+
+\begin{multicols*}{3}
+
+\topic{1. Lectura y notación del profesor}
+
+\[
+\boxed{\Htriple{P}{C}{Q}}
+\]
+Si el estado inicial cumple la \textbf{precondición} $P$ y el código $C$
+\emph{termina}, el estado final cumple la \textbf{poscondición} $Q$.
+
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X@{}}
+$\{P\},\{Q\}$ & conjuntos de relaciones entre variables y constantes (aserciones).\\
+$\{\ \}$ & aserción vacía: no restringe nada; equivale a $\top$.\\
+$\bot$ & contradicción; ningún estado la satisface.\\
+$x_0$ & valor inicial/histórico; no cambia aunque cambie $x$.\\
+$:=$ & asignación; $=$ es igualdad lógica.\\
+$s\models P$ & el estado $s$ satisface $P$.\\
+\end{tabularx}
+
+\textbf{Corrección parcial:} si termina, entrega $Q$.\quad
+\textbf{Corrección total:} parcial $+$ prueba de terminación.
+
+\textbf{Validez vs. demostración:}
+$\models\Htriple{P}{C}{Q}$ significa ``es verdadera''; 
+$\vdash\Htriple{P}{C}{Q}$ significa ``se deriva con las reglas''.
+
+\topic{2. Fuerza lógica y consecuencia}
+
+$R$ es \textbf{más fuerte} que $S$ si $R\Rightarrow S$: admite menos estados.
+$\bot$ es la más fuerte; $\top$ la más débil.
+
+\[
+\boxed{
+\frac{P'\Rightarrow P\qquad \Htriple{P}{C}{Q}\qquad Q\Rightarrow Q'}
+     {\Htriple{P'}{C}{Q'}}}
+\]
+Se puede \textbf{fortalecer la precondición} y \textbf{debilitar la
+poscondición}. Mnemotecnia: las flechas apuntan hacia la terna nueva,
+$P'\Rightarrow P$ y $Q\Rightarrow Q'$.
+
+\topic{3. Axioma de asignación: regla clave}
+
+Para $V:=E$, partir de la meta $Q$ y sustituir en ella el valor que tendrá $V$:
+\[
+\boxed{\Htriple{Q_E^V}{V:=E}{Q}},\qquad
+Q_E^V\equiv Q[E/V].
+\]
+Lectura: ``$Q$ con $V$ sustituida por $E$''. En las diapositivas,
+$\{V=E,Q\}$ \textbf{indica reemplazo}; \alerta{no} significa $V=E\land Q$.
+La condición calculada es la más débil que garantiza $Q$.
+
+\textbf{Ejemplos relámpago}
+\[
+\begin{aligned}
+\Htriple{?}{k:=4a}{k=12}:&\quad 4a=12\iff\boxed{a=3},\\
+\Htriple{?}{i:=2i}{i<6}:&\quad 2i<6\iff\boxed{i<3},\\
+\Htriple{?}{x:=1/x}{x\ge0}:&\quad 1/x\ge0,\ x\ne0\iff\boxed{x>0}.
+\end{aligned}
+\]
+\alerta{Dominio:} añadir $x\ne0$, radicando $\ge0$, índice válido, etc.
+
+\topic{4. Composición y cálculo hacia atrás}
+
+\[
+\boxed{
+\frac{\Htriple{P}{C_1}{R}\qquad\Htriple{R}{C_2}{Q}}
+     {\Htriple{P}{C_1;C_2}{Q}}}
+\]
+$R$ es la aserción intermedia. El código se ejecuta hacia delante, pero se
+\textbf{verifica de derecha a izquierda}:
+\[
+Q\xleftarrow{\ C_n\ }R_{n-1}\xleftarrow{\ C_{n-1}\ }\cdots
+\xleftarrow{\ C_1\ }P_{\min}.
+\]
+Al final comprobar $P_{\rm dada}\Rightarrow P_{\min}$.
+
+\textbf{Ejemplo:}
+\[
+\Htriple{?}{a:=a+2;\ b:=2a}{b=14}
+\]
+$b=14\Leftarrow a=7\Leftarrow a+2=7$; luego $\boxed{a=5}$.
+
+\topic{5. Reglas que combinan ternas}
+
+Para el \textbf{mismo código} $C$:
+\[
+\frac{\Htriple{P_1}{C}{Q_1}\quad\Htriple{P_2}{C}{Q_2}}
+     {\Htriple{P_1\land P_2}{C}{Q_1\land Q_2}}
+\quad
+\frac{\Htriple{P_1}{C}{Q_1}\quad\Htriple{P_2}{C}{Q_2}}
+     {\Htriple{P_1\lor P_2}{C}{Q_1\lor Q_2}}.
+\]
+Conjunción acumula garantías; disyunción reúne casos alternativos.
+$\Htriple{P}{\mathbf{skip}}{P}$ deja el estado intacto.
+
+\topic{6. Condicionales: demostrar todos los caminos}
+
+\textbf{Con \texttt{else}:}
+\[
+\boxed{
+\frac{\Htriple{P\land B}{C_1}{Q}\qquad
+      \Htriple{P\land\neg B}{C_2}{Q}}
+     {\Htriple{P}{\mathbf{if}\ B\ \mathbf{then}\ C_1\ \mathbf{else}\ C_2}{Q}}}
+\]
+Ambas ramas deben garantizar la \textbf{misma} $Q$ (o algo que la implique).
+
+\textbf{Sin \texttt{else}:}
+\[
+\frac{\Htriple{P\land B}{C_1}{Q}\qquad(P\land\neg B)\Rightarrow Q}
+     {\Htriple{P}{\mathbf{if}\ B\ \mathbf{then}\ C_1}{Q}}.
+\]
+La rama falsa ejecuta $\mathbf{skip}$; no se puede ignorar.
+
+\textbf{Ejemplo del profesor: máximo}
+\[
+\Htriple{\top}{\mathbf{if}\ a>b\ \mathbf{then}\ m:=a\ \mathbf{else}\ m:=b}
+{m\ge a\land m\ge b}.
+\]
+Rama $B$: sustituir $m\mapsto a$ y usar $a>b\Rightarrow a\ge b$.
+Rama $\neg B$: sustituir $m\mapsto b$ y usar $\neg(a>b)\iff b\ge a$.
+Si $P\land B=\bot$, esa rama es inalcanzable y su terna vale vacíamente.
+
+\topic{7. Invariantes de bloque y de ciclo}
+
+Una relación $I$ es preservada por el bloque $C$ si
+\[
+\boxed{\Htriple{I}{C}{I}}.
+\]
+Las variables pueden cambiar; lo que permanece es la relación.
+
+Para $\mathbf{while}\ B\ \mathbf{do}\ C$:
+\[
+\boxed{
+\frac{\Htriple{I\land B}{C}{I}}
+     {\Htriple{I}{\mathbf{while}\ B\ \mathbf{do}\ C}{I\land\neg B}}}
+\]
+Para demostrar $\Htriple{P}{\mathbf{while}\ B\ \mathbf{do}\ C}{Q}$ hay tres
+\textbf{condiciones de verificación}:
+\[
+\boxed{P\Rightarrow I}\quad
+\boxed{\Htriple{I\land B}{C}{I}}\quad
+\boxed{I\land\neg B\Rightarrow Q}.
+\]
+Son, respectivamente: \textbf{inicialización, mantenimiento y salida útil}.
+
+\textbf{Conexión con inducción:}\par
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+Caso base & $I$ vale antes de la iteración $0$.\\
+Hipótesis & $I$ vale después de $n$ iteraciones.\\
+Paso & una ejecución de $C$ da $I$ para $n+1$.\\
+Salida & usar además $\neg B$ para obtener $Q$.\\
+\end{tabularx}
+
+\topic{8. Cómo inventar y fortalecer $I$}
+
+\begin{enumerate}
+  \item Nombrar valores iniciales que cambian: $M_0,x_0,\ldots$
+  \item Trazar $0,1,2,3$ iteraciones y escribir variables en función de $n$.
+  \item Eliminar $n$ y buscar: \emph{acumulado $\circ$ pendiente $=$ total}.
+  \item Añadir cotas que permitan concluir $Q$ al salir.
+  \item Probar; una tabla sugiere $I$, pero \alerta{no lo demuestra}.
+\end{enumerate}
+
+\textbf{Patrones del profesor}\par
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+Cuadrado por sumas & $I:C=DA$, $V=A-D$.\\
+Potencia & $I:RN^M=N^{M_0}$, $V=M$.\\
+Suma $1\ldots n$ & $I:s=\frac{i(i+1)}2\land0\le i\le n$, $V=n-i$.\\
+\end{tabularx}
+Ejemplo de fortalecimiento: $Y=X!$ puede preservarse, pero añadir $X\le N$
+permite deducir $X=N$ cuando la salida solo da $X\ge N$.
+
+\topic{9. Terminación: función variante}
+
+El invariante prueba corrección parcial. Para corrección total, encontrar una
+variante entera $V$ tal que, mientras $I\land B$:
+\[
+\boxed{V\ge0}\qquad\text{y}\qquad\boxed{V_{\rm después}<V_{\rm antes}}.
+\]
+Forma formal útil, guardando el valor anterior $v$:
+\[
+\Htriple{I\land B\land V=v}{C}{I\land0\le V<v}.
+\]
+Un entero no negativo no puede disminuir estrictamente para siempre.
+\textbf{Cuidado:} preservar $I$ no prueba que el ciclo termine.
+
+\topic{10. Precondición más débil y transformadores}
+
+Para corrección parcial:
+\[
+\Htriple{P}{C}{Q}\quad\Longleftrightarrow\quad P\Rightarrow wlp(C,Q).
+\]
+Para código determinista sin ciclos, $wp$ y $wlp$ se calculan igual:
+\[
+\begin{aligned}
+wlp(V:=E,Q)&=Q[E/V],\\
+wlp(C_1;C_2,Q)&=wlp(C_1,wlp(C_2,Q)),\\
+wlp(\mathbf{if},Q)&=(B\Rightarrow wlp(C_1,Q))\\
+&\quad\land(\neg B\Rightarrow wlp(C_2,Q)).
+\end{aligned}
+\]
+$wlp$: precondición liberal más débil (parcial). $wp$: precondición más débil
+(total). $sp(C,P)$ razona hacia delante y produce la poscondición más fuerte.
+
+\topic{11. Receta de examen}
+
+\begin{enumerate}
+  \item Escribir claramente $P$, código $C$, meta $Q$ y dominios.
+  \item Marcar variables modificadas; separar valor actual de inicial ($x_0$).
+  \item Sin ciclo: empezar en $Q$ y sustituir \textbf{hacia atrás}.
+  \item En secuencias: insertar cada aserción intermedia $R$.
+  \item En un \texttt{if}: abrir casos $P\land B$ y $P\land\neg B$.
+  \item En un \texttt{while}: proponer $I$ y probar entrada, preservación y salida.
+  \item Si piden corrección total: añadir variante y sus dos obligaciones.
+  \item Simplificar las fórmulas; usar consecuencia para cerrar las implicaciones.
+  \item Si una flecha parece falsa, buscar un contraejemplo concreto.
+\end{enumerate}
+
+\topic{12. Errores que cuestan puntos}
+
+\begin{itemize}
+  \item Sustituir en $P$ hacia delante en vez de sustituir $V\mapsto E$ en $Q$.
+  \item Tratar $\{V=E,Q\}$ como conjunción o confundir $:=$ con $=$.
+  \item Omitir el dominio de una operación parcial.
+  \item No verificar $P_{\rm dada}\Rightarrow P_{\min}$.
+  \item Probar una sola rama del \texttt{if}; olvidar el $\mathbf{skip}$ sin \texttt{else}.
+  \item Llamar invariante a algo que solo coincide en ejemplos.
+  \item Usar $I$ sin $\neg B$ para concluir la poscondición.
+  \item Confundir corrección parcial con total; olvidar la variante.
+\end{itemize}
+
+\topic{13. Pruebas de cordura de 20 segundos}
+
+\begin{itemize}
+  \item \textbf{Asignación:} toma un valor que cumpla la precondición calculada,
+        ejecuta una vez y revisa $Q$.
+  \item \textbf{Consecuencia:} una precondición más fuerte admite \emph{menos}
+        entradas; una poscondición más débil exige \emph{menos} a la salida.
+  \item \textbf{Ciclo:} revisa estado inicial, una vuelta simbólica y estado de salida.
+  \item \textbf{Variante:} calcula $V$ antes/después; debe bajar y no cruzar sin límite.
+\end{itemize}
+
+\vfill
+{\scriptsize\color{gris}
+Fuente del curso: \emph{Programación Avanzada, Notas 4--6}, Gustavo Márquez
+Flores. Convención usada: $Q_E^V\equiv Q[E/V]$ y $\{\ \}=\top$.
+}
+
+\end{multicols*}
+\end{document}

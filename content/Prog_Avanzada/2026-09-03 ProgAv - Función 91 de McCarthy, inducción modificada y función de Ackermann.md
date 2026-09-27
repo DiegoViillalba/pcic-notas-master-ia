@@ -337,7 +337,13 @@ $$
 \{x=2\}\ \ w:=A(x,y)\ \ \{w=2y+3\}
 $$
 
-Usando el axioma de asignación hacia atrás, \(Q[w/A(x,y)]=\{A(x,y)=y+2\}\); esa terna es válida por el axioma de asignación. Como ya se demostró que \(x=1\Rightarrow A(x,y)=y+2\), la regla de consecuencia cierra la prueba:
+Usando el axioma de asignación hacia atrás,
+
+$$
+Q^{w}_{A(x,y)}=(w=y+2)^{w}_{A(x,y)}\equiv A(x,y)=y+2.
+$$
+
+La terna resultante es válida por el axioma de asignación. Como ya se demostró que \(x=1\Rightarrow A(x,y)=y+2\), la regla de consecuencia cierra la prueba:
 
 $$
 \frac{\{A(x,y)=y+2\}\ w:=A(x,y)\ \{w=y+2\} \qquad x=1\Rightarrow A(x,y)=y+2}{\{x=1\}\ w:=A(x,y)\ \{w=y+2\}}.

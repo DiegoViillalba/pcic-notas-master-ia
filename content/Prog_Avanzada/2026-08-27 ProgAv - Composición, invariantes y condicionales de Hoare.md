@@ -52,13 +52,13 @@ La idea unificadora es que la ejecución avanza de izquierda a derecha, pero la 
 
 ## 1. Herramienta básica: sustitución en una asignación
 
-Para una asignación \(V:=E\), el [[Axioma de asignación de Hoare|axioma de asignación]] establece:
+Para una asignación $V:=E$, el [[Axioma de asignación de Hoare|axioma de asignación]] establece:
 
 $$
-\boxed{\{Q[E/V]\}\ V:=E\ \{Q\}}.
+\boxed{\{Q^{V}_{E}\}\ V:=E\ \{Q\}}.
 $$
 
-\(Q[E/V]\) significa sustituir en \(Q\) cada aparición libre de \(V\) por \(E\). El resultado es la [[Precondición más débil|precondición más débil]] que garantiza \(Q\).
+$Q^{V}_{E}\equiv Q[E/V]$ significa sustituir en $Q$ cada aparición libre de $V$ por $E$; se lee “$Q$ con $V$ sustituida por $E$”. El resultado es la [[Precondición más débil|precondición más débil]] que garantiza $Q$.
 
 > [!important] Sentido de la sustitución
 > No se “despeja el programa”. Se imagina el valor que tendrá la variable después de la asignación y se reemplaza ese valor dentro de la postcondición.
@@ -70,13 +70,13 @@ flowchart RL
     WP --> H["Precondición de V := E"]
 ~~~
 
-En las fórmulas siguientes, \(\top\) representa la aserción vacía `{ }`: no impone ninguna restricción y es verdadera para todo estado.
+En las fórmulas siguientes, $\top$ representa la aserción vacía `{ }`: no impone ninguna restricción y es verdadera para todo estado.
 
 ---
 
 ## 2. Ejercicios de asignación
 
-### Ejemplo a: precondición de \(j:=i+1\)
+### Ejemplo a: precondición de $j:=i+1$
 
 Se quiere completar:
 
@@ -84,12 +84,12 @@ $$
 \{P\}\ j:=i+1\ \{j>0\}.
 $$
 
-**Paso 1.** Identificar \(V=j\), \(E=i+1\) y \(Q:(j>0)\).
+**Paso 1.** Identificar $V=j$, $E=i+1$ y $Q:(j>0)$.
 
-**Paso 2.** Sustituir \(j\) por \(i+1\):
+**Paso 2.** Sustituir $j$ por $i+1$:
 
 $$
-Q[i+1/j]:(i+1)>0.
+(j>0)^j_{i+1}\equiv(i+1)>0.
 $$
 
 **Paso 3.** Simplificar:
@@ -111,15 +111,15 @@ flowchart RL
     I --> P["i mayor que -1"]
 ~~~
 
-Comprobación: \(i=-0.5\) produce \(j=0.5>0\); \(i=-1\) produce \(j=0\), que no cumple la desigualdad estricta.
+Comprobación: $i=-0.5$ produce $j=0.5>0$; $i=-1$ produce $j=0$, que no cumple la desigualdad estricta.
 
-### Ejemplo b: precondición de \(y:=x^2\)
+### Ejemplo b: precondición de $y:=x^2$
 
 $$
 \{P\}\ y:=x^2\ \{y>1\}.
 $$
 
-**Paso 1.** Sustituir \(y\) por \(x^2\):
+**Paso 1.** Sustituir $y$ por $x^2$:
 
 $$
 P:(x^2>1).
@@ -147,20 +147,20 @@ flowchart TD
     B -->|"x mayor que 1"| OK2["Sirve"]
 ~~~
 
-Los extremos \(x=-1\) y \(x=1\) se excluyen porque producen \(y=1\), no \(y>1\).
+Los extremos $x=-1$ y $x=1$ se excluyen porque producen $y=1$, no $y>1$.
 
-### Ejemplo c: postcondición de \(x:=x^2\)
+### Ejemplo c: postcondición de $x:=x^2$
 
 $$
 \{x>2\}\ x:=x^2\ \{Q\}.
 $$
 
-Para distinguir momentos, escribimos \(x_0\) para el valor inicial y \(x_1\) para el final:
+Para distinguir momentos, escribimos $x_0$ para el valor inicial y $x_1$ para el final:
 
-1. \(x_0>2\).
-2. La asignación produce \(x_1=x_0^2\).
-3. \(x_0>2\Rightarrow x_0^2>4\).
-4. Por tanto, \(x_1>4\).
+1. $x_0>2$.
+2. La asignación produce $x_1=x_0^2$.
+3. $x_0>2\Rightarrow x_0^2>4$.
+4. Por tanto, $x_1>4$.
 
 $$
 \boxed{\{x>2\}\ x:=x^2\ \{x>4\}}.
@@ -174,17 +174,17 @@ flowchart LR
 ~~~
 
 > [!note]
-> En una terna se reutiliza normalmente \(x\), pero \(x_0,x_1\) evita confundir el valor anterior con el posterior.
+> En una terna se reutiliza normalmente $x$, pero $x_0,x_1$ evita confundir el valor anterior con el posterior.
 
-### Ejemplo d: precondición de \(x:=1/x\)
+### Ejemplo d: precondición de $x:=1/x$
 
 $$
 \{P\}\ x:=\frac1x\ \{x\ge0\}.
 $$
 
-**Paso 1.** Sustituir \(x\) por \(1/x\): \(\frac1x\ge0\).
+**Paso 1.** Sustituir $x$ por $1/x$: $\frac1x\ge0$.
 
-**Paso 2.** Incluir el dominio: \(x\ne0\).
+**Paso 2.** Incluir el dominio: $x\ne0$.
 
 **Paso 3.** Analizar signos:
 
@@ -211,14 +211,14 @@ flowchart TD
 
 ## 3. Concatenación de código
 
-La concatenación \(C_1;C_2\) ejecuta primero \(C_1\) y después \(C_2\). El estado final de \(C_1\) se convierte en el inicial de \(C_2\). La [[Regla de composición de Hoare|regla de composición]] es:
+La concatenación $C_1;C_2$ ejecuta primero $C_1$ y después $C_2$. El estado final de $C_1$ se convierte en el inicial de $C_2$. La [[Regla de composición de Hoare|regla de composición]] es:
 
 $$
 \frac{\{P\}\ C_1\ \{R\}\qquad \{R\}\ C_2\ \{Q\}}
 {\{P\}\ C_1;C_2\ \{Q\}}.
 $$
 
-\(R\) es la **aserción intermedia**.
+$R$ es la **aserción intermedia**.
 
 ~~~mermaid
 flowchart LR
@@ -228,7 +228,7 @@ flowchart LR
     C2 --> Q["Q"]
 ~~~
 
-Para más instrucciones se aplica la regla repetidamente. Las aserciones intermedias suelen calcularse desde \(Q\) hacia atrás.
+Para más instrucciones se aplica la regla repetidamente. Las aserciones intermedias suelen calcularse desde $Q$ hacia atrás.
 
 ---
 
@@ -240,7 +240,7 @@ $$
 \{\top\}\ c:=a+b;\ c:=c/2\ \left\{c=\frac{a+b}{2}\right\}.
 $$
 
-**Paso 1. Última instrucción.** Sustituir \(c\) por \(c/2\):
+**Paso 1. Última instrucción.** Sustituir $c$ por $c/2$:
 
 $$
 \frac c2=\frac{a+b}{2}\iff c=a+b.
@@ -250,7 +250,7 @@ $$
 \{c=a+b\}\ c:=c/2\ \left\{c=\frac{a+b}{2}\right\}. \tag{1}
 $$
 
-**Paso 2. Primera instrucción.** Sustituir \(c\) por \(a+b\):
+**Paso 2. Primera instrucción.** Sustituir $c$ por $a+b$:
 
 $$
 (a+b)=(a+b)\iff\top.
@@ -276,19 +276,19 @@ flowchart LR
     R -. "verificar hacia atrás" .-> P
 ~~~
 
-La tautología explica por qué no hace falta restringir \(a\) o \(b\), suponiendo que dividir entre \(2\) esté definido.
+La tautología explica por qué no hace falta restringir $a$ o $b$, suponiendo que dividir entre $2$ esté definido.
 
 ---
 
-## 5. Ejemplo: construir \(1+r+r^2\)
+## 5. Ejemplo: construir $1+r+r^2$
 
 $$
 \{\top\}\ s:=1;\ s:=s+r;\ s:=s+r^2\ \{s=1+r+r^2\}.
 $$
 
-Se supone que \(r\) no cambia.
+Se supone que $r$ no cambia.
 
-**Paso 1.** Retroceder por \(s:=s+r^2\):
+**Paso 1.** Retroceder por $s:=s+r^2$:
 
 $$
 (s=1+r+r^2)[s+r^2/s]\iff s=1+r.
@@ -298,7 +298,7 @@ $$
 \{s=1+r\}\ s:=s+r^2\ \{s=1+r+r^2\}. \tag{1}
 $$
 
-**Paso 2.** Retroceder por \(s:=s+r\):
+**Paso 2.** Retroceder por $s:=s+r$:
 
 $$
 (s=1+r)[s+r/s]\iff s=1.
@@ -308,7 +308,7 @@ $$
 \{s=1\}\ s:=s+r\ \{s=1+r\}. \tag{2}
 $$
 
-**Paso 3.** Retroceder por \(s:=1\):
+**Paso 3.** Retroceder por $s:=1$:
 
 $$
 (s=1)[1/s]\iff1=1\iff\top.
@@ -340,9 +340,9 @@ $$
 \{a=A\land b=B\}\ h:=a;\ a:=b;\ b:=h\ \{a=B\land b=A\}.
 $$
 
-\(A\) y \(B\) representan valores iniciales y no cambian.
+$A$ y $B$ representan valores iniciales y no cambian.
 
-**Paso 1.** Antes de \(b:=h\):
+**Paso 1.** Antes de $b:=h$:
 
 $$
 (a=B\land b=A)[h/b]\iff a=B\land h=A.
@@ -352,7 +352,7 @@ $$
 \{a=B\land h=A\}\ b:=h\ \{a=B\land b=A\}. \tag{1}
 $$
 
-**Paso 2.** Antes de \(a:=b\):
+**Paso 2.** Antes de $a:=b$:
 
 $$
 (a=B\land h=A)[b/a]\iff b=B\land h=A.
@@ -362,7 +362,7 @@ $$
 \{b=B\land h=A\}\ a:=b\ \{a=B\land h=A\}. \tag{2}
 $$
 
-**Paso 3.** Antes de \(h:=a\):
+**Paso 3.** Antes de $h:=a$:
 
 $$
 (b=B\land h=A)[a/h]\iff b=B\land a=A.
@@ -384,19 +384,19 @@ flowchart LR
     C3 --> S3["Final: a = B; b = A"]
 ~~~
 
-\(h\) conserva el valor inicial de \(a\), que se perdería al ejecutar \(a:=b\).
+$h$ conserva el valor inicial de $a$, que se perdería al ejecutar $a:=b$.
 
 ---
 
 ## 7. Invariante de un programa
 
-Un [[Invariante de programa|invariante de programa]] para un bloque \(C\) es una aserción \(I\) preservada:
+Un [[Invariante de programa|invariante de programa]] para un bloque $C$ es una aserción $I$ preservada:
 
 $$
 \{I\}\ C\ \{I\}.
 $$
 
-No exige que las variables conserven sus valores; exige que se conserve la **relación** expresada por \(I\).
+No exige que las variables conserven sus valores; exige que se conserve la **relación** expresada por $I$.
 
 ~~~mermaid
 flowchart LR
@@ -404,9 +404,9 @@ flowchart LR
     C --> S1["El estado final también satisface I"]
 ~~~
 
-### Ejemplo: preservar \(r=2^i\)
+### Ejemplo: preservar $r=2^i$
 
-Demostrar que \(I:r=2^i\) es invariante de:
+Demostrar que $I:r=2^i$ es invariante de:
 
 ~~~text
 i := i + 1
@@ -417,7 +417,7 @@ $$
 \{r=2^i\}\ i:=i+1;\ r:=2r\ \{r=2^i\}.
 $$
 
-**Paso 1.** Retroceder por \(r:=2r\):
+**Paso 1.** Retroceder por $r:=2r$:
 
 $$
 (r=2^i)[2r/r]\iff2r=2^i\iff r=2^{i-1}.
@@ -427,7 +427,7 @@ $$
 \{r=2^{i-1}\}\ r:=2r\ \{r=2^i\}. \tag{1}
 $$
 
-**Paso 2.** Retroceder por \(i:=i+1\):
+**Paso 2.** Retroceder por $i:=i+1$:
 
 $$
 r=2^{(i+1)-1}\iff r=2^i.
@@ -459,8 +459,8 @@ $$
 
 Comprobaciones:
 
-- \(i=2,r=4\) produce \(i=3,r=8=2^3\).
-- \(i=6,r=64\) produce \(i=7,r=128=2^7\).
+- $i=2,r=4$ produce $i=3,r=8=2^3$.
+- $i=6,r=64$ produce $i=7,r=128=2^7$.
 
 ~~~mermaid
 flowchart TD
@@ -479,8 +479,8 @@ flowchart TD
 
 En `if B then C1`:
 
-1. Si \(B\) es verdadera, se ejecuta \(C_1\).
-2. Si \(B\) es falsa, el estado queda igual.
+1. Si $B$ es verdadera, se ejecuta $C_1$.
+2. Si $B$ es falsa, el estado queda igual.
 
 La [[Regla condicional de Hoare|regla condicional]] es:
 
@@ -514,7 +514,7 @@ $$
 \{\top\}\ \textbf{if }(max<a)\textbf{ then }max:=a\ \{max\ge a\}.
 $$
 
-\(P=\top\), \(B:(max<a)\), \(Q:(max\ge a)\).
+$P=\top$, $B:(max<a)$, $Q:(max\ge a)$.
 
 **Rama falsa.** En un orden total:
 
@@ -528,13 +528,13 @@ $$
 (\top\land\neg(max<a))\Rightarrow max\ge a. \tag{1}
 $$
 
-**Rama verdadera.** Sustituir \(max\) por \(a\) en \(max\ge a\) produce \(a\ge a\), una tautología:
+**Rama verdadera.** Sustituir $max$ por $a$ en $max\ge a$ produce $a\ge a$, una tautología:
 
 $$
 \{\top\}\ max:=a\ \{max\ge a\}.
 $$
 
-Como \(max<a\Rightarrow\top\), por consecuencia:
+Como $max<a\Rightarrow\top$, por consecuencia:
 
 $$
 \{max<a\}\ max:=a\ \{max\ge a\}. \tag{2}
@@ -582,7 +582,7 @@ flowchart TD
     Q2 --> Q
 ~~~
 
-\(P\) acompaña a ambas ramas; lo adicional es \(B\) o \(\neg B\). Las dos deben establecer \(Q\), o una condición más fuerte que implique \(Q\).
+$P$ acompaña a ambas ramas; lo adicional es $B$ o $\neg B$. Las dos deben establecer $Q$, o una condición más fuerte que implique $Q$.
 
 ### Ejemplo complementario: máximo de dos valores
 
@@ -592,10 +592,10 @@ No aparece desarrollado en las diapositivas, pero aplica la regla:
 if a >= b then max := a else max := b
 ~~~
 
-Se desea \(Q:(max\ge a\land max\ge b)\).
+Se desea $Q:(max\ge a\land max\ge b)$.
 
-- Si \(a\ge b\), \(max:=a\) produce \(Q\).
-- Si \(a<b\), \(max:=b\) produce \(Q\).
+- Si $a\ge b$, $max:=a$ produce $Q$.
+- Si $a<b$, $max:=b$ produce $Q$.
 
 ~~~mermaid
 flowchart TD
@@ -612,8 +612,8 @@ flowchart TD
 
 ### Para una secuencia
 
-1. Escribir la postcondición final \(Q\).
-2. Tomar la última asignación y calcular \(Q[E/V]\).
+1. Escribir la postcondición final $Q$.
+2. Tomar la última asignación y calcular $Q^{V}_{E}$.
 3. Usar el resultado como postcondición de la instrucción anterior.
 4. Repetir hasta llegar al principio.
 5. Verificar que la precondición declarada implica la calculada.
@@ -633,11 +633,11 @@ flowchart RL
 
 ### Para un condicional
 
-1. Identificar \(P\), \(B\) y \(Q\).
-2. Demostrar \(\{P\land B\}C_1\{Q\}\).
-3. En la rama falsa, añadir \(\neg B\).
-4. Sin `else`, probar \((P\land\neg B)\Rightarrow Q\).
-5. Con `else`, demostrar \(\{P\land\neg B\}C_2\{Q\}\).
+1. Identificar $P$, $B$ y $Q$.
+2. Demostrar $\{P\land B\}C_1\{Q\}$.
+3. En la rama falsa, añadir $\neg B$.
+4. Sin `else`, probar $(P\land\neg B)\Rightarrow Q$.
+5. Con `else`, demostrar $\{P\land\neg B\}C_2\{Q\}$.
 6. Concluir con la regla condicional.
 
 ---
@@ -645,19 +645,19 @@ flowchart RL
 ## 11. Precisiones importantes
 
 > [!warning] Dominio
-> En \(x:=1/x\), además de sustituir, debe exigirse \(x\ne0\). Toda operación parcial aporta obligaciones de dominio.
+> En $x:=1/x$, además de sustituir, debe exigirse $x\ne0$. Toda operación parcial aporta obligaciones de dominio.
 
 > [!note] Aserción vacía
-> `{ }` representa \(\top\), la aserción verdadera para todo estado; no una condición imposible.
+> `{ }` representa $\top$, la aserción verdadera para todo estado; no una condición imposible.
 
 > [!note] Valores anteriores y posteriores
-> En \(x:=x^2\), el lado derecho usa el valor anterior y el izquierdo recibe el nuevo. \(x_0,x_1\) elimina la ambigüedad.
+> En $x:=x^2$, el lado derecho usa el valor anterior y el izquierdo recibe el nuevo. $x_0,x_1$ elimina la ambigüedad.
 
 > [!note] Invariante de bloque y de ciclo
-> \(\{I\}C\{I\}\) prueba preservación por un bloque. Para un ciclo también debe demostrarse que \(I\) vale antes de la primera iteración.
+> $\{I\}C\{I\}$ prueba preservación por un bloque. Para un ciclo también debe demostrarse que $I$ vale antes de la primera iteración.
 
 > [!note] `if` sin `else`
-> La rama falsa no desaparece: ejecuta `skip`, por lo que \(P\land\neg B\) debe implicar \(Q\).
+> La rama falsa no desaparece: ejecuta `skip`, por lo que $P\land\neg B$ debe implicar $Q$.
 
 ---
 
@@ -683,17 +683,17 @@ Y := R
 
 ![[slide-23.png]]
 
-En un condicional no hay una sola condición intermedia: hay dos obligaciones, una bajo \(B\) y otra bajo \(\neg B\). Ambas deben llegar a la misma \(Q\).
+En un condicional no hay una sola condición intermedia: hay dos obligaciones, una bajo $B$ y otra bajo $\neg B$. Ambas deben llegar a la misma $Q$.
 
 ![[slide-27.png]]
 
 ### Ejercicio corto
 
-Demuestra \(\{\top\}\ \mathbf{if}\ a\le b\ \mathbf{then}\ m:=a\ \mathbf{else}\ m:=b\ \{m=\min(a,b)\}\).
+Demuestra $\{\top\}\ \mathbf{if}\ a\le b\ \mathbf{then}\ m:=a\ \mathbf{else}\ m:=b\ \{m=\min(a,b)\}$.
 
 > [!success]- Solución paso a paso
-> 1. Rama \(a\le b\): sustituir \(m\) por \(a\) reduce la meta a \(a=\min(a,b)\).
-> 2. Rama \(a>b\): sustituir \(m\) por \(b\) reduce la meta a \(b=\min(a,b)\).
+> 1. Rama $a\le b$: sustituir $m$ por $a$ reduce la meta a $a=\min(a,b)$.
+> 2. Rama $a>b$: sustituir $m$ por $b$ reduce la meta a $b=\min(a,b)$.
 > 3. Las dos fórmulas son verdaderas bajo la guarda de su rama.
 > 4. La regla condicional une ambas derivaciones.
 
@@ -703,17 +703,17 @@ Véase también [[Guía paso a paso - Lógica de Hoare#4. Condicionales demostra
 
 | Diap. | Lámina | Contenido | Sección |
 |---:|---:|---|---|
-| 1 | 82 | Precondiciones de \(j:=i+1\) y \(y:=x^2\) | §2 a–b |
-| 2 | 83 | Postcondición de \(x:=x^2\); precondición de \(x:=1/x\) | §2 c–d |
+| 1 | 82 | Precondiciones de $j:=i+1$ y $y:=x^2$ | §2 a–b |
+| 2 | 83 | Postcondición de $x:=x^2$; precondición de $x:=1/x$ | §2 c–d |
 | 3 | 84 | Concatenación de código | §3 |
 | 4 | 85 | Regla de concatenación y ejemplo de la media | §3–4 |
 | 5 | 86 | Demostración de la media | §4 |
-| 6 | 87 | Inicio del ejemplo \(1+r+r^2\) | §5 |
+| 6 | 87 | Inicio del ejemplo $1+r+r^2$ | §5 |
 | 7 | 88 | Fin del polinomio e inicio del intercambio | §5–6 |
 | 8 | 89 | Demostración del intercambio | §6 |
-| 9 | 90 | Invariante y ejemplo \(r=2^i\) | §7 |
+| 9 | 90 | Invariante y ejemplo $r=2^i$ | §7 |
 | 10 | 91 | Demostración formal del invariante | §7 |
-| 11 | 92 | Casos \(i=2\) e \(i=6\) | §7 |
+| 11 | 92 | Casos $i=2$ e $i=6$ | §7 |
 | 12 | 93 | Comprobación algebraica | §7 |
 | 13 | 94 | `if` sin `else` | §8 |
 | 14 | 95 | Regla y diagrama sin `else` | §8 |
@@ -742,7 +742,7 @@ Véase también [[Guía paso a paso - Lógica de Hoare#4. Condicionales demostra
 
 ## Resumen después de clase
 
-El axioma de asignación permite calcular precondiciones por sustitución y demostrar desde la salida hacia la entrada. La composición conecta instrucciones mediante aserciones intermedias, como en la media, el polinomio y el intercambio. Un invariante es una relación preservada aun cuando cambien los valores individuales. En un condicional se analizan por separado \(B\) y \(\neg B\), y ambos caminos deben garantizar la misma postcondición.
+El axioma de asignación permite calcular precondiciones por sustitución y demostrar desde la salida hacia la entrada. La composición conecta instrucciones mediante aserciones intermedias, como en la media, el polinomio y el intercambio. Un invariante es una relación preservada aun cuando cambien los valores individuales. En un condicional se analizan por separado $B$ y $\neg B$, y ambos caminos deben garantizar la misma postcondición.
 
 ## Referencia
 

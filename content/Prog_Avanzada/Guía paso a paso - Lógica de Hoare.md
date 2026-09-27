@@ -73,10 +73,10 @@ No afirma que el programa vaya a terminar. Para obtener corrección total se dem
 Para \(V:=E\) y postcondición \(Q\):
 
 \[
-\boxed{\{Q[E/V]\}\ V:=E\ \{Q\}}.
+\boxed{\{Q^{V}_{E}\}\ V:=E\ \{Q\}}.
 \]
 
-Se sustituye **la variable asignada \(V\) por la expresión \(E\) dentro de \(Q\)**.
+Usamos la convención \(Q^{V}_{E}\equiv Q[E/V]\). Se lee **“\(Q\) con la variable asignada \(V\) sustituida por la expresión \(E\)”**.
 
 ![[slide-15.png]]
 
@@ -97,7 +97,7 @@ Completar:
 **Paso 4.** Sustituir:
 
 \[
-Q[4a/k]\equiv 4a=12.
+(k=12)^k_{4a}\equiv 4a=12.
 \]
 
 **Paso 5.** Simplificar: \(a=3\).
@@ -105,6 +105,24 @@ Q[4a/k]\equiv 4a=12.
 \[
 \boxed{\{a=3\}\ k:=4a\ \{k=12\}}.
 \]
+
+### Caso de las diapositivas: obtener una postcondición
+
+Si la precondición \(P\) fija los valores necesarios para evaluar \(E\) y \(C\equiv(V=E)\), las diapositivas usan:
+
+\[
+\boxed{\{P\}\ V:=E\ \left\{C^{E}_{\{P\}}\right\}}.
+\]
+
+Así, \(Q=C^{E}_{\{P\}}\). El esquema \(\{E=\{P\},C\}\) mostrado en las diapositivas indica el reemplazo, no una conjunción lógica.
+
+Por ejemplo:
+
+\[
+C^{4a}_{\{a=3\}}\equiv(k=4a)^{4a}_{\{a=3\}}\equiv k=12,
+\]
+
+de modo que \(\{a=3\}\ k:=4a\ \{k=12\}\). Esta abreviatura sirve cuando \(P\) aporta valores concretos suficientes; no es una regla para transformar mecánicamente cualquier precondición.
 
 ### La falacia “hacia adelante”
 

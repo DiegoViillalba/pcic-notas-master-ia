@@ -25,17 +25,25 @@ Después de la asignación, `V` contiene el valor de `E` calculado en el estado 
 ## Formulación
 
 $$
-\boxed{\{Q[E/V]\}\ V:=E\ \{Q\}}.
+\boxed{\{Q^{V}_{E}\}\ V:=E\ \{Q\}}.
 $$
 
-La sustitución debe ser simultánea y evitar la captura de variables.
+La convención usada en las notas de Programación Avanzada es
+
+$$
+Q^{V}_{E}\equiv Q[E/V],
+$$
+
+que se lee **“$Q$ con $V$ sustituida por $E$”**. Así, la precondición calculada es $P=Q^{V}_{E}$. La sustitución debe ser simultánea y evitar la captura de variables.
+
+Las diapositivas representan intuitivamente la sustitución con el esquema $\{V=E,Q\}$: se usa $V=E$ para reemplazar $V$ dentro de $Q$; no se trata de afirmar la conjunción $V=E\land Q$ antes de ejecutar la asignación.
 
 ## Ejemplo mínimo
 
 ```text
 Q: k = 12
 instrucción: k := 4*a
-Q[4*a/k]: 4*a = 12
+Q^k_{4a}: 4*a = 12
 precondición simplificada: a = 3
 ```
 
@@ -60,20 +68,38 @@ No debe escribirse sin aclaración `i=i+1` después de `i:=i+1`: los dos lados r
 La forma correcta parte de la postcondición $Q$. La regla falsa
 
 $$
-\{P\}\ V:=E\ \{P[E/V]\}
+\{P\}\ V:=E\ \{P^{V}_{E}\}
 $$
 
-podría producir $\{x=0\}\ x:=1\ \{1=0\}$, lo cual revela el error. En cambio, para probar $\{?\}\ x:=1\ \{x=1\}$ se calcula $(x=1)[1/x]$, que es $1=1$; por tanto la precondición más débil es $\top$.
+podría producir $\{x=0\}\ x:=1\ \{1=0\}$, lo cual revela el error. En cambio, para probar $\{?\}\ x:=1\ \{x=1\}$ se calcula $(x=1)^x_1$, que es $1=1$; por tanto la precondición más débil es $\top$.
 
 ## Mini ejercicio
 
 Para $z:=3x-2$ y $Q:z>7$:
 
 $$
-Q[3x-2/z]\equiv3x-2>7\iff x>3.
+(z>7)^z_{3x-2}\equiv3x-2>7\iff x>3.
 $$
 
 Comprueba con $x=4$ y con el valor frontera $x=3$.
+
+## Cálculo de una postcondición en las diapositivas
+
+Cuando la precondición $P$ fija los valores necesarios para evaluar $E$, las diapositivas 26–27 llaman $C^{E}_{\{P\}}$ al resultado de sustituir esos valores en la igualdad $C\equiv(V=E)$:
+
+$$
+\{P\}\ V:=E\ \left\{C^{E}_{\{P\}}\right\}.
+$$
+
+En esa convención, $Q=C^{E}_{\{P\}}$. El esquema auxiliar $\{E=\{P\},C\}$ de las diapositivas indica el reemplazo que debe efectuarse; no representa una conjunción lógica.
+
+Por ejemplo:
+
+$$
+C^{4a}_{\{a=3\}}\equiv(k=4a)^{4a}_{\{a=3\}}\equiv k=12,
+$$
+
+y por ello $\{a=3\}\ k:=4a\ \{k=12\}$. Esta es una sustitución hacia adelante de valores conocidos, no la forma general de la postcondición más fuerte para una precondición arbitraria.
 
 ## Relaciones
 

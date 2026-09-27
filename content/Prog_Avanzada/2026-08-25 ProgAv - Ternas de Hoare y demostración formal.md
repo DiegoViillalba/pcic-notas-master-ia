@@ -392,23 +392,40 @@ flowchart TB
 Para una asignación $V:=E$ y una postcondición $Q$, se sustituye en $Q$ cada aparición libre de $V$ por $E$:
 
 $$
-\boxed{\{Q[E/V]\}\ V:=E\ \{Q\}}.
+\boxed{\{Q^{V}_{E}\}\ V:=E\ \{Q\}}.
 $$
 
-$Q[E/V]$ se lee “$Q$ con $E$ sustituido por $V$”. Es la [[Precondición más débil|precondición más débil]] que garantiza $Q$ para esa asignación. *(Diap. 24–25.)*
+La notación adoptada en estas notas es:
+
+$$
+Q^{V}_{E}\equiv Q[E/V],
+$$
+
+y se lee **“$Q$ con $V$ sustituida por $E$”**. Por tanto,
+
+$$
+P=Q^{V}_{E}.
+$$
+
+Las diapositivas escriben el esquema auxiliar $\{V=E,Q\}$ para indicar que se usa $V=E$ como regla de reemplazo dentro de $Q$. No debe interpretarse como la conjunción $V=E\land Q$ en el estado inicial. El resultado $Q^{V}_{E}$ es la [[Precondición más débil|precondición más débil]] que garantiza $Q$ para esa asignación. *(Diap. 24–25.)*
 
 #### Ejemplo 1: `k := 4*a`
 
-Se desea $k=12$ al final:
+Buscamos responder:
+$$
+\{a=?\}\ k:=4a\ \{k=12\}
+$$
+
+Es decir, se desea $k=12$ al final:
 
 $$
 Q:k=12.
 $$
 
-Sustituir $k$ por $4a$ produce:
+Sustituir $k$ por $4a$ produce la precondición:
 
 $$
-Q[4a/k]:4a=12\iff a=3.
+P=(k=12)^{k}_{4a}\equiv4a=12\iff a=3.
 $$
 
 Por tanto:
@@ -421,10 +438,15 @@ $$
 
 #### Ejemplo 2: `i := 2*i`
 
+Determinar la precondición para que la siguiente terna sea correcta:
+
+$$
+\{P\}\ i:=2i\ \{i<6\}
+$$
 Para obtener $i<6$ después de la asignación:
 
 $$
-(i<6)[2i/i]\equiv2i<6\equiv i<3.
+P=Q^{V}_{E}=(i<6)^i_{2i}\equiv2i<6\equiv i<3.
 $$
 
 Luego:
@@ -434,6 +456,35 @@ $$
 $$
 
 *(Diap. 26.)*
+
+#### Cálculo hacia adelante de una postcondición
+
+Las diapositivas 26–27 presentan también el caso en que se conoce una precondición $P$ que fija los valores usados por la expresión $E$. Si $C$ denota la igualdad producida por la asignación, $C\equiv(V=E)$, se usa la notación:
+
+$$
+\boxed{\{P\}\ V:=E\ \left\{C^{E}_{\{P\}}\right\}}.
+$$
+
+Por tanto, en esta convención:
+
+$$
+Q=C^{E}_{\{P\}}.
+$$
+
+$C^{E}_{\{P\}}$ se lee **“$C$ con los valores dados por $P$ sustituidos en $E$”**. Por ejemplo, si $P\equiv(a=3)$ y $C\equiv(k=4a)$:
+
+$$
+C^{4a}_{\{a=3\}}\equiv(k=4a)^{4a}_{\{a=3\}}\equiv k=4(3)\equiv k=12.
+$$
+
+Así se obtiene:
+
+$$
+\boxed{\{a=3\}\ k:=4a\ \{k=12\}}.
+$$
+
+> [!important] Alcance de esta notación
+> Las diapositivas representan el reemplazo mediante el esquema auxiliar $\{E=\{P\},C\}$. Se trata de una instrucción de sustitución, no de una conjunción lógica. Este cálculo directo funciona cuando $P$ proporciona valores suficientes para evaluar $E$, como en el ejemplo de las diapositivas. Para una precondición arbitraria, la postcondición más fuerte puede necesitar conservar valores anteriores mediante una variable fresca o un cuantificador existencial; no se obtiene aplicando mecánicamente $P^{V}_{E}$.
 
 #### Ejemplo 3: varias instrucciones
 
@@ -471,7 +522,7 @@ wp(código, Q):
         devolver wp(C1, condición_intermedia)
 ```
 
-Las diapositivas 26–27 también ilustran el razonamiento hacia adelante con $a=3$ y `k := 4*a`, que permite concluir $k=12$. En general, el cálculo hacia atrás por sustitución es la regla más directa y evita confundir valores anteriores y posteriores.
+Las diapositivas 26–27 también ilustran este razonamiento hacia adelante con $a=3$ y `k := 4*a`, que permite concluir $k=12$. En general, el cálculo hacia atrás mediante $Q^{V}_{E}$ es la regla básica del axioma de asignación y evita confundir valores anteriores y posteriores.
 
 ---
 
@@ -490,7 +541,7 @@ Las diapositivas 26–27 también ilustran el razonamiento hacia adelante con $a
 > No es necesario que la precondición declarada sea literalmente igual a la calculada. Basta que sea suficientemente fuerte: si $P_{inicial}\Rightarrow wp(C,Q)$, entonces $\{P_{inicial}\}C\{Q\}$ es válida por la regla de consecuencia.
 
 > [!note] Cálculo hacia adelante, diapositivas 26–27
-> Sustituir directamente valores conocidos funciona en el ejemplo `a=3; k:=4*a`. Para programas generales, la postcondición más fuerte puede requerir conservar el valor anterior mediante una variable fresca o un cuantificador existencial.
+> Sustituir directamente valores conocidos funciona en el ejemplo `a=3; k:=4*a`, escrito como $C^{4a}_{\{a=3\}}$. Para programas generales, la postcondición más fuerte puede requerir conservar el valor anterior mediante una variable fresca o un cuantificador existencial.
 
 ---
 
@@ -544,7 +595,7 @@ Un sistema correcto (*sound*) no permite demostrar ternas inválidas. Esta disti
 Se propone erróneamente:
 
 \[
-\{P\}\ V:=E\ \{P[E/V]\}.
+\{P\}\ V:=E\ \{P^{V}_{E}\}.
 \]
 
 Toma \(P\equiv x=0\), \(V=x\) y \(E=1\):
@@ -552,7 +603,7 @@ Toma \(P\equiv x=0\), \(V=x\) y \(E=1\):
 1. La supuesta regla produciría \(\{x=0\}\ x:=1\ \{1=0\}\).
 2. La postcondición es falsa en todo estado.
 3. Por tanto, la regla propuesta no puede ser correcta.
-4. La regla válida parte de la meta \(Q\) y calcula \(Q[E/V]\) **antes** de la asignación.
+4. La regla válida parte de la meta \(Q\) y calcula \(Q^{V}_{E}\equiv Q[E/V]\) **antes** de la asignación.
 
 ![[slide-16.png]]
 

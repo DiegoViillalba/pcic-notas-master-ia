@@ -32,7 +32,7 @@ Se fija primero la salida deseada y se pregunta qué debía ser verdad justo ant
 Para una asignación, la misma ecuación vale para ambos transformadores (si evaluar $E$ termina):
 
 $$
-T(V:=E,Q)=Q[E/V],\qquad T\in\{wp,wlp\}.
+T(V:=E,Q)=Q^{V}_{E}\equiv Q[E/V],\qquad T\in\{wp,wlp\}.
 $$
 
 Para una secuencia:

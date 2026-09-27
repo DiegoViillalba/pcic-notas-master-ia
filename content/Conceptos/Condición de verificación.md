@@ -34,7 +34,8 @@ $$
 genera:
 
 $$
-P\Rightarrow Q[E/V].
+P\Rightarrow Q^{V}_{E},
+\qquad\text{donde }Q^{V}_{E}\equiv Q[E/V].
 $$
 
 Para un ciclo anotado:
@@ -89,4 +90,3 @@ El generador puede ser mecánico, pero elegir un invariante útil normalmente re
 
 - Fuente: `/Users/diegovillalba/Downloads/AllLectures.pdf`, páginas PDF 47–69.
 - Desarrollo guiado: [[Guía paso a paso - Lógica de Hoare#6. De programa anotado a condiciones de verificación|De programa anotado a condiciones de verificación]].
-

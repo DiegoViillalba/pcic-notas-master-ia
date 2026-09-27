@@ -117,7 +117,7 @@ En los tres casos, \(m\) no es menor que ninguno de los dos valores.
 La asignación es \(m:=a\). Calculamos hacia atrás desde \(Q\), sustituyendo \(m\) por \(a\):
 
 $$
-Q[a/m]
+Q^{m}_{a}
 =
 (a\ge a)\land(a\ge b).
 $$
@@ -139,7 +139,7 @@ $$
 En un orden total, negar \(a>b\) equivale a afirmar \(b\ge a\). La asignación es \(m:=b\). Sustituyendo \(m\) por \(b\):
 
 $$
-Q[b/m]
+Q^{m}_{b}
 =
 (b\ge a)\land(b\ge b).
 $$
