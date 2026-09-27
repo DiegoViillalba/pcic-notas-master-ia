@@ -46,3 +46,66 @@ a.internal {
 .katex-display > .katex > .katex-html {
   font-family: unset !important;
 }
+
+// Barra lateral derecha (TOC + gráfico + backlinks) colapsable: al plegarla,
+// la columna central se expande para ocupar ese espacio. El botón lo agrega
+// DefaultFrame.tsx; el estado (clase "right-collapsed" en #quartz-body) lo
+// controla el script embebido ahí mismo, persistido en localStorage.
+.right.sidebar {
+  transition: padding 0.2s ease;
+}
+
+.right-sidebar-toggle {
+  position: absolute;
+  left: -12px;
+  top: 6.5rem;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 50%;
+  color: var(--darkgray);
+  cursor: pointer;
+  z-index: 2;
+}
+.right-sidebar-toggle:hover {
+  background: var(--lightgray);
+  color: var(--secondary);
+}
+.right-sidebar-toggle svg {
+  transition: transform 0.2s ease;
+}
+#quartz-body.right-collapsed .right-sidebar-toggle svg {
+  transform: rotate(180deg);
+}
+
+@media all and ($desktop) {
+  #quartz-body.right-collapsed {
+    grid-template:
+      "grid-sidebar-left grid-header"
+      "grid-sidebar-left grid-center"
+      "grid-sidebar-left grid-footer"
+      / #{$sidePanelWidth} auto !important;
+  }
+  #quartz-body.right-collapsed .right.sidebar {
+    width: 0;
+    min-width: 0;
+    padding: 6rem 0 2rem;
+    overflow: visible;
+  }
+  #quartz-body.right-collapsed .right.sidebar > *:not(.right-sidebar-toggle) {
+    display: none;
+  }
+}
+
+// Debajo de 1200px la barra derecha ya cambia a una fila horizontal propia
+// (ver base.scss); el toggle de colapsar solo tiene sentido en escritorio.
+@media not ($desktop) {
+  .right-sidebar-toggle {
+    display: none;
+  }
+}

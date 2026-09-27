@@ -50,6 +50,27 @@ export const DefaultFrame: PageFrame = {
           </div>
         </div>
         <div class="right sidebar">
+          <button
+            id="right-sidebar-toggle"
+            class="right-sidebar-toggle"
+            type="button"
+            title="Colapsar/expandir barra lateral"
+            aria-label="Colapsar barra lateral derecha"
+            aria-expanded="true"
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
           {right.map((BodyComponent) => (
             <BodyComponent {...componentData} />
           ))}
@@ -57,6 +78,37 @@ export const DefaultFrame: PageFrame = {
         {footer.map((FooterComponent) => (
           <FooterComponent {...componentData} />
         ))}
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: `(function(){
+  var KEY = "quartz-right-sidebar-collapsed";
+  function apply(collapsed) {
+    var body = document.getElementById("quartz-body");
+    if (!body) return;
+    body.classList.toggle("right-collapsed", collapsed);
+    var btn = document.getElementById("right-sidebar-toggle");
+    if (btn) btn.setAttribute("aria-expanded", String(!collapsed));
+  }
+  function onClick() {
+    var body = document.getElementById("quartz-body");
+    if (!body) return;
+    var next = !body.classList.contains("right-collapsed");
+    localStorage.setItem(KEY, String(next));
+    apply(next);
+  }
+  function init() {
+    apply(localStorage.getItem(KEY) === "true");
+    var btn = document.getElementById("right-sidebar-toggle");
+    if (btn && !btn.dataset.bound) {
+      btn.dataset.bound = "true";
+      btn.addEventListener("click", onClick);
+    }
+  }
+  document.addEventListener("nav", init);
+})();`,
+          }}
+        />
       </>
     )
   },
