@@ -84,18 +84,18 @@ a.internal {
 }
 
 @media all and ($desktop) {
+  // Importante: solo se cambia el ancho de la 3ª columna, nunca
+  // grid-template-areas. Si se redefinieran las áreas sin incluir
+  // "grid-sidebar-right", el navegador ya no podría ubicar ahí a
+  // .right.sidebar (grid-area: grid-sidebar-right) y la reubicaría como
+  // ítem huérfano en una fila implícita nueva al final de la página —
+  // que es exactamente el bug de "el botón se va hasta abajo y no reabre".
   #quartz-body.right-collapsed {
-    grid-template:
-      "grid-sidebar-left grid-header"
-      "grid-sidebar-left grid-center"
-      "grid-sidebar-left grid-footer"
-      / #{$sidePanelWidth} auto !important;
+    grid-template-columns: #{$sidePanelWidth} auto 0 !important;
   }
   #quartz-body.right-collapsed .right.sidebar {
-    width: 0;
     min-width: 0;
     padding: 6rem 0 2rem;
-    overflow: visible;
   }
   #quartz-body.right-collapsed .right.sidebar > *:not(.right-sidebar-toggle) {
     display: none;
