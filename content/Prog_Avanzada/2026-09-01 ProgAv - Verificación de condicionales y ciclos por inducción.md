@@ -49,7 +49,7 @@ flowchart LR
     VAR --> TERM["Terminación"]
 ~~~
 
-La primera parte completa la verificación de condicionales con **else**. La segunda introduce la [[Inducción matemática aplicada a ciclos|inducción matemática]] como herramienta para demostrar que una relación entre variables sigue siendo cierta después de \(0,1,2,\ldots\) iteraciones. Esa relación persistente es el [[Invariante de ciclo|invariante del ciclo]]. *(Diap. 1–17; láminas 101–117.)*
+La primera parte completa la verificación de condicionales con **else**. La segunda introduce la [[Inducción matemática aplicada a ciclos|inducción matemática]] como herramienta para demostrar que una relación entre variables sigue siendo cierta después de $0,1,2,\ldots$ iteraciones. Esa relación persistente es el [[Invariante de ciclo|invariante del ciclo]]. *(Diap. 1–17; láminas 101–117.)*
 
 ---
 
@@ -74,13 +74,13 @@ $$
 
 La estructura de la prueba es sencilla:
 
-1. En la rama verdadera sabemos \(P\land B\).
-2. En la rama falsa sabemos \(P\land\neg B\).
+1. En la rama verdadera sabemos $P\land B$.
+2. En la rama falsa sabemos $P\land\neg B$.
 3. Cada rama puede ejecutar instrucciones distintas.
-4. Ambas deben terminar garantizando la misma postcondición \(Q\).
+4. Ambas deben terminar garantizando la misma postcondición $Q$.
 
 > [!important]
-> No basta con que el programa produzca el resultado esperado en algunos valores. La prueba debe cubrir todas las entradas admitidas por \(P\) y los dos posibles resultados de evaluar \(B\).
+> No basta con que el programa produzca el resultado esperado en algunos valores. La prueba debe cubrir todas las entradas admitidas por $P$ y los dos posibles resultados de evaluar $B$.
 
 ---
 
@@ -106,15 +106,17 @@ $$
 
 ### 2.1. Antes de las fórmulas: intuición con números
 
-- Si \(a=7\) y \(b=3\), la condición es verdadera y se asigna \(m:=7\).
-- Si \(a=2\) y \(b=5\), la condición es falsa y se asigna \(m:=5\).
-- Si \(a=b=4\), la condición \(a>b\) es falsa y se asigna \(m:=b=4\).
+- Si $a=7$ y $b=3$, la condición es verdadera y se asigna $m:=7$.
+- Si $a=2$ y $b=5$, la condición es falsa y se asigna $m:=5$.
+- Si $a=b=4$, la condición $a>b$ es falsa y se asigna $m:=b=4$.
 
-En los tres casos, \(m\) no es menor que ninguno de los dos valores.
+En los tres casos, $m$ no es menor que ninguno de los dos valores.
 
-### 2.2. Rama verdadera: \(a>b\)
+### 2.2. Rama verdadera: $a>b$
 
-La asignación es \(m:=a\). Calculamos hacia atrás desde \(Q\), sustituyendo \(m\) por \(a\):
+**P.D.** $\{a>b\}  \ m := a \ \{(m\geq a) \land (m\geq b)\}$
+
+La asignación es $m:=a$. Calculamos hacia atrás desde $Q$, sustituyendo $m$ por $a$:
 
 $$
 Q^{m}_{a}
@@ -122,7 +124,7 @@ Q^{m}_{a}
 (a\ge a)\land(a\ge b).
 $$
 
-La primera parte, \(a\ge a\), siempre es cierta. Además:
+La primera parte, $a\ge a$, siempre es cierta. Además debilitando tenemos:
 
 $$
 a>b\Rightarrow a\ge b.
@@ -134,9 +136,9 @@ $$
 \boxed{\{a>b\}\ m:=a\ \{m\ge a\land m\ge b\}}.
 $$
 
-### 2.3. Rama falsa: \(\neg(a>b)\)
+### 2.3. Rama falsa: $\neg(a>b)$
 
-En un orden total, negar \(a>b\) equivale a afirmar \(b\ge a\). La asignación es \(m:=b\). Sustituyendo \(m\) por \(b\):
+En un orden total, negar $a>b$ equivale a afirmar $b\ge a$. La asignación es $m:=b$. Sustituyendo $m$ por $b$:
 
 $$
 Q^{m}_{b}
@@ -144,7 +146,7 @@ Q^{m}_{b}
 (b\ge a)\land(b\ge b).
 $$
 
-\(b\ge b\) siempre es cierta y la condición de la rama ya proporciona \(b\ge a\). Por tanto:
+$b\ge b$ siempre es cierta y la condición de la rama ya proporciona $b\ge a$. Por tanto:
 
 $$
 \boxed{\{\neg(a>b)\}\ m:=b\ \{m\ge a\land m\ge b\}}.
@@ -152,7 +154,7 @@ $$
 
 ### 2.4. Unir las ramas
 
-Las dos ramas establecen \(Q\), así que la regla condicional permite concluir:
+Las dos ramas establecen $Q$, así que la regla condicional permite concluir:
 
 $$
 \boxed{
@@ -177,7 +179,7 @@ flowchart TD
 
 ## 3. Ejemplo con una rama imposible
 
-Ahora la precondición ya afirma que \(a>b\):
+Ahora la precondición ya afirma que $a>b$:
 
 $$
 \boxed{
@@ -187,15 +189,36 @@ $$
 }.
 $$
 
+Notemos como en nuestro problema:
+$$
+P  : \{a>b\}\ \qquad B : \{a>b\}\ \qquad C: m:=a \qquad Q = \{m = a\}\
+$$
 ### Rama verdadera
 
-La precondición de la rama es:
+Buscamos demostrar que:
+$$
+\{a >b\} \ m := a \ \{ m= a\}
+$$
+Mediante el esquema de demostración usado anteriormente tenemos:
+$$
+P = \{Q^V_E\} = \{(m = a)^{m}_a\} = \{a = a\} = \{\top\}
+$$
+Es decir, se cumple que:
+$$
+\therefore \{\top\} \ m := a \ \{m = a\}
+$$
+Convenientemente, notemos como la precondición de la rama es:
 
 $$
-(a>b)\land(a>b),
+\{(a>b)\land(a>b)\} = \{\top\}
 $$
 
-que equivale simplemente a \(a>b\). La asignación \(m:=a\) garantiza directamente \(m=a\):
+Así para nuestra definición 
+
+$$
+\{P\land B\}\ C_1\ \{Q\}
+$$
+La asignación $m:=a$ garantiza directamente $m=a$:
 
 $$
 \{a>b\}\ m:=a\ \{m=a\}.
@@ -203,19 +226,53 @@ $$
 
 ### Rama falsa
 
-La precondición de esta rama sería:
+Buscamos demostrar que 
+$$
+\neg\{a >b\} \ m := b \ \{ m= a\}
+$$
+
+En esta ocasión se cumple que para la precondición
+
+$$
+P = \{Q^V_E\} = \{(m = a)^{m}_b\} = \{b = a\} 
+$$
+
+Lo que nos permite denotarlo como 
+
+$$
+\therefore \{b =a\} \ m := a \ \{m = a\}
+$$
+Para lo que podemos garantizar que: 
+
+$$
+\{\neg (b >a ) \land \neg(a > b)\} \implies \{b= a\}
+$$
+
+Para conseguir el argumento buscado, notemos que:
+
+$$
+a > b \implies a \geq b \equiv \neg (b>a)
+$$
+Es decir, debilitando la precondición anterior tenemos que se cumple:
+
+$$
+\{ (a >b ) \land \neg(a > b)\} \implies \{ (a \geq b ) \land \neg(a > b)\}
+$$
+Con lo cual conseguimos la forma buscada por nuestra definición.
+
+Para darle sentido notemos como precondición de esta rama sería:
 
 $$
 (a>b)\land\neg(a>b)=\bot.
 $$
 
-No existe un estado que satisfaga simultáneamente ambas partes. La rama es **inalcanzable** para cualquier entrada permitida. Por ello, la terna de esa rama es verdadera vacíamente:
+No existe un estado que satisfaga simultáneamente ambas partes. La rama es **inalcanzable** para cualquier entrada permitida. Por ello, la terna de esa rama **es verdadera vacíamente**:
 
 $$
 \{\bot\}\ m:=b\ \{m=a\}.
 $$
 
-Así, el condicional completo garantiza \(m=a\).
+Así, el condicional completo garantiza $m=a$.
 
 > [!note] Una contradicción no significa que el programa falló
 > Significa que ese camino no puede ejecutarse desde la precondición dada. Esta idea simplifica muchas pruebas de programas.
@@ -230,7 +287,7 @@ En un condicional hay un número finito de caminos y se prueba cada uno. En un c
 0 veces, 1 vez, 2 veces, ..., n veces
 ~~~
 
-No podemos escribir una prueba separada para cada \(n\). Necesitamos una sola demostración que cubra todos los casos. Ahí aparece la inducción matemática.
+No podemos escribir una prueba separada para cada $n$. Necesitamos una sola demostración que cubra todos los casos. Ahí aparece la inducción matemática.
 
 ### Microejemplo: un contador
 
@@ -240,25 +297,25 @@ while x < 3
     x := x + 1
 ~~~
 
-Si \(x_n\) es el valor después de \(n\) iteraciones:
+Si $x_n$ es el valor después de $n$ iteraciones:
 
-| \(n\) | \(x_n\) |
+| $n$ | $x_n$ |
 |---:|---:|
 | 0 | 0 |
 | 1 | 1 |
 | 2 | 2 |
 | 3 | 3 |
 
-La tabla sugiere \(x_n=n\). Pero observar cuatro filas no demuestra la fórmula. La inducción permite probarla para todo \(n\) que alcance el ciclo.
+La tabla sugiere $x_n=n$. Pero observar cuatro filas no demuestra la fórmula. La inducción permite probarla para todo $n$ que alcance el ciclo.
 
 ---
 
 ## 5. Inducción matemática aplicada a un programa
 
-Para demostrar una proposición \(P(n)\) para todo \(n\ge k\), se prueban dos piezas:
+Para demostrar una proposición $P(n)$ para todo $n\ge k$, se prueban dos piezas:
 
-1. **Caso base:** \(P(k)\) es verdadera.
-2. **Paso inductivo:** para un \(n\ge k\) arbitrario, suponemos \(P(n)\) y demostramos \(P(n+1)\).
+1. **Caso base:** $P(k)$ es verdadera.
+2. **Paso inductivo:** para un $n\ge k$ arbitrario, suponemos $P(n)$ y demostramos $P(n+1)$.
 
 Entonces se concluye:
 
@@ -266,14 +323,14 @@ $$
 \forall n\ge k,\ P(n).
 $$
 
-En un ciclo que comienza contando en \(0\), la correspondencia es:
+En un ciclo que comienza contando en $0$, la correspondencia es:
 
 | Inducción | Ejecución del ciclo |
 |---|---|
-| \(P(0)\) | Estado antes de ejecutar el cuerpo por primera vez |
-| Hipótesis \(P(n)\) | Relación cierta después de \(n\) iteraciones |
-| Paso \(P(n)\Rightarrow P(n+1)\) | Una ejecución del cuerpo conserva la relación |
-| \(P(n)\) para todo \(n\) | La relación es un invariante |
+| $P(0)$ | Estado antes de ejecutar el cuerpo por primera vez |
+| Hipótesis $P(n)$ | Relación cierta después de $n$ iteraciones |
+| Paso $P(n)\Rightarrow P(n+1)$ | Una ejecución del cuerpo conserva la relación |
+| $P(n)$ para todo $n$ | La relación es un invariante |
 
 ~~~mermaid
 flowchart LR
@@ -288,7 +345,7 @@ flowchart LR
 ~~~
 
 > [!important]
-> La hipótesis de inducción no afirma que \(P(n)\) sea cierta “porque sí”. Se la supone temporalmente para un \(n\) arbitrario y se usa para demostrar que el siguiente estado también satisface la propiedad.
+> La hipótesis de inducción no afirma que $P(n)$ sea cierta “porque sí”. Se la supone temporalmente para un $n$ arbitrario y se usa para demostrar que el siguiente estado también satisface la propiedad.
 
 ---
 
@@ -306,19 +363,19 @@ Cuadrado(A):
     return C
 ~~~
 
-Para corrección total supondremos \(A\in\mathbb Z\) y \(A\ge0\). \(C\) es el acumulador y \(D\) cuenta cuántas veces hemos sumado \(A\).
+Para corrección total supondremos $A\in\mathbb Z$ y $A\ge0$. $C$ es el acumulador y $D$ cuenta cuántas veces hemos sumado $A$.
 
 ### 6.1. Construir la conjetura con un caso pequeño
 
-Sea \(A=4\):
+Sea $A=4$:
 
-| Iteraciones \(n\) | \(C_n\) | \(D_n\) | Comprobación |
+| Iteraciones $n$ | $C_n$ | $D_n$ | Comprobación |
 |---:|---:|---:|---|
-| 0 | 0 | 0 | \(0=0\cdot4\) |
-| 1 | 4 | 1 | \(4=1\cdot4\) |
-| 2 | 8 | 2 | \(8=2\cdot4\) |
-| 3 | 12 | 3 | \(12=3\cdot4\) |
-| 4 | 16 | 4 | \(16=4\cdot4\) |
+| 0 | 0 | 0 | $0=0\cdot4$ |
+| 1 | 4 | 1 | $4=1\cdot4$ |
+| 2 | 8 | 2 | $8=2\cdot4$ |
+| 3 | 12 | 3 | $12=3\cdot4$ |
+| 4 | 16 | 4 | $16=4\cdot4$ |
 
 El patrón es:
 
@@ -328,7 +385,7 @@ C_n=nA,
 D_n=n.
 $$
 
-Al eliminar \(n\), obtenemos una relación directa entre las variables del programa:
+Al eliminar $n$, obtenemos una relación directa entre las variables del programa:
 
 $$
 \boxed{I:\ C_n=D_nA}.
@@ -340,11 +397,11 @@ Esta igualdad es el invariante.
 
 <iframe src="invariantes-ciclos-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
-El explorador muestra el estado después de cada iteración. Los valores cambian, pero la igualdad resaltada se conserva. En el primer algoritmo, \(D\) cuenta las sumas ya realizadas; en el segundo, \(M\) cuenta los factores que aún faltan.
+El explorador muestra el estado después de cada iteración. Los valores cambian, pero la igualdad resaltada se conserva. En el primer algoritmo, $D$ cuenta las sumas ya realizadas; en el segundo, $M$ cuenta los factores que aún faltan.
 
 ### 6.2. Demostración del invariante
 
-**Caso base, \(n=0\).** Antes de entrar al ciclo:
+**Caso base, $n=0$.** Antes de entrar al ciclo:
 
 $$
 C_0=0,
@@ -358,7 +415,7 @@ $$
 C_0=0=D_0A.
 $$
 
-**Hipótesis de inducción.** Supongamos que después de \(n\) iteraciones:
+**Hipótesis de inducción.** Supongamos que después de $n$ iteraciones:
 
 $$
 C_n=D_nA.
@@ -384,7 +441,7 @@ C_{n+1}
 \end{aligned}
 $$
 
-Se demostró \(P(n)\Rightarrow P(n+1)\). Por inducción:
+Se demostró $P(n)\Rightarrow P(n+1)$. Por inducción:
 
 $$
 \boxed{\forall n\ge0,\ C_n=D_nA}.
@@ -392,34 +449,34 @@ $$
 
 ### 6.3. Usar la salida para obtener el resultado
 
-El invariante por sí solo no dice que \(C=A^2\). Hay que combinarlo con la condición de salida.
+El invariante por sí solo no dice que $C=A^2$. Hay que combinarlo con la condición de salida.
 
-Como \(D\) parte de \(0\), aumenta de uno en uno y \(A\ge0\), al terminar se cumple \(D=A\). Entonces:
+Como $D$ parte de $0$, aumenta de uno en uno y $A\ge0$, al terminar se cumple $D=A$. Entonces:
 
 $$
 C=DA=AA=A^2.
 $$
 
-Por tanto, la función devuelve el cuadrado de \(A\).
+Por tanto, la función devuelve el cuadrado de $A$.
 
 ### 6.4. ¿Por qué termina?
 
-Mientras el ciclo continúa, \(D<A\). La cantidad:
+Mientras el ciclo continúa, $D<A$. La cantidad:
 
 $$
 V=A-D
 $$
 
-es un entero no negativo y disminuye exactamente en \(1\) en cada iteración. No puede disminuir indefinidamente, así que el ciclo llega a \(D=A\).
+es un entero no negativo y disminuye exactamente en $1$ en cada iteración. No puede disminuir indefinidamente, así que el ciclo llega a $D=A$.
 
 > [!warning] Dominio necesario
-> Si \(A<0\), \(D\) comienza en \(0\) y solo aumenta; nunca alcanzará \(A\). La prueba del resultado sería solo condicional a que terminara. Exigir \(A\ge0\) permite demostrar también la terminación.
+> Si $A<0$, $D$ comienza en $0$ y solo aumenta; nunca alcanzará $A$. La prueba del resultado sería solo condicional a que terminara. Exigir $A\ge0$ permite demostrar también la terminación.
 
 ---
 
 ## 7. Segundo ciclo: descubrir que calcula una potencia
 
-La subrutina recibe \(N\) y \(M\) no negativos y modifica \(M\):
+La subrutina recibe $N$ y $M$ no negativos y modifica $M$:
 
 ~~~text
 Potencia(N, M):
@@ -432,22 +489,22 @@ Potencia(N, M):
 
 Para distinguir el exponente original del valor mutable, llamaremos:
 
-- \(M_0\): exponente recibido al entrar;
-- \(M_n\): valor que queda después de \(n\) iteraciones;
-- \(R_n\): acumulador después de \(n\) iteraciones.
+- $M_0$: exponente recibido al entrar;
+- $M_n$: valor que queda después de $n$ iteraciones;
+- $R_n$: acumulador después de $n$ iteraciones.
 
-### 7.1. Empezar con un ejemplo: \(N=2,\ M_0=5\)
+### 7.1. Empezar con un ejemplo: $N=2,\ M_0=5$
 
-| \(n\) | \(R_n\) | \(M_n\) | Producto conservado \(R_n2^{M_n}\) |
+| $n$ | $R_n$ | $M_n$ | Producto conservado $R_n2^{M_n}$ |
 |---:|---:|---:|---:|
-| 0 | 1 | 5 | \(1\cdot2^5=32\) |
-| 1 | 2 | 4 | \(2\cdot2^4=32\) |
-| 2 | 4 | 3 | \(4\cdot2^3=32\) |
-| 3 | 8 | 2 | \(8\cdot2^2=32\) |
-| 4 | 16 | 1 | \(16\cdot2=32\) |
-| 5 | 32 | 0 | \(32\cdot1=32\) |
+| 0 | 1 | 5 | $1\cdot2^5=32$ |
+| 1 | 2 | 4 | $2\cdot2^4=32$ |
+| 2 | 4 | 3 | $4\cdot2^3=32$ |
+| 3 | 8 | 2 | $8\cdot2^2=32$ |
+| 4 | 16 | 1 | $16\cdot2=32$ |
+| 5 | 32 | 0 | $32\cdot1=32$ |
 
-Cada iteración mueve un factor \(N\) desde la parte “pendiente” hacia \(R\). Se observa:
+Cada iteración mueve un factor $N$ desde la parte “pendiente” hacia $R$. Se observa:
 
 $$
 R_n=N^n,
@@ -455,7 +512,7 @@ R_n=N^n,
 M_n=M_0-n.
 $$
 
-Eliminamos \(n=M_0-M_n\):
+Eliminamos $n=M_0-M_n$:
 
 $$
 R_n=N^{M_0-M_n}.
@@ -487,13 +544,13 @@ $$
 
 ### 7.3. Paso inductivo
 
-Supongamos que después de \(n\) iteraciones:
+Supongamos que después de $n$ iteraciones:
 
 $$
 R_nN^{M_n}=N^{M_0}.
 $$
 
-Si el cuerpo vuelve a ejecutarse, \(M_n>0\), y produce:
+Si el cuerpo vuelve a ejecutarse, $M_n>0$, y produce:
 
 $$
 R_{n+1}=R_nN,
@@ -515,33 +572,33 @@ $$
 Por inducción, la relación se conserva durante todo el ciclo.
 
 > [!tip] Prueba sin división
-> Las diapositivas despejan \(R_n=N^{M_0}/N^{M_n}\). La forma multiplicativa \(R_nN^{M_n}=N^{M_0}\) es más robusta porque no necesita dividir por \(N^{M_n}\) y deja visible la idea de “calculado × pendiente”.
+> Las diapositivas despejan $R_n=N^{M_0}/N^{M_n}$. La forma multiplicativa $R_nN^{M_n}=N^{M_0}$ es más robusta porque no necesita dividir por $N^{M_n}$ y deja visible la idea de “calculado × pendiente”.
 
 ### 7.4. Salida y resultado
 
-El ciclo termina cuando \(M_n=0\). Sustituimos en el invariante:
+El ciclo termina cuando $M_n=0$. Sustituimos en el invariante:
 
 $$
 R_nN^0=N^{M_0}.
 $$
 
-Como \(N^0=1\):
+Como $N^0=1$:
 
 $$
 \boxed{R_n=N^{M_0}}.
 $$
 
-La subrutina calcula \(N\) elevado al exponente original \(M_0\).
+La subrutina calcula $N$ elevado al exponente original $M_0$.
 
 ### 7.5. Terminación
 
-La variante es el propio \(M\):
+La variante es el propio $M$:
 
 $$
 V=M.
 $$
 
-Si \(M_0\ge0\), durante el ciclo \(M>0\) y cada iteración resta \(1\). Por tanto, tras exactamente \(M_0\) iteraciones se alcanza \(M=0\).
+Si $M_0\ge0$, durante el ciclo $M>0$ y cada iteración resta $1$. Por tanto, tras exactamente $M_0$ iteraciones se alcanza $M=0$.
 
 ---
 
@@ -549,13 +606,13 @@ Si \(M_0\ge0\), durante el ciclo \(M>0\) y cada iteración resta \(1\). Por tant
 
 Los invariantes rara vez aparecen por adivinación pura. Un procedimiento útil es:
 
-1. **Nombrar los estados.** Usar \(X_n\) para el valor de \(X\) después de \(n\) iteraciones.
-2. **Trazar pocos casos.** Calcular \(n=0,1,2,3\) con números pequeños.
-3. **Buscar una fórmula con \(n\).** Por ejemplo, \(C_n=nA\) o \(M_n=M_0-n\).
-4. **Eliminar \(n\).** Combinar las fórmulas para obtener una relación entre variables del programa.
-5. **Conservar los datos originales.** Si una entrada se modifica, nombrar su valor inicial, como \(M_0\).
+1. **Nombrar los estados.** Usar $X_n$ para el valor de $X$ después de $n$ iteraciones.
+2. **Trazar pocos casos.** Calcular $n=0,1,2,3$ con números pequeños.
+3. **Buscar una fórmula con $n$.** Por ejemplo, $C_n=nA$ o $M_n=M_0-n$.
+4. **Eliminar $n$.** Combinar las fórmulas para obtener una relación entre variables del programa.
+5. **Conservar los datos originales.** Si una entrada se modifica, nombrar su valor inicial, como $M_0$.
 6. **Probar inicialización y mantenimiento.** Los ejemplos sugieren; la inducción demuestra.
-7. **Combinar con la salida.** \(I\land\neg B\) debe implicar la postcondición.
+7. **Combinar con la salida.** $I\land\neg B$ debe implicar la postcondición.
 8. **Buscar una variante.** Una cantidad entera no negativa que disminuya prueba terminación.
 
 ~~~mermaid
@@ -575,22 +632,22 @@ flowchart TD
 
 ## 9. Corrección parcial frente a corrección total
 
-Para un ciclo **while \(B\) do \(C\)**, una demostración completa separa dos obligaciones:
+Para un ciclo **while $B$ do $C$**, una demostración completa separa dos obligaciones:
 
 ### Corrección parcial
 
-1. El invariante \(I\) vale antes del ciclo.
-2. Si \(I\land B\) vale antes del cuerpo, \(I\) vuelve a valer después:
+1. El invariante $I$ vale antes del ciclo.
+2. Si $I\land B$ vale antes del cuerpo, $I$ vuelve a valer después:
 
 $$
 \{I\land B\}\ C\ \{I\}.
 $$
 
-3. Al salir, \(I\land\neg B\) implica la postcondición \(Q\).
+3. Al salir, $I\land\neg B$ implica la postcondición $Q$.
 
 ### Terminación
 
-Se exhibe una variante \(V\) que:
+Se exhibe una variante $V$ que:
 
 - toma valores en los enteros no negativos mientras el ciclo continúa;
 - disminuye estrictamente en cada iteración.
@@ -599,8 +656,8 @@ En esta clase:
 
 | Programa | Invariante principal | Condición al salir | Variante |
 |---|---|---|---|
-| Cuadrado por sumas | \(C=DA\) | \(D=A\) | \(A-D\) |
-| Potencia por productos | \(RN^M=N^{M_0}\) | \(M=0\) | \(M\) |
+| Cuadrado por sumas | $C=DA$ | $D=A$ | $A-D$ |
+| Potencia por productos | $RN^M=N^{M_0}$ | $M=0$ | $M$ |
 
 $$
 \boxed{
@@ -620,13 +677,13 @@ $$
 > Una tabla ayuda a descubrir el patrón, pero no sustituye el caso base ni el paso inductivo.
 
 > [!warning] Confundir valor inicial y valor actual
-> En el algoritmo de potencia, \(M\) cambia. La respuesta debe expresarse con el exponente original \(M_0\), no con el \(M\) final, que vale \(0\).
+> En el algoritmo de potencia, $M$ cambia. La respuesta debe expresarse con el exponente original $M_0$, no con el $M$ final, que vale $0$.
 
 > [!warning] Olvidar el estado de cero iteraciones
-> El invariante debe ser cierto antes de ejecutar el cuerpo. Por eso el caso base suele ser \(n=0\).
+> El invariante debe ser cierto antes de ejecutar el cuerpo. Por eso el caso base suele ser $n=0$.
 
 > [!warning] Creer que el invariante ya es la postcondición
-> \(C=DA\) solo se convierte en \(C=A^2\) cuando también sabemos que el ciclo salió con \(D=A\).
+> $C=DA$ solo se convierte en $C=A^2$ cuando también sabemos que el ciclo salió con $D=A$.
 
 > [!warning] Demostrar el resultado pero no la terminación
 > Sin una variante o argumento equivalente solo se obtiene corrección parcial: “si termina, el resultado es correcto”.
@@ -653,18 +710,18 @@ Esta plantilla conecta la inducción con la lógica de Hoare: el caso base prueb
 
 ## 12. Ejercicios de comprobación
 
-1. En el ciclo del cuadrado, usa \(A=3\) y escribe los estados \((C,D)\) desde \(n=0\) hasta la salida. Verifica \(C=DA\) en cada fila.
-2. En el ciclo de potencia, usa \(N=3\) y \(M_0=4\). ¿Qué valor tiene \(RN^M\) después de cada iteración?
-3. Explica por qué \(R=N^M\) **no** es un invariante del segundo ciclo.
-4. ¿Qué falla en la terminación de **Cuadrado(A)** si \(A=-2\)?
-5. En la terna con precondición \(a>b\), ¿por qué no necesitamos que la asignación \(m:=b\) produzca realmente \(m=a\)?
+1. En el ciclo del cuadrado, usa $A=3$ y escribe los estados $(C,D)$ desde $n=0$ hasta la salida. Verifica $C=DA$ en cada fila.
+2. En el ciclo de potencia, usa $N=3$ y $M_0=4$. ¿Qué valor tiene $RN^M$ después de cada iteración?
+3. Explica por qué $R=N^M$ **no** es un invariante del segundo ciclo.
+4. ¿Qué falla en la terminación de **Cuadrado(A)** si $A=-2$?
+5. En la terna con precondición $a>b$, ¿por qué no necesitamos que la asignación $m:=b$ produzca realmente $m=a$?
 
 > [!check]- Respuestas breves
-> 1. \((0,0),(3,1),(6,2),(9,3)\); en todos, \(C=3D\).
-> 2. Siempre vale \(3^4=81\): \(1\cdot3^4,3\cdot3^3,9\cdot3^2,27\cdot3,81\cdot1\).
-> 3. Tanto \(R\) como \(M\) cambian en sentidos opuestos; por ejemplo, al inicio \(R=1\) y \(N^M=N^{M_0}\). La relación conservada es \(RN^M=N^{M_0}\).
-> 4. \(D\) empieza en \(0\) y aumenta; nunca alcanza \(-2\).
-> 5. La precondición de la rama falsa es \((a>b)\land\neg(a>b)\), una contradicción; esa rama es inalcanzable.
+> 1. $(0,0),(3,1),(6,2),(9,3)$; en todos, $C=3D$.
+> 2. Siempre vale $3^4=81$: $1\cdot3^4,3\cdot3^3,9\cdot3^2,27\cdot3,81\cdot1$.
+> 3. Tanto $R$ como $M$ cambian en sentidos opuestos; por ejemplo, al inicio $R=1$ y $N^M=N^{M_0}$. La relación conservada es $RN^M=N^{M_0}$.
+> 4. $D$ empieza en $0$ y aumenta; nunca alcanza $-2$.
+> 5. La precondición de la rama falsa es $(a>b)\land\neg(a>b)$, una contradicción; esa rama es inalcanzable.
 
 ---
 
@@ -678,20 +735,20 @@ La notación compacta de la regla de `while` se traduce en preguntas concretas. 
 
 hay que demostrar:
 
-1. **Entrada:** \(P\Rightarrow I\).
-2. **Preservación:** \(\{I\land B\}C\{I\}\).
-3. **Salida útil:** \(I\land\neg B\Rightarrow Q\).
+1. **Entrada:** $P\Rightarrow I$.
+2. **Preservación:** $\{I\land B\}C\{I\}$.
+3. **Salida útil:** $I\land\neg B\Rightarrow Q$.
 
 ![[slide-67.png]]
 
-Para corrección total se agregan dos obligaciones sobre una variante entera \(E\):
+Para corrección total se agregan dos obligaciones sobre una variante entera $E$:
 
-4. \(I\land B\Rightarrow E\ge0\).
-5. Una vuelta del cuerpo reduce \(E\) estrictamente.
+4. $I\land B\Rightarrow E\ge0$.
+5. Una vuelta del cuerpo reduce $E$ estrictamente.
 
 ![[slide-85.png]]
 
-### Ejemplo paso a paso: sumar de 1 a \(n\)
+### Ejemplo paso a paso: sumar de 1 a $n$
 
 ```text
 i := 0; s := 0;
@@ -707,14 +764,14 @@ I:\ s=\frac{i(i+1)}2\land0\le i\le n,
 \qquad E=n-i.
 \]
 
-1. Con \(i=0,s=0\), el invariante es cierto.
-2. Si vale antes de la vuelta, después \(i'=i+1\) y
+1. Con $i=0,s=0$, el invariante es cierto.
+2. Si vale antes de la vuelta, después $i'=i+1$ y
    \[
    s'=s+i'=\frac{i(i+1)}2+(i+1)=\frac{(i+1)(i+2)}2.
    \]
-3. Al salir, \(i\ge n\); combinado con \(i\le n\), resulta \(i=n\).
-4. Entonces \(s=n(n+1)/2\).
-5. \(E=n-i\) es no negativa bajo la guarda y disminuye en uno.
+3. Al salir, $i\ge n$; combinado con $i\le n$, resulta $i=n$.
+4. Entonces $s=n(n+1)/2$.
+5. $E=n-i$ es no negativa bajo la guarda y disminuye en uno.
 
 Con esto quedan demostradas corrección parcial **y** terminación.
 
@@ -725,9 +782,9 @@ Con esto quedan demostradas corrección parcial **y** terminación.
 | Diap. | Lámina | Contenido | Sección |
 |---:|---:|---|---|
 | 1–4 | 101–104 | Verificación del máximo de dos valores | §2 |
-| 5–7 | 105–107 | Condicional con precondición \(a>b\) | §3 |
+| 5–7 | 105–107 | Condicional con precondición $a>b$ | §3 |
 | 8 | 108 | Principio de inducción matemática | §5 |
-| 9–12 | 109–112 | Cuadrado mediante sumas e invariante \(C_n=D_nA\) | §6 |
+| 9–12 | 109–112 | Cuadrado mediante sumas e invariante $C_n=D_nA$ | §6 |
 | 13 | 113 | Definición de invariante e inicio de potencia | §7 |
 | 14–17 | 114–117 | Invariante y prueba del algoritmo de potencia | §7 |
 
@@ -741,12 +798,12 @@ Con esto quedan demostradas corrección parcial **y** terminación.
 ## Dudas para revisar
 
 - [x] ¿Cuál es la regla formal de Hoare para **while** y cómo se deriva de estas tres obligaciones? Véanse §13 y [[Condición de verificación|Condición de verificación]].
-- [ ] ¿Qué convención adopta el curso para \(0^0\) cuando el exponente inicial es cero?
+- [ ] ¿Qué convención adopta el curso para $0^0$ cuando el exponente inicial es cero?
 - [ ] ¿Cómo cambia el invariante de potencia rápida cuando el exponente se divide entre dos?
 
 ## Resumen después de clase
 
-Un condicional se verifica demostrando una postcondición común en las ramas \(B\) y \(\neg B\); una rama contradictoria puede ser inalcanzable. Para un ciclo se usa inducción sobre el número de iteraciones: el caso base establece el invariante antes de comenzar y el paso inductivo demuestra que una ejecución del cuerpo lo conserva. Al terminar, el invariante se combina con la negación de la guarda para obtener la postcondición. Una variante decreciente añade la prueba de terminación y convierte la corrección parcial en corrección total.
+Un condicional se verifica demostrando una postcondición común en las ramas $B$ y $\neg B$; una rama contradictoria puede ser inalcanzable. Para un ciclo se usa inducción sobre el número de iteraciones: el caso base establece el invariante antes de comenzar y el paso inductivo demuestra que una ejecución del cuerpo lo conserva. Al terminar, el invariante se combina con la negación de la guarda para obtener la postcondición. Una variante decreciente añade la prueba de terminación y convierte la corrección parcial en corrección total.
 
 ## Referencia
 

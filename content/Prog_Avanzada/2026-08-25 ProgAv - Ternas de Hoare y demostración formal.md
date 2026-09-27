@@ -160,7 +160,15 @@ $$
 \{P\}\ C\ \{Q\}.
 $$
 
-Su lectura es: si la ejecución de $C$ comienza en un estado que satisface $P$ y termina, el estado final satisface $Q$. *(Diap. 8 y 10.)*
+Su lectura es: si la ejecución de $C$ comienza en un estado que satisface $P$ y termina, el estado final satisface $Q$. *(Diap. 8 y 10.)*. 
+
+Una manera intuitiva de entender esta  tripleta  es como: 
+$$
+ \underbrace{P}_{\text{estado antes}} \quad \xrightarrow{\quad C\quad} \quad \underbrace{Q}_{\text{estado después}}. 
+$$
+Donde en lenguaje coloquial podemos decir que:
+
+Si  $P$ es verdadera **antes** de ejecutar  $C$ , y $C$ termina, entonces $Q$ será verdadera **después**.
 
 Ejemplo de la presentación:
 
@@ -259,7 +267,16 @@ $$
 
 Que $A\Rightarrow B$ no obliga a que $B\Rightarrow A$. Por ejemplo, $y=4\Rightarrow y\ne0$, pero $y\ne0\not\Rightarrow y=4$. Solo cuando ambas implicaciones son válidas, $A$ y $B$ son lógicamente equivalentes.
 
----
+### Notación de Inferencia
+
+A lo largo de las notas se empleará la convención siguiente, partiendo del esquemátco:
+$$
+ \frac{ \text{premisa 1} \qquad \text{premisa 2} }{ \text{conclusión} }
+$$
+
+El cual se lee como :
+
+> **Si puedo demostrar las dos cosas que están arriba de la línea, entonces puedo concluir lo que está debajo de la línea.**
 
 ## 5. Regla de consecuencia
 
@@ -585,8 +602,8 @@ La numeración “diap.” cuenta las 27 páginas del PDF; “lámina” conserv
 
 Las diapositivas nuevas distinguen dos afirmaciones que conviene no mezclar:
 
-- \(\models\{P\}C\{Q\}\): la terna es **válida** según la semántica.
-- \(\vdash\{P\}C\{Q\}\): la terna es **demostrable** con las reglas de Hoare.
+- $\models\{P\}C\{Q\}$: la terna es **válida** según la semántica.
+- $\vdash\{P\}C\{Q\}$: la terna es **demostrable** con las reglas de Hoare.
 
 Un sistema correcto (*sound*) no permite demostrar ternas inválidas. Esta distinción explica por qué no basta que una regla “parezca intuitiva”.
 
@@ -598,17 +615,17 @@ Se propone erróneamente:
 \{P\}\ V:=E\ \{P^{V}_{E}\}.
 \]
 
-Toma \(P\equiv x=0\), \(V=x\) y \(E=1\):
+Toma $P\equiv x=0$, $V=x$ y $E=1$:
 
-1. La supuesta regla produciría \(\{x=0\}\ x:=1\ \{1=0\}\).
+1. La supuesta regla produciría $\{x=0\}\ x:=1\ \{1=0\}$.
 2. La postcondición es falsa en todo estado.
 3. Por tanto, la regla propuesta no puede ser correcta.
-4. La regla válida parte de la meta \(Q\) y calcula \(Q^{V}_{E}\equiv Q[E/V]\) **antes** de la asignación.
+4. La regla válida parte de la meta $Q$ y calcula $Q^{V}_{E}\equiv Q[E/V]$ **antes** de la asignación.
 
 ![[slide-16.png]]
 
 > [!example] Práctica inmediata
-> Para \(z:=3x-2\) y meta \(z>7\), sustituye \(z\): \(3x-2>7\), luego \(x>3\). Comprueba con \(x=4\) y con el valor frontera \(x=3\).
+> Para $z:=3x-2$ y meta $z>7$, sustituye $z$: $3x-2>7$, luego $x>3$. Comprueba con $x=4$ y con el valor frontera $x=3$.
 
 Continúa con ejercicios graduados en [[Guía paso a paso - Lógica de Hoare#8. Ejercicios graduados|la guía paso a paso]].
 

@@ -398,6 +398,8 @@ $$
 
 No exige que las variables conserven sus valores; exige que se conserve la **relación** expresada por $I$.
 
+Es decir, para cualquier aserción que es a la vez , pre condición y post condición de un código se le denomina invariante.
+
 ~~~mermaid
 flowchart LR
     S0["El estado inicial satisface I"] --> C["El bloque cambia el estado"]
@@ -516,7 +518,13 @@ $$
 
 $P=\top$, $B:(max<a)$, $Q:(max\ge a)$.
 
-**Rama falsa.** En un orden total:
+Es decir:
+$$
+ \underbrace{max<a}_{\text{ANTES}} \quad\xrightarrow{\;max:=a\;}\quad \underbrace{max=a}_{\text{DESPUÉS}} \quad\Rightarrow\quad \underbrace{max\ge a}_{\text{DESPUÉS}}. 
+$$
+
+**Rama falsa.**  $\neg (max<a)$
+En un orden total:
 
 $$
 \neg(max<a)\iff max\ge a.
@@ -525,16 +533,36 @@ $$
 Como no cambia el estado:
 
 $$
-(\top\land\neg(max<a))\Rightarrow max\ge a. \tag{1}
+(\{\top\}\land\neg(max<a))\Rightarrow max\ge a. \tag{1}
 $$
 
-**Rama verdadera.** Sustituir $max$ por $a$ en $max\ge a$ produce $a\ge a$, una tautología:
+**Rama verdadera.** $(max<a)$
+
+Buscamos demostrar que:
+$$
+\{max<a\}\  max := a\ \{max \geq a\}
+$$
+
+Demostrando la precondición:
+$$
+P = \{Q^V_E\} = \{(max\geq a)\}^{max}_{a} \ = \{max = a , max \geq a\} = \{a\geq a\}
+$$
+
+Con lo que obtenemos que por debilitamiento:
+$$
+\{a= a\} \implies \{a \geq a\}
+$$
+Asi que podemos fortalecer:
+$$
+\{a = a\} \max:=a \{max \geq a\}
+$$
+Lo cual es una tautología:
 
 $$
 \{\top\}\ max:=a\ \{max\ge a\}.
 $$
 
-Como $max<a\Rightarrow\top$, por consecuencia:
+Como cualquier aseveración fortalece la vacía entonces: $max<a\Rightarrow\top$, por consecuencia:
 
 $$
 \{max<a\}\ max:=a\ \{max\ge a\}. \tag{2}

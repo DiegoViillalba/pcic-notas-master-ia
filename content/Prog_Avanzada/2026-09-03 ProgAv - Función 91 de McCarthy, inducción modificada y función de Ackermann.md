@@ -65,7 +65,7 @@ McCarthy propuso en 1970 una función deliberadamente "incómoda" para la verifi
 $$
 f(x)=
 \begin{cases}
-x-10 & \text{si } x>100\[4pt]
+x-10 & \text{si } x>100 \\
 f\big(f(x+11)\big) & \text{si } x\le 100
 \end{cases}
 $$
@@ -80,7 +80,7 @@ La segunda parte es inmediata: es literalmente la definición cuando `x > 100`. 
 
 ### 2.1. Antes de la prueba formal: seguir la recursión a mano
 
-Para \(x=1\), sustituyendo la definición una y otra vez (Notas 7, lámina 119–120):
+Para $x=1$, sustituyendo la definición una y otra vez (Notas 7, lámina 119–120):
 
 ~~~text
 f(1)  = f( f(12) )
@@ -167,16 +167,16 @@ Usa los valores sugeridos (`n=1`, `n=45`, `n=89`, `n=96`, `n=100`, `n=111`) o es
 
 ## 5. El principio de inducción modificado
 
-La inducción de la clase pasada demuestra \(P(n)\) para todo \(n\ge k\) subiendo desde un caso base pequeño. Aquí necesitamos lo contrario: demostrar \(P(x)\) para todo \(x\le k\), **bajando** desde un techo fijo. El principio se adapta así:
+La inducción de la clase pasada demuestra $P(n)$ para todo $n\ge k$ subiendo desde un caso base pequeño. Aquí necesitamos lo contrario: demostrar $P(x)$ para todo $x\le k$, **bajando** desde un techo fijo. El principio se adapta así:
 
 > [!important] Principio de inducción modificado
-> Sea \(k\) un entero fijo (positivo, negativo o cero). Para demostrar que \(P(n)\) es verdadera para toda \(n\le k\), basta demostrar:
-> 1. **Paso básico:** \(P(k)\) es verdadera.
-> 2. **Paso inductivo:** para toda \(n<k\), si \(P(m)\) es verdadera para **todo** \(m\) tal que \(n<m\le k\) (hipótesis de inducción), entonces \(P(n)\) es verdadera.
+> Sea $k$ un entero fijo (positivo, negativo o cero). Para demostrar que $P(n)$ es verdadera para toda $n\le k$, basta demostrar:
+> 1. **Paso básico:** $P(k)$ es verdadera.
+> 2. **Paso inductivo:** para toda $n<k$, si $P(m)$ es verdadera para **todo** $m$ tal que $n<m\le k$ (hipótesis de inducción), entonces $P(n)$ es verdadera.
 >
-> Entonces \(P(n)\) es verdadera para toda \(n\le k\).
+> Entonces $P(n)$ es verdadera para toda $n\le k$.
 
-Gráficamente, la hipótesis de inducción cubre todo el tramo entre el punto que se está probando y el techo \(k\), no solo el vecino inmediato:
+Gráficamente, la hipótesis de inducción cubre todo el tramo entre el punto que se está probando y el techo $k$, no solo el vecino inmediato:
 
 ~~~mermaid
 flowchart LR
@@ -192,19 +192,19 @@ Esta variante es exactamente lo que necesitamos: para probar `f(x) = 91` con `x`
 
 ## 6. Demostración: `f(x) = 91` para todo entero `x ≤ 100`
 
-Sea \(P(x)\): *"la función obtiene \(f(x)=91\ \forall\) entero \(x\le100\), y \(f(x)=x-10\) para \(x>100\)"*. Se aplica el principio de inducción modificado con techo \(k=100\).
+Sea $P(x)$: *"la función obtiene $f(x)=91\ \forall$ entero $x\le100$, y $f(x)=x-10$ para $x>100$"*. Se aplica el principio de inducción modificado con techo $k=100$.
 
-### 6.1. Paso básico: \(x = 100\)
+### 6.1. Paso básico: $x = 100$
 
 $$
 f(100)=f\big(f(111)\big)=f(101)=91.
 $$
 
-(\(111>100\Rightarrow f(111)=111-10=101\); y \(101>100\Rightarrow f(101)=101-10=91\).) El caso base es cierto.
+($111>100\Rightarrow f(111)=111-10=101$; y $101>100\Rightarrow f(101)=101-10=91$.) El caso base es cierto.
 
 ### 6.2. Hipótesis de inducción
 
-Sea \(x<100\) arbitraria. Suponemos que la propiedad ya vale para **todo** \(m\) con \(x<m\le100\):
+Sea $x<100$ arbitraria. Suponemos que la propiedad ya vale para **todo** $m$ con $x<m\le100$:
 
 $$
 \forall\, m,\ x<m\le100:\quad f(m)=91.
@@ -212,32 +212,32 @@ $$
 
 ### 6.3. Paso inductivo
 
-Como \(x<100\), por definición \(f(x)=f\big(f(x+11)\big)\). Hay exactamente dos casos, según dónde caiga \(x+11\):
+Como $x<100$, por definición $f(x)=f\big(f(x+11)\big)$. Hay exactamente dos casos, según dónde caiga $x+11$:
 
-**Caso a) \(x+11>100\).**
+**Caso a) $x+11>100$.**
 
 $$
 f(x)=f\big(f(x+11)\big)=f\big((x+11)-10\big)=f(x+1).
 $$
 
-Como \(x+1>x\) y \(x+1\le100\) (porque \(x<100\)), la hipótesis de inducción aplica directamente: \(f(x+1)=91\). Por lo tanto \(f(x)=91\).
+Como $x+1>x$ y $x+1\le100$ (porque $x<100$), la hipótesis de inducción aplica directamente: $f(x+1)=91$. Por lo tanto $f(x)=91$.
 
-**Caso b) \(x+11\le100\).**
+**Caso b) $x+11\le100$.**
 
 $$
 f(x)=f\big(f(x+11)\big)=f(91),
 $$
 
-porque \(x+11>x\) y \(x+11\le100\), así que la hipótesis da \(f(x+11)=91\). Falta evaluar \(f(91)\): como \(x+11\le100\Rightarrow x\le89<91\), tenemos \(91>x\) y \(91\le100\), de modo que la **misma** hipótesis de inducción da \(f(91)=91\). Por lo tanto \(f(x)=91\).
+porque $x+11>x$ y $x+11\le100$, así que la hipótesis da $f(x+11)=91$. Falta evaluar $f(91)$: como $x+11\le100\Rightarrow x\le89<91$, tenemos $91>x$ y $91\le100$, de modo que la **misma** hipótesis de inducción da $f(91)=91$. Por lo tanto $f(x)=91$.
 
-En ambos casos \(f(x)=91\), lo que completa el paso inductivo.
+En ambos casos $f(x)=91$, lo que completa el paso inductivo.
 
 $$
 \boxed{\therefore\ f(x)=91\ \ \forall\ \text{entero } x\le100.}
 $$
 
 > [!note] Por qué hacía falta la hipótesis "para todo m mayor", y no solo "para x+1"
-> El caso (b) necesita el valor de \(f\) en **dos** puntos distintos mayores que \(x\) (\(x+11\) y luego \(91\)), no solo en el sucesor inmediato. Por eso la inducción simple ("si vale en \(n\), vale en \(n+1\)") no alcanza aquí: se necesita la versión fuerte/modificada, que supone la propiedad en **todo** el tramo \((x,k]\).
+> El caso (b) necesita el valor de $f$ en **dos** puntos distintos mayores que $x$ ($x+11$ y luego $91$), no solo en el sucesor inmediato. Por eso la inducción simple ("si vale en $n$, vale en $n+1$") no alcanza aquí: se necesita la versión fuerte/modificada, que supone la propiedad en **todo** el tramo $(x,k]$.
 
 ## 7. Generalizando: la función de Ackermann
 
@@ -265,13 +265,13 @@ A(x+1,y+1)&=A\big(x,\,A(x+1,y)\big) &&\text{(3)}
 \end{aligned}
 $$
 
-Igual que `mc91`, cada rama recursiva llama a `A` con argumentos que, en algún sentido, "avanzan hacia" un caso ya resuelto — aquí se demuestra con **inducción sobre dos variables**: primero sobre \(m\) (o \(x\)), y dentro de cada paso, una inducción anidada sobre \(n\) (o \(y\)).
+Igual que `mc91`, cada rama recursiva llama a `A` con argumentos que, en algún sentido, "avanzan hacia" un caso ya resuelto — aquí se demuestra con **inducción sobre dos variables**: primero sobre $m$ (o $x$), y dentro de cada paso, una inducción anidada sobre $n$ (o $y$).
 
 ### 7.1. `A(1, z) = z + 2` — inducción sobre `z`
 
-**Base**, \(z=0\): \(A(1,0)=A(0,1)\) por (2) \(=1+1=2=0+2\).
+**Base**, $z=0$: $A(1,0)=A(0,1)$ por (2) $=1+1=2=0+2$.
 
-**Hipótesis:** \(A(1,n)=n+2\).
+**Hipótesis:** $A(1,n)=n+2$.
 
 **Paso:**
 $$
@@ -282,7 +282,7 @@ $$\therefore\ A(1,z)=z+2.$$
 
 ### 7.2. `A(2, z) = 2z + 3` — inducción sobre `z`, usando el resultado anterior
 
-**Base**, \(z=0\): \(A(2,0)=A(1,1)=1+2=3=2\cdot0+3\).
+**Base**, $z=0$: $A(2,0)=A(1,1)=1+2=3=2\cdot0+3$.
 
 **Paso:**
 $$
@@ -293,7 +293,7 @@ $$\therefore\ A(2,z)=2z+3.$$
 
 ### 7.3. `A(3, z) = 2^(z+3) − 3`
 
-**Base:** \(A(3,0)=A(2,1)=2\cdot1+3=5=2^{0+3}-3\).
+**Base:** $A(3,0)=A(2,1)=2\cdot1+3=5=2^{0+3}-3$.
 
 **Paso:**
 $$
@@ -306,15 +306,15 @@ $$
 A(4,z)=\underbrace{2^{2^{\cdot^{\cdot^{2}}}}}_{z+2\text{ veces}}-3.
 $$
 
-Por ejemplo, \(A(4,1)=2^{2^{2}}-13=65533\) y \(A(4,2)=2^{65536}-3\), un número con **19 729 dígitos**. La tabla de las diapositivas resume el crecimiento:
+Por ejemplo, $A(4,1)=2^{2^{2}}-13=65533$ y $A(4,2)=2^{65536}-3$, un número con **19 729 dígitos**. La tabla de las diapositivas resume el crecimiento:
 
-| \(m\backslash n\) | 0 | 1 | 2 | 3 | fórmula |
+| $m\backslash n$ | 0 | 1 | 2 | 3 | fórmula |
 |---:|---:|---:|---:|---:|---|
-| 0 | 1 | 2 | 3 | 4 | \(n+1\) |
-| 1 | 2 | 3 | 4 | 5 | \(n+2\) |
-| 2 | 3 | 5 | 7 | 9 | \(2n+3\) |
-| 3 | 5 | 13 | 29 | 61 | \(2^{n+3}-3\) |
-| 4 | 13 | 65533 | \(2^{65536}-3\) | … | torre de 2 |
+| 0 | 1 | 2 | 3 | 4 | $n+1$ |
+| 1 | 2 | 3 | 4 | 5 | $n+2$ |
+| 2 | 3 | 5 | 7 | 9 | $2n+3$ |
+| 3 | 5 | 13 | 29 | 61 | $2^{n+3}-3$ |
+| 4 | 13 | 65533 | $2^{65536}-3$ | … | torre de 2 |
 
 > [!warning] Por qué el proyecto `Ackermann` truena con `StackOverflowException`
 > Cada llamada recursiva de `A(m, n)` con `m ≥ 3` y `n` moderada abre una cantidad astronómica de llamadas anidadas antes de tocar un caso base. Según el análisis de las diapositivas, `A(4,2)` ya supera "el número de partículas del universo elevado a la potencia 200", y `A(5,2)` ni siquiera cabría representarse en el universo físico. Ningún lenguaje con pila de tamaño finito puede evaluarlo por recursión directa.
@@ -325,7 +325,7 @@ $$
 \forall\, x,y\in\mathbb{N}_0:\quad y+1\le A(x,y).
 $$
 
-Se demuestra por inducción sobre \(x\) (paso base \(x=0\)), y **dentro** del paso inductivo sobre \(x\), se hace una segunda inducción sobre \(y\). Esta anidación —una inducción dentro de otra— es la misma herramienta que usamos para `mc91`, llevada a dos variables en vez de una.
+Se demuestra por inducción sobre $x$ (paso base $x=0$), y **dentro** del paso inductivo sobre $x$, se hace una segunda inducción sobre $y$. Esta anidación —una inducción dentro de otra— es la misma herramienta que usamos para `mc91`, llevada a dos variables en vez de una.
 
 ## 8. Ternas de Hoare sobre la función de Ackermann
 
@@ -343,16 +343,16 @@ $$
 Q^{w}_{A(x,y)}=(w=y+2)^{w}_{A(x,y)}\equiv A(x,y)=y+2.
 $$
 
-La terna resultante es válida por el axioma de asignación. Como ya se demostró que \(x=1\Rightarrow A(x,y)=y+2\), la regla de consecuencia cierra la prueba:
+La terna resultante es válida por el axioma de asignación. Como ya se demostró que $x=1\Rightarrow A(x,y)=y+2$, la regla de consecuencia cierra la prueba:
 
 $$
 \frac{\{A(x,y)=y+2\}\ w:=A(x,y)\ \{w=y+2\} \qquad x=1\Rightarrow A(x,y)=y+2}{\{x=1\}\ w:=A(x,y)\ \{w=y+2\}}.
 $$
 
-El mismo patrón, sustituyendo \(y+2\) por \(2y+3\) y usando §7.2, prueba la segunda terna.
+El mismo patrón, sustituyendo $y+2$ por $2y+3$ y usando §7.2, prueba la segunda terna.
 
 > [!note] Complemento de `AllLectures`: evaluar la expresión también debe terminar
-> El axioma de asignación para **corrección total** supone que evaluar el lado derecho termina. En `w := A(x,y)`, demostrar solo el valor matemático de \(A(x,y)\) no basta si todavía no se ha justificado que la llamada recursiva termina para las entradas permitidas. Conviene separar: **(1)** el lema que calcula el resultado, **(2)** el argumento bien fundado de terminación y **(3)** la regla de consecuencia. Véase [[Guía paso a paso - Lógica de Hoare#5. Ciclos invariante salida y variante|invariante y variante]] para el análogo iterativo.
+> El axioma de asignación para **corrección total** supone que evaluar el lado derecho termina. En `w := A(x,y)`, demostrar solo el valor matemático de $A(x,y)$ no basta si todavía no se ha justificado que la llamada recursiva termina para las entradas permitidas. Conviene separar: **(1)** el lema que calcula el resultado, **(2)** el argumento bien fundado de terminación y **(3)** la regla de consecuencia. Véase [[Guía paso a paso - Lógica de Hoare#5. Ciclos invariante salida y variante|invariante y variante]] para el análogo iterativo.
 
 > [!tip] La utilidad de haber demostrado A(1,z) y A(2,z) por separado
 > Una vez fijado un teorema (`A(1,z) = z+2`), se vuelve una pieza reutilizable: en la verificación de un programa ya no hay que "desenrollar" la recursión de Ackermann, solo aplicar el teorema y la regla de consecuencia — exactamente igual que usar un lema ya probado en una demostración matemática más grande.
@@ -363,9 +363,9 @@ El mismo patrón, sustituyendo \(y+2\) por \(2y+3\) y usando §7.2, prueba la se
 
 | | Ciclos (clase anterior) | `mc91` y Ackermann (esta clase) |
 |---|---|---|
-| Dirección | Sube desde \(k\) (p. ej. \(n=0\)) | Baja desde un techo \(k\) fijo |
+| Dirección | Sube desde $k$ (p. ej. $n=0$) | Baja desde un techo $k$ fijo |
 | Qué crece | El número de iteraciones ya hechas | — el argumento puede subir *temporalmente* antes de resolverse |
-| Hipótesis | \(P(n)\) para un \(n\) fijo anterior | \(P(m)\)\ para **todo** \(m\) entre \(x\) y el techo \(k\) |
+| Hipótesis | $P(n)$ para un $n$ fijo anterior | $P(m)$\ para **todo** $m$ entre $x$ y el techo $k$ |
 | Qué demuestra | Un invariante se conserva | Una llamada recursiva siempre termina en el mismo valor |
 | Ejemplo | `C = D·A` en `Cuadrado(A)` | `f(x) = 91` en `mc91` |
 
@@ -377,13 +377,13 @@ El mismo patrón, sustituyendo \(y+2\) por \(2y+3\) y usando §7.2, prueba la se
 > `mc91(1)` primero sube hasta argumentos como 89, 100, 111... antes de bajar. Verla crecer no significa que diverja; hay que demostrar que el crecimiento está acotado (aquí, por el `+11` contra el `>100`).
 
 > [!warning] Usar inducción simple donde hace falta la modificada/fuerte
-> El caso (b) de la demostración necesita el valor de \(f\) en dos puntos distintos mayores que \(x\) (no solo en \(x+1\)). Una hipótesis "solo vale para el siguiente" no alcanza.
+> El caso (b) de la demostración necesita el valor de $f$ en dos puntos distintos mayores que $x$ (no solo en $x+1$). Una hipótesis "solo vale para el siguiente" no alcanza.
 
 > [!warning] Olvidar que la hipótesis de inducción tiene un rango, no un solo punto
-> En la inducción modificada, la hipótesis cubre "todo \(m\) con \(x<m\le k\)", no un único valor. Aplicarla correctamente significa verificar, en cada uso, que el valor que se sustituye cae dentro de ese rango.
+> En la inducción modificada, la hipótesis cubre "todo $m$ con $x<m\le k$", no un único valor. Aplicarla correctamente significa verificar, en cada uso, que el valor que se sustituye cae dentro de ese rango.
 
 > [!warning] Tratar `A(m,n)` como si tuviera un solo caso base
-> Tiene tres cláusulas (\(m=0\); \(m>0,n=0\); \(m>0,n>0\)), y demostrar una propiedad general requiere inducción **anidada**: sobre \(m\) primero, y sobre \(n\) dentro de cada paso.
+> Tiene tres cláusulas ($m=0$; $m>0,n=0$; $m>0,n>0$), y demostrar una propiedad general requiere inducción **anidada**: sobre $m$ primero, y sobre $n$ dentro de cada paso.
 
 ---
 
