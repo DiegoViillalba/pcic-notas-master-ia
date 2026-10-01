@@ -191,7 +191,7 @@ $$
 
 Notemos como en nuestro problema:
 $$
-P  : \{a>b\}\ \qquad B : \{a>b\}\ \qquad C: m:=a \qquad Q = \{m = a\}\
+P  : \{a>b\}\ \qquad B : \{a>b\}\ \qquad C: m:=a \qquad Q = \{m = a\}
 $$
 ### Rama verdadera
 

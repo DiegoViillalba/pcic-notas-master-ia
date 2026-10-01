@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Del conocimiento a la acción</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: light-dark(#f7f6f2, #171816);
+    --panel: light-dark(#ffffff, #232522);
+    --text: light-dark(#20231f, #eef0eb);
+    --muted: light-dark(#626a60, #afb8aa);
+    --line: light-dark(#d9ddd5, #444a42);
+    --accent: light-dark(#365f4a, #91c7a8);
+    --accent-soft: light-dark(#e1eee6, #263c30);
+    --warn: light-dark(#8a4f19, #efb36f);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); }
+  main { max-width: 980px; margin: 0 auto; padding: 20px; }
+  h1, h2, h3 { margin: 0; font-weight: 650; }
+  h1 { font-size: clamp(1.45rem, 3vw, 2rem); }
+  h2 { font-size: 1.15rem; }
+  p { line-height: 1.55; }
+  .subtitle { color: var(--muted); margin: 6px 0 18px; }
+  .stages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }
+  button { font: inherit; }
+  .stage, .action, .reset {
+    border: 1px solid var(--line); background: var(--panel); color: var(--text);
+    border-radius: 10px; padding: 10px; min-height: 44px; cursor: pointer;
+  }
+  .stage[aria-pressed="true"] { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .stage:focus-visible, .action:focus-visible, .reset:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 10px; align-items: stretch; }
+  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; min-height: 120px; }
+  .box strong { display: block; color: var(--accent); margin-bottom: 8px; }
+  .arrow { align-self: center; color: var(--muted); font-size: 1.5rem; }
+  .detail { margin: 12px 0 24px; color: var(--muted); min-height: 48px; }
+  .lab { border-top: 1px solid var(--line); padding-top: 20px; }
+  .state { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .chip { background: var(--accent-soft); border-radius: 999px; padding: 6px 10px; font-size: .92rem; }
+  .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .action:disabled { opacity: .42; cursor: not-allowed; }
+  .action:not(:disabled):hover { border-color: var(--accent); }
+  .status { background: var(--panel); border-left: 4px solid var(--accent); padding: 10px 12px; margin-top: 12px; min-height: 48px; }
+  .status.warn { border-left-color: var(--warn); }
+  .reset { margin-top: 10px; }
+  .legend { color: var(--muted); font-size: .9rem; }
+  @media (max-width: 700px) {
+    .stages { grid-template-columns: 1fr; }
+    .flow { grid-template-columns: 1fr; }
+    .arrow { transform: rotate(90deg); justify-self: center; }
+    .actions { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 420px) { .actions { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Del conocimiento a la acción</h1>
+  <p class="subtitle">Selecciona una etapa para seguir la secuencia que une lógica, representación y planificación.</p>
+
+  <nav class="stages" aria-label="Etapas del agente">
+    <button class="stage" data-stage="0" aria-pressed="true">1. Representar</button>
+    <button class="stage" data-stage="1" aria-pressed="false">2. Inferir</button>
+    <button class="stage" data-stage="2" aria-pressed="false">3. Formular meta</button>
+    <button class="stage" data-stage="3" aria-pressed="false">4. Planificar</button>
+    <button class="stage" data-stage="4" aria-pressed="false">5. Ejecutar y revisar</button>
+  </nav>
+
+  <section class="flow" aria-live="polite">
+    <div class="box"><strong>Entrada</strong><span id="input"></span></div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="box"><strong>Mecanismo</strong><span id="mechanism"></span></div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="box"><strong>Salida</strong><span id="output"></span></div>
+  </section>
+  <p class="detail" id="detail"></p>
+
+  <section class="lab">
+    <h2>Laboratorio: plan parcialmente ordenado</h2>
+    <p class="legend">Meta: regresar a casa con taladro, leche y plátanos. Solo se habilitan acciones cuyas precondiciones ya se cumplen; observa que comprar leche y plátanos no exige un orden mutuo.</p>
+    <div class="state" id="state" aria-label="Estado actual"></div>
+    <div class="actions" id="actions"></div>
+    <div class="status" id="status" aria-live="polite">Elige una acción habilitada.</div>
+    <button class="reset" id="reset">Reiniciar plan</button>
+  </section>
+</main>
+
+<script>
+const stages = [
+  {
+    input: 'Objetos, eventos, relaciones y conocimiento de sentido común.',
+    mechanism: 'Categorías, marcos, scripts, taxonomías y ontologías.',
+    output: 'Una base explícita que una máquina puede consultar.',
+    detail: 'La lógica aporta el lenguaje; una ontología organiza el vocabulario compartido y un script captura la estructura típica de una situación.'
+  },
+  {
+    input: 'Hechos, reglas y una consulta.',
+    mechanism: 'FOL → FNC/CNF → unificación → resolución por refutación.',
+    output: 'Una consecuencia demostrada o una búsqueda sin prueba.',
+    detail: 'La continuidad con las clases previas está aquí: representar no basta; el agente necesita derivar información que no aparece escrita literalmente.'
+  },
+  {
+    input: 'Estado inicial y deseo del agente.',
+    mechanism: 'Convertir el deseo en literales-meta comprobables.',
+    output: 'Condiciones de terminación, por ejemplo At(Home) ∧ Have(Drill) ∧ Have(Milk) ∧ Have(Bananas).',
+    detail: 'La meta no dice todavía cómo actuar. Separa el qué debe ser verdadero del cómo conseguirlo.'
+  },
+  {
+    input: 'Estado, meta y operadores con precondiciones y efectos.',
+    mechanism: 'STRIPS y enlaces causales entre pasos parcialmente ordenados.',
+    output: 'Una red de acciones; solo se fija el orden que realmente es necesario.',
+    detail: 'Cada precondición abierta debe recibir soporte de un efecto anterior, y ninguna acción intermedia debe destruir ese soporte.'
+  },
+  {
+    input: 'Plan y observaciones del mundo durante la ejecución.',
+    mechanism: 'Plan sin sensores, plan condicional o monitoreo con replanificación.',
+    output: 'Acción adaptada a información incompleta, incorrecta o cambiante.',
+    detail: 'La lógica clásica funciona bien en modelos deterministas; si hay incertidumbre cuantitativa, el siguiente paso del curso son los agentes probabilísticos.'
+  }
+];
+
+const input = document.getElementById('input');
+const mechanism = document.getElementById('mechanism');
+const output = document.getElementById('output');
+const detail = document.getElementById('detail');
+const stageButtons = [...document.querySelectorAll('.stage')];
+
+function showStage(index) {
+  const stage = stages[index];
+  input.textContent = stage.input;
+  mechanism.textContent = stage.mechanism;
+  output.textContent = stage.output;
+  detail.textContent = stage.detail;
+  stageButtons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === index)));
+}
+stageButtons.forEach(button => button.addEventListener('click', () => showStage(Number(button.dataset.stage))));
+showStage(0);
+
+const actionDefs = [
+  { id: 'go-hws', label: 'Ir a ferretería', enabled: s => s.at !== 'Ferretería' && !s.drill, run: s => { s.at = 'Ferretería'; } },
+  { id: 'buy-drill', label: 'Comprar taladro', enabled: s => s.at === 'Ferretería' && !s.drill, run: s => { s.drill = true; } },
+  { id: 'go-sm', label: 'Ir a supermercado', enabled: s => s.at !== 'Supermercado' && (!s.milk || !s.bananas), run: s => { s.at = 'Supermercado'; } },
+  { id: 'buy-milk', label: 'Comprar leche', enabled: s => s.at === 'Supermercado' && !s.milk, run: s => { s.milk = true; } },
+  { id: 'buy-bananas', label: 'Comprar plátanos', enabled: s => s.at === 'Supermercado' && !s.bananas, run: s => { s.bananas = true; } },
+  { id: 'go-home', label: 'Regresar a casa', enabled: s => s.at !== 'Casa' && s.drill && s.milk && s.bananas, run: s => { s.at = 'Casa'; } }
+];
+let planState;
+const stateNode = document.getElementById('state');
+const actionsNode = document.getElementById('actions');
+const statusNode = document.getElementById('status');
+
+function goalReached(s) { return s.at === 'Casa' && s.drill && s.milk && s.bananas; }
+function renderPlan(message = 'Elige una acción habilitada.') {
+  stateNode.innerHTML = '';
+  [`Lugar: ${planState.at}`, `Taladro: ${planState.drill ? 'sí' : 'no'}`, `Leche: ${planState.milk ? 'sí' : 'no'}`, `Plátanos: ${planState.bananas ? 'sí' : 'no'}`].forEach(text => {
+    const span = document.createElement('span'); span.className = 'chip'; span.textContent = text; stateNode.appendChild(span);
+  });
+  actionsNode.innerHTML = '';
+  actionDefs.forEach(def => {
+    const button = document.createElement('button');
+    button.className = 'action'; button.textContent = def.label; button.disabled = !def.enabled(planState) || goalReached(planState);
+    button.addEventListener('click', () => { def.run(planState); renderPlan(`Ejecutaste: ${def.label}.`); });
+    actionsNode.appendChild(button);
+  });
+  if (goalReached(planState)) {
+    statusNode.className = 'status';
+    statusNode.textContent = 'Meta alcanzada: estás en casa y tienes los tres productos.';
+  } else {
+    statusNode.className = 'status warn';
+    statusNode.textContent = message;
+  }
+}
+function resetPlan() {
+  planState = { at: 'Casa', drill: false, milk: false, bananas: false };
+  renderPlan();
+}
+document.getElementById('reset').addEventListener('click', resetPlan);
+resetPlan();
+</script>
+</body>
+</html>

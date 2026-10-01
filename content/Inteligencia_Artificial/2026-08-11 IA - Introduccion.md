@@ -22,7 +22,7 @@ tags:
   - clase
   - inteligencia-artificial
 ---
-
+![[AI 1 Introducción.pdf]]
 # Clase 1 — Introducción a la inteligencia artificial
 
 ## Preguntas centrales
@@ -51,12 +51,12 @@ El [[Problema de la parada|problema de la parada]] muestra uno de esos límites:
 
 Se presentaron dos ejes: **pensamiento frente a comportamiento** y **semejanza humana frente a racionalidad**. De su combinación surgen cuatro maneras de caracterizar el objetivo de la IA:
 
-| Enfoque | Pregunta guía | Método principal |
-|---|---|---|
-| Pensar como humanos | ¿El sistema reproduce procesos mentales humanos? | Modelado cognitivo, psicología y observación experimental |
-| Actuar como humanos | ¿Su comportamiento es indistinguible del humano? | [[Prueba de Turing|Prueba de Turing]] |
-| Pensar racionalmente | ¿Obtiene conclusiones correctas a partir de lo que sabe? | Lógica y leyes del pensamiento |
-| Actuar racionalmente | ¿Elige la mejor acción posible según la información disponible? | Diseño de [[Agente racional|agentes racionales]] |
+| Enfoque              | Pregunta guía                                                   | Método principal                                          |
+| -------------------- | --------------------------------------------------------------- | --------------------------------------------------------- |
+| Pensar como humanos  | ¿El sistema reproduce procesos mentales humanos?                | Modelado cognitivo, psicología y observación experimental |
+| Actuar como humanos  | ¿Su comportamiento es indistinguible del humano?                | [[Prueba de Turing]]                         |
+| Pensar racionalmente | ¿Obtiene conclusiones correctas a partir de lo que sabe?        | Lógica y leyes del pensamiento                            |
+| Actuar racionalmente | ¿Elige la mejor acción posible según la información disponible? | Diseño de [[Agente racional]]                |
 
 Pensar racionalmente no garantiza por sí solo actuar bien: una inferencia puede ser correcta y, aun así, llegar demasiado tarde o no considerar la incertidumbre. Por eso el curso adopta principalmente el enfoque de **actuar racionalmente**, que permite evaluar decisiones y resultados sin exigir que la máquina imite la mente humana.
 
@@ -64,7 +64,7 @@ Pensar racionalmente no garantiza por sí solo actuar bien: una inferencia puede
 
 ### Prueba de Turing
 
-La [[Prueba de Turing|prueba de Turing]] fue propuesta como una manera operativa de evitar la vaguedad de la pregunta «¿puede pensar una máquina?». Un juez conversa por escrito con dos participantes ocultos, una persona y una máquina. Si, a partir de las respuestas, no puede distinguir de forma fiable cuál es la máquina, se considera que esta ha superado la prueba.
+La [[Prueba de Turing|prueba de Turing]] fue propuesta como una manera operativa de evitar la vaguedad de la pregunta «¿puede pensar una máquina?». Un juez conversa por escrito con dos participantes ocultos, una persona y una máquina. Si de manera estadística, a partir de las respuestas, no puede distinguir de forma fiable cuál es la máquina, se considera que esta ha superado la prueba.
 
 La prueba evalúa **comportamiento lingüístico indistinguible**, no demuestra directamente conciencia o comprensión. Para superarla, un sistema necesitaría al menos procesamiento de lenguaje natural, representación del conocimiento, razonamiento automático y aprendizaje. La prueba total de Turing añadiría percepción y acción en el mundo mediante visión computacional y robótica.
 
@@ -78,7 +78,7 @@ La conclusión propuesta por John Searle es que ejecutar correctamente un progra
 
 La distinción entre [[IA fuerte e IA débil|IA fuerte e IA débil]] responde a una pregunta filosófica:
 
-- **IA fuerte:** sostiene que una máquina adecuadamente construida podría tener comprensión o estados mentales propios.
+- **IA fuerte (dura en diapositivas):** sostiene que una máquina adecuadamente construida podría tener comprensión o estados mentales propios.
 - **IA débil:** utiliza la computadora para simular o ejecutar capacidades inteligentes sin afirmar que posee conciencia o comprensión real.
 
 «Débil» no significa poco capaz, y «fuerte» no es sinónimo exacto de IA general. Un sistema podría resolver muchas tareas y seguir considerándose IA débil si no afirmamos que realmente comprende lo que hace.
@@ -89,8 +89,8 @@ Un [[Agente racional|agente racional]] es una entidad que percibe un ambiente y 
 
 Esto aclara la diferencia entre un agente **inteligente** y uno **racional**:
 
-- «Inteligente» es una caracterización amplia que puede referirse a capacidades como aprender, razonar, comunicarse o adaptarse.
-- «Racional» es un criterio técnico sobre la decisión: actuar de la mejor manera esperada con la información y los recursos disponibles.
+- **Inteligente** es una caracterización amplia que puede referirse a capacidades como aprender, razonar, comunicarse o adaptarse.
+- **Racional** es un criterio técnico sobre la decisión: actuar de la mejor manera esperada con la información y los recursos disponibles.
 
 Un agente racional no es omnisciente ni tiene que acertar siempre. Puede tomar una decisión razonable y obtener un mal resultado debido a información incompleta o a un ambiente incierto. La racionalidad se juzga por la decisión disponible en ese momento, no por conocer el futuro.
 

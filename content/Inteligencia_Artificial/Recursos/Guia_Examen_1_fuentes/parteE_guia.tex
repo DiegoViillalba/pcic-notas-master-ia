@@ -1,0 +1,86 @@
+\newpage
+% ======================= PARTE E =======================
+\section{Parte E — Estilo del examen real (2025)}
+
+\begin{nota}
+\textbf{Qué muestra el examen de 2025.} Cuatro preguntas de 25 puntos: (1) modelar un ambiente real y
+reformularlo como juego competitivo; (2) A* en una gráfica pequeña con heurística admisible pero
+inconsistente; (3) modelar un juego \emph{estocástico} y definir su operador de valor
+(expectiminimax); (4) leer una KB en CNF de primer orden, derivar por resolución en 2–3 pasos y decidir
+si otra conclusión se sigue. Se permitía \textbf{una hoja A4 de notas}. Predominan el modelado y la
+explicación sobre las demostraciones largas: responde con estructura (listas, tablas) y justifica cada
+decisión en una o dos líneas.
+\end{nota}
+
+\begin{ejercicio}{E1 · Examen 1 de 2025 (resuélvelo en 2 h) \dif{2}\fuente{Examen del profesor, 2025}}
+\textbf{1. Agentes y ambientes competitivos (25).} Te contratan para diseñar un sistema de taxis
+autónomos en la Ciudad de México; la tarea es decidir dónde colocar los taxis.
+(a) \pts{15} Modela el ambiente: estados, perceptos, acciones y propiedades (observable/parcial,
+determinista/estocástico, discreto/continuo). Sé breve.
+(b) \pts{10} Existen compañías que compiten por el espacio. Reformula como juego competitivo y discute
+qué algoritmo (minimax, expectimax) sería más adecuado.
+
+\textbf{2. Búsqueda informada (25).} Aristas $S\to A\,(1)$, $S\to B\,(4)$, $A\to C\,(2)$, $B\to C\,(1)$, $C\to G\,(3)$;
+$h(S)=5$, $h(A)=3$, $h(B)=2$, $h(C)=1$, $h(G)=0$.
+(a) \pts{10} Ejecuta A* mostrando el orden de expansión. (b) \pts{10} ¿La solución es óptima? Justifica.
+(c) \pts{5} La heurística es admisible pero no consistente. Explica por qué y qué cambios de
+implementación preservan la optimalidad.
+
+\textbf{3. Juegos con incertidumbre (25).} Connect-4 de $4\times4$: al dejar caer una ficha en una columna,
+con probabilidad $\rho$ cae en esa columna y con probabilidad $1-\rho$ en una columna uniformemente aleatoria.
+(a) \pts{10} Modela formalmente: estados, acciones, transición estocástica.
+(b) \pts{15} Define un operador de valor que combine minimax y expectimax para este juego.
+
+\textbf{4. Lógica: CNF y resolución (25).} KB:
+1.\ $\neg\p{Estudiante}(x)\vee\neg\p{TomaIA}(x)\vee\p{Conoce}(x,\p{astar})$;\;
+2.\ $\p{Algoritmo}(\p{astar})$;\; 3.\ $\p{Optimo}(\p{astar})$;\;
+4.\ $\neg\p{Optimo}(a)\vee\p{UsaAdmisible}(a)$;\; 5.\ $\neg\p{UsaAdmisible}(a)\vee\p{Correcto}(a)$;\;
+6.\ $\p{Estudiante}(\p{bob})$;\; 7.\ $\p{TomaIA}(\p{bob})$.
+(a) \pts{10} Lectura en lenguaje natural de cada cláusula. (b) \pts{10} Por resolución, deriva
+$\p{Conoce}(\p{bob},\p{astar})$ en 2–3 pasos. (c) \pts{5} ¿Se sigue $\p{Correcto}(\p{astar})$? Si sí, argumento
+breve por resolución; si no, qué falta en la base.
+\end{ejercicio}
+
+\begin{ejercicio}{E2 · Modelar un ambiente real y su versión competitiva \dif{2}\fuente{estilo 2025, pregunta 1}}
+Diseñas el agente que redistribuye bicicletas entre las estaciones de un sistema de bicis compartidas
+(camiones que mueven bicis de estaciones llenas a vacías).
+(a) Modela el ambiente: medida de desempeño, estados, perceptos, acciones y las seis propiedades
+(observable, agentes, determinista, episódico, estático, discreto). ¿Es un problema de búsqueda, de
+CSP o de búsqueda local? Justifica.
+(b) Una empresa rival de scooters compite por los mismos usuarios y también decide dónde colocar sus
+vehículos. Formúlalo como juego (jugadores, turnos, acciones, utilidades). ¿Es de suma cero? ¿Usarías
+minimax, expectimax o expectiminimax? ¿Qué harías si el juego es demasiado grande para llegar a las hojas?
+\end{ejercicio}
+
+\begin{ejercicio}{E3 · A* con heurística inconsistente y reapertura \dif{2}\fuente{estilo 2025, pregunta 2}}
+Aristas dirigidas: $S\to A\,(2)$, $S\to B\,(1)$, $A\to C\,(1)$, $B\to C\,(3)$, $C\to D\,(1)$, $D\to G\,(2)$.
+Heurística: $h(S)=5$, $h(A)=4$, $h(B)=1$, $h(C)=1$, $h(D)=2$, $h(G)=0$.
+(a) Calcula $h^*$; muestra que $h$ es admisible y encuentra los arcos que violan la consistencia.
+(b) Ejecuta A* en grafo \emph{sin} reapertura. ¿Qué costo devuelve? ¿Es óptimo?
+(c) Ejecuta A* \emph{con} reapertura de nodos cerrados. ¿Qué cambia?
+(d) ¿Cuál es el mínimo número de valores de $h$ que hay que cambiar para que sea consistente (y siga admisible)? Propón uno.
+\end{ejercicio}
+
+\begin{ejercicio}{E4 · Gato con viento \dif{2}\fuente{estilo 2025, pregunta 3}}
+En un gato estocástico, al marcar una casilla libre, con probabilidad $\rho$ la marca queda ahí y con
+probabilidad $1-\rho$ queda en una casilla libre distinta, elegida uniformemente.
+(a) Modela formalmente: estados, jugador en turno, acciones, modelo de transición $P(s'\mid s,a)$,
+prueba terminal y utilidad.
+(b) Escribe el operador expectiminimax para este juego con profundidad limitada y función de evaluación.
+(c) En cierta posición MAX tiene dos jugadas. \emph{Atacar}: si la marca cae donde quiere, gana ($+1$);
+si se desvía, pierde ($-1$). \emph{Bloquear}: si cae donde quiere, empata ($0$); si se desvía, cae con igual
+probabilidad en una casilla que empata ($0$) o en una que pierde ($-1$). Calcula el valor de ambas jugadas
+en función de $\rho$ y el umbral de $\rho$ a partir del cual conviene atacar. ¿Qué elegiría minimax (tratando
+el azar como adversario)?
+\end{ejercicio}
+
+\begin{ejercicio}{E5 · KB en CNF: leer, derivar y detectar qué falta \dif{2}\fuente{estilo 2025, pregunta 4}}
+KB: 1.\ $\neg\p{Robot}(x)\vee\neg\p{Bateria}(x)\vee\p{Mueve}(x)$;\; 2.\ $\neg\p{Mueve}(x)\vee\neg\p{EnRuta}(x)\vee\p{Entrega}(x)$;\;
+3.\ $\p{Robot}(r_1)$;\; 4.\ $\p{Bateria}(r_1)$;\; 5.\ $\neg\p{Dron}(x)\vee\p{Vuela}(x)$;\; 6.\ $\neg\p{Vuela}(x)\vee\p{EvitaTrafico}(x)$;\;
+7.\ $\p{EnRuta}(r_2)$.
+(a) Lee cada cláusula en lenguaje natural (como implicación).
+(b) Deriva $\p{Mueve}(r_1)$ por resolución en 2 pasos.
+(c) ¿Se sigue $\p{Entrega}(r_1)$? ¿Y $\p{EvitaTrafico}(r_1)$? Si no, di qué falta y da un modelo de la KB donde sea falsa.
+(d) Pasa a CNF: «Todo dron con batería baja regresa a la base» y «Todo pedido es entregado por algún
+robot». ¿Cuál necesita skolemización?
+\end{ejercicio}

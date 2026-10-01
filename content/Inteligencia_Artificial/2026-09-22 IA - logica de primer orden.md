@@ -40,6 +40,9 @@ tags:
 > [!note] Numeración del material
 > La presentación se titula «Clase 14», aunque el calendario del curso registra el 22 de septiembre como la sesión 13. Este apunte conserva la fecha real y sigue, una por una, las 19 diapositivas del PDF.
 
+> [!warning] Ajuste de continuidad
+> Este apunte resume la versión completa de 19 diapositivas disponible el 22, pero la nota rápida del [[2026-09-24 IA - CNF|24 de septiembre]] indica que la clase siguiente retomó el ejercicio de Jack, Curiosity y Tuna. Por eso, las secciones finales siguen siendo correctas como material de estudio, aunque probablemente no describen con exactitud cuánto se alcanzó a cubrir presencialmente el día 22. La versión ampliada del PDF y las discrepancias se documentan en la nota del 24.
+
 ## Antes de comenzar: cuatro ideas mínimas
 
 La [[Lógica de primer orden|lógica de primer orden]] representa objetos y relaciones mediante **términos** y **predicados**:

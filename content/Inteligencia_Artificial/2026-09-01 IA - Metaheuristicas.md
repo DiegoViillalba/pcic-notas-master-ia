@@ -26,12 +26,11 @@ tags: [clase, inteligencia-artificial, busqueda-local, metaheuristicas]
 
 ¿Cómo encontrar una buena configuración cuando el espacio de posibilidades es enorme y mejorar una solución completa resulta más práctico que construir todo un árbol de búsqueda?
 
-> [!summary] 💎 Gem · La idea de la clase
+> [!summary] La idea de la clase
 > Partimos de una configuración y buscamos mejorarla. **Hill climbing** acepta mejoras; **tabú** usa memoria para evitar regresos; **recocido simulado** acepta algunos empeoramientos según una temperatura; los **evolutivos** mantienen una población y producen nuevas soluciones mediante selección y variación.
 
-**Cómo estudiar esta nota:** primero entiende estado, vecindario y objetivo; después compara las tres búsquedas de un estado; finalmente recorre una generación de un algoritmo genético. Los recuadros 💎 son las “gems”: ideas breves para recordar.
+**Cómo estudiar esta nota:** primero entiende estado, vecindario y objetivo; después compara las tres búsquedas de un estado; finalmente recorre una generación de un algoritmo genético.
 
-**Fuente y alcance:** se integra el contenido de las 23 diapositivas de [[AI 6 Metaheuristicas.pdf]], incluidos el quiz y las figuras. Los ejemplos numéricos, las precisiones y el laboratorio son ampliaciones didácticas; la sección de Markov recupera el apunte tomado durante clase. No se inventan los comentarios orales de la tarea 1, que la diapositiva 1 solo menciona.
 
 ```mermaid
 flowchart TD
@@ -69,7 +68,7 @@ Una **heurística** orienta decisiones usando información del problema. Una **m
 - **Satisfacción:** buscamos cualquier estado factible. Podemos minimizar $C(s)$, el número de restricciones violadas. Si $C(s)=0$, terminamos con una solución.
 - **Optimización:** buscamos el mejor valor entre los estados permitidos, por ejemplo minimizar la duración total de un horario ya factible.
 
-> [!tip] 💎 Gem · Completo no significa válido
+> [!tip]  Completo no significa válido
 > Una **asignación completa** da un valor a todas las variables; puede violar restricciones. Un **algoritmo completo** garantiza encontrar una solución cuando existe, bajo las condiciones de su definición. Son usos distintos de “completo”.
 
 ### 1.2 Convención de esta nota
@@ -110,7 +109,7 @@ flowchart LR
 
 Desde B hay que bajar a C para llegar a E. Este único obstáculo explica por qué aparecen tabú y recocido.
 
-> [!tip] 💎 Gem · Un óptimo local depende del vecindario
+> [!tip]  Un óptimo local depende del vecindario
 > B es máximo local si solo podemos movernos a A o C. Si permitimos saltar de B a E, deja de serlo. Diseñar los movimientos es parte de diseñar el algoritmo.
 
 ## 3. Hill climbing: subir hasta no poder mejorar
@@ -157,7 +156,7 @@ En el dibujo original, B es la cima pequeña, D inicia una meseta y E es la cima
 
 Desde Y, **alcanzar E requiere poder atravesar o saltar la meseta**. Si se permiten movimientos laterales y se logra cruzarla, puede continuar hasta E; no está garantizado solo por permitir empates. La diapositiva no especifica tamaño del paso, vecindario ni desempate, por lo que no determina una única trayectoria formal.
 
-> [!tip] 💎 Gem · “Ya no puedo mejorar” es una afirmación local
+> [!tip]  “Ya no puedo mejorar” es una afirmación local
 > Hill climbing demuestra que sus movimientos inmediatos no mejoran el estado. No demuestra que ya encontró la mejor configuración del problema.
 
 ## 4. Búsqueda tabú: memoria para no regresar inmediatamente
@@ -202,7 +201,7 @@ En F, su único vecino E está tabú. Para este ejemplo paramos y devolvemos E. 
 
 Un **criterio de aspiración** puede permitir un movimiento tabú si mejora el récord global. La **intensificación** concentra esfuerzos en regiones prometedoras; la **diversificación** dirige la búsqueda hacia regiones menos exploradas.
 
-> [!tip] 💎 Gem · Memoria y récord cumplen tareas distintas
+> [!tip]  Memoria y récord cumplen tareas distintas
 > La lista tabú ayuda a decidir adónde ir; `mejor` conserva qué devolver. Aceptar un estado peor puede servir para explorar sin perder el mejor resultado encontrado.
 
 **Limitaciones:** una memoria corta puede permitir ciclos posteriores; una muy larga puede bloquear movimientos útiles. No garantiza optimalidad con un presupuesto finito.
@@ -422,7 +421,7 @@ flowchart LR
 
 Si maximizamos aptitud, gana el **mayor** valor. El torneo es aleatorio por la elección de participantes, aunque el ganador entre ellos se elija determinísticamente. Aumentar su tamaño suele aumentar la presión de selección; con tamaño 1, el padre es simplemente el participante aleatorio.
 
-> [!tip] 💎 Gem · Seleccionar no es ordenar toda la población
+> [!tip]  Seleccionar no es ordenar toda la población
 > Un torneo puede elegir a alguien que no sea el mejor global. Esa posibilidad ayuda a mantener variedad de padres.
 
 ## 9. Representación: cromosoma, gen y alelo
@@ -460,7 +459,7 @@ Si la aptitud es contar unos, los padres valen 3 y 3; los hijos valen 6 y 0. **L
 
 En cruza de dos puntos intercambiamos el segmento entre dos cortes. Con más puntos alternamos el origen de los segmentos. El número de cortes y su posición modifican qué bloques de información se conservan.
 
-> [!tip] 💎 Gem · Recombinar no garantiza mejorar
+> [!tip]  Recombinar no garantiza mejorar
 > La cruza produce candidatos. Solo la evaluación permite saber si la combinación sirve para el objetivo.
 
 ## 11. Mutación: introducir variación nueva
@@ -491,7 +490,7 @@ $$
 
 El resto de las veces se mutan dos o más. $1/L$ es una elección inicial, no una constante universal; con cromosomas cortos ni siquiera es una probabilidad especialmente pequeña.
 
-> [!tip] 💎 Gem · Cruza combina; mutación puede recuperar valores ausentes
+> [!tip]  Cruza combina; mutación puede recuperar valores ausentes
 > Si todos los individuos tienen 0 en una posición, la cruza por segmentos no crea un 1 allí. La mutación puede hacerlo y ayudar a recuperar diversidad.
 
 ## 12. Una generación genética completa, con números
@@ -535,7 +534,7 @@ La clase sugiere tabú y recocido para problemas discretos/combinatorios, y evol
 
 **Ejemplo intuitivo, no demostración:** si sabemos que las configuraciones parecidas suelen tener calidades parecidas, la búsqueda local puede aprovechar esa estructura. Si no existe esa relación, el supuesto de que conviene explorar cerca del mejor estado pierde utilidad.
 
-> [!tip] 💎 Gem · Elegir un algoritmo es elegir qué estructura aprovechar
+> [!tip]  Elegir un algoritmo es elegir qué estructura aprovechar
 > El teorema no dice que todos rindan igual en tu problema. Invita a justificar los supuestos y comparar con datos de la familia de problemas que realmente importa.
 
 Para una comparación útil: mismo presupuesto de evaluaciones, varias semillas cuando hay azar, mismas instancias y registro de mejor valor, variabilidad, factibilidad, tiempo y memoria. Una ejecución afortunada no basta para declarar un ganador.

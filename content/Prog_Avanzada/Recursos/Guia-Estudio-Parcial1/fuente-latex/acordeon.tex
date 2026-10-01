@@ -1,0 +1,226 @@
+% Formulario de una hoja (frente) + soluciones del examen anterior (reverso)
+\documentclass[9pt,letterpaper]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-noshorthands,es-nodecimaldot,es-tabla]{babel}
+\usepackage{kpfonts}
+\usepackage[margin=1.05cm]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{listings}
+
+\definecolor{azul}{HTML}{1F4E79}
+\definecolor{verde}{HTML}{2E6B30}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1.6pt}
+\setlength{\columnsep}{9pt}
+\setlength{\columnseprule}{0.3pt}
+\def\columnseprulecolor{\color{gray!50}}
+\setlist{nosep,leftmargin=10pt}
+\setlength{\abovedisplayskip}{2pt}\setlength{\belowdisplayskip}{2pt}
+\setlength{\abovedisplayshortskip}{1pt}\setlength{\belowdisplayshortskip}{1pt}
+
+\newcommand{\hoare}[3]{\{#1\}\,#2\,\{#3\}}
+\newcommand{\asg}{\mathrel{:=}}
+\newcommand{\kw}[1]{\mathbf{#1}}
+\newcommand{\bloque}[1]{\par\vspace{3pt}{\color{white}\colorbox{azul}{\parbox{\dimexpr\linewidth-2\fboxsep}{\bfseries\small #1}}}\par\vspace{1pt}}
+\newcommand{\secv}[1]{\par\vspace{4pt}{\color{white}\colorbox{verde}{\parbox{\dimexpr\linewidth-2\fboxsep}{\bfseries #1}}}\par\vspace{2pt}}
+\newcommand{\regla}[2]{\dfrac{#1}{#2}}
+
+\lstset{basicstyle=\ttfamily\scriptsize,columns=fullflexible,keepspaces=true,
+  frame=single,framerule=0.3pt,rulecolor=\color{gray!60},xleftmargin=2pt,xrightmargin=2pt,
+  aboveskip=2pt,belowskip=2pt,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {É}{{\'E}}1 {ñ}{{\~n}}1}
+
+\raggedcolumns
+\begin{document}
+% ======================================================= FRENTE
+{\color{azul}\large\bfseries Programación Avanzada — Formulario del primer parcial}\hfill{\small Prof. G. Márquez · PCIC UNAM 2026-1}\\[-4pt]
+{\color{azul}\rule{\linewidth}{0.8pt}}
+\vspace{-6pt}
+\begin{multicols}{3}
+\small
+
+\bloque{1. Fundamentos}
+\textbf{Algoritmo:} pasos finitos y definidos que terminan. \textbf{Programa} = algoritmo en un lenguaje. Wirth: \emph{algoritmos + estructuras de datos = programas}.\\
+\textbf{Gramática} $G=(V,T,S,P)$; $L(G)=\{w\in T^*\mid S\Rightarrow^*w\}$. Chomsky: 0 irrestricta, 1 sensible al contexto, 2 libre de contexto ($A\to\alpha$), 3 regular ($A\to aB\mid a$). $a^nb^n$: tipo 2.\\
+\textbf{Paradigmas:} imperativo (\emph{cómo}: C, Pascal, Java) vs.\ declarativo (\emph{qué}): funcional (Haskell, Lisp) y lógico (Prolog). Compilado/interpretado depende de la implementación.\\
+\textbf{Böhm–Jacopini:} secuencia, selección, iteración bastan.\\
+\textbf{Métricas de módulos:} \emph{cohesión} (relación interna; alta) y \emph{acoplamiento} (dependencia entre módulos; bajo); eficiencia: tiempo y memoria; corrección parcial/total.\\
+\textbf{MVC:} controlador (coordina), modelo (datos y lógica), vista (presentación).
+
+\bloque{2. Divide y vencerás}
+Si $P$ es simple $\to$ \texttt{solucion\_simple(P)}; si no, descomponer en $P_1..P_k$ \emph{semejantes y menores}, $S_i=\mathrm{DyV}(P_i)$, \texttt{combinar(S1..Sk)}. Termina porque el tamaño decrece.\\
+$T(n)=aT(n/b)+f(n)$:\
+$T(n/2)+1\to\log n$ (búsq.\ binaria, llamar con $m\pm1$, caso vacío $izq>der$);\
+$2T(n/2)+1\to n$ (máximo, suma);\
+$2T(n/2)+n\to n\log n$ (mergesort; QuickSort balanceado);\
+$T(n-1)+n\to n^2$ (QuickSort peor caso);\
+$4T(n/2)+n\to n^2$;\ $3T(n/2)+n\to n^{1.585}$ (Karatsuba).\\
+\textbf{QuickSort} (Qsort.PAS): pivote $x=a[(l+r)\,\mathrm{div}\,2]$; $i$ avanza mientras $a[i]<x$, $j$ retrocede mientras $x<a[j]$; si $i\le j$ intercambia; al cruzar: \texttt{Sort(l,j)}, \texttt{Sort(i,r)}. Pivote central $\ne$ partición equilibrada.\\
+\textbf{Enteros grandes:} $u=Bw+x$, $v=By+z$, $uv=B^2wy+B(wz+xy)+xz$; Karatsuba: $wz+xy=(w+x)(y+z)-wy-xz$.
+
+\bloque{3. Backtracking}
+Árbol de soluciones parciales en profundidad: \emph{seleccionar opción $\to$ Aceptable (poda) $\to$ anotar $\to$ ¿completa? $\to$ Backtracking($i+1$) $\to$ cancelar anotación}.
+\begin{itemize}
+\item \textbf{Una:} \texttt{Hasta Éxito o NoQuedanOpciones}.
+\item \textbf{Todas:} \texttt{Hasta NoQuedanOpciones}; \texttt{ApuntarSoluciónCompleta}.
+\item \textbf{Mejor:} explora todo; \texttt{Si EsMejorSolución} guarda; con cota $\to$ branch and bound.
+\end{itemize}
+Sin poda: $O(b^d)$ nodos.\\
+\textbf{8 reinas:} una por fila, $sol[k]=j$; ocupados: columna $j$, diagonales $j-k$ y $j+k$. 92 soluciones (12 fundamentales); 4 reinas: $[2,4,1,3],[3,1,4,2]$.\\
+\textbf{Cuadro mágico:} $M_n=\frac{n(n^2+1)}2$: 15, 34, 65, 111. \emph{Siamés} ($n$ impar): 1 al centro arriba; sig.\ arriba-derecha con envoltura; si ocupada, abajo. $3\times3$: filas 8\,1\,6 / 3\,5\,7 / 4\,9\,2. \emph{$n\equiv0\ (4)$:} llenar $1..n^2$ y cambiar $x\mapsto n^2+1-x$ fuera de las diagonales de cada bloque $4\times4$.
+
+\columnbreak
+\bloque{4. Lógica de Hoare}
+$\hoare{P}{C}{Q}$: si $C$ inicia en $P$ \emph{y termina}, acaba en $Q$. \textbf{Total} = parcial + terminación (sin ciclos/recursión: parcial $\Rightarrow$ total).\\
+\textbf{Fuerza:} $R$ más fuerte que $S$ si $R\Rightarrow S$. $\bot\Rightarrow x=15\Rightarrow x>10\Rightarrow x>0\Rightarrow\top$; $\{\ \}\equiv\top$.\\
+\textbf{Asignación:} $\hoare{Q[E/V]}{V\asg E}{Q}$ (+ dominio: divisor $\ne0$). Ej.: $\hoare{i<3}{i\asg2i}{i<6}$; $\hoare{x>0}{x\asg1/x}{x\ge0}$.
+\[\regla{P_1\Rightarrow P\ \ \hoare{P}{C}{Q}}{\hoare{P_1}{C}{Q}}\qquad\regla{\hoare{P}{C}{Q}\ \ Q\Rightarrow Q_1}{\hoare{P}{C}{Q_1}}\]
+\[\regla{\hoare{P_1}{C}{Q_1}\ \hoare{P_2}{C}{Q_2}}{\hoare{P_1\land P_2}{C}{Q_1\land Q_2}}\ (\text{igual con }\lor)\]
+\textbf{Composición:} $\regla{\hoare{P}{C_1}{R}\quad\hoare{R}{C_2}{Q}}{\hoare{P}{C_1;C_2}{Q}}$; se calcula \emph{hacia atrás}: $\hoare{x>4}{x\asg x+1;\,y\asg2x}{y>10}$.\\
+\textbf{Invariante de bloque:} $\hoare{I}{C}{I}$ (se conserva la relación). Ej.\ $r=2^i$ con $i\asg i+1;\,r\asg2r$.
+\[\regla{\hoare{P\land B}{C_1}{Q}\quad P\land\neg B\Rightarrow Q}{\hoare{P}{\kw{if}\,B\,\kw{then}\,C_1}{Q}}\]
+\[\regla{\hoare{P\land B}{C_1}{Q}\quad \hoare{P\land\neg B}{C_2}{Q}}{\hoare{P}{\kw{if}\,B\,\kw{then}\,C_1\,\kw{else}\,C_2}{Q}}\]
+\textbf{Rama inalcanzable:} si $P\land B\equiv\bot$, $\hoare{\bot}{C}{Q}$ vale por vacuidad ($\bot\Rightarrow$ todo).\\
+\textbf{Plantilla if:} (1) escribir $P,B,Q$; (2) rama V: $wp(C_1,Q)$ y $P\land B\Rightarrow wp$; (3) rama F con $\neg B$; (4) regla condicional; (5) sin ciclos $\Rightarrow$ total.
+
+\bloque{5. Ciclos e inducción}
+\textbf{While $B$ do $C$:} (i) $P\Rightarrow I$; (ii) $\hoare{I\land B}{C}{I}$; (iii) $I\land\neg B\Rightarrow Q$; (iv) variante $V\in\mathbb N$ estrictamente decreciente.\\
+\textbf{Inducción:} base $P(0)$ (antes de iterar) + paso $P(n)\Rightarrow P(n+1)$ (una iteración conserva).\\
+\textbf{Hallar $I$:} trazar $n=0..3$, escribir $x_n$ en función de $n$, eliminar $n$, nombrar valores originales ($M_0$).\\[1pt]
+{\renewcommand{\arraystretch}{1.1}\footnotesize
+\begin{tabular}{@{}l@{\ }l@{\ }l@{}}
+Programa & Invariante & Variante\\\hline
+\texttt{Cuadrado(A)} & $C=DA$ & $A-D$\\
+Potencia $R\cdot N$, $M\!-\!1$ & $RN^M=N^{M_0}$ & $M$\\
+\texttt{for i<10: j--} & $i+j=9$ & $10-i$\\
+suma $1..n$ & $s=\frac{i(i+1)}2$ & $n-i$\\
+división por restas & $a=qb+r\land r\ge0$ & $r$\\
+factorial & $f=i!$ & $n-i$
+\end{tabular}}
+
+\columnbreak
+\bloque{6. McCarthy y Ackermann}
+$f(x)=x-10$ si $x>100$; $f(f(x+11))$ si $x\le100$. $f(99)=f(f(110))=f(100)=f(f(111))=f(101)=91$.\\
+\textbf{Inducción modificada:} $P(k)$ y, $\forall n<k$: [$P(m)\ \forall m\in(n,k]$] $\Rightarrow P(n)$; entonces $P(n)\ \forall n\le k$.\\
+\textbf{Prueba $f(x)=91$}, $k=100$: base $f(100)=f(111\!\to\!101)=91$. Paso ($x<100$): (a) $x+11>100$: $f(x)=f(x+1)=91$; (b) $x+11\le100$: $f(x)=f(f(x+11))=f(91)=91$ (ambos en $(x,100]$).\\
+\textbf{Ackermann:} $A(0,y)=y+1$; $A(x+1,0)=A(x,1)$; $A(x+1,y+1)=A(x,A(x+1,y))$.\\
+$A(1,z)=z+2$, $A(2,z)=2z+3$, $A(3,z)=2^{z+3}-3$, $A(4,z)$: torre de $z+3$ doses $-3$ ($A(4,1)=65533$). Ej.\ $A(2,n+1)=A(1,A(2,n))=2n+5$.\\
+\textbf{Hoare:} $\hoare{x=1}{w\asg A(x,y)}{w=y+2}$: asignación + lema + consecuencia.
+
+\bloque{7. Prolog y resolución}
+Regla \texttt{a :- b1,..,bm.} $\equiv b_1\land..\land b_m\to a\equiv a\lor\neg b_1\lor..\lor\neg b_m$ (Horn definida). Hecho: $a\leftarrow\top$. Meta \texttt{?- a1,..,an} $\equiv\neg A_1\lor..\lor\neg A_n$.\\
+\textbf{Resolución:} $\regla{C\lor L\quad D\lor\neg L'}{(C\lor D)\theta}$, $\theta=\mathrm{UMG}(L,L')$. \textbf{Refutación:} $S\cup\{\neg F\}\vdash\square\Rightarrow S\models F$.\\
+\textbf{Paso SLD:} $\leftarrow A_1..A_k..A_n$ + regla $A\leftarrow B_1..B_m$, $\theta=\mathrm{UMG}(A,A_k)$ $\Rightarrow$ $\leftarrow(A_1..A_{k-1},B_1..B_m,A_{k+1}..A_n)\theta$. Éxito: $\square$. S = selección, L = lineal, D = definidas. Renombrar variables.\\
+\textbf{Unificación:} $p(X,b)\sim p(a,Y)$: $\{X/a,Y/b\}$; $p(X,X)\not\sim p(a,b)$; $X\not\sim f(X)$.\\
+\textbf{Sintaxis:} \texttt{,} y; \texttt{;} o / otra respuesta (backtracking); \texttt{\textbackslash+} negación como falla; \texttt{!} corte (elimina puntos de elección); \texttt{is} evalúa; \texttt{=} unifica; \texttt{=:=} compara. \texttt{X = 2+3} $\to$ \texttt{2+3}; \texttt{X is 2+3} $\to$ 5. Mayúscula o \texttt{\_} = variable (\texttt{Maria} $\ne$ \texttt{maria}). \texttt{recibe (X)} con espacio: error.\\
+\textbf{Corte verde} (solo eficiencia, \texttt{mayor}) vs.\ \textbf{rojo} (cambia respuestas, \texttt{max}): \texttt{max(3,5,3)} da \texttt{true} $\to$ usar \texttt{max(X,Y,Z) :- X<Y, !, Z=Y.}
+\begin{lstlisting}
+factorial(0,1) :- !.
+factorial(N,F) :- N>0, N1 is N-1,
+    factorial(N1,F1), F is N*F1.
+\end{lstlisting}
+\end{multicols}
+
+\newpage
+% ======================================================= REVERSO
+\lstset{basicstyle=\ttfamily\footnotesize}
+{\color{verde}\large\bfseries Soluciones del primer parcial del año pasado}\hfill{\small Programación Avanzada · Prof. G. Márquez}\\[-4pt]
+{\color{verde}\rule{\linewidth}{0.8pt}}
+\vspace{-6pt}
+\begin{multicols}{2}
+
+\secv{1. Demostrar que $\hoare{a<b}{\kw{if}\ (a>b)\ \kw{then}\ m\asg a\ \kw{else}\ m\asg b}{m=b}$ es válida}
+$P: a<b$,\quad $B: a>b$,\quad $Q: m=b$. Por la regla del \textbf{if}–\textbf{else} basta probar (1) $\hoare{P\land B}{m\asg a}{Q}$ y (2) $\hoare{P\land\neg B}{m\asg b}{Q}$.
+
+\textbf{(1) Rama verdadera.} $P\land B\equiv a<b\land a>b\equiv\bot$: ningún estado la satisface, la rama es \emph{inalcanzable}. Formalmente, por asignación $\hoare{a=b}{m\asg a}{m=b}$ (sustituir $m$ por $a$ en $m=b$) y, como $\bot\Rightarrow a=b$, por fortalecimiento de la precondición:
+\[\hoare{a<b\land a>b}{m\asg a}{m=b}\ \text{ es válida (por vacuidad).}\]
+
+\textbf{(2) Rama falsa.} $P\land\neg B\equiv a<b\land a\le b\equiv a<b$. Por asignación, $(m=b)[b/m]\equiv b=b\equiv\top$: $\hoare{\top}{m\asg b}{m=b}$. Como $a<b\Rightarrow\top$, por consecuencia:
+\[\hoare{a<b\land\neg(a>b)}{m\asg b}{m=b}.\]
+
+\textbf{Conclusión.} Regla condicional:
+\[\regla{\hoare{a<b\land a>b}{m\asg a}{m=b}\qquad\hoare{a<b\land\neg(a>b)}{m\asg b}{m=b}}{\hoare{a<b}{\kw{if}\,(a>b)\,\kw{then}\,m\asg a\,\kw{else}\,m\asg b}{m=b}}\]
+Sin ciclos ni recursión, termina: \textbf{corrección total}. $\blacksquare$\\
+\emph{Intuición:} si $a<b$ la guarda es falsa, siempre se ejecuta $m\asg b$. \emph{Error a evitar:} suponer $a>b$ y tratar de obtener $m=b$; hay que reconocer que esa rama no ocurre.
+
+\secv{2. ¿Qué métricas de módulos existen para medir su eficiencia?}
+\textbf{Diseño modular (visto en clase):}
+\begin{itemize}
+\item \textbf{Cohesión:} qué tan relacionadas están las responsabilidades internas del módulo. Se busca \emph{alta}: fácil de nombrar, entender, probar y reutilizar.
+\item \textbf{Acoplamiento:} cuánto depende un módulo de otros. Se busca \emph{bajo}: cambiar uno sin afectar a los demás.
+\end{itemize}
+Meta: \textbf{alta cohesión y bajo acoplamiento}.\\
+\textbf{Eficiencia:} \emph{tiempo de ejecución} (complejidad temporal, p.\,ej.\ $O(n\log n)$) y \emph{uso de memoria} (complejidad espacial).\\
+\textbf{Corrección:} si es correcto (parcial) y si termina (total).\\
+\emph{Complemento:} complejidad ciclomática de McCabe, líneas de código, \emph{fan-in/fan-out}; tipos de cohesión (funcional $\dots$ coincidental) y de acoplamiento (de datos $\dots$ de contenido).
+
+\secv{3. Algoritmo de Divide y vencerás en seudocódigo}
+\begin{lstlisting}
+Funcion Divide_y_Venceras( P : Problema ): Solución
+{ Devuelve la solución del problema P }
+Inicio
+  Si P es suficientemente pequeño o simple
+    Entonces devolver( solucion_simple( P ) )
+  Si_No
+    descomponer P en k partes( P1, P2, ..., Pk );
+    Para( i = 1; i <= k; i++ )
+      Si = Divide_y_Venceras( Pi );
+    devolver( combinar( S1, S2, ..., Sk ) );
+Fin
+\end{lstlisting}
+\textbf{Condiciones:} subproblemas semejantes y de menor tamaño; caso base directo; combinación eficiente; cada llamada reduce el tamaño (terminación). Costo $T(n)=aT(n/b)+f(n)$. Ejemplos: QuickSort, búsqueda binaria, mergesort, multiplicación de enteros grandes.
+
+\columnbreak
+\secv{4. Demostrar que el invariante es $i+j=9$}
+\begin{lstlisting}
+int j = 9;
+for( int i=0; i<10; i++ )  j--;
+\end{lstlisting}
+Equivale a \texttt{j:=9; i:=0; while i<10 do \{ j:=j-1; i:=i+1 \}}. Sean $i_n,j_n$ los valores tras $n$ iteraciones; traza $(0,9),(1,8),(2,7),\dots$ \ $P(n): i_n+j_n=9$.
+
+\textbf{Caso base} ($n=0$): $i_0=0$, $j_0=9$, $i_0+j_0=9$. \checkmark
+
+\textbf{Hipótesis de inducción:} $i_n+j_n=9$.
+
+\textbf{Paso inductivo:} si $i_n<10$, el cuerpo da $j_{n+1}=j_n-1$, $i_{n+1}=i_n+1$:
+\[i_{n+1}+j_{n+1}=(i_n+1)+(j_n-1)=i_n+j_n\overset{\text{H.I.}}{=}9.\]
+Por inducción, $i+j=9$ se cumple tras cualquier número de iteraciones: es invariante. $\blacksquare$
+
+\emph{Forma Hoare:} $\hoare{i+j=9\land i<10}{j\asg j-1;\ i\asg i+1}{i+j=9}$: hacia atrás, por $i\asg i+1$: $i+1+j=9$; por $j\asg j-1$: $i+j=9$. \checkmark
+
+\textbf{Salida:} también $0\le i\le10$ es invariante; al salir $\neg(i<10)\Rightarrow i=10$ y $j=9-10=-1$.\\
+\textbf{Terminación:} variante $10-i$ (entera, $\ge0$, baja 1 por vuelta): 10 iteraciones, corrección total.
+
+\secv{5. Backtracking para buscar la mejor solución}
+Construye la solución por \textbf{etapas} $i$: prueba cada opción, anota solo las \emph{aceptables} (poda), avanza a $i+1$ y al volver cancela la anotación para probar la siguiente (vuelta atrás). Recorre en profundidad el árbol de soluciones parciales.
+\begin{lstlisting}
+Funcion Backtracking( Etapa i, solucionMejor ) devuelve: boolean
+Inicio
+  Éxito = falso;
+  IniciarOpciones( i, GrupoOpciones o );
+  Repetir
+    SeleccionarNuevaOpcion( o, Opcion n );
+    Si ( Aceptable( n ) ) entonces
+      AnotarOpcion( i, n );
+      Si SolucionCompleta( i ) entonces
+        Éxito = verdadero;
+        Si EsMejorSolucion( solucionActual, solucionMejor ) entonces
+          ApuntarSolucionActual();     // solucionMejor := actual
+        finsi;
+      Sino
+        Éxito = Backtracking( i+1, solucionMejor );
+        Si Éxito = falso entonces cancelamosAnotacion( i, n ); finsi;
+      Finsi;
+    Finsi;
+  Hasta ( NoQuedanOpciones( o ) );    // no para al primer éxito
+  Retorna Éxito;
+Fin
+\end{lstlisting}
+\textbf{Diferencias:} \emph{una solución} termina con \texttt{Hasta (Éxito = verdadero) o NoQuedanOpciones}; \emph{todas} recorre todo y guarda cada una (\texttt{ApuntarSoluciónCompleta}); \emph{la mejor} recorre todo y conserva solo la mejor según un \textbf{criterio de calidad} (\texttt{EsMejorSolucion}). Si se podan ramas cuya cota no puede superar a la mejor actual: \emph{branch and bound}. Para seguir explorando tras registrar una solución hay que deshacer la anotación. Sin poda: $O(b^d)$.
+\end{multicols}
+\end{document}
