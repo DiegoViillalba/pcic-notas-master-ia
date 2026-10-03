@@ -1,142 +1,274 @@
-\documentclass[8pt,a4paper]{extarticle}
+\documentclass[10pt,a4paper]{extarticle}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[spanish,es-noshorthands]{babel}
+\usepackage[spanish,es-noshorthands,es-nodecimaldot]{babel}
 \usepackage{lmodern}
-\usepackage[margin=0.7cm]{geometry}
-\usepackage{amsmath,amssymb,multicol,enumitem,xcolor}
+\usepackage[margin=0.65cm]{geometry}
+\usepackage{amsmath,amssymb,multicol,enumitem,xcolor,array,booktabs}
+\usepackage[most]{tcolorbox}
 \definecolor{azul}{HTML}{1F4E79}
+\definecolor{azulclaro}{HTML}{E8F0F8}
+\definecolor{naranja}{HTML}{B85C00}
 \pagestyle{empty}
-\setlength{\parindent}{0pt}\setlength{\parskip}{1pt}
+\setlength{\parindent}{0pt}\setlength{\parskip}{0.8pt}
 \setlist{nosep,leftmargin=1em}
-\setlength{\columnsep}{0.35cm}\setlength{\columnseprule}{0.2pt}
-\newcommand{\T}[1]{\par\smallskip{\color{azul}\bfseries\MakeUppercase{#1}}\par}
+\setlength{\columnsep}{0.32cm}\setlength{\columnseprule}{0.2pt}
+\renewcommand{\arraystretch}{1.05}
+\newcommand{\T}[1]{\par\vspace{2.5pt}{\color{white}\colorbox{azul}{\parbox{\dimexpr\linewidth-2\fboxsep}{\bfseries\MakeUppercase{#1}}}}\par\vspace{1pt}}
+\newcommand{\st}[1]{{\color{azul}\bfseries #1}}
+\newcommand{\ojo}[1]{{\color{naranja}\bfseries #1}}
 \newcommand{\imp}{\Rightarrow}\newcommand{\sii}{\Leftrightarrow}
 \newcommand{\p}[1]{\ensuremath{\textit{#1}}}
+\newtcolorbox{caja}{colback=azulclaro,colframe=azul,boxrule=0.4pt,arc=1pt,left=2pt,right=2pt,top=1pt,bottom=1pt}
 \begin{document}
+% =============================== FRENTE ===============================
 \begin{multicols*}{3}
-{\large\bfseries\color{azul} IA · Examen 1 · Hoja de notas}\par
+{\large\bfseries\color{azul} IA · Examen 1 · Formulario (frente)}\par
 
-\T{Plantilla: modelar un ambiente}
-\textbf{PEAS}: desempeño, entorno, actuadores, sensores. \textbf{Estados, perceptos, acciones.}
-Propiedades (justifica cada una): totalmente/parcialmente observable; uno/multiagente (cooperativo,
-competitivo); determinista/estocástico; episódico/secuencial; estático/dinámico; discreto/continuo;
-conocido/desconocido. Mundo real (taxis, bicis, robots): parcial, multi, estocástico, secuencial,
-dinámico, continuo (discretizar en zonas/intervalos).
-Agente racional: maximiza el desempeño \emph{esperado} dadas las percepciones (no es omnisciencia).
-Reflejo (regla condición–acción) vs.\ planea («qué pasa si», modelo + meta).
+\T{Agentes y modelado del ambiente}
+\st{Agente racional}: elige la acción que maximiza el desempeño \emph{esperado} dada la secuencia de
+percepciones y su conocimiento (no es omnisciente: lo esperado, no lo real).
+\st{PEAS}: \emph{P}erformance (desempeño), \emph{E}nvironment, \emph{A}ctuadores, \emph{S}ensores.
+\st{Modelar}: estados, perceptos, acciones, transición, desempeño.
+\st{Propiedades} (justificar cada una en 1 línea):
+\begin{itemize}
+\item observable total / \emph{parcial} (¿el sensor ve todo el estado relevante?)
+\item un agente / \emph{multiagente} (cooperativo, competitivo)
+\item determinista / \emph{estocástico} (¿el resultado de la acción es seguro?)
+\item episódico / \emph{secuencial} (¿la decisión afecta el futuro?)
+\item estático / \emph{dinámico} (¿cambia mientras el agente piensa?)
+\item discreto / \emph{continuo}; conocido / desconocido
+\end{itemize}
+Mundo real (taxis, bicis, robots): parcial, multi, estocástico, secuencial, dinámico, continuo (discretizar).
+\st{Tipos}: reflejo (regla condición–acción, sin consecuencias), con modelo, basado en metas
+(«¿qué pasa si…?»), basado en utilidad. Cuatro enfoques: pensar/actuar × humano/racional; el curso:
+\emph{actuar racionalmente}. Turing (conducta), cuarto chino (sintaxis $\ne$ semántica; IA fuerte vs débil).
 
-\T{Plantilla: reformular como juego}
-Jugadores; estado (incluye a todos); turnos (simultáneos $\to$ alternados); acciones; transición
-(¿azar?); terminal; utilidades. ¿Suma cero? ¿Información perfecta? \emph{Minimax}: rival óptimo y hostil,
-peor caso, conservador. \emph{Expectimax}: rival/entorno probabilístico, maximiza lo esperado.
-\emph{Expectiminimax}: decisiones propias (max), rival (min) y azar ($\sum p$). Árbol grande: profundidad
-límite + \textsc{Eval}, alfa-beta, profundización iterativa. $n$ jugadores: vectores, cada uno maximiza su
-componente; alianzas.
+\T{Reformular como juego}
+Jugadores · estado (todos) · turno (simultáneo $\to$ alternado) · acciones · transición (¿azar?) ·
+terminal · utilidad. ¿Suma cero? ¿Info.\ perfecta?
+\st{Minimax}: rival óptimo y hostil, peor caso, conservador. \st{Expectimax}: rival o entorno
+probabilístico, maximiza lo esperado (racional si el rival no es malicioso). \st{Expectiminimax}: max + min + azar.
+Árbol grande: profundidad límite + \textsc{Eval}, alfa-beta, profundización iterativa.
+$n$ jugadores: tuplas, cada uno maximiza su componente; alianzas.
 
-\T{Formular búsqueda}
-Estado, inicial, $\textsc{Acciones}(s)$, $\textsc{Resultado}(s,a)$, meta, costo. Completitud de la formulación:
-biyección entre soluciones y caminos. Tamaño: $|S|$, $b$, cota de $d$, BFS genera $O(b^d)$.
-Repetidos: búsqueda en grafo (explorados), no pierde óptimo porque el costo futuro depende solo del estado.
+\T{Formular un problema de búsqueda}
+Estado · inicial · $\textsc{Acciones}(s)$ · $\textsc{Resultado}(s,a)$ · meta · costo $c(s,a,s')$.
+Tamaño $|S|$; $b$ = ramificación; $d$ = prof.\ solución; $m$ = prof.\ máx.; BFS genera $O(b^d)$.
+Repetidos $\Rightarrow$ búsqueda en grafo (explorados); no pierde el óptimo: el costo futuro solo depende del estado.
+Árbol vs grafo: un grafo finito con ciclos da un árbol infinito.
 
-\T{No informada} {\footnotesize
-\begin{tabular}{@{}lllll@{}}
- & Compl. & Ópt. & Tiempo & Espacio\\\hline
+\T{Búsqueda no informada}
+{\footnotesize
+\begin{tabular}{@{}l@{\;\;}l@{\;\;}l@{\;\;}l@{\;\;}l@{}}
+\toprule
+ & Compl. & Ópt. & Tiempo & Espacio\\\midrule
 BFS & sí & c.\,unif. & $b^d$ & $b^d$\\
-UCS & sí ($\epsilon>0$) & sí & $b^{1+\lfloor C^*/\epsilon\rfloor}$ & ídem\\
+UCS & sí ($\epsilon{>}0$) & sí & $b^{1+\lfloor C^*/\epsilon\rfloor}$ & ídem\\
 DFS & no & no & $b^m$ & $bm$\\
 IDS & sí & c.\,unif. & $b^d$ & $bd$\\
-Bidir. & sí & sí* & $b^{d/2}$ & $b^{d/2}$
+Bidir. & sí & sí & $b^{d/2}$ & $b^{d/2}$\\\bottomrule
 \end{tabular}}
-Frontera: FIFO, prioridad $g$, LIFO. UCS/A*: meta al \emph{extraer}. IDS: $db+(d-1)b^2+\dots+b^d$
-($b{=}10,d{=}5$: 123\,450 vs 111\,110).
+Frontera: BFS cola FIFO; UCS prioridad $g$; DFS pila LIFO; A* prioridad $g+h$.
+\ojo{UCS/A*: prueba de meta al EXTRAER}, no al generar. IDS: $db+(d-1)b^2+\dots+b^d$
+($b{=}10,d{=}5$: 123\,450 vs BFS 111\,110). BFS $\subset$ UCS (costos iguales); UCS = A* con $h{=}0$;
+DFS = primero-el-mejor con $f{=}-$prof.
 
 \T{A* y heurísticas}
-$f=g+h$; voraz $f=h$ (no óptima; en árbol puede ciclar); $w$A*: $f=g+wh$, costo $\le wC^*$.
-\textbf{Admisible} $0\le h\le h^*$. \textbf{Consistente} $h(n)\le c(n,a,n')+h(n')$, $h(G)=0$.
-Consistente $\Rightarrow$ admisible (inducción sobre el camino). Consistente $\Rightarrow$ $f$ no decrece
-$\Rightarrow$ al extraer $n$, $g(n)=g^*(n)$ $\Rightarrow$ sin reexpansiones, óptimo en grafo.
-\textbf{Árbol + admisible = óptimo}: ancestro $n$ de la meta óptima en frontera: $f(n)\le C^*<f(G_2)$.
-\textbf{Grafo + inconsistente}: puede cerrar un nodo con $g$ subóptimo. Síntoma: $f$ baja al avanzar.
-Arreglos: reabrir nodos cerrados, búsqueda en árbol, pathmax $f(n')=\max(f(n'),f(n))$, hacer $h$ consistente.
-Revisar consistencia: \emph{arco por arco}; admisibilidad: calcular $h^*$ hacia atrás desde $G$.
-Relajación $\Rightarrow$ admisible y consistente. 8-puzzle: $h_1$ (teletransporte), $h_2$ Manhattan
-(mover a adyacente aunque esté ocupada); $h_2\ge h_1$ domina: expande $\subseteq$ (A* expande todo $f<C^*$).
-$\max(h_1,h_2)$ admisible/consistente; $h_1+h_2$ \emph{no}. $b^*$: $N+1=\sum_{i=0}^d (b^*)^i$.
-Bidireccional (Dijkstra): parar si $\mu\le g^F_{\min}+g^B_{\min}$; $f^F_{\min}+f^B_{\min}$ NO vale. MM: $pr=\max(f,2g)$, no expande $g>C^*/2$.
+$f(n)=g(n)+h(n)$. Voraz: $f=h$ (no óptima, en árbol cicla). $w$A*: $f=g+wh$, costo $\le wC^*$.
+\begin{caja}
+\st{Admisible}: $0\le h(n)\le h^*(n)$ (nunca sobreestima).\\
+\st{Consistente}: $h(n)\le c(n,a,n')+h(n')$ $\forall$ arco, y $h(\text{meta})=0$.\\
+Consistente $\Rightarrow$ admisible. Consistente $\Rightarrow$ $f$ no decrece $\Rightarrow$ al extraer, $g=g^*$
+$\Rightarrow$ sin reexpansiones; A* en grafo óptimo.\\
+Árbol + admisible $\Rightarrow$ óptimo: ancestro $n$ en frontera, $f(n)\le C^*<f(G_2)$.
+\end{caja}
+\st{Revisar}: $h^*$ hacia atrás desde $G$ (admisible: $h\le h^*$); consistencia \emph{arco por arco}.
+\ojo{Grafo + inconsistente}: un nodo puede cerrarse con $g$ subóptimo (síntoma: $f$ baja). Arreglos:
+reabrir nodos cerrados, búsqueda en árbol, pathmax $f(n')\gets\max(f(n'),f(n))$, $h$ consistente.
+\st{Traza} (tabla): paso | extrae $(g,f)$ | frontera con $f$ | comentario (mejora, descarta, empate).
+\st{Relajación} $\Rightarrow$ admisible y consistente. 8-puzzle: $h_1$ fuera de lugar (teletransporte),
+$h_2$ Manhattan (mover aunque esté ocupada). Dominancia $h_2\ge h_1$: A* expande todo $f<C^*$ $\Rightarrow$
+expande menos. $\max(h_1,h_2)$ sí; $h_1+h_2$ \emph{no} admisible. $b^*$: $N{+}1=\sum_{i=0}^{d}(b^*)^i$.
+\st{Bidireccional}: parar si $\mu\le g^F_{\min}+g^B_{\min}$ (Dijkstra); MM: $pr=\max(f,2g)$, encuentro en $C^*/2$.
 
 \T{CSP}
-$(X,D,C)$; solución = asignación completa y consistente. Backtracking = DFS una variable por nivel
-($d^n$ hojas, no $n!d^n$). FC: poda vecinos del asignado. Arco $X\to Y$ consistente: $\forall x\,\exists y$.
-AC-3: si \textsc{Revise}$(X,Y)$ borra, encolar $(Z,X)$, $Z\ne Y$; $O(cd^3)$. Resultados: dominio vacío /
-todos unitarios / hay que buscar. MRV (falla primero), grado (desempate), LCV (falla al último).
-Árbol: $O(nd^2)$. Arco-consistente $\not\Rightarrow$ solución (triángulo con 2 colores).
-Australia 3 colores: 18 soluciones.
+$(X,D,C)$; solución = completa y consistente. Restricciones: unaria, binaria, global (Alldiff), suave.
+\st{Backtracking}: DFS, 1 variable por nivel ($d^n$ hojas, no $n!d^n$).
+\st{FC}: al asignar $X$, borrar valores incompatibles de sus vecinos.
+\st{Arco} $X\to Y$ consistente: $\forall x\in D_X\ \exists y\in D_Y$ compatible.
+\st{AC-3}: si \textsc{Revise}$(X,Y)$ borra, encolar $(Z,X)$ $\forall Z\ne Y$; $O(cd^3)$.
+Resultado: dominio vacío (sin sol.) / todos unitarios (sol.) / buscar.
+\st{MRV}: menos valores (falla primero); \st{grado}: desempate; \st{LCV}: valor que menos restringe.
+Árbol: $O(nd^2)$. Arco-consistente $\not\Rightarrow$ solución (triángulo, 2 colores).
 
 \T{Búsqueda local}
-Estados completos, memoria $O(1)$, incompleta. Hill climbing: máx.\ locales, mesetas, crestas;
-reinicios: $1/p$ intentos. Tabú: mejor vecino no tabú aunque empeore. Recocido: aceptar peor con
-$e^{\Delta E/T}$ ($\Delta E<0$); $T$ alta = aleatorio, baja = HC. GA: aptitud, selección (proporcional
-$f_i/\sum f$, torneo), cruza en un punto, mutación $P_m\approx1/L$, $P(\text{sin mut.})=(1-P_m)^L$.
-No free lunch. Min-conflicts: bueno en $n$-reinas, malo en Sudoku difícil.
-
+Estados completos, memoria $O(1)$, incompleta. \st{Hill climbing}: máx.\ locales, mesetas, crestas;
+reinicios: $1/p$ intentos. \st{Tabú}: mejor vecino \emph{no tabú} aunque empeore.
+\st{Recocido} (maximizar): $\Delta E=f(n)-f(s)$; si $\Delta E>0$ acepta; si no, con prob.\ $e^{\Delta E/T}$;
+$T\gets\alpha T$. $T$ alta = aleatorio; baja = hill climbing.
+\st{GA}: aptitud, selección ($f_i/\sum f$ o torneo), cruza en un punto, mutación $P_m\approx1/L$;
+$P(\text{sin mutar})=(1-P_m)^L$. No free lunch.
 
 \T{Minimax y alfa-beta}
-$V=\textsc{Util}$ terminal; $\max$ en MAX; $\min$ en MIN. $O(b^m)$ tiempo, $O(bm)$ espacio.
-$\alpha$: mejor de MAX en el camino; $\beta$: mejor de MIN. En MIN: si $v\le\alpha$ podar; en MAX: si $v\ge\beta$
-podar; pasar $(\alpha,\beta)$ hacia abajo, actualizar al regresar. Orden perfecto $O(b^{m/2})$: hojas
-$b^{\lceil m/2\rceil}+b^{\lfloor m/2\rfloor}-1$; aleatorio $O(b^{3m/4})$. Raíz exacta, internos solo cotas.
-\textbf{Evaluación}: $\textsc{Eval}=\sum w_if_i$, rápida, ordena terminales como la utilidad.
-Gato: $3X_2+X_1-(3O_2+O_1)$. Efecto horizonte. Minimax invariante a transformaciones crecientes.
+$V(s)=\textsc{Util}(s)$ si terminal; $\max$ en MAX; $\min$ en MIN. Tiempo $O(b^m)$, espacio $O(bm)$.
+$\alpha$ = mejor valor de MAX en el camino; $\beta$ = mejor de MIN. Pasar $(\alpha,\beta)$ hacia abajo.
+\ojo{En MIN: si $v\le\alpha$ podar. En MAX: si $v\ge\beta$ podar.} Actualizar $\alpha$ en MAX y $\beta$ en MIN.
+Orden perfecto $O(b^{m/2})$ (hojas $b^{\lceil m/2\rceil}+b^{\lfloor m/2\rfloor}-1$); aleatorio $O(b^{3m/4})$.
+La raíz es exacta; los nodos podados solo dan cotas.
+\st{Evaluación}: $\textsc{Eval}(s)=\sum_i w_if_i(s)$; rápida, ordena terminales igual que la utilidad.
+Gato: $3X_2+X_1-(3O_2+O_1)$. Efecto horizonte.
 
 \T{Expectimax / expectiminimax}
-Azar: $V=\sum_i p_iV(s_i)$. Operador:
-$V(s)=\textsc{Util}(s)$ si terminal; $\max_a\sum_{s'}P(s'|s,a)V(s')$ en MAX; $\min_a\sum_{s'}P(s'|s,a)V(s')$
-en MIN (con límite: \textsc{Eval}). Costo $O(b^mn^m)$. Solo invariante ante $ax+b$, $a>0$ (importa la escala).
-Poda con utilidades acotadas $[L,U]$: cota sup.\ $=\sum_{\text{vistos}}p_iv_i+(\sum_{\text{resto}}p_i)U$.
-Transición con desvío: $P(c'|c)=\rho[c'=c]+\frac{1-\rho}{|A|}$ (uniforme incl.\ $c$) o $\frac{1-\rho}{|A|-1}$ (excl.\ $c$): \emph{declara el supuesto}.
-Minimax vs MIN subóptimo: MAX nunca obtiene menos que $V$.
+\begin{caja}\small
+$V(s)=\textsc{Util}(s)$ si es terminal (\textsc{Eval} en el límite)\\
+MAX: $V(s)=\max_a\sum_{s'}P(s'|s,a)\,V(s')$\\
+MIN: $V(s)=\min_a\sum_{s'}P(s'|s,a)\,V(s')$\\
+Azar: $V(s)=\sum_i p_i\,V(s_i)$
+\end{caja}
+Costo $O(b^m n^m)$. Si $\rho=1$ es minimax. \ojo{Importa la escala}: solo invariante ante $ax+b$, $a>0$
+(minimax: ante cualquier función creciente).
+Desvío: $P(c'|c)=\rho[c'{=}c]+\frac{1-\rho}{|A|}$ (uniforme incl.\ $c$); \emph{declara el supuesto}.
+Poda con utilidades en $[L,U]$: cota sup.\ $=\sum_{\text{vistos}}p_iv_i+(\sum_{\text{resto}}p_i)\,U$.
 
 \T{Utilidad}
-$L=[p,A;1-p,B]$. Axiomas: ordenabilidad, transitividad, continuidad, sustituibilidad, monotonicidad,
-descomponibilidad $\Rightarrow$ $\exists U$ con $U(L)=\sum p_iU(S_i)$ (MEU). Allais: $B\succ A$ y $C\succ D$
-$\Rightarrow U(3k)>0.8U(4k)$ y $0.8U(4k)>U(3k)$: contradicción. Equivalente cierto: $U(x)=EU$.
+Lotería $L=[p,A;\,1{-}p,B]$; $A\succ B$ preferencia, $A\sim B$ indiferencia.
+Axiomas: ordenabilidad, transitividad, continuidad, sustituibilidad, monotonicidad, descomponibilidad
+$\Rightarrow\exists U$: $U(L)=\sum_ip_iU(S_i)$; elegir la de máxima utilidad esperada (MEU).
+Allais: $B\succ A$ y $C\succ D$ $\Rightarrow$ $U(3k)>0.8U(4k)>U(3k)$: contradicción.
+Equivalente cierto: $x$ con $U(x)=EU(L)$.
+\end{multicols*}
 
-\T{Lógica proposicional}
-$KB\models\alpha$ sii $M(KB)\subseteq M(\alpha)$ sii $KB\imp\alpha$ válida sii $KB\wedge\neg\alpha$ insat.
-Tell/Ask: sí ($\models f$), no ($\models\neg f$), no sé (contingente). Correcto: $\vdash\subseteq\models$; completo: $\supseteq$.
-Equivalencias: $\alpha\imp\beta\equiv\neg\alpha\vee\beta\equiv\neg\beta\imp\neg\alpha$; De Morgan; $\neg(\alpha\imp\beta)\equiv\alpha\wedge\neg\beta$;
-$A\imp(B\imp C)\equiv(A\wedge B)\imp C$; $(A\wedge B)\imp C\equiv(A\imp C)\vee(B\imp C)$.
-\textbf{CNF}: quitar $\sii$, quitar $\imp$, meter $\neg$, distribuir $\vee$ sobre $\wedge$.
-$B\sii(P\vee Q)$: $(\neg B\vee P\vee Q)(\neg P\vee B)(\neg Q\vee B)$.
-\textbf{Resolución}: $\frac{a\vee p,\ \neg p\vee b}{a\vee b}$; refutación: añadir $\neg\alpha$, buscar $\square$.
-\textbf{Horn}: $\le1$ positivo; definida $=1$. FC/BC lineales; MP completo con Horn. $P\vee Q$ no es Horn
-(modelos Horn cerrados bajo intersección).
-Encadenamiento adelante: contadores de premisas + agenda. Atrás: evitar metas repetidas en la pila.
-\textbf{DPLL}: terminación temprana, símbolo puro, cláusula unitaria, ramificar (true primero).
-2-CNF: resolventes de $\le2$ literales $\Rightarrow$ $O(n^2)$ cláusulas, polinomial; 3-CNF crece a $3^n$.
-Modelos: $n$ símbolos $\Rightarrow2^n$; $B\vee C$ sobre 4: 12.
+\newpage
+% =============================== REVERSO ===============================
+{\large\bfseries\color{azul} IA · Examen 1 · Formulario (reverso): lógica}\par\vspace{2pt}
+\begin{tcolorbox}[colback=azulclaro,colframe=azul,boxrule=0.5pt,arc=1pt,left=3pt,right=3pt,top=2pt,bottom=2pt,
+  title={\bfseries SÍMBOLOS Y CÓMO SE LEEN \hfill TABLA DE VERDAD},fonttitle=\footnotesize,colbacktitle=azul,toptitle=0pt,bottomtitle=0pt]
+\footnotesize
+\begin{minipage}[t]{0.33\linewidth}
+\begin{tabular}{@{}c@{\;\;}l@{}}
+$\neg P$ & no $P$ (negación)\\
+$P\wedge Q$ & $P$ y $Q$ (conjunción)\\
+$P\vee Q$ & $P$ o $Q$ o ambos (inclusivo)\\
+$P\imp Q$ & si $P$ entonces $Q$ (implicación)\\
+$P\sii Q$ & $P$ si y solo si $Q$ (bicondicional)\\
+$\top,\ \bot$ & \textit{True} (siempre V), \textit{False}\\
+$\square$ & cláusula vacía = contradicción
+\end{tabular}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.33\linewidth}
+\begin{tabular}{@{}c@{\;\;}l@{}}
+$KB\models\alpha$ & vincula: $\alpha$ V en todo modelo de $KB$\\
+$KB\vdash\alpha$ & deriva: se obtiene con reglas\\
+$\alpha\equiv\beta$ & equivalentes: mismos modelos\\
+$M(\alpha)$ & modelos donde $\alpha$ es V\\
+$\forall x$,\ $\exists x$ & para todo $x$; existe algún $x$\\
+$\{x/A\}$ & sustitución: $x$ se vuelve $A$\\
+$\theta$ & unificador: $p\theta=q\theta$
+\end{tabular}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.31\linewidth}
+\centering
+\begin{tabular}{@{}cc|c@{\,}c@{\,}c@{\,}c@{\,}c@{}}
+$P$ & $Q$ & $\neg P$ & $P{\wedge}Q$ & $P{\vee}Q$ & $P{\imp}Q$ & $P{\sii}Q$\\\hline
+V & V & F & V & V & V & V\\
+V & F & F & F & V & \textbf{F} & F\\
+F & V & V & F & V & V & F\\
+F & F & V & F & F & V & V
+\end{tabular}\\[2pt]
+\raggedright $P\imp Q$ solo es F con V$\imp$F. Precedencia: $\neg,\wedge,\vee,\imp,\sii$. $n$ símbolos: $2^n$ modelos.
+\end{minipage}
+\end{tcolorbox}
+\begin{multicols*}{3}
+\T{Definiciones semánticas}
+\st{Modelo}: asignación V/F a cada símbolo. \st{Válida} (tautología): V en todo modelo.
+\st{Satisfacible}: V en algún modelo. \st{Insatisfacible}: en ninguno. \st{Contingente}: en unos sí y en otros no.
+\begin{caja}
+$KB\models\alpha\iff M(KB)\subseteq M(\alpha)\iff KB\imp\alpha$ válida $\iff KB\wedge\neg\alpha$ insatisfacible.
+\end{caja}
+\st{Tell($f$)}: «ya lo sabía» ($KB\models f$); «no lo creo» ($KB\models\neg f$); «aprendí algo» (contingente).
+\st{Ask($f$)}: sí / no / no sé. \st{Correcto}: $\vdash\subseteq\models$. \st{Completo}: $\models\subseteq\vdash$.
+Monotonía: $KB\models\alpha\Rightarrow KB\wedge\beta\models\alpha$.
+
+\T{Equivalencias clave}
+{\small
+$P\imp Q\equiv\neg P\vee Q\equiv\neg Q\imp\neg P$ (contrapositiva)\\
+$P\sii Q\equiv(P\imp Q)\wedge(Q\imp P)$\\
+$\neg(P\wedge Q)\equiv\neg P\vee\neg Q$;\ \ $\neg(P\vee Q)\equiv\neg P\wedge\neg Q$ (De Morgan)\\
+$\neg\neg P\equiv P$;\ \ $\neg(P\imp Q)\equiv P\wedge\neg Q$\\
+$P\vee(Q\wedge R)\equiv(P\vee Q)\wedge(P\vee R)$ (distribución)\\
+$P\wedge(Q\vee R)\equiv(P\wedge Q)\vee(P\wedge R)$\\
+$A\imp(B\imp C)\equiv(A\wedge B)\imp C$ (exportación)\\
+$(A\wedge B)\imp C\equiv(A\imp C)\vee(B\imp C)$\\
+$(A\imp C)\wedge(B\imp C)\equiv(A\vee B)\imp C$\\
+$P\vee\neg P\equiv\top$;\ \ $P\wedge\neg P\equiv\bot$;\ \ $\bot\imp Q\equiv\top$}
+
+\T{CNF proposicional}
+1) quitar $\sii$; 2) quitar $\imp$; 3) meter $\neg$ (De Morgan, $\neg\neg$); 4) distribuir $\vee$ sobre $\wedge$.
+Ej.: $B\sii(P\vee Q)\to(\neg B\vee P\vee Q)\wedge(\neg P\vee B)\wedge(\neg Q\vee B)$.
+$(V\imp N)\imp R\to(V\vee R)\wedge(\neg N\vee R)$; $V\imp(N\imp R)\to\neg V\vee\neg N\vee R$.
+
+\T{Inferencia}
+\st{Modus ponens}: $\dfrac{P,\ P\imp Q}{Q}$ (correcto, no completo; completo con Horn).
+\st{Resolución}: $\dfrac{\ell_1\vee\dots\vee p,\quad\neg p\vee m_1\vee\dots}{\ell_1\vee\dots\vee m_1\vee\dots}$
+(correcta; completa por refutación).
+\begin{caja}
+\st{Refutación}: añadir $\neg\alpha$ a la KB, pasar todo a CNF, resolver hasta $\square$ $\Rightarrow KB\models\alpha$.
+Si no sale $\square$: dar un \emph{modelo} de la KB con $\alpha$ falsa y decir qué hecho falta.
+\end{caja}
+\st{Horn}: $\le1$ literal positivo; \st{definida}: exactamente 1 ($p_1\wedge\dots\wedge p_k\imp q$); \st{meta}: 0.
+Resolvente de Horn es Horn. $P\vee Q$ no es Horn.
+\st{Encadenamiento adelante}: agenda + contador de premisas por regla; al llegar a 0, se infiere la
+conclusión. Lineal. \st{Atrás}: de la meta a los hechos; evitar metas repetidas en la pila.
+\st{DPLL}: terminación temprana, símbolo puro (un solo signo), cláusula unitaria, ramificar (V primero).
+2-CNF: polinomial ($O(n^2)$ cláusulas posibles); 3-CNF: NP-completo.
 
 \T{Lógica de primer orden}
-$\forall x\,(P(x)\imp Q(x))$; $\exists x\,(P(x)\wedge Q(x))$. «Solo uno»: $\exists x\,[P(x)\wedge\forall y\,(P(y)\imp y=x)]$.
-«Ninguno»: $\neg\exists=\forall\neg$. $\exists y\forall x\models\forall x\exists y$, no al revés.
-\textbf{CNF}: (1) quitar $\imp,\sii$ (2) meter $\neg$ ($\neg\forall=\exists\neg$) (3) estandarizar variables
-(4) Skolem: $\exists y$ dentro de $\forall x_1..x_k$ $\to F(x_1..x_k)$; sin $\forall$ externo $\to$ constante
-(5) quitar $\forall$ (6) distribuir. ¡$\exists$ en antecedente $\to\forall$, sin Skolem!
-Ej.: $\forall x[\forall y\,A(y)\imp L(x,y)]\imp\exists y\,L(y,x)$ $\to$ $(A(F(x))\vee L(G(x),x))(\neg L(x,F(x))\vee L(G(x),x))$.
-\textbf{Leer cláusulas}: $\neg A\vee\neg B\vee C$ = «$A\wedge B\imp C$»; variables = «para todo».
-\textbf{Unificación}: argumento por argumento, aplicar $\theta$ acumulado; falla con constantes/funciones
-distintas o por ocurrencia ($x$ vs $F(x)$). Estandarizar aparte antes de unificar.
-Ej.: $\p{Conoce}(Juan,x),\p{Conoce}(y,Madre(y))\to\{y/Juan,x/Madre(Juan)\}$.
-\textbf{Resolución LPO}: resolver $p$ y $\neg q$ con $\theta=\textsc{Unify}(p,q)$, aplicar $\theta$ al resolvente; factorizar
-literales repetidos. Pasos típicos: hecho + regla $\{x/c\}$ $\to$ regla más corta $\to$ \dots $\to\square$.
-\textbf{¿No se sigue?} Mostrar un modelo de la KB donde la conclusión es falsa y decir qué hecho falta.
-\textbf{Prolog}: Horn, SLD en profundidad, arriba$\to$abajo, izq$\to$der, sin occurs check;
-la recursión por la izquierda cicla.
+Términos: constantes, variables, funciones $F(x)$. Átomos: predicados $P(t_1,..)$.
+\begin{caja}
+«Todo $P$ es $Q$»: $\forall x\,(P(x)\imp Q(x))$ \quad«Algún $P$ es $Q$»: $\exists x\,(P(x)\wedge Q(x))$\\
+\ojo{Error típico}: $\forall$ con $\wedge$ (demasiado fuerte); $\exists$ con $\imp$ (demasiado débil).
+\end{caja}
+«Ningún $P$ es $Q$»: $\forall x\,(P(x)\imp\neg Q(x))$. «Solo uno»: $\exists x\,[P(x)\wedge\forall y\,(P(y)\imp y{=}x)]$.
+$\neg\forall x\,P\equiv\exists x\,\neg P$; $\neg\exists x\,P\equiv\forall x\,\neg P$. $\exists y\forall x\models\forall x\exists y$ (no al revés).
+
+\T{CNF en LPO (6 pasos)}
+1) quitar $\sii,\imp$; 2) meter $\neg$ (cambia $\forall\leftrightarrow\exists$); 3) estandarizar variables;
+4) \st{Skolem}: $\exists y$ dentro de $\forall x_1..x_k$ $\to$ $F(x_1..x_k)$; sin $\forall$ externo $\to$ constante;
+5) quitar $\forall$; 6) distribuir $\vee$ sobre $\wedge$.
+\ojo{$\exists$ en el antecedente de $\imp$ se vuelve $\forall$: sin Skolem.}
+Ej.: $\forall x\,[\p{Persona}(x)\imp\exists y\,\p{Madre}(y,x)]\to\neg\p{Persona}(x)\vee\p{Madre}(M(x),x)$.
+
+\T{Leer cláusulas en lenguaje natural}
+$\neg A(x)\vee\neg B(x)\vee C(x)$ = «todo $x$ que es $A$ y $B$ es $C$». Literales negados = condiciones;
+el positivo = conclusión; variables = «para todo». Hecho sin variables = afirmación concreta.
+
+\T{Unificación}
+Comparar argumento por argumento aplicando $\theta$ acumulado. Falla con constantes/funciones distintas
+o por \st{ocurrencia} ($x$ vs.\ $F(x)$). Estandarizar aparte antes. MGU = el más general.
+Ej.: $\p{Conoce}(\p{Juan},x)$, $\p{Conoce}(y,\p{Madre}(y))\to\{y/\p{Juan},x/\p{Madre}(\p{Juan})\}$.
+$P(x,F(x))$, $P(F(y),y)$: falla (ocurrencia).
+
+\T{Resolución en LPO: ejemplo tipo examen}
+KB: (1) $\neg\p{Est}(x)\vee\neg\p{Toma}(x)\vee\p{Conoce}(x,a)$, (6) $\p{Est}(\p{bob})$, (7) $\p{Toma}(\p{bob})$.
+(1)+(6) $\{x/\p{bob}\}$: $\neg\p{Toma}(\p{bob})\vee\p{Conoce}(\p{bob},a)$; +(7): $\p{Conoce}(\p{bob},a)$.
+Refutación: añadir $\neg\alpha$, resolver hasta $\square$, anotar $\theta$ en cada paso; factorizar repetidos.
+\st{Prolog}: Horn, SLD en profundidad, arriba$\to$abajo, izq.$\to$der.; recursión por la izquierda cicla.
+
+\T{Ejemplos resueltos (repaso rápido)}
+\st{Validez por tabla}: $(P\imp Q)\imp(\neg Q\imp\neg P)$ es válida (contrapositiva);
+$(P\imp Q)\imp(Q\imp P)$ contingente (falla con $P{=}$F, $Q{=}$V); $P\wedge\neg P$ insatisfacible.
+\st{Resolución prop.}: KB $\{A\imp(B\vee C),A,\neg B,\neg C\}$: $(\neg A\vee B\vee C)+A\to B\vee C$; $+\neg B\to C$; $+\neg C\to\square$.
+\st{A* inconsistente (2025)}: $S{\to}A(1)$, $S{\to}B(4)$, $A{\to}C(2)$, $B{\to}C(1)$, $C{\to}G(3)$; $h(S,A,B,C,G)=5,3,2,1,0$.
+Extrae S(0,5), A(1,4), C(3,4), B(4,6), G(6,6): costo 6 óptimo ($h^*(S)=6$). Viola $S\to A$: $5>1+3$.
+\st{Expectiminimax}: azar $0.5\cdot\min(3,9)+0.5\cdot\min(6,4)=3.5$.
+\st{Desvío}: atacar $2\rho-1$ vs bloquear $-(1-\rho)/2$: atacar si $\rho>1/3$.
+\st{Recocido}: $\Delta E=-2$, $T=1$: $e^{-2}=0.135$; $T=10$: $0.82$.
+\st{Unificación}: $\p{Ama}(x,\p{Padre}(x))$, $\p{Ama}(\p{Padre}(y),z)$: $\{x/\p{Padre}(y),\ z/\p{Padre}(\p{Padre}(y))\}$.
+\st{Skolem}: $\exists x\forall y\,\p{Ama}(y,x)\to\p{Ama}(y,C)$; $\forall x[\forall y\,P(x,y)\imp\exists z\,Q(x,z)]\to\neg P(x,F(x))\vee Q(x,G(x))$.
 
 \T{Recordatorios de examen}
-Escribe la definición antes de usarla. En trazas: tabla con paso, extraído $(g,f)$, frontera, comentario;
-declara los desempates. En «¿es óptima?»: compara con $h^*$ o con otro camino. En juegos estocásticos:
-declara el supuesto sobre el azar.
+Escribe la definición antes de usarla. Declara supuestos (desempates, azar). En «¿es óptima?», compara
+con $h^*$ u otro camino. Justifica cada propiedad del ambiente. Revisa el tiempo: no te atores en una pregunta.
 \end{multicols*}
 \end{document}

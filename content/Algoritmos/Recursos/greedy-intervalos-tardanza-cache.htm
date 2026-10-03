@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Greedy: intervalos, tardanza y caché</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#f6f7fb, #0f1420);
+      --surface: light-dark(#ffffff, #182132);
+      --surface-2: light-dark(#eef2f8, #222d41);
+      --text: light-dark(#172033, #edf2fb);
+      --muted: light-dark(#5e697b, #abb7ca);
+      --border: light-dark(#d6dce7, #39465c);
+      --accent: light-dark(#3157c8, #93abff);
+      --accent-soft: light-dark(#e5eaff, #273762);
+      --good: light-dark(#147a50, #67d6aa);
+      --good-soft: light-dark(#e2f5ec, #173e32);
+      --warn: light-dark(#9a5b00, #f0b45b);
+      --warn-soft: light-dark(#fff1d7, #493516);
+      --bad: light-dark(#b42318, #ff9189);
+      --bad-soft: light-dark(#fde7e5, #4b2426);
+      --shadow: light-dark(0 9px 25px rgba(36, 49, 77, .10), 0 9px 25px rgba(0, 0, 0, .28));
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 18px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+    main { max-width: 980px; margin: 0 auto; }
+    h1 { margin: 0 0 5px; font-size: clamp(1.35rem, 3vw, 2rem); }
+    h2 { margin: 0; font-size: 1.08rem; }
+    p { margin: 0; }
+    .lead { color: var(--muted); margin-bottom: 15px; }
+    .tabs { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+    button {
+      min-height: 40px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      background: var(--surface);
+      font: inherit;
+    }
+    button:hover { border-color: var(--accent); }
+    button:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 2px; }
+    button:disabled { opacity: .45; }
+    button[aria-selected="true"], button.primary {
+      color: light-dark(#ffffff, #101624);
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .panel {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .panel[hidden] { display: none; }
+    .panel-head { display: flex; align-items: start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .muted { color: var(--muted); }
+    .status {
+      min-height: 54px;
+      margin: 10px 0 14px;
+      padding: 9px 11px;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 9px 9px 0;
+      background: var(--surface-2);
+    }
+    .status strong { display: block; margin-bottom: 2px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .metric-row { display: flex; flex-wrap: wrap; gap: 9px; margin: 10px 0; }
+    .metric {
+      min-width: 130px;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+    }
+    .metric span { display: block; color: var(--muted); font-size: .82rem; }
+    .metric strong { font-variant-numeric: tabular-nums; }
+    .timeline {
+      position: relative;
+      min-height: 250px;
+      padding: 10px 12px 30px 45px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background:
+        repeating-linear-gradient(to right, transparent 0, transparent calc(10% - 1px), color-mix(in srgb, var(--border) 55%, transparent) calc(10% - 1px), color-mix(in srgb, var(--border) 55%, transparent) 10%),
+        var(--bg);
+    }
+    .time-axis {
+      position: absolute;
+      left: 45px;
+      right: 12px;
+      bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: .75rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .interval-row { position: relative; height: 31px; }
+    .row-label {
+      position: absolute;
+      left: -34px;
+      top: 5px;
+      width: 24px;
+      color: var(--muted);
+      font-weight: 700;
+      text-align: center;
+    }
+    .bar {
+      position: absolute;
+      top: 3px;
+      height: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: .82rem;
+      font-weight: 700;
+      transition: left .5s ease, width .5s ease, background-color .35s ease, opacity .35s ease, transform .35s ease;
+    }
+    .bar.accepted { border-color: var(--good); background: var(--good-soft); }
+    .bar.rejected { border-color: var(--bad); background: var(--bad-soft); opacity: .55; }
+    .bar.current { animation: enter .55s ease both; }
+    .bar.swapped { animation: exchange .58s ease both; }
+    .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; color: var(--muted); font-size: .84rem; }
+    .key { display: inline-flex; align-items: center; gap: 5px; }
+    .swatch { width: 12px; height: 12px; border-radius: 3px; background: var(--surface-2); border: 1px solid var(--border); }
+    .swatch.good { background: var(--good-soft); border-color: var(--good); }
+    .swatch.bad { background: var(--bad-soft); border-color: var(--bad); }
+    .queue { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .chip {
+      min-width: 34px;
+      padding: 5px 8px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg);
+      text-align: center;
+      font-size: .84rem;
+      font-variant-numeric: tabular-nums;
+      transition: transform .3s ease, opacity .3s ease, background-color .3s ease;
+    }
+    .chip.done { opacity: .48; }
+    .chip.active { border-color: var(--accent); background: var(--accent-soft); animation: enter .55s ease both; }
+    .room-grid { display: grid; gap: 7px; }
+    .room-row { display: grid; grid-template-columns: 58px 1fr; align-items: center; gap: 7px; }
+    .room-name { color: var(--muted); font-size: .84rem; }
+    .room-track {
+      position: relative;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: repeating-linear-gradient(to right, var(--bg) 0, var(--bg) calc(12.5% - 1px), color-mix(in srgb, var(--border) 58%, transparent) calc(12.5% - 1px), color-mix(in srgb, var(--border) 58%, transparent) 12.5%);
+    }
+    .room-bar { top: 6px; height: 27px; }
+    .schedule {
+      position: relative;
+      height: 76px;
+      margin-top: 8px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: var(--bg);
+      overflow: hidden;
+    }
+    .job-bar { top: 20px; height: 35px; }
+    .job-bar small { margin-left: 5px; font-weight: 400; color: var(--muted); }
+    .deadline-row {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(66px, 1fr));
+      gap: 6px;
+      margin-top: 9px;
+      overflow-x: auto;
+    }
+    .deadline-cell {
+      padding: 7px;
+      border-bottom: 2px solid var(--border);
+      color: var(--muted);
+      font-size: .8rem;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .deadline-cell.late { border-color: var(--bad); color: var(--bad); }
+    .request-strip { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 13px; }
+    .request {
+      min-width: 39px;
+      padding: 8px 9px;
+      border-radius: 8px;
+      background: var(--surface-2);
+      text-align: center;
+      font-weight: 700;
+      transition: transform .3s ease, background-color .3s ease, opacity .3s ease;
+    }
+    .request.past { opacity: .45; }
+    .request.active { background: var(--accent-soft); color: var(--accent); animation: enter .55s ease both; }
+    .cache-box {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(90px, 150px));
+      gap: 10px;
+      margin: 8px 0;
+    }
+    .cache-slot {
+      display: grid;
+      min-height: 74px;
+      place-items: center;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      font-size: 1.35rem;
+      font-weight: 800;
+      transition: border-color .35s ease, background-color .35s ease, transform .35s ease;
+    }
+    .cache-slot.changed { border-color: var(--accent); background: var(--accent-soft); animation: cacheSwap .6s ease both; }
+    .future { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 9px; }
+    .future span { padding: 5px 8px; border-radius: 7px; background: var(--surface-2); color: var(--muted); font-size: .82rem; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @keyframes enter {
+      from { transform: translateY(-7px) scale(.98); opacity: .45; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @keyframes exchange {
+      0% { transform: translateY(0); }
+      45% { transform: translateY(-9px); background: var(--warn-soft); }
+      100% { transform: translateY(0); }
+    }
+    @keyframes cacheSwap {
+      0% { transform: scale(.92); }
+      55% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+    @media (max-width: 650px) {
+      body { padding: 10px; }
+      .panel { padding: 12px; }
+      .panel-head { display: block; }
+      .timeline { padding-left: 38px; }
+      .time-axis { left: 38px; }
+      .row-label { left: -31px; }
+      .bar { font-size: .75rem; }
+      .room-row { grid-template-columns: 48px 1fr; }
+      .controls button { flex: 1 1 auto; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Elecciones voraces que sí se pueden demostrar</h1>
+    <p class="lead">Avanza una decisión a la vez y observa qué invariante, intercambio o cota inferior hace segura la elección local.</p>
+
+    <nav class="tabs" role="tablist" aria-label="Temas del laboratorio">
+      <button id="tab-select" role="tab" aria-selected="true" aria-controls="panel-select">Selección</button>
+      <button id="tab-rooms" role="tab" aria-selected="false" aria-controls="panel-rooms">Partición</button>
+      <button id="tab-late" role="tab" aria-selected="false" aria-controls="panel-late">Tardanza</button>
+      <button id="tab-cache" role="tab" aria-selected="false" aria-controls="panel-cache">Caché</button>
+    </nav>
+
+    <section id="panel-select" class="panel" role="tabpanel" aria-labelledby="tab-select">
+      <div class="panel-head">
+        <div>
+          <h2>Selección de intervalos · terminar primero</h2>
+          <p class="muted">Los trabajos se revisan por tiempo de finalización; se acepta el siguiente compatible.</p>
+        </div>
+      </div>
+      <div id="select-status" class="status" aria-live="polite"></div>
+      <div id="select-timeline" class="timeline" role="img" aria-label="Intervalos ordenados por tiempo de finalización"></div>
+      <div class="legend"><span class="key"><i class="swatch good"></i>aceptado</span><span class="key"><i class="swatch bad"></i>descartado por conflicto</span></div>
+      <div id="select-order" class="queue" aria-label="Orden por finalización"></div>
+      <div class="controls">
+        <button id="select-next" class="primary">Evaluar siguiente</button>
+        <button id="select-reset">Reiniciar</button>
+      </div>
+    </section>
+
+    <section id="panel-rooms" class="panel" role="tabpanel" aria-labelledby="tab-rooms" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>Partición de intervalos · comenzar primero</h2>
+          <p class="muted">Cada clase va al aula que se libera antes; si ninguna está libre, se abre una nueva.</p>
+        </div>
+      </div>
+      <div id="rooms-status" class="status" aria-live="polite"></div>
+      <div class="metric-row">
+        <div class="metric"><span>Aulas abiertas</span><strong id="rooms-count">0</strong></div>
+        <div class="metric"><span>Profundidad de la instancia</span><strong>3</strong></div>
+      </div>
+      <div id="room-grid" class="room-grid" aria-label="Asignación de clases a aulas"></div>
+      <div id="room-queue" class="queue" aria-label="Clases en orden de inicio"></div>
+      <div class="controls">
+        <button id="rooms-next" class="primary">Asignar siguiente</button>
+        <button id="rooms-reset">Reiniciar</button>
+      </div>
+    </section>
+
+    <section id="panel-late" class="panel" role="tabpanel" aria-labelledby="tab-late" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>Minimizar la tardanza máxima · intercambio</h2>
+          <p class="muted">Cada paso elimina una inversión de fechas límite sin aumentar la tardanza máxima.</p>
+        </div>
+      </div>
+      <div id="late-status" class="status" aria-live="polite"></div>
+      <div class="metric-row">
+        <div class="metric"><span>Tardanza máxima L</span><strong id="late-max">0</strong></div>
+        <div class="metric"><span>Inversiones restantes</span><strong id="late-inversions">0</strong></div>
+      </div>
+      <div id="late-schedule" class="schedule" role="img" aria-label="Calendarización de trabajos sobre una línea de tiempo"></div>
+      <div id="deadline-row" class="deadline-row" aria-label="Finalización y tardanza por trabajo"></div>
+      <div class="controls">
+        <button id="late-next" class="primary">Intercambiar inversión</button>
+        <button id="late-reset">Restaurar orden inicial</button>
+      </div>
+    </section>
+
+    <section id="panel-cache" class="panel" role="tabpanel" aria-labelledby="tab-cache" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>Caché óptima fuera de línea · Bélády</h2>
+          <p class="muted">En un fallo, se expulsa el elemento cuya siguiente solicitud está más lejos en el futuro.</p>
+        </div>
+      </div>
+      <div id="cache-status" class="status" aria-live="polite"></div>
+      <div id="request-strip" class="request-strip" aria-label="Secuencia de solicitudes"></div>
+      <div class="metric-row">
+        <div class="metric"><span>Expulsiones</span><strong id="cache-evictions">0</strong></div>
+        <div class="metric"><span>Capacidad</span><strong>2 elementos</strong></div>
+      </div>
+      <div id="cache-box" class="cache-box" aria-label="Contenido actual de la caché"></div>
+      <div id="future" class="future"></div>
+      <div class="controls">
+        <button id="cache-next" class="primary">Atender solicitud</button>
+        <button id="cache-reset">Reiniciar</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const tabs = [...document.querySelectorAll('[role="tab"]')];
+    tabs.forEach(tab => tab.addEventListener('click', () => {
+      tabs.forEach(other => {
+        const selected = other === tab;
+        other.setAttribute('aria-selected', String(selected));
+        document.getElementById(other.getAttribute('aria-controls')).hidden = !selected;
+      });
+    }));
+
+    const axis = (start, end, labels = 6) => {
+      const values = Array.from({ length: labels }, (_, i) => start + (end - start) * i / (labels - 1));
+      return `<div class="time-axis">${values.map(v => `<span>${Number.isInteger(v) ? v : v.toFixed(1)}</span>`).join('')}</div>`;
+    };
+
+    // Selección de intervalos
+    const selectJobs = [
+      { id: 'A', s: 0, f: 3 },
+      { id: 'B', s: 1, f: 2 },
+      { id: 'C', s: 3, f: 5 },
+      { id: 'D', s: 4, f: 7 },
+      { id: 'E', s: 5, f: 9 },
+      { id: 'F', s: 8, f: 10 }
+    ].sort((a, b) => a.f - b.f || a.s - b.s);
+    let selectStep = 0;
+    let selectLastFinish = -Infinity;
+    const selectDecisions = new Map();
+
+    function renderSelect(current = null) {
+      const timeline = document.getElementById('select-timeline');
+      timeline.innerHTML = selectJobs.map(job => {
+        const state = selectDecisions.get(job.id) || 'pending';
+        return `<div class="interval-row"><span class="row-label">${job.id}</span><div class="bar ${state} ${current === job.id ? 'current' : ''}" style="left:${job.s * 10}%;width:${(job.f - job.s) * 10}%">[${job.s}, ${job.f})</div></div>`;
+      }).join('') + axis(0, 10);
+      document.getElementById('select-order').innerHTML = selectJobs.map((job, i) => `<span class="chip ${i < selectStep ? 'done' : ''} ${i === selectStep ? 'active' : ''}">${job.id}: f=${job.f}</span>`).join('');
+      const chosen = selectJobs.filter(job => selectDecisions.get(job.id) === 'accepted').map(job => job.id);
+      const status = document.getElementById('select-status');
+      if (selectStep === 0) status.innerHTML = '<strong>Preparado.</strong>El menor tiempo de finalización deja la mayor porción posible de la línea libre.';
+      else if (selectStep === selectJobs.length) status.innerHTML = `<strong>Solución: {${chosen.join(', ')}}.</strong>Se eligieron ${chosen.length} trabajos compatibles; el argumento de intercambio demuestra que ningún calendario puede elegir más.`;
+      document.getElementById('select-next').disabled = selectStep >= selectJobs.length;
+    }
+
+    document.getElementById('select-next').addEventListener('click', () => {
+      if (selectStep >= selectJobs.length) return;
+      const job = selectJobs[selectStep];
+      const accepted = job.s >= selectLastFinish;
+      selectDecisions.set(job.id, accepted ? 'accepted' : 'rejected');
+      if (accepted) selectLastFinish = job.f;
+      selectStep += 1;
+      document.getElementById('select-status').innerHTML = accepted
+        ? `<strong>${job.id} se acepta.</strong>Empieza en ${job.s}, después del último final ${selectLastFinish === job.f ? job.s === 1 ? '−∞' : selectJobs.filter(x => selectDecisions.get(x.id) === 'accepted' && x.id !== job.id).at(-1)?.f ?? '−∞' : selectLastFinish}. El nuevo final de referencia es ${job.f}.`
+        : `<strong>${job.id} se descarta.</strong>Empieza en ${job.s}, antes de que termine el último elegido en ${selectLastFinish}.`;
+      renderSelect(job.id);
+    });
+    document.getElementById('select-reset').addEventListener('click', () => {
+      selectStep = 0; selectLastFinish = -Infinity; selectDecisions.clear(); renderSelect();
+    });
+
+    // Partición de intervalos
+    const lectures = [
+      { id: 'a', s: 9, f: 10.5 },
+      { id: 'b', s: 9.5, f: 11 },
+      { id: 'c', s: 10, f: 12 },
+      { id: 'd', s: 11, f: 12.5 },
+      { id: 'e', s: 11.5, f: 13 },
+      { id: 'f', s: 12, f: 13 }
+    ];
+    let roomStep = 0;
+    let rooms = [];
+    let roomAssignments = [];
+    const pctRoom = value => (value - 9) / 4 * 100;
+
+    function renderRooms(current = null) {
+      const grid = document.getElementById('room-grid');
+      if (!rooms.length) {
+        grid.innerHTML = '<p class="muted">Las aulas aparecerán conforme sean necesarias.</p>';
+      } else {
+        grid.innerHTML = rooms.map((room, index) => `<div class="room-row"><span class="room-name">Aula ${index + 1}</span><div class="room-track">${roomAssignments.filter(a => a.room === index).map(a => `<div class="bar room-bar ${a.id === current ? 'current' : 'accepted'}" style="left:${pctRoom(a.s)}%;width:${(a.f - a.s) / 4 * 100}%">${a.id}</div>`).join('')}</div></div>`).join('');
+      }
+      document.getElementById('rooms-count').textContent = rooms.length;
+      document.getElementById('room-queue').innerHTML = lectures.map((lecture, i) => `<span class="chip ${i < roomStep ? 'done' : ''} ${i === roomStep ? 'active' : ''}">${lecture.id} · ${lecture.s}–${lecture.f}</span>`).join('');
+      document.getElementById('rooms-next').disabled = roomStep >= lectures.length;
+      if (roomStep === 0) document.getElementById('rooms-status').innerHTML = '<strong>Preparado.</strong>Las clases se procesan por hora de inicio creciente.';
+      if (roomStep === lectures.length) document.getElementById('rooms-status').innerHTML = '<strong>Óptimo: 3 aulas.</strong>El algoritmo usa exactamente la profundidad 3, que es una cota inferior para cualquier solución.';
+    }
+
+    document.getElementById('rooms-next').addEventListener('click', () => {
+      if (roomStep >= lectures.length) return;
+      const lecture = lectures[roomStep];
+      let candidate = -1;
+      let earliest = Infinity;
+      rooms.forEach((finish, index) => {
+        if (finish <= lecture.s && finish < earliest) { candidate = index; earliest = finish; }
+      });
+      const opened = candidate === -1;
+      if (opened) { candidate = rooms.length; rooms.push(lecture.f); }
+      else rooms[candidate] = lecture.f;
+      roomAssignments.push({ ...lecture, room: candidate });
+      roomStep += 1;
+      document.getElementById('rooms-status').innerHTML = opened
+        ? `<strong>${lecture.id} abre el aula ${candidate + 1}.</strong>A las ${lecture.s} todas las aulas existentes siguen ocupadas.`
+        : `<strong>${lecture.id} entra al aula ${candidate + 1}.</strong>Era el aula disponible cuyo último trabajo terminaba primero.`;
+      renderRooms(lecture.id);
+    });
+    document.getElementById('rooms-reset').addEventListener('click', () => {
+      roomStep = 0; rooms = []; roomAssignments = []; renderRooms();
+    });
+
+    // Minimización de tardanza
+    const lateJobs = {
+      1: { t: 3, d: 6 }, 2: { t: 2, d: 8 }, 3: { t: 1, d: 9 },
+      4: { t: 4, d: 9 }, 5: { t: 3, d: 14 }, 6: { t: 2, d: 15 }
+    };
+    const initialLateOrder = [3, 2, 6, 1, 5, 4];
+    let lateOrder = [...initialLateOrder];
+    let lateLastSwap = [];
+
+    function scheduleStats(order) {
+      let finish = 0;
+      return order.map(id => {
+        const start = finish;
+        finish += lateJobs[id].t;
+        return { id, start, finish, lateness: Math.max(0, finish - lateJobs[id].d) };
+      });
+    }
+    function inversionCount(order) {
+      let total = 0;
+      for (let i = 0; i < order.length; i++) for (let j = i + 1; j < order.length; j++) {
+        if (lateJobs[order[i]].d > lateJobs[order[j]].d) total += 1;
+      }
+      return total;
+    }
+    function nextAdjacentInversion(order) {
+      for (let i = 0; i < order.length - 1; i++) if (lateJobs[order[i]].d > lateJobs[order[i + 1]].d) return i;
+      return -1;
+    }
+    function ensureLateBars() {
+      const schedule = document.getElementById('late-schedule');
+      if (schedule.children.length) return;
+      Object.keys(lateJobs).forEach(id => {
+        const bar = document.createElement('div');
+        bar.id = `late-job-${id}`;
+        bar.className = 'bar job-bar';
+        schedule.appendChild(bar);
+      });
+    }
+    function renderLate(message = null) {
+      ensureLateBars();
+      const stats = scheduleStats(lateOrder);
+      const totalTime = stats.at(-1).finish;
+      stats.forEach(job => {
+        const bar = document.getElementById(`late-job-${job.id}`);
+        bar.style.left = `${job.start / totalTime * 100}%`;
+        bar.style.width = `${lateJobs[job.id].t / totalTime * 100}%`;
+        bar.className = `bar job-bar ${lateLastSwap.includes(job.id) ? 'swapped' : ''}`;
+        bar.innerHTML = `J${job.id}<small>d=${lateJobs[job.id].d}</small>`;
+      });
+      document.getElementById('deadline-row').innerHTML = stats.map(job => `<div class="deadline-cell ${job.lateness ? 'late' : ''}">J${job.id}: f=${job.finish}, ℓ=${job.lateness}</div>`).join('');
+      const maxLate = Math.max(...stats.map(job => job.lateness));
+      const inversions = inversionCount(lateOrder);
+      document.getElementById('late-max').textContent = maxLate;
+      document.getElementById('late-inversions').textContent = inversions;
+      const status = document.getElementById('late-status');
+      if (message) status.innerHTML = message;
+      else status.innerHTML = `<strong>Orden inicial: ${lateOrder.map(id => `J${id}`).join(' → ')}.</strong>Su tardanza máxima es ${maxLate}; busca una pareja adyacente con fechas límite invertidas.`;
+      const done = nextAdjacentInversion(lateOrder) === -1;
+      document.getElementById('late-next').disabled = done;
+      if (done) status.innerHTML = `<strong>Orden EDF alcanzado: ${lateOrder.map(id => `J${id}`).join(' → ')}.</strong>No quedan inversiones y L = ${maxLate}. Con desempate fijo, éste es el calendario voraz.`;
+    }
+    document.getElementById('late-next').addEventListener('click', () => {
+      const index = nextAdjacentInversion(lateOrder);
+      if (index < 0) return;
+      const before = Math.max(...scheduleStats(lateOrder).map(job => job.lateness));
+      const left = lateOrder[index], right = lateOrder[index + 1];
+      [lateOrder[index], lateOrder[index + 1]] = [right, left];
+      lateLastSwap = [left, right];
+      const after = Math.max(...scheduleStats(lateOrder).map(job => job.lateness));
+      renderLate(`<strong>Intercambio J${left} ↔ J${right}: L pasa de ${before} a ${after}.</strong>Como d${right}=${lateJobs[right].d} &lt; d${left}=${lateJobs[left].d}, corregir esta inversión no empeora el objetivo.`);
+    });
+    document.getElementById('late-reset').addEventListener('click', () => {
+      lateOrder = [...initialLateOrder]; lateLastSwap = []; renderLate();
+    });
+
+    // Caché de Bélády
+    const requests = ['a', 'b', 'c', 'b', 'c', 'a', 'b'];
+    const initialCache = ['a', 'b'];
+    let cache = [...initialCache];
+    let cacheStep = 0;
+    let evictions = 0;
+    let changedSlot = -1;
+
+    function nextUse(item, after) {
+      const index = requests.indexOf(item, after + 1);
+      return index === -1 ? Infinity : index;
+    }
+    function renderCache() {
+      document.getElementById('request-strip').innerHTML = requests.map((item, i) => `<span class="request ${i < cacheStep ? 'past' : ''} ${i === cacheStep ? 'active' : ''}">${item}</span>`).join('');
+      document.getElementById('cache-box').innerHTML = cache.map((item, i) => `<div class="cache-slot ${i === changedSlot ? 'changed' : ''}">${item}</div>`).join('');
+      document.getElementById('cache-evictions').textContent = evictions;
+      const future = document.getElementById('future');
+      if (cacheStep < requests.length) {
+        future.innerHTML = cache.map(item => {
+          const use = nextUse(item, cacheStep - 1);
+          return `<span>${item}: siguiente uso ${use === Infinity ? 'nunca' : `en posición ${use + 1}`}</span>`;
+        }).join('');
+      } else future.innerHTML = '<span>Secuencia terminada</span>';
+      document.getElementById('cache-next').disabled = cacheStep >= requests.length;
+      if (cacheStep === 0) document.getElementById('cache-status').innerHTML = '<strong>Caché inicial {a, b}.</strong>La secuencia completa es conocida: a, b, c, b, c, a, b.';
+      if (cacheStep === requests.length) document.getElementById('cache-status').innerHTML = `<strong>Fin: ${evictions} expulsiones.</strong>Para esta instancia, FF alcanza el calendario óptimo mostrado en las diapositivas.`;
+    }
+    document.getElementById('cache-next').addEventListener('click', () => {
+      if (cacheStep >= requests.length) return;
+      const request = requests[cacheStep];
+      changedSlot = -1;
+      if (cache.includes(request)) {
+        document.getElementById('cache-status').innerHTML = `<strong>Solicitud ${cacheStep + 1}: ${request} es un acierto.</strong>No cambia el contenido de la caché.`;
+      } else {
+        const uses = cache.map(item => nextUse(item, cacheStep));
+        const farthest = Math.max(...uses);
+        const slot = uses.indexOf(farthest);
+        const evicted = cache[slot];
+        cache[slot] = request;
+        changedSlot = slot;
+        evictions += 1;
+        document.getElementById('cache-status').innerHTML = `<strong>Fallo: entra ${request} y sale ${evicted}.</strong>${farthest === Infinity ? `${evicted} no vuelve a solicitarse.` : `Su siguiente uso estaba más lejos, en la posición ${farthest + 1}.`}`;
+      }
+      cacheStep += 1;
+      renderCache();
+    });
+    document.getElementById('cache-reset').addEventListener('click', () => {
+      cache = [...initialCache]; cacheStep = 0; evictions = 0; changedSlot = -1; renderCache();
+    });
+
+    renderSelect();
+    renderRooms();
+    renderLate();
+    renderCache();
+  </script>
+</body>
+</html>
