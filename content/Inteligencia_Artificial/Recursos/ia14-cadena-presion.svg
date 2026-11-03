@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="280" viewBox="0 0 700 280" role="img" aria-labelledby="title desc">
+<title id="title">Cadena: observar el medio bloquea</title>
+<desc id="desc">X apunta a Y; Y apunta a Z. Camino activo sin observar Y.
+Al observar Y: X ⟂ Z | Y.</desc>
+<style>
+svg{color-scheme:light dark;--bg:#fafbf9;--ink:#1d3035;--line:#536971;--node:#ffffff;--accent:#146879;--soft:#dceff0;--muted:#53646c}
+@media(prefers-color-scheme:dark){svg{--bg:#182228;--ink:#edf3f4;--line:#a9bdc5;--node:#23333c;--accent:#81d2dc;--soft:#264c56;--muted:#bdcbd0}}
+.canvas{fill:var(--bg)}text{font-family:system-ui,sans-serif;fill:var(--ink);text-anchor:middle} .heading{font-size:23px;font-weight:600}.label{font-size:18px}.small{font-size:16px;fill:var(--muted)}.symbol{font-size:24px;font-weight:600}.edge{stroke:var(--line);stroke-width:2;fill:none}.node{fill:var(--node);stroke:var(--line);stroke-width:1.7}.observed{fill:var(--soft);stroke:var(--accent);stroke-width:2.5}
+</style>
+<rect class="canvas" width="700" height="280" rx="12"/>
+<text class="heading" x="350" y="36">Cadena: observar el medio bloquea</text>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="var(--line)"/></marker></defs>
+<line class="edge" x1="142.00" y1="125.00" x2="313.00" y2="125.00" marker-end="url(#arrow)"/>
+<line class="edge" x1="382.00" y1="125.00" x2="553.00" y2="125.00" marker-end="url(#arrow)"/>
+<circle class="node " cx="110" cy="125" r="32"/><text class="symbol" x="110" y="133">X</text><text class="label" x="110" y="183" style="text-anchor:middle">Baja presión</text>
+<circle class="node " cx="350" cy="125" r="32"/><text class="symbol" x="350" y="133">Y</text><text class="label" x="350" y="183" style="text-anchor:middle">Lluvia</text>
+<circle class="node " cx="590" cy="125" r="32"/><text class="symbol" x="590" y="133">Z</text><text class="label" x="590" y="183" style="text-anchor:middle">Tráfico</text>
+<text class="small" x="350" y="240">Camino activo sin observar Y.</text>
+<text class="small" x="350" y="263">Al observar Y: X ⟂ Z | Y.</text>
+</svg>

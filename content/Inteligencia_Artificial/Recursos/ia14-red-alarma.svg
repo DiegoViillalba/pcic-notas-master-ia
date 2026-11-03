@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="500" viewBox="0 0 700 500" role="img" aria-labelledby="title desc">
+<title id="title">Alarma: cinco variables, cinco factores</title>
+<desc id="desc">B apunta a A; E apunta a A; A apunta a J; A apunta a M. P(B,E,A,J,M) = P(B) P(E) P(A|B,E) P(J|A) P(M|A)</desc>
+<style>
+svg{color-scheme:light dark;--bg:#fafbf9;--ink:#1d3035;--line:#536971;--node:#ffffff;--accent:#146879;--soft:#dceff0;--muted:#53646c}
+@media(prefers-color-scheme:dark){svg{--bg:#182228;--ink:#edf3f4;--line:#a9bdc5;--node:#23333c;--accent:#81d2dc;--soft:#264c56;--muted:#bdcbd0}}
+.canvas{fill:var(--bg)}text{font-family:system-ui,sans-serif;fill:var(--ink);text-anchor:middle} .heading{font-size:23px;font-weight:600}.label{font-size:18px}.small{font-size:16px;fill:var(--muted)}.symbol{font-size:24px;font-weight:600}.edge{stroke:var(--line);stroke-width:2;fill:none}.node{fill:var(--node);stroke:var(--line);stroke-width:1.7}.observed{fill:var(--soft);stroke:var(--accent);stroke-width:2.5}
+</style>
+<rect class="canvas" width="700" height="500" rx="12"/>
+<text class="heading" x="350" y="36">Alarma: cinco variables, cinco factores</text>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="var(--line)"/></marker></defs>
+<line class="edge" x1="224.18" y1="120.96" x2="322.04" y2="205.77" marker-end="url(#arrow)"/>
+<line class="edge" x1="475.82" y1="120.96" x2="377.96" y2="205.77" marker-end="url(#arrow)"/>
+<line class="edge" x1="325.82" y1="250.96" x2="227.96" y2="335.77" marker-end="url(#arrow)"/>
+<line class="edge" x1="374.18" y1="250.96" x2="472.04" y2="335.77" marker-end="url(#arrow)"/>
+<circle class="node " cx="200" cy="100" r="32"/><text class="symbol" x="200" y="108">B</text><text class="label" x="247" y="106" style="text-anchor:start">Robo</text>
+<circle class="node " cx="500" cy="100" r="32"/><text class="symbol" x="500" y="108">E</text><text class="label" x="547" y="106" style="text-anchor:start">Terremoto</text>
+<circle class="node " cx="350" cy="230" r="32"/><text class="symbol" x="350" y="238">A</text><text class="label" x="397" y="236" style="text-anchor:start">Alarma</text>
+<circle class="node " cx="200" cy="360" r="32"/><text class="symbol" x="200" y="368">J</text><text class="label" x="200" y="418" style="text-anchor:middle">John llama</text>
+<circle class="node " cx="500" cy="360" r="32"/><text class="symbol" x="500" y="368">M</text><text class="label" x="500" y="418" style="text-anchor:middle">Mary llama</text>
+<text class="small" x="350" y="460">P(B,E,A,J,M) = P(B) P(E) P(A|B,E) P(J|A) P(M|A)</text>
+</svg>

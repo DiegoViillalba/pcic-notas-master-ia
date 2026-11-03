@@ -36,7 +36,7 @@ tags:
 
 ### Modelo del problema
 
-Representamos la pila de arriba hacia abajo como
+Representamos la pila de **arriba hacia abajo** como
 
 $$
 A=(a_1,a_2,\ldots,a_n),
@@ -101,10 +101,9 @@ while pointer > 1:
     pointer -= 1
 
 print("Arreglo ordenado:", a)
-	
-	
-
 ```
+
+
 
 
 ### Invariante y Progreso en Pancake Sort

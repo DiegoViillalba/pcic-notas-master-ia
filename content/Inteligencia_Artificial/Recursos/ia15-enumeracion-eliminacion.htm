@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inferencia exacta: seguir los factores</title>
+<style>
+:root{color-scheme:light dark;--ink:light-dark(#192e37,#e6edf1);--muted:light-dark(#52616b,#b9c5cd);--line:light-dark(#ccd7dc,#45545e);--surface:light-dark(#f1f6f7,#23353e);--accent:light-dark(#0f637c,#89d4e4)}
+*{box-sizing:border-box}body{margin:0;padding:20px;color:var(--ink);background:transparent;font:16px/1.5 system-ui,sans-serif}main{max-width:1000px;margin:auto}h1{font-size:1.35rem;font-weight:600;margin:0 0 8px}h2{font-size:1.1rem;font-weight:600;margin:18px 0 8px}p{margin:8px 0}.muted{color:var(--muted)}.controls{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0}label{display:flex;flex:1 1 210px;flex-direction:column;gap:5px}select,button{font:inherit;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:5px;padding:8px 10px;max-width:100%}select{background:var(--surface)}button:disabled{opacity:.45}button:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:3px}button[aria-pressed="true"]{background:var(--surface);border-color:var(--accent)}.stepper{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0}.stepper output{font-variant-numeric:tabular-nums}.factors{display:flex;gap:8px;flex-wrap:wrap}.factors button{display:flex;flex-direction:column;align-items:flex-start;gap:2px}.scope{color:var(--muted);font-size:.85rem}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}caption{text-align:left;padding:12px 0;font-weight:600}th,td{text-align:left;padding:9px 7px;border-bottom:1px solid var(--line)}th{font-weight:600}.number{text-align:right}.row-button{padding:4px 8px;min-height:32px}.selected td{background:var(--surface)}.expression{font-family:ui-monospace,monospace;overflow-wrap:anywhere;font-size:.9rem}.check{padding-top:12px;border-top:1px solid var(--line);margin-top:20px}#result{font-variant-numeric:tabular-nums}noscript{display:block;margin:12px 0}@media(max-width:520px){body{padding:12px}label{flex-basis:100%}th,td{padding:8px 4px}.row-button{padding:4px 6px}}@media(pointer:coarse){button,select{min-height:44px}}
+</style>
+</head>
+<body>
+<main id="ia15-factor-lab">
+<h1>Inferencia exacta: seguir los factores</h1>
+<p class="muted">«+» verdadero · «−» falso. Cada paso muestra una tabla y permite inspeccionar sus cuentas.</p>
+<div class="controls">
+  <label>Consulta
+    <select id="case">
+      <option value="chain">Cadena: P(L)</option>
+      <option value="rain">Cadena: P(L | +r)</option>
+      <option value="alarm">Alarma: P(B | j,m)</option>
+    </select>
+  </label>
+  <label>Método
+    <select id="method"><option value="ve">Eliminación</option><option value="enum">Enumeración</option></select>
+  </label>
+  <label>Orden de las ocultas
+    <select id="order"></select>
+  </label>
+</div>
+<p id="roles"></p>
+<p id="network" class="expression"></p>
+<div class="stepper"><button type="button" id="prev">Anterior</button><output id="position"></output><button type="button" id="next">Siguiente</button></div>
+<section aria-live="polite" aria-atomic="true"><h2 id="step-title"></h2><p id="explanation"></p></section>
+<h2>Factores actuales</h2>
+<div id="factors" class="factors" aria-label="Elegir un factor para ver su tabla"></div>
+<div class="table-wrap"><table><caption id="caption"></caption><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+<p id="calculation" class="expression" aria-live="polite"></p>
+<p id="max-size" class="muted"></p>
+<p id="result" class="check"></p>
+<p class="muted">Cadena: diapositivas 18–25 de AI 15. Alarma: estructura de AI 15 y CPT de AIMA, figura 13.2, retomadas en el apunte del 6 de octubre. Funciona sin conexión.</p>
+<noscript>Activa JavaScript para recorrer el cálculo. En la nota: P(l)=0.134, P(l | r)=0.26 y P(b | j,m)≈0.284172.</noscript>
+</main>
+<script>
+(()=>{
+'use strict';
+const root=document.getElementById('ia15-factor-lab'),el=id=>root.querySelector('#'+id);
+const fmt=n=>Number(n.toPrecision(12)).toString(),sign=v=>v?'＋':'−';
+function assignments(scope){return Array.from({length:2**scope.length},(_,i)=>Object.fromEntries(scope.map((x,j)=>[x,1-((i>>(scope.length-j-1))&1)])));}
+function factor(name,scope,fn){return{name,scope:[...scope],rows:assignments(scope).map(v=>({v,value:fn(v),terms:null,operation:null}))};}
+function lookup(f,v){const r=f.rows.find(r=>f.scope.every(x=>r.v[x]===v[x]));if(!r)throw Error('Asignación incompleta en '+f.name);return r.value;}
+function restrict(f,e){const scope=f.scope.filter(x=>!(x in e));return factor(f.name,scope,v=>lookup(f,{...v,...e}));}
+function multiply(fs,name){const scope=[...new Set(fs.flatMap(f=>f.scope))];const f=factor(name,scope,v=>fs.reduce((p,g)=>p*lookup(g,v),1));f.rows.forEach(r=>{r.terms=fs.map(g=>lookup(g,r.v));r.operation=' × ';});return f;}
+function sumout(f,x,name){const scope=f.scope.filter(v=>v!==x);const g=factor(name,scope,v=>lookup(f,{...v,[x]:1})+lookup(f,{...v,[x]:0}));g.rows.forEach(r=>{r.terms=[1,0].map(value=>lookup(f,{...r.v,[x]:value}));r.operation=' + ';});return g;}
+function model(key){
+ if(key==='alarm'){
+  const pa={'11':.95,'10':.94,'01':.29,'00':.001};
+  return{q:'B',hidden:['A','E'],evidence:{J:1,M:1},network:'B → A ← E; A → J; A → M',roles:'Consulta: B (robo). Evidencia: J=+, M=+. Ocultas: A (alarma), E (terremoto).',
+   factors:[factor('P(B)',['B'],v=>v.B?.001:.999),factor('P(E)',['E'],v=>v.E?.002:.998),factor('P(A | B,E)',['B','E','A'],v=>v.A?pa[''+v.B+v.E]:1-pa[''+v.B+v.E]),factor('P(J | A)',['A','J'],v=>v.J?(v.A?.9:.05):1-(v.A?.9:.05)),factor('P(M | A)',['A','M'],v=>v.M?(v.A?.7:.01):1-(v.A?.7:.01))]};
+ }
+ return{q:'L',hidden:key==='rain'?['T']:['R','T'],evidence:key==='rain'?{R:1}:{},network:'R → T → L',roles:key==='rain'?'Consulta: L. Evidencia: R=+. Oculta: T.':'Consulta: L. Sin evidencia. Ocultas: R,T.',factors:[factor('P(R)',['R'],v=>v.R?.1:.9),factor('P(T | R)',['R','T'],v=>v.T?(v.R?.8:.1):1-(v.R?.8:.1)),factor('P(L | T)',['T','L'],v=>v.L?(v.T?.3:.1):1-(v.T?.3:.1))]};
+}
+function build(key,method,order){
+ const m=model(key);let fs=m.factors.map(f=>restrict(f,m.evidence)),maxRows=Math.max(...fs.map(f=>f.rows.length)),trace=[];
+ function add(title,explanation,focus){maxRows=Math.max(maxRows,...fs.map(f=>f.rows.length));trace.push({title,explanation,factors:[...fs],focus:Math.max(0,focus),maxRows});}
+ add('Preparar los factores',Object.keys(m.evidence).length?'Los valores observados ya están fijados en cada factor que los menciona. Una tabla puede quedar como un escalar.':'Cada distribución local es un factor. Aún no hemos sumado ninguna variable.',0);
+ if(method==='enum'){
+  const joint=multiply(fs,'Conjunta compatible');fs=[joint];add('Multiplicar los factores locales','Construimos cada mundo compatible con la evidencia; después agruparemos sus pesos por la consulta.',0);
+  for(const x of order){fs=[sumout(fs[0],x,'Suma sobre '+x)];add('Sumar '+x,'Para cada asignación de las otras variables, sumamos las filas con '+x+'=+ y '+x+'=−.',0);}
+ }else{
+  for(const x of order){
+   const selected=fs.filter(f=>f.scope.includes(x)),rest=fs.filter(f=>!f.scope.includes(x));
+   const joined=multiply(selected,'Producto para '+x);fs=[...rest,joined];
+   add('Unir los factores con '+x,selected.map(f=>f.name).join(' × ')+'. Los demás factores esperan; no se multiplican en este paso.',fs.length-1);
+   const reduced=sumout(joined,x,'Resumen sin '+x);fs=[...rest,reduced];
+   add('Eliminar '+x,'Sumamos los dos valores de '+x+' en el producto. El resumen sustituye a todos los factores usados.',fs.length-1);
+  }
+  fs=[multiply(fs,'Pesos conjuntos')];add('Multiplicar los factores restantes','El resultado w('+m.q+') contiene la masa conjunta de cada valor consultado con la evidencia.',0);
+ }
+ const weights=fs[0],mass=weights.rows.reduce((s,r)=>s+r.value,0);
+ if(!(mass>0))throw Error('Evidencia con probabilidad cero');
+ const posterior={name:'Posterior P('+m.q+' | evidencia)',scope:weights.scope,rows:weights.rows.map(r=>({v:{...r.v},value:r.value/mass,terms:[r.value,mass],operation:' ÷ '}))};
+ fs=[posterior];add('Normalizar','La suma de los pesos es Z='+fmt(mass)+'. Dividimos cada peso entre ese mismo total.',0);
+ return{m,trace,mass,posterior,weights,maxRows};
+}
+let run,index=0,selected=0,rowIndex=0;
+function options(){const key=el('case').value;const orders=key==='alarm'?['A,E','E,A']:key==='rain'?['T']:['R,T','T,R'];el('order').innerHTML=orders.map(x=>'<option value="'+x+'">'+x.replaceAll(',',', ')+'</option>').join('');}
+function restart(){run=build(el('case').value,el('method').value,el('order').value.split(','));index=0;selected=run.trace[0].focus;rowIndex=0;render();}
+function renderTable(){
+ const step=run.trace[index],f=step.factors[selected];rowIndex=Math.min(rowIndex,f.rows.length-1);
+ el('caption').textContent=f.name+' · alcance {'+f.scope.join(', ')+'} · '+f.rows.length+' '+(f.rows.length===1?'entrada':'entradas');
+ el('thead').innerHTML='<tr>'+f.scope.map(x=>'<th scope="col">'+x+'</th>').join('')+'<th scope="col" class="number">Valor</th><th scope="col">Cuenta</th></tr>';
+ el('tbody').innerHTML=f.rows.map((r,i)=>'<tr class="'+(rowIndex===i?'selected':'')+'">'+f.scope.map(x=>'<td>'+sign(r.v[x])+'</td>').join('')+'<td class="number">'+fmt(r.value)+'</td><td><button type="button" class="row-button" data-row="'+i+'" aria-label="Ver cuenta de fila '+(i+1)+'">Ver</button></td></tr>').join('');
+ el('tbody').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{rowIndex=Number(b.dataset.row);renderTable();}));
+ const r=f.rows[rowIndex],v=f.scope.map(x=>x+'='+sign(r.v[x])).join(', ')||'escalar';
+ el('calculation').textContent=v+': '+(r.terms?r.terms.map(fmt).join(r.operation)+' = ':'valor local = ')+fmt(r.value);
+ root.querySelectorAll('[data-factor]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.factor)===selected)));
+}
+function render(){
+ const s=run.trace[index];el('roles').textContent=run.m.roles;el('network').textContent=run.m.network;el('position').textContent='Paso '+(index+1)+' de '+run.trace.length;el('prev').disabled=index===0;el('next').disabled=index===run.trace.length-1;el('step-title').textContent=s.title;el('explanation').textContent=s.explanation;
+ el('factors').innerHTML=s.factors.map((f,i)=>'<button type="button" data-factor="'+i+'" aria-pressed="'+(i===selected)+'"><span>'+f.name+'</span><span class="scope">{'+f.scope.join(', ')+'} · '+f.rows.length+' entradas</span></button>').join('');
+ el('factors').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{selected=Number(b.dataset.factor);rowIndex=0;renderTable();}));
+ el('max-size').textContent='Mayor tabla presente hasta este paso: '+s.maxRows+' entradas. El conteo incluye factores iniciales y productos antes de sumar.';
+ const last=index===run.trace.length-1;
+ el('result').textContent=last?'Resultado: '+run.posterior.rows.map(r=>'P('+sign(r.v[run.m.q])+run.m.q+' | evidencia) = '+fmt(r.value)).join(' · '):'Avanza para construir la respuesta. Los valores de la tabla actual pueden ser pesos sin normalizar.';
+ root.dataset.case=el('case').value;root.dataset.method=el('method').value;root.dataset.step=String(index);root.dataset.final=String(last);root.dataset.maxRows=String(run.maxRows);root.dataset.mass=String(run.mass);root.dataset.posterior=String(run.posterior.rows.find(r=>r.v[run.m.q]===1).value);renderTable();
+}
+el('prev').addEventListener('click',()=>{if(index>0){index--;selected=run.trace[index].focus;rowIndex=0;render();}});el('next').addEventListener('click',()=>{if(index<run.trace.length-1){index++;selected=run.trace[index].focus;rowIndex=0;render();}});el('case').addEventListener('change',()=>{options();restart();});el('method').addEventListener('change',restart);el('order').addEventListener('change',restart);
+window.ia15Factors={model,build,lookup,multiply,sumout,restrict};options();restart();
+})();
+</script>
+</body>
+</html>

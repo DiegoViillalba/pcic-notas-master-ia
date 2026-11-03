@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Códigos de prefijos y árboles</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#f6f7fb, #0f1420);
+      --surface: light-dark(#ffffff, #182132);
+      --surface-2: light-dark(#eef2f8, #222d41);
+      --text: light-dark(#172033, #edf2fb);
+      --muted: light-dark(#5e697b, #abb7ca);
+      --border: light-dark(#d6dce7, #39465c);
+      --accent: light-dark(#3157c8, #93abff);
+      --accent-soft: light-dark(#e5eaff, #273762);
+      --good: light-dark(#147a50, #67d6aa);
+      --good-soft: light-dark(#e2f5ec, #173e32);
+      --warn: light-dark(#9a5b00, #f0b45b);
+      --warn-soft: light-dark(#fff1d7, #493516);
+      --bad: light-dark(#b42318, #ff9189);
+      --bad-soft: light-dark(#fde7e5, #4b2426);
+      --shadow: light-dark(0 9px 25px rgba(36, 49, 77, .10), 0 9px 25px rgba(0, 0, 0, .28));
+      --s0: light-dark(#3157c8, #93abff);
+      --s1: light-dark(#147a50, #67d6aa);
+      --s2: light-dark(#9a5b00, #f0b45b);
+      --s3: light-dark(#8a2bb8, #d59bff);
+      --s4: light-dark(#b42318, #ff9189);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 18px; background: var(--bg); color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+    main { max-width: 980px; margin: 0 auto; }
+    h1 { margin: 0 0 5px; font-size: clamp(1.35rem, 3vw, 2rem); }
+    h2 { margin: 0; font-size: 1.08rem; }
+    h3 { margin: 14px 0 6px; font-size: .95rem; }
+    p { margin: 0; }
+    .lead { color: var(--muted); margin-bottom: 15px; }
+    .tabs { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+    button, select, input {
+      min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 9px;
+      color: var(--text); background: var(--surface); font: inherit;
+    }
+    input[type="number"] { width: 82px; min-height: 34px; padding: 4px 8px; }
+    button:hover { border-color: var(--accent); }
+    button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 2px; }
+    button:disabled { opacity: .45; }
+    button[aria-selected="true"], button.primary { color: light-dark(#ffffff, #101624); background: var(--accent); border-color: var(--accent); }
+    .panel { padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); }
+    .panel[hidden] { display: none; }
+    .muted { color: var(--muted); }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .status { min-height: 54px; margin: 12px 0; padding: 9px 11px; border-left: 4px solid var(--accent); border-radius: 0 9px 9px 0; background: var(--surface-2); }
+    .status.bad { border-left-color: var(--bad); background: var(--bad-soft); }
+    .status.good { border-left-color: var(--good); background: var(--good-soft); }
+    .status.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+    .status strong { display: block; margin-bottom: 2px; }
+    .metric-row { display: flex; flex-wrap: wrap; gap: 9px; margin: 10px 0; }
+    .metric { min-width: 130px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
+    .metric span { display: block; color: var(--muted); font-size: .82rem; }
+    .metric strong { font-variant-numeric: tabular-nums; font-size: 1.1rem; }
+    .bits { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.05rem; display: flex; flex-wrap: wrap; gap: 2px 8px; padding: 10px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); min-height: 46px; }
+    .grp { display: inline-flex; flex-direction: column; align-items: center; }
+    .grp small { font-family: inherit; font-size: .72rem; color: var(--muted); }
+    .bit { display: inline-block; min-width: 1ch; text-align: center; border-radius: 4px; transition: background .25s; }
+    .bit.done { color: var(--muted); }
+    .bit.buf { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+    .bit.next { outline: 2px solid var(--accent); }
+    table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+    th, td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+    th { color: var(--muted); font-weight: 600; font-size: .85rem; }
+    td code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .grid2 { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; }
+    @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } body { padding: 12px; } }
+    .tree-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); padding: 6px; }
+    svg text { font-family: ui-sans-serif, system-ui, sans-serif; fill: var(--text); }
+    .edge { stroke: var(--border); stroke-width: 2; }
+    .edge.hot { stroke: var(--accent); stroke-width: 3.5; }
+    .elabel { font-size: 12px; fill: var(--accent) !important; font-weight: 700; }
+    .node-int { fill: var(--surface); stroke: var(--muted); stroke-width: 1.5; }
+    .node-int.single { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 2.5; }
+    .node-int.hot { stroke: var(--accent); stroke-width: 3; }
+    .leaf { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; cursor: pointer; }
+    .leaf.hot { fill: var(--accent); }
+    .leaf.sel { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 3; }
+    .swapped { animation: pop .6s ease; }
+    @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+    .leaf-label { font-weight: 700; pointer-events: none; }
+    .leaf-sub { font-size: 11px; fill: var(--muted) !important; pointer-events: none; }
+    .chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: .8rem; border: 1px solid var(--border); background: var(--surface-2); }
+    .chip.good { border-color: var(--good); background: var(--good-soft); }
+    .chip.bad { border-color: var(--bad); background: var(--bad-soft); }
+    .formula { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; padding: 8px 10px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border); margin-top: 8px; overflow-x: auto; }
+    ul.log { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: .9rem; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Códigos de prefijos y árboles</h1>
+  <p class="lead">Codifica y decodifica con los códigos de clase, mira su árbol binario y prueba el argumento de intercambio entre hojas.</p>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="t1">1 · Codificar y decodificar</button>
+    <button role="tab" aria-selected="false" data-tab="t2">2 · Árbol del código</button>
+    <button role="tab" aria-selected="false" data-tab="t3">3 · Intercambio</button>
+  </div>
+
+  <!-- Frecuencias compartidas -->
+  <section class="panel" style="margin-bottom:14px">
+    <div class="row" style="justify-content:space-between">
+      <h2>Frecuencias</h2>
+      <button id="resetFreq">Restaurar las de clase</button>
+    </div>
+    <div class="row" id="freqInputs" style="margin-top:8px"></div>
+    <p class="muted" id="freqSum" style="margin-top:6px;font-size:.88rem"></p>
+  </section>
+
+  <!-- TAB 1 -->
+  <section class="panel" id="t1" role="tabpanel">
+    <div class="row">
+      <label>Código <select id="codeSel1"></select></label>
+      <label>Texto <input id="textIn" value="aabced" style="width:150px"></label>
+    </div>
+    <div class="metric-row" id="metrics1"></div>
+    <h3>Codificación</h3>
+    <div class="bits" id="encoded"></div>
+    <h3>Decodificación voraz bit por bit</h3>
+    <div class="bits" id="decBits"></div>
+    <div class="status" id="decStatus"></div>
+    <div class="controls">
+      <button class="primary" id="stepBtn">Leer siguiente bit</button>
+      <button id="runBtn">Decodificar todo</button>
+      <button id="resetDec">Reiniciar</button>
+    </div>
+    <h3>Tabla del código</h3>
+    <div id="codeTable1"></div>
+  </section>
+
+  <!-- TAB 2 -->
+  <section class="panel" id="t2" role="tabpanel" hidden>
+    <div class="row">
+      <label>Código <select id="codeSel2"></select></label>
+      <button id="contractBtn">Contraer nodos de un solo hijo (Lema 1)</button>
+    </div>
+    <div class="status" id="treeStatus"></div>
+    <div class="grid2">
+      <div class="tree-wrap"><svg id="tree2" role="img" aria-label="Árbol binario del código"></svg></div>
+      <div>
+        <div id="codeTable2"></div>
+        <div class="formula" id="pbsFormula2"></div>
+      </div>
+    </div>
+    <p class="muted" style="margin-top:8px;font-size:.88rem">Haz clic en una hoja para resaltar su camino: 0 = izquierda, 1 = derecha. Los nodos en ámbar tienen un solo hijo.</p>
+  </section>
+
+  <!-- TAB 3 -->
+  <section class="panel" id="t3" role="tabpanel" hidden>
+    <div class="row">
+      <label>Forma del árbol <select id="shapeSel"></select></label>
+      <button id="lemmaBtn">Etiquetar por Lema 2 (más frecuente arriba)</button>
+      <button id="resetSwap">Reiniciar etiquetas</button>
+    </div>
+    <div class="metric-row" id="metrics3"></div>
+    <div class="status" id="swapStatus"><strong>Elige dos hojas.</strong>Haz clic en una hoja y luego en otra para intercambiar sus símbolos.</div>
+    <div class="grid2">
+      <div class="tree-wrap"><svg id="tree3" role="img" aria-label="Árbol para intercambiar etiquetas"></svg></div>
+      <div>
+        <div id="codeTable3"></div>
+        <ul class="log" id="swapLog"></ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const SYMS = ["a", "b", "c", "d", "e"];
+  const CLASS_F = { a: .32, b: .25, c: .20, d: .18, e: .05 };
+  let F = { ...CLASS_F };
+
+  const CODES = {
+    fijo:   { name: "Longitud fija (3 bits)", map: { a: "000", b: "001", c: "111", d: "010", e: "101" } },
+    gamma:  { name: "γ  (a=11, b=01, c=001, d=10, e=000)", map: { a: "11", b: "01", c: "001", d: "10", e: "000" } },
+    gammaP: { name: "γ' (a=11, b=10, c=01, d=001, e=000)", map: { a: "11", b: "10", c: "01", d: "001", e: "000" } },
+    gamma4: { name: "γ⁗ árbol no completo (d=00)", map: { a: "110", b: "101", c: "100", d: "00", e: "111" } },
+    ambig:  { name: "Ambiguo (a=0, b=1, c=01)", map: { a: "0", b: "1", c: "01" } }
+  };
+  const symColor = s => `var(--s${SYMS.indexOf(s) % 5})`;
+  const fmt = x => (Math.round(x * 1000) / 1000).toFixed(2).replace(/^0\./, ".");
+  const fmt3 = x => (Math.round(x * 1000) / 1000).toString();
+  const el = id => document.getElementById(id);
+
+  /* ---------- Tabs ---------- */
+  document.querySelectorAll('[role="tab"]').forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll('[role="tab"]').forEach(x => x.setAttribute("aria-selected", x === b));
+    document.querySelectorAll('[role="tabpanel"]').forEach(p => p.hidden = p.id !== b.dataset.tab);
+  }));
+
+  /* ---------- Frecuencias ---------- */
+  function buildFreqInputs() {
+    el("freqInputs").innerHTML = SYMS.map(s =>
+      `<label class="mono"><span style="color:${symColor(s)};font-weight:700">${s}</span> <input type="number" min="0" max="1" step="0.01" data-s="${s}" value="${F[s]}"></label>`).join("");
+    el("freqInputs").querySelectorAll("input").forEach(inp => inp.addEventListener("input", () => {
+      const v = parseFloat(inp.value);
+      F[inp.dataset.s] = isFinite(v) && v >= 0 ? v : 0;
+      renderAll();
+    }));
+  }
+  el("resetFreq").addEventListener("click", () => { F = { ...CLASS_F }; buildFreqInputs(); renderAll(); });
+
+  const pbs = map => Object.keys(map).reduce((acc, s) => acc + (F[s] || 0) * map[s].length, 0);
+
+  function prefixViolations(map) {
+    const out = [], ks = Object.keys(map);
+    for (const x of ks) for (const y of ks)
+      if (x !== y && map[y].startsWith(map[x])) out.push([x, y]);
+    return out;
+  }
+
+  function codeTable(map, highlight) {
+    const rows = Object.keys(map).map(s => {
+      const f = F[s] || 0;
+      return `<tr${highlight === s ? ' style="background:var(--accent-soft)"' : ""}><td><b style="color:${symColor(s)}">${s}</b></td><td><code>${map[s]}</code></td><td>${map[s].length}</td><td>${fmt(f)}</td><td>${fmt3(f * map[s].length)}</td></tr>`;
+    }).join("");
+    return `<table><thead><tr><th>x</th><th>γ(x)</th><th>|γ(x)|</th><th>f<sub>x</sub></th><th>f<sub>x</sub>·|γ(x)|</th></tr></thead><tbody>${rows}</tbody>
+      <tfoot><tr><th colspan="4">PBS</th><th>${fmt3(pbs(map))}</th></tr></tfoot></table>`;
+  }
+
+  ["codeSel1", "codeSel2"].forEach(id => {
+    el(id).innerHTML = Object.entries(CODES).map(([k, c]) => `<option value="${k}">${c.name}</option>`).join("");
+    el(id).value = "gamma";
+  });
+
+  /* ---------- TAB 1 ---------- */
+  let dec = null;
+
+  function cleanText(map) {
+    const raw = el("textIn").value.toLowerCase();
+    return [...raw].filter(ch => ch in map).join("");
+  }
+
+  function countParses(bits, map) {
+    // número de formas de partir bits en palabras del código (DP)
+    const n = bits.length, ways = Array(n + 1).fill(0), back = Array.from({ length: n + 1 }, () => []);
+    ways[0] = 1;
+    for (let i = 0; i < n; i++) if (ways[i]) for (const [s, w] of Object.entries(map))
+      if (bits.startsWith(w, i)) { ways[i + w.length] += ways[i]; back[i + w.length].push([i, s]); }
+    const samples = [];
+    (function walk(j, acc) {
+      if (samples.length >= 4) return;
+      if (j === 0) { samples.push(acc.slice().reverse().join("")); return; }
+      for (const [i, s] of back[j]) { acc.push(s); walk(i, acc); acc.pop(); }
+    })(n, []);
+    return { ways: ways[n], samples };
+  }
+
+  function resetDecoder() {
+    const key = el("codeSel1").value, map = CODES[key].map;
+    const text = cleanText(map);
+    const bits = [...text].map(s => map[s]).join("");
+    dec = { key, map, text, bits, pos: 0, beta: "", out: "", bufStart: 0, done: bits.length === 0, error: false };
+    renderTab1();
+  }
+
+  function step() {
+    if (!dec || dec.done) return;
+    const v = dec.bits[dec.pos++];
+    if (dec.beta === "") dec.bufStart = dec.pos - 1;
+    dec.beta += v;
+    const hit = Object.keys(dec.map).find(s => dec.map[s] === dec.beta);
+    if (hit) {
+      dec.out += hit; dec.last = `β = <code>${dec.beta}</code> coincide con γ(${hit}) → emitir <b>${hit}</b> y reiniciar β.`;
+      dec.beta = "";
+    } else {
+      dec.last = `β = <code>${dec.beta}</code> todavía no es una palabra del código: seguir leyendo.`;
+    }
+    if (dec.pos >= dec.bits.length) {
+      dec.done = true;
+      if (dec.beta !== "") { dec.error = true; dec.last += " Se acabaron los bits con β ≠ ε: error."; }
+    }
+    renderTab1();
+  }
+
+  function renderTab1() {
+    const { map, text, bits } = dec;
+    const viol = prefixViolations(map);
+    const isPrefix = viol.length === 0;
+    const parses = countParses(bits, map);
+    el("metrics1").innerHTML = `
+      <div class="metric"><span>Símbolos del texto</span><strong>${text.length}</strong></div>
+      <div class="metric"><span>Bits codificados</span><strong>${bits.length}</strong></div>
+      <div class="metric"><span>Con longitud fija (3 bits)</span><strong>${text.length * 3}</strong></div>
+      <div class="metric"><span>PBS(γ)</span><strong>${fmt3(pbs(map))}</strong></div>
+      <div class="metric"><span>¿De prefijos?</span><strong>${isPrefix ? '<span class="chip good">sí</span>' : '<span class="chip bad">no</span>'}</strong></div>`;
+
+    el("encoded").innerHTML = text ? [...text].map(s =>
+      `<span class="grp"><span style="color:${symColor(s)};font-weight:700">${map[s]}</span><small>${s}</small></span>`).join("")
+      : '<span class="muted">El texto no contiene símbolos de este código.</span>';
+
+    el("decBits").innerHTML = [...bits].map((b, i) => {
+      let cls = "bit";
+      if (i < dec.pos && i >= dec.bufStart && dec.beta !== "") cls += " buf";
+      else if (i < dec.pos) cls += " done";
+      if (i === dec.pos && !dec.done) cls += " next";
+      return `<span class="${cls}">${b}</span>`;
+    }).join("") || '<span class="muted">—</span>';
+
+    const st = el("decStatus");
+    let html = `<strong>Salida: ${dec.out ? `<span class="mono">${dec.out}</span>` : "ε"} · β = ${dec.beta ? `<code>${dec.beta}</code>` : "ε"}</strong>`;
+    html += dec.last || "Pulsa “Leer siguiente bit”.";
+    st.className = "status";
+    if (dec.done && bits.length) {
+      if (dec.error || dec.out !== text) {
+        st.className = "status bad";
+        html += `<br>La lectura voraz dio <b class="mono">${dec.out}</b>, pero el texto original era <b class="mono">${text}</b>.`;
+      } else st.className = "status good";
+      if (parses.ways > 1) {
+        st.className = "status bad";
+        html += `<br><b>Ambigüedad:</b> la cadena admite ${parses.ways} lecturas, por ejemplo ${parses.samples.map(x => `<span class="mono">${x}</span>`).join(", ")}.`;
+      }
+    }
+    if (!isPrefix) html += `<br><span class="muted">Viola la propiedad de prefijos: ${viol.slice(0, 4).map(([x, y]) => `γ(${x})=${map[x]} es prefijo de γ(${y})=${map[y]}`).join("; ")}.</span>`;
+    st.innerHTML = html;
+    el("stepBtn").disabled = el("runBtn").disabled = dec.done;
+    el("codeTable1").innerHTML = codeTable(map);
+  }
+
+  el("stepBtn").addEventListener("click", step);
+  el("runBtn").addEventListener("click", () => { while (!dec.done) step(); });
+  el("resetDec").addEventListener("click", resetDecoder);
+  el("codeSel1").addEventListener("change", resetDecoder);
+  el("textIn").addEventListener("input", resetDecoder);
+
+  /* ---------- Árboles ---------- */
+  function buildTrie(map) {
+    const root = { c: [null, null], sym: null, id: 0 };
+    let id = 1;
+    for (const [s, w] of Object.entries(map)) {
+      let n = root;
+      for (const b of w) {
+        const k = +b;
+        if (!n.c[k]) n.c[k] = { c: [null, null], sym: null, id: id++ };
+        n = n.c[k];
+      }
+      n.sym = s;
+    }
+    return root;
+  }
+
+  function layout(root) {
+    let leafX = 0, maxD = 0;
+    (function rec(n, d, parent) {
+      n.d = d; n.parent = parent; maxD = Math.max(maxD, d);
+      const kids = n.c.filter(Boolean);
+      if (!kids.length) { n.x = leafX++; return; }
+      n.c.forEach(k => k && rec(k, d + 1, n));
+      n.x = kids.reduce((a, k) => a + k.x, 0) / kids.length;
+    })(root, 0, null);
+    return { leaves: leafX, depth: maxD };
+  }
+
+  function nodes(root) { const out = []; (function r(n) { out.push(n); n.c.forEach(k => k && r(k)); })(root); return out; }
+
+  function drawTree(svg, root, opts = {}) {
+    const { leaves, depth } = layout(root);
+    const W = Math.max(320, leaves * 74 + 40), H = depth * 78 + 80, X = n => 40 + n.x * 74 + 0, Y = n => 30 + n.d * 78;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", W); svg.setAttribute("height", H);
+    const all = nodes(root);
+    const hotIds = new Set(opts.hotPath || []);
+    let s = "";
+    for (const n of all) n.c.forEach((k, b) => {
+      if (!k) return;
+      const hot = hotIds.has(k.id);
+      s += `<line class="edge${hot ? " hot" : ""}" x1="${X(n)}" y1="${Y(n)}" x2="${X(k)}" y2="${Y(k)}"/>`;
+      const mx = (X(n) + X(k)) / 2 + (b ? 8 : -8), my = (Y(n) + Y(k)) / 2 - 2;
+      s += `<text class="elabel" x="${mx}" y="${my}" text-anchor="middle">${b}</text>`;
+    });
+    for (const n of all) {
+      if (n.sym === null) {
+        const single = n.c.filter(Boolean).length === 1;
+        s += `<circle class="node-int${single ? " single" : ""}${hotIds.has(n.id) ? " hot" : ""}" cx="${X(n)}" cy="${Y(n)}" r="8"/>`;
+      } else {
+        const sym = opts.labelOf ? opts.labelOf(n) : n.sym;
+        const cls = ["leaf"]; if (hotIds.has(n.id)) cls.push("hot"); if (opts.selected === n.id) cls.push("sel");
+        s += `<g data-leaf="${n.id}" style="transform-origin:${X(n)}px ${Y(n)}px" class="${opts.flash && opts.flash.includes(n.id) ? "swapped" : ""}" tabindex="0" role="button" aria-label="hoja ${sym}">
+          <circle class="${cls.join(" ")}" cx="${X(n)}" cy="${Y(n)}" r="17" style="stroke:${symColor(sym)}"/>
+          <text class="leaf-label" x="${X(n)}" y="${Y(n) + 5}" text-anchor="middle" style="fill:${hotIds.has(n.id) ? "var(--surface)" : symColor(sym)}">${sym}</text>
+          <text class="leaf-sub" x="${X(n)}" y="${Y(n) + 33}" text-anchor="middle">f=${fmt(F[sym] || 0)} · d=${n.d}</text></g>`;
+      }
+    }
+    svg.innerHTML = s;
+  }
+
+  function pathIds(n) { const ids = []; while (n) { ids.push(n.id); n = n.parent; } return ids; }
+
+  /* ---------- TAB 2 ---------- */
+  let t2 = { map: null, root: null, hot: null };
+
+  function contract(map) {
+    // contrae nodos con un hijo: quita el bit correspondiente
+    const root = buildTrie(map); layout(root);
+    const out = {};
+    (function rec(n, prefix) {
+      if (n.sym !== null) { out[n.sym] = prefix; return; }
+      const kids = n.c.map((k, b) => [k, b]).filter(([k]) => k);
+      if (kids.length === 1) rec(kids[0][0], prefix);
+      else kids.forEach(([k, b]) => rec(k, prefix + b));
+    })(root, "");
+    if (Object.keys(out).length === 1) out[Object.keys(out)[0]] = "0";
+    return out;
+  }
+
+  function loadTab2(map) {
+    t2.map = map; t2.root = buildTrie(map); t2.hot = null; renderTab2();
+  }
+  function renderTab2() {
+    const viol = prefixViolations(t2.map);
+    const st = el("treeStatus");
+    const all = nodes(t2.root);
+    const singles = all.filter(n => n.sym === null && n.c.filter(Boolean).length === 1).length;
+    const internalSyms = viol.length > 0;
+    let hotLeaf = t2.hot ? all.find(n => n.id === t2.hot) : null;
+    drawTree(el("tree2"), t2.root, { hotPath: hotLeaf ? pathIds((layout(t2.root), hotLeaf)) : [] });
+    if (internalSyms) {
+      st.className = "status bad";
+      st.innerHTML = `<strong>No es código de prefijos.</strong>Algún símbolo cae en un nodo interno (su palabra es prefijo de otra), así que este “árbol” no tiene todos los símbolos en hojas.`;
+    } else if (singles) {
+      st.className = "status warn";
+      st.innerHTML = `<strong>Código de prefijos, pero el árbol no es completo.</strong>${singles} nodo(s) interno(s) con un solo hijo. Contraerlos sube hojas un nivel y baja el PBS (Lema 1).`;
+    } else {
+      st.className = "status good";
+      st.innerHTML = `<strong>Árbol completo.</strong>Todo nodo interno tiene dos hijos; los símbolos están solo en las hojas.`;
+    }
+    el("contractBtn").disabled = !singles || internalSyms;
+    el("codeTable2").innerHTML = codeTable(t2.map, hotLeaf && hotLeaf.sym);
+    el("pbsFormula2").innerHTML = "PBS(T) = Σ f<sub>x</sub>·depth(x) = " +
+      Object.keys(t2.map).map(s => `${fmt(F[s] || 0)}·${t2.map[s].length}`).join(" + ") + ` = <b>${fmt3(pbs(t2.map))}</b>`;
+    el("tree2").querySelectorAll("[data-leaf]").forEach(g => g.addEventListener("click", () => { t2.hot = +g.dataset.leaf; renderTab2(); }));
+  }
+  el("codeSel2").addEventListener("change", () => loadTab2(CODES[el("codeSel2").value].map));
+  el("contractBtn").addEventListener("click", () => {
+    const before = pbs(t2.map); const m = contract(t2.map); loadTab2(m);
+    el("treeStatus").innerHTML += `<br>PBS: ${fmt3(before)} → <b>${fmt3(pbs(m))}</b>.`;
+  });
+
+  /* ---------- TAB 3 ---------- */
+  const SHAPES = { gamma: "Forma de γ (Shannon–Fano)", gammaP: "Forma de γ'", fijo: "Longitud fija" };
+  el("shapeSel").innerHTML = Object.entries(SHAPES).map(([k, n]) => `<option value="${k}">${n}</option>`).join("");
+  let t3 = null;
+
+  function loadTab3() {
+    const key = el("shapeSel").value;
+    const map = CODES[key].map;
+    const root = buildTrie(map); layout(root);
+    const leaves = nodes(root).filter(n => n.sym !== null);
+    const label = {}; leaves.forEach(n => label[n.id] = n.sym);
+    t3 = { root, leaves, label, sel: null, log: [], flash: null, start: null };
+    t3.start = pbs3();
+    renderTab3();
+  }
+  const pbs3 = () => t3.leaves.reduce((a, n) => a + (F[t3.label[n.id]] || 0) * n.d, 0);
+  const map3 = () => { const m = {}; const code = {}; (function r(n, p) { if (n.sym !== null) { code[n.id] = p; return; } n.c.forEach((k, b) => k && r(k, p + b)); })(t3.root, ""); t3.leaves.forEach(n => m[t3.label[n.id]] = code[n.id]); return m; };
+
+  function renderTab3() {
+    drawTree(el("tree3"), t3.root, { labelOf: n => t3.label[n.id], selected: t3.sel, flash: t3.flash });
+    t3.flash = null;
+    const cur = pbs3();
+    // óptimo para esta forma (Lema 2)
+    const depths = t3.leaves.map(n => n.d).sort((a, b) => a - b);
+    const fs = SYMS.map(s => F[s] || 0).sort((a, b) => b - a);
+    const best = depths.reduce((a, d, i) => a + d * (fs[i] || 0), 0);
+    el("metrics3").innerHTML = `
+      <div class="metric"><span>PBS actual</span><strong>${fmt3(cur)}</strong></div>
+      <div class="metric"><span>PBS inicial</span><strong>${fmt3(t3.start)}</strong></div>
+      <div class="metric"><span>Mejor etiquetado de esta forma</span><strong>${fmt3(best)}</strong></div>`;
+    el("codeTable3").innerHTML = codeTable(map3());
+    el("swapLog").innerHTML = t3.log.map(x => `<li>${x}</li>`).join("");
+    el("tree3").querySelectorAll("[data-leaf]").forEach(g => {
+      const act = () => clickLeaf(+g.dataset.leaf);
+      g.addEventListener("click", act);
+      g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(); } });
+    });
+  }
+
+  function clickLeaf(id) {
+    if (t3.sel === null) { t3.sel = id; el("swapStatus").className = "status"; el("swapStatus").innerHTML = `<strong>Seleccionada: ${t3.label[id]}.</strong>Ahora elige la otra hoja.`; renderTab3(); return; }
+    if (t3.sel === id) { t3.sel = null; renderTab3(); return; }
+    const A = t3.leaves.find(n => n.id === t3.sel), B = t3.leaves.find(n => n.id === id);
+    const x = t3.label[A.id], y = t3.label[B.id];
+    const before = pbs3();
+    t3.label[A.id] = y; t3.label[B.id] = x;
+    const after = pbs3();
+    const delta = before - after; // = (d_A - d_B)(f_x - f_y)
+    const st = el("swapStatus");
+    const formula = `(depth(${x}) − depth(${y}))·(f<sub>${x}</sub> − f<sub>${y}</sub>) = (${A.d} − ${B.d})·(${fmt(F[x])} − ${fmt(F[y])}) = ${fmt3((A.d - B.d) * ((F[x] || 0) - (F[y] || 0)))}`;
+    if (Math.abs(delta) < 1e-12) { st.className = "status"; st.innerHTML = `<strong>Sin cambio en el PBS.</strong>${A.d === B.d ? "Las dos hojas están al mismo nivel: el multiplicador es el mismo." : "Las frecuencias son iguales."}<div class="formula">PBS(T) − PBS(T') = ${formula}</div>`; }
+    else if (delta > 0) { st.className = "status good"; st.innerHTML = `<strong>Mejora: el PBS bajó ${fmt3(delta)}.</strong>El símbolo más frecuente quedó más arriba.<div class="formula">PBS(T) − PBS(T') = ${formula} &gt; 0</div>`; }
+    else { st.className = "status bad"; st.innerHTML = `<strong>Empeora: el PBS subió ${fmt3(-delta)}.</strong>Un símbolo menos frecuente quedó arriba de uno más frecuente.<div class="formula">PBS(T) − PBS(T') = ${formula} &lt; 0</div>`; }
+    t3.log.unshift(`${x} ↔ ${y}: PBS ${fmt3(before)} → ${fmt3(after)}`);
+    t3.log = t3.log.slice(0, 6);
+    t3.sel = null; t3.flash = [A.id, B.id];
+    renderTab3();
+  }
+
+  el("lemmaBtn").addEventListener("click", () => {
+    const before = pbs3();
+    const leaves = [...t3.leaves].sort((a, b) => a.d - b.d);
+    const syms = t3.leaves.map(n => t3.label[n.id]).sort((a, b) => (F[b] || 0) - (F[a] || 0));
+    leaves.forEach((n, i) => t3.label[n.id] = syms[i]);
+    t3.log.unshift(`Etiquetado por Lema 2: PBS ${fmt3(before)} → ${fmt3(pbs3())}`);
+    el("swapStatus").className = "status good";
+    el("swapStatus").innerHTML = "<strong>Hojas menos profundas ← símbolos más frecuentes.</strong>Para esta forma de árbol ya no hay intercambio que mejore el PBS. ¿Podría otra forma ser mejor?";
+    t3.flash = t3.leaves.map(n => n.id);
+    renderTab3();
+  });
+  el("resetSwap").addEventListener("click", loadTab3);
+  el("shapeSel").addEventListener("change", loadTab3);
+
+  function renderAll() {
+    const total = SYMS.reduce((a, s) => a + F[s], 0);
+    el("freqSum").textContent = `Σ f = ${fmt3(total)}${Math.abs(total - 1) > 1e-9 ? " (no suma 1; el PBS se calcula igual, como peso total)" : ""}`;
+    if (dec) renderTab1();
+    if (t2.root) renderTab2();
+    if (t3) renderTab3();
+  }
+
+  buildFreqInputs();
+  resetDecoder();
+  loadTab2(CODES.gamma.map);
+  loadTab3();
+  renderAll();
+})();
+</script>
+</body>
+</html>

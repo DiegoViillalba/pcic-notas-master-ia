@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Huffman paso a paso</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#f6f7fb, #0f1420);
+      --surface: light-dark(#ffffff, #182132);
+      --surface-2: light-dark(#eef2f8, #222d41);
+      --text: light-dark(#172033, #edf2fb);
+      --muted: light-dark(#5e697b, #abb7ca);
+      --border: light-dark(#d6dce7, #39465c);
+      --accent: light-dark(#3157c8, #93abff);
+      --accent-soft: light-dark(#e5eaff, #273762);
+      --good: light-dark(#147a50, #67d6aa);
+      --good-soft: light-dark(#e2f5ec, #173e32);
+      --warn: light-dark(#9a5b00, #f0b45b);
+      --warn-soft: light-dark(#fff1d7, #493516);
+      --bad: light-dark(#b42318, #ff9189);
+      --bad-soft: light-dark(#fde7e5, #4b2426);
+      --shadow: light-dark(0 9px 25px rgba(36, 49, 77, .10), 0 9px 25px rgba(0, 0, 0, .28));
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 18px; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.45; }
+    main { max-width: 1000px; margin: 0 auto; }
+    h1 { margin: 0 0 5px; font-size: clamp(1.35rem, 3vw, 2rem); }
+    h2 { margin: 0 0 8px; font-size: 1.05rem; }
+    h3 { margin: 14px 0 6px; font-size: .95rem; }
+    .lead { color: var(--muted); margin: 0 0 15px; }
+    button, select, input { min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 9px; color: var(--text); background: var(--surface); font: inherit; }
+    input.freq { width: 78px; min-height: 34px; padding: 4px 8px; }
+    input.sym { width: 54px; min-height: 34px; padding: 4px 8px; text-align: center; font-weight: 700; }
+    button:hover { border-color: var(--accent); }
+    button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 2px; }
+    button:disabled { opacity: .45; }
+    button.primary { color: light-dark(#ffffff, #101624); background: var(--accent); border-color: var(--accent); }
+    .panel { padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); margin-bottom: 14px; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .muted { color: var(--muted); }
+    .symrow { display: inline-flex; gap: 4px; align-items: center; padding: 4px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
+    .symrow button { min-height: 30px; padding: 2px 8px; }
+    .status { min-height: 54px; margin: 12px 0; padding: 9px 11px; border-left: 4px solid var(--accent); border-radius: 0 9px 9px 0; background: var(--surface-2); }
+    .status.good { border-left-color: var(--good); background: var(--good-soft); }
+    .status strong { display: block; margin-bottom: 2px; }
+    .queue { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 44px; padding: 8px; border: 1px dashed var(--border); border-radius: 10px; background: var(--bg); }
+    .qchip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); font-variant-numeric: tabular-nums; transition: all .3s; }
+    .qchip.pick { border-color: var(--warn); background: var(--warn-soft); font-weight: 700; }
+    .qchip.new { border-color: var(--good); background: var(--good-soft); font-weight: 700; animation: rise .5s ease; }
+    @keyframes rise { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .forest { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); padding: 6px; }
+    svg text { font-family: ui-sans-serif, system-ui, sans-serif; fill: var(--text); }
+    .edge { stroke: var(--border); stroke-width: 2; }
+    .elabel { font-size: 12px; fill: var(--accent) !important; font-weight: 700; }
+    .nint { fill: var(--surface); stroke: var(--muted); stroke-width: 1.5; }
+    .nleaf { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+    .pick { stroke: var(--warn) !important; stroke-width: 3.5 !important; }
+    .newn { stroke: var(--good) !important; stroke-width: 3.5 !important; fill: var(--good-soft) !important; }
+    .nlabel { font-size: 12px; font-weight: 700; }
+    .nsub { font-size: 11px; fill: var(--muted) !important; }
+    .metric-row { display: flex; flex-wrap: wrap; gap: 9px; margin: 10px 0; }
+    .metric { min-width: 140px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
+    .metric span { display: block; color: var(--muted); font-size: .82rem; }
+    .metric strong { font-variant-numeric: tabular-nums; font-size: 1.1rem; }
+    .metric.best { border-color: var(--good); background: var(--good-soft); }
+    table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+    th, td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+    th { color: var(--muted); font-weight: 600; font-size: .85rem; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } body { padding: 12px; } }
+    .steps { margin: 6px 0 0; padding-left: 20px; font-size: .9rem; color: var(--muted); }
+    .steps li.cur { color: var(--text); font-weight: 600; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Huffman paso a paso</h1>
+  <p class="lead">Cola de prioridad, fusiones y árbol final. Cambia las frecuencias y compara con el código fijo, Shannon–Fano y la entropía.</p>
+
+  <section class="panel">
+    <h2>Alfabeto y frecuencias</h2>
+    <div class="row" style="margin-bottom:8px">
+      <select id="preset" aria-label="Instancia">
+        <option value="clase">Ejemplo de clase (a .32, b .25, c .20, d .18, e .05)</option>
+        <option value="tarea">a .4, b .3, c .2, d .1</option>
+        <option value="unif">Uniforme, 8 símbolos</option>
+        <option value="fib">Tipo Fibonacci (árbol muy profundo)</option>
+        <option value="texto">Contar letras de un texto…</option>
+      </select>
+      <input id="texto" value="abracadabra" style="width:200px" hidden aria-label="Texto">
+      <button id="addSym">+ símbolo</button>
+    </div>
+    <div class="row" id="symList"></div>
+    <p class="muted" id="sumInfo" style="margin:6px 0 0;font-size:.88rem"></p>
+  </section>
+
+  <section class="panel">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="margin:0">Ejecución</h2>
+      <div class="row">
+        <button id="reset">Reiniciar</button>
+        <button class="primary" id="step">Siguiente fusión</button>
+        <button id="all">Ejecutar todo</button>
+        <button id="play">▶ Reproducir</button>
+      </div>
+    </div>
+    <div class="status" id="status"></div>
+    <h3>Cola de prioridad Q (ordenada por frecuencia)</h3>
+    <div class="queue" id="queue"></div>
+    <h3>Bosque</h3>
+    <div class="forest"><svg id="forest" role="img" aria-label="Bosque de Huffman"></svg></div>
+    <ol class="steps" id="stepList"></ol>
+  </section>
+
+  <section class="panel" id="resultPanel">
+    <h2>Resultado</h2>
+    <div class="metric-row" id="metrics"></div>
+    <div class="grid2">
+      <div>
+        <h3>Código de Huffman</h3>
+        <div id="codeTable"></div>
+      </div>
+      <div>
+        <h3>Comparación con Shannon–Fano</h3>
+        <p class="muted" style="font-size:.88rem;margin:0 0 6px">Shannon–Fano divide de arriba hacia abajo en dos grupos de frecuencia lo más parecida posible (variante de Kleinberg–Tardos).</p>
+        <div id="sfTable"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const el = id => document.getElementById(id);
+  const PRESETS = {
+    clase: [["a", .32], ["b", .25], ["c", .20], ["d", .18], ["e", .05]],
+    tarea: [["a", .4], ["b", .3], ["c", .2], ["d", .1]],
+    unif: "abcdefgh".split("").map(s => [s, .125]),
+    fib: [["a", 34], ["b", 21], ["c", 13], ["d", 8], ["e", 5], ["f", 3], ["g", 2], ["h", 1], ["i", 1]].map(([s, v]) => [s, v / 88])
+  };
+  let syms = PRESETS.clase.map(x => x.slice());
+  let steps = [], cur = 0, timer = null;
+
+  const r3 = x => Math.round(x * 1000) / 1000;
+  const fmt = x => { const v = r3(x); return (v < 1 ? v.toFixed(3).replace(/0+$/, "").replace(/\.$/, "") : v.toString()).replace(/^0\./, "."); };
+
+  /* ---------- Entrada ---------- */
+  function renderInputs() {
+    el("symList").innerHTML = syms.map(([s, f], i) => `
+      <span class="symrow"><input class="sym" data-i="${i}" value="${s}" maxlength="3" aria-label="símbolo">
+      <input class="freq" type="number" min="0" step="0.01" data-i="${i}" value="${r3(f)}" aria-label="frecuencia de ${s}">
+      <button data-del="${i}" aria-label="quitar ${s}" ${syms.length <= 2 ? "disabled" : ""}>×</button></span>`).join("");
+    el("symList").querySelectorAll(".sym").forEach(inp => inp.addEventListener("change", () => { syms[+inp.dataset.i][0] = inp.value.trim() || "?"; recompute(); }));
+    el("symList").querySelectorAll(".freq").forEach(inp => inp.addEventListener("change", () => { const v = parseFloat(inp.value); syms[+inp.dataset.i][1] = isFinite(v) && v > 0 ? v : 0.001; recompute(); }));
+    el("symList").querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => { syms.splice(+b.dataset.del, 1); renderInputs(); recompute(); }));
+    const total = syms.reduce((a, x) => a + x[1], 0);
+    el("sumInfo").textContent = `|Σ| = ${syms.length} · Σ f = ${fmt(total)}` + (Math.abs(total - 1) > 1e-6 ? " → se normalizan para calcular PBS." : "");
+  }
+  el("addSym").addEventListener("click", () => {
+    const used = new Set(syms.map(x => x[0]));
+    const s = "abcdefghijklmnopqrstuvwxyz".split("").find(c => !used.has(c)) || "x" + syms.length;
+    syms.push([s, .05]); renderInputs(); recompute();
+  });
+  el("preset").addEventListener("change", () => {
+    const v = el("preset").value;
+    el("texto").hidden = v !== "texto";
+    if (v === "texto") fromText(); else syms = PRESETS[v].map(x => x.slice());
+    renderInputs(); recompute();
+  });
+  el("texto").addEventListener("input", () => { fromText(); renderInputs(); recompute(); });
+  function fromText() {
+    const t = [...el("texto").value].map(c => c === " " ? "␣" : c);
+    const cnt = {}; t.forEach(c => cnt[c] = (cnt[c] || 0) + 1);
+    const n = t.length || 1;
+    syms = Object.entries(cnt).sort((a, b) => b[1] - a[1]).map(([s, k]) => [s, k / n]);
+    if (syms.length < 2) syms = [["a", .5], ["b", .5]];
+  }
+
+  /* ---------- Huffman ---------- */
+  function normalized() {
+    const total = syms.reduce((a, x) => a + x[1], 0) || 1;
+    return syms.map(([s, f]) => [s, f / total]);
+  }
+
+  function computeSteps() {
+    let id = 0, order = 0;
+    const leaves = normalized().map(([s, f]) => ({ id: id++, sym: s, f, left: null, right: null, ord: order++ }));
+    let Q = leaves.slice();
+    const cmp = (a, b) => a.f - b.f || a.ord - b.ord;
+    Q.sort(cmp);
+    const out = [{ Q: Q.slice(), pick: [], made: null, msg: "Se insertan todos los símbolos en Q como hojas (árboles de un nodo)." }];
+    while (Q.length > 1) {
+      Q.sort(cmp);
+      const x = Q[0], y = Q[1];
+      out[out.length - 1].nextPick = [x.id, y.id];
+      const z = { id: id++, sym: null, f: x.f + y.f, left: x, right: y, ord: order++ };
+      Q = Q.slice(2); Q.push(z); Q.sort(cmp);
+      out.push({ Q: Q.slice(), pick: [x.id, y.id], made: z,
+        msg: `extractMin → <b>${label(x)}</b> (${fmt(x.f)}), extractMin → <b>${label(y)}</b> (${fmt(y.f)}). Nuevo nodo <b>${label(z)}</b> con frecuencia ${fmt(x.f)} + ${fmt(y.f)} = ${fmt(z.f)}; insert.` });
+    }
+    return out;
+  }
+  function label(n) { return n.sym !== null ? n.sym : label(n.left) + label(n.right); }
+
+  function codesOf(root) {
+    const code = {}, depth = {};
+    (function r(n, p) {
+      if (n.sym !== null) { code[n.sym] = p || "0"; depth[n.sym] = Math.max(p.length, 1); return; }
+      r(n.left, p + "0"); r(n.right, p + "1");
+    })(root, "");
+    return { code, depth };
+  }
+
+  /* ---------- Shannon–Fano (división más equilibrada) ---------- */
+  function shannonFano(items) {
+    const code = {};
+    (function rec(group, prefix) {
+      if (group.length === 1) { code[group[0][0]] = prefix || "0"; return; }
+      const total = group.reduce((a, x) => a + x[1], 0);
+      let bestMask = 1, bestDiff = Infinity;
+      const n = group.length;
+      if (n <= 14) {
+        for (let m = 1; m < (1 << n) - 1; m++) {
+          if (!(m & 1)) continue; // fija el primero en el grupo izquierdo para no repetir
+          let s = 0; for (let i = 0; i < n; i++) if (m >> i & 1) s += group[i][1];
+          const d = Math.abs(total - 2 * s);
+          if (d < bestDiff - 1e-12) { bestDiff = d; bestMask = m; }
+        }
+      } else { // contiguo en orden decreciente
+        let s = 0; for (let i = 0; i < n - 1; i++) { s += group[i][1]; const d = Math.abs(total - 2 * s); if (d < bestDiff) { bestDiff = d; bestMask = (1 << (i + 1)) - 1; } }
+      }
+      const L = group.filter((_, i) => bestMask >> i & 1), R = group.filter((_, i) => !(bestMask >> i & 1));
+      rec(L, prefix + "0"); rec(R, prefix + "1");
+    })(items.slice().sort((a, b) => b[1] - a[1]), "");
+    return code;
+  }
+
+  /* ---------- Dibujo ---------- */
+  function drawForest(Q, pickIds, madeId) {
+    const svg = el("forest");
+    const GAP = 30, DX = 58, DY = 66;
+    let offset = 20, maxDepth = 0, s = "";
+    const placed = [];
+    for (const root of Q) {
+      let leafX = 0, md = 0;
+      (function lay(n, d) { n._d = d; md = Math.max(md, d);
+        if (n.sym !== null) { n._x = leafX++; return; }
+        lay(n.left, d + 1); lay(n.right, d + 1); n._x = (n.left._x + n.right._x) / 2; })(root, 0);
+      maxDepth = Math.max(maxDepth, md);
+      placed.push({ root, off: offset });
+      offset += Math.max(1, leafX) * DX + GAP;
+    }
+    const W = Math.max(offset, 320), H = maxDepth * DY + 90;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("width", W); svg.setAttribute("height", H);
+    for (const { root, off } of placed) {
+      const X = n => off + n._x * DX + 18, Y = n => 28 + n._d * DY;
+      (function edges(n) {
+        if (n.sym !== null) return;
+        [[n.left, 0], [n.right, 1]].forEach(([k, b]) => {
+          s += `<line class="edge" x1="${X(n)}" y1="${Y(n)}" x2="${X(k)}" y2="${Y(k)}"/>`;
+          s += `<text class="elabel" x="${(X(n) + X(k)) / 2 + (b ? 9 : -9)}" y="${(Y(n) + Y(k)) / 2 - 2}" text-anchor="middle">${b}</text>`;
+          edges(k);
+        });
+      })(root);
+      (function nodesDraw(n) {
+        const extra = pickIds.includes(n.id) ? " pick" : (n.id === madeId ? " newn" : "");
+        if (n.sym !== null) {
+          s += `<circle class="nleaf${extra}" cx="${X(n)}" cy="${Y(n)}" r="16"/>`;
+          s += `<text class="nlabel" x="${X(n)}" y="${Y(n) + 4}" text-anchor="middle">${n.sym}</text>`;
+          s += `<text class="nsub" x="${X(n)}" y="${Y(n) + 31}" text-anchor="middle">${fmt(n.f)}</text>`;
+        } else {
+          s += `<circle class="nint${extra}" cx="${X(n)}" cy="${Y(n)}" r="16"/>`;
+          s += `<text class="nlabel" x="${X(n)}" y="${Y(n) + 4}" text-anchor="middle" style="font-size:10.5px">${fmt(n.f)}</text>`;
+          nodesDraw(n.left); nodesDraw(n.right);
+        }
+      })(root);
+    }
+    svg.innerHTML = s;
+  }
+
+  function render() {
+    const st = steps[cur];
+    const next = st.nextPick || [];
+    el("queue").innerHTML = st.Q.map(n => `<span class="qchip${next.includes(n.id) ? " pick" : ""}${st.made && n.id === st.made.id ? " new" : ""}">${label(n)} : ${fmt(n.f)}</span>`).join("");
+    drawForest(st.Q, cur === steps.length - 1 ? [] : next, st.made ? st.made.id : null);
+    const done = cur === steps.length - 1;
+    const status = el("status");
+    status.className = "status" + (done ? " good" : "");
+    status.innerHTML = `<strong>Paso ${cur} de ${steps.length - 1}${done ? " · Q tiene un solo árbol: terminado" : ""}</strong>${st.msg}` +
+      (!done ? `<br><span class="muted">Siguiente: los dos mínimos (en ámbar) se fusionarán.</span>` : "");
+    el("stepList").innerHTML = steps.slice(1).map((x, i) => `<li class="${i + 1 === cur ? "cur" : ""}">${label(x.made)} = ${label(x.made.left)} + ${label(x.made.right)} → ${fmt(x.made.f)}</li>`).join("");
+    el("step").disabled = el("all").disabled = done;
+    el("play").disabled = done;
+    renderResult(done);
+  }
+
+  function renderResult(done) {
+    const items = normalized();
+    const F = Object.fromEntries(items);
+    const k = items.length;
+    const root = steps[steps.length - 1].Q[0];
+    const { code } = codesOf(root);
+    const pbsOf = c => items.reduce((a, [s, f]) => a + f * c[s].length, 0);
+    const H = items.reduce((a, [, f]) => a + (f > 0 ? f * Math.log2(1 / f) : 0), 0);
+    const huff = pbsOf(code), fixed = Math.ceil(Math.log2(k)), sf = shannonFano(items), sfP = pbsOf(sf);
+    el("metrics").innerHTML = `
+      <div class="metric best"><span>PBS Huffman</span><strong>${done ? r3(huff) : "?"}</strong></div>
+      <div class="metric"><span>Longitud fija ⌈log₂ ${k}⌉</span><strong>${fixed}</strong></div>
+      <div class="metric"><span>PBS Shannon–Fano</span><strong>${r3(sfP)}</strong></div>
+      <div class="metric"><span>Entropía H(f)</span><strong>${r3(H)}</strong></div>`;
+    el("codeTable").innerHTML = done ? `<table><thead><tr><th>x</th><th>f<sub>x</sub></th><th>γ(x)</th><th>depth</th><th>f·depth</th></tr></thead><tbody>` +
+      items.map(([s, f]) => `<tr><td><b>${s}</b></td><td>${fmt(f)}</td><td><code>${code[s]}</code></td><td>${code[s].length}</td><td>${fmt(f * code[s].length)}</td></tr>`).join("") +
+      `</tbody><tfoot><tr><th colspan="4">PBS</th><th>${r3(huff)}</th></tr></tfoot></table>
+      <p class="muted" style="font-size:.85rem;margin:6px 0 0">Aquí el hijo izquierdo (0) es el primer mínimo extraído. Las notas pueden etiquetar 0/1 al revés; el PBS es el mismo.</p>`
+      : `<p class="muted">Termina la ejecución para leer el código desde la raíz.</p>`;
+    el("sfTable").innerHTML = `<table><thead><tr><th>x</th><th>γ<sub>SF</sub>(x)</th><th>f·|γ|</th></tr></thead><tbody>` +
+      items.map(([s, f]) => `<tr><td><b>${s}</b></td><td><code>${sf[s]}</code></td><td>${fmt(f * sf[s].length)}</td></tr>`).join("") +
+      `</tbody><tfoot><tr><th colspan="2">PBS</th><th>${r3(sfP)}</th></tr></tfoot></table>
+      <p class="muted" style="font-size:.85rem;margin:6px 0 0">${sfP - huff > 1e-9 ? `Shannon–Fano pierde ${r3(sfP - huff)} bits por símbolo frente a Huffman.` : "En esta instancia Shannon–Fano empata con Huffman (no siempre ocurre)."} Siempre se cumple H ≤ PBS<sub>Huffman</sub> &lt; H + 1.</p>`;
+  }
+
+  function stop() { if (timer) { clearInterval(timer); timer = null; el("play").textContent = "▶ Reproducir"; } }
+  function recompute() { stop(); steps = computeSteps(); cur = 0; render(); }
+  el("reset").addEventListener("click", () => { stop(); cur = 0; render(); });
+  el("step").addEventListener("click", () => { if (cur < steps.length - 1) { cur++; render(); } });
+  el("all").addEventListener("click", () => { stop(); cur = steps.length - 1; render(); });
+  el("play").addEventListener("click", () => {
+    if (timer) return stop();
+    el("play").textContent = "⏸ Pausa";
+    timer = setInterval(() => { if (cur >= steps.length - 1) return stop(); cur++; render(); }, 1300);
+  });
+
+  renderInputs();
+  recompute();
+})();
+</script>
+</body>
+</html>

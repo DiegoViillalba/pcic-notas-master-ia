@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="630" viewBox="0 0 700 630" role="img" aria-labelledby="title desc">
+<title id="title">Ejemplo 2: abrir y volver a bloquear</title>
+<desc id="desc">L apunta a R; R apunta a D; R apunta a T; B apunta a T; T apunta a T′. Camino L → R → T ← B.
+Observar T abre T; observar también R bloquea el camino.</desc>
+<style>
+svg{color-scheme:light dark;--bg:#fafbf9;--ink:#1d3035;--line:#536971;--node:#ffffff;--accent:#146879;--soft:#dceff0;--muted:#53646c}
+@media(prefers-color-scheme:dark){svg{--bg:#182228;--ink:#edf3f4;--line:#a9bdc5;--node:#23333c;--accent:#81d2dc;--soft:#264c56;--muted:#bdcbd0}}
+.canvas{fill:var(--bg)}text{font-family:system-ui,sans-serif;fill:var(--ink);text-anchor:middle} .heading{font-size:23px;font-weight:600}.label{font-size:18px}.small{font-size:16px;fill:var(--muted)}.symbol{font-size:24px;font-weight:600}.edge{stroke:var(--line);stroke-width:2;fill:none}.node{fill:var(--node);stroke:var(--line);stroke-width:1.7}.observed{fill:var(--soft);stroke:var(--accent);stroke-width:2.5}
+</style>
+<rect class="canvas" width="700" height="630" rx="12"/>
+<text class="heading" x="350" y="36">Ejemplo 2: abrir y volver a bloquear</text>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="var(--line)"/></marker></defs>
+<line class="edge" x1="240.00" y1="122.00" x2="240.00" y2="188.00" marker-end="url(#arrow)"/>
+<line class="edge" x1="217.37" y1="247.63" x2="126.16" y2="338.84" marker-end="url(#arrow)"/>
+<line class="edge" x1="264.08" y1="246.07" x2="372.15" y2="340.64" marker-end="url(#arrow)"/>
+<line class="edge" x1="526.61" y1="246.83" x2="427.05" y2="339.75" marker-end="url(#arrow)"/>
+<line class="edge" x1="400.00" y1="397.00" x2="400.00" y2="463.00" marker-end="url(#arrow)"/>
+<circle class="node " cx="240" cy="90" r="32"/><text class="symbol" x="240" y="98">L</text><text class="label" x="287" y="96" style="text-anchor:start">Baja presión</text>
+<circle class="node " cx="240" cy="225" r="32"/><text class="symbol" x="240" y="233">R</text><text class="label" x="287" y="231" style="text-anchor:start">Lluvia</text>
+<circle class="node " cx="550" cy="225" r="32"/><text class="symbol" x="550" y="233">B</text><text class="label" x="597" y="231" style="text-anchor:start">Partido</text>
+<circle class="node " cx="100" cy="365" r="32"/><text class="symbol" x="100" y="373">D</text><text class="label" x="100" y="423" style="text-anchor:middle">Goteo</text>
+<circle class="node " cx="400" cy="365" r="32"/><text class="symbol" x="400" y="373">T</text><text class="label" x="447" y="371" style="text-anchor:start">Tráfico</text>
+<circle class="node " cx="400" cy="500" r="32"/><text class="symbol" x="400" y="508">T′</text><text class="label" x="400" y="558" style="text-anchor:middle">Reporte</text>
+<text class="small" x="350" y="590">Camino L → R → T ← B.</text>
+<text class="small" x="350" y="613">Observar T abre T; observar también R bloquea el camino.</text>
+</svg>

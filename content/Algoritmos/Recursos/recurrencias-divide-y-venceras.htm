@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Una o dos ramas: árboles de recurrencia</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, -apple-system, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 22px; background: #f4f7fb; color: #17243a; }
+    main { max-width: 920px; margin: auto; padding: 22px; border: 1px solid #d7e0ec; border-radius: 18px; background: white; box-shadow: 0 6px 24px #1a365d12; }
+    h1 { margin: 0 0 6px; font-size: 1.4rem; }
+    p { line-height: 1.45; margin: 7px 0 16px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end; margin: 16px 0; }
+    .controls > div { display: grid; gap: 6px; }
+    .label { font-size: .83rem; font-weight: 700; color: #425574; }
+    .segmented { display: inline-flex; border: 1px solid #b9c8db; border-radius: 10px; overflow: hidden; }
+    button { border: 0; padding: 9px 13px; background: #f2f5fa; color: #17243a; cursor: pointer; font: inherit; }
+    button + button { border-left: 1px solid #b9c8db; }
+    button[aria-pressed="true"] { background: #1655a4; color: white; font-weight: 700; }
+    button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid #ed9b36; outline-offset: 2px; }
+    select { padding: 8px; border: 1px solid #b9c8db; border-radius: 8px; background: white; color: #17243a; font: inherit; }
+    .formula { padding: 12px 15px; border-radius: 10px; background: #eaf2fc; font-weight: 700; }
+    .scrub { display: flex; align-items: center; gap: 12px; margin: 18px 0 8px; }
+    .scrub input { flex: 1; min-width: 80px; accent-color: #1655a4; }
+    .tree { display: grid; gap: 8px; max-height: 350px; overflow: auto; padding: 4px; }
+    .row { display: grid; grid-template-columns: 82px minmax(0, 1fr) 135px; align-items: center; gap: 10px; padding: 8px; border: 1px solid #dce5f0; border-radius: 10px; }
+    .row.active { border-color: #1655a4; background: #edf5ff; box-shadow: inset 4px 0 #1655a4; }
+    .level { font-weight: 700; font-size: .87rem; }
+    .nodes { display: flex; flex-wrap: wrap; gap: 4px; }
+    .node { min-width: 36px; padding: 5px 6px; border-radius: 6px; background: #d9e8fa; color: #123e76; text-align: center; font-size: .79rem; font-weight: 700; }
+    .leaf { background: #e1f1e5; color: #21643a; }
+    .cost { text-align: right; font-size: .86rem; font-variant-numeric: tabular-nums; }
+    .detail { margin-top: 15px; padding: 12px 14px; border-radius: 10px; background: #fff2d9; }
+    .total { margin-top: 12px; font-weight: 700; }
+    @media(max-width: 620px) {
+      body { padding: 8px; }
+      main { padding: 14px; }
+      .row { grid-template-columns: 48px minmax(0, 1fr); }
+      .cost { grid-column: 2; text-align: left; }
+      .node { min-width: 29px; font-size: .7rem; }
+    }
+    @media(prefers-color-scheme: dark) {
+      body { background: #111827; color: #e5edf8; }
+      main { background: #1c2738; border-color: #394b64; box-shadow: none; }
+      .label { color: #b8cbe6; }
+      .formula { background: #243e61; }
+      .row { border-color: #40516a; }
+      .row.active { background: #213e64; border-color: #79b6ff; box-shadow: inset 4px 0 #79b6ff; }
+      .node { background: #274c77; color: #e1efff; }
+      .leaf { background: #25503b; color: #e3f8e8; }
+      .detail { background: #5a4222; }
+      button { background: #263750; color: #e5edf8; }
+      button[aria-pressed="true"] { background: #286cc0; }
+      select { background: #263750; color: #e5edf8; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>¿Una rama o dos?</h1>
+  <p>Explora por qué la búsqueda binaria suma trabajo constante por nivel y la división en dos mitades suma trabajo proporcional a <i>n</i> por nivel.</p>
+  <div class="controls">
+    <div>
+      <span class="label">Recurrencia</span>
+      <div class="segmented" role="group" aria-label="Tipo de recurrencia">
+        <button id="binary" type="button" aria-pressed="true">Una rama</button>
+        <button id="merge" type="button" aria-pressed="false">Dos ramas</button>
+      </div>
+    </div>
+    <div>
+      <label class="label" for="size">Tamaño n</label>
+      <select id="size"><option>8</option><option selected>16</option><option>32</option></select>
+    </div>
+  </div>
+  <div class="formula" id="formula"></div>
+  <div class="scrub">
+    <label class="label" for="depth">Nivel</label>
+    <input id="depth" type="range" min="0" max="4" value="0">
+    <strong id="depthValue">0</strong>
+  </div>
+  <div class="tree" id="tree" aria-label="Niveles del árbol de recurrencia"></div>
+  <div class="detail" id="detail" aria-live="polite"></div>
+  <div class="total" id="total"></div>
+  <p style="font-size:.8rem;margin-bottom:0">Los costos están normalizados: cada comparación o unidad de mezcla vale 1. Las hojas tienen costo constante.</p>
+</main>
+<script>
+  const binaryButton = document.getElementById('binary');
+  const mergeButton = document.getElementById('merge');
+  const sizeSelect = document.getElementById('size');
+  const depthInput = document.getElementById('depth');
+  const depthValue = document.getElementById('depthValue');
+  const tree = document.getElementById('tree');
+  const formula = document.getElementById('formula');
+  const detail = document.getElementById('detail');
+  const total = document.getElementById('total');
+  let mode = 'binary';
+
+  function render() {
+    const n = Number(sizeSelect.value);
+    const height = Math.log2(n);
+    depthInput.max = height;
+    if (Number(depthInput.value) > height) depthInput.value = height;
+    const selected = Number(depthInput.value);
+    depthValue.textContent = selected;
+    binaryButton.setAttribute('aria-pressed', String(mode === 'binary'));
+    mergeButton.setAttribute('aria-pressed', String(mode === 'merge'));
+    formula.textContent = mode === 'binary'
+      ? 'T(n) ≤ T(n/2) + 1  →  O(log₂ n)'
+      : 'T(n) ≤ 2T(n/2) + n  →  O(n log₂ n)';
+    tree.replaceChildren();
+    for (let level = 0; level <= height; level++) {
+      const count = mode === 'binary' ? 1 : 2 ** level;
+      const size = n / (2 ** level);
+      const perNode = level === height ? 1 : mode === 'binary' ? 1 : size;
+      const row = document.createElement('div');
+      row.className = 'row' + (level === selected ? ' active' : '');
+      const label = document.createElement('span');
+      label.className = 'level';
+      label.textContent = 'Nivel ' + level;
+      const nodes = document.createElement('div');
+      nodes.className = 'nodes';
+      for (let i = 0; i < count; i++) {
+        const node = document.createElement('span');
+        node.className = 'node' + (level === height ? ' leaf' : '');
+        node.textContent = size;
+        node.title = 'Subproblema de tamaño ' + size;
+        nodes.append(node);
+      }
+      const cost = document.createElement('span');
+      cost.className = 'cost';
+      cost.textContent = count + ' × ' + perNode + ' = ' + count * perNode;
+      row.append(label, nodes, cost);
+      tree.append(row);
+    }
+    const count = mode === 'binary' ? 1 : 2 ** selected;
+    const subsize = n / (2 ** selected);
+    const perNode = selected === height ? 1 : mode === 'binary' ? 1 : subsize;
+    detail.textContent = 'Nivel ' + selected + ': ' + count + ' subproblema' + (count === 1 ? '' : 's')
+      + ' de tamaño ' + subsize + '. Trabajo del nivel = ' + count + ' × ' + perNode + ' = ' + (count * perNode) + '.';
+    total.textContent = mode === 'binary'
+      ? 'Total: ' + height + ' niveles internos × 1 + 1 hoja = ' + (height + 1) + ' = O(log n).'
+      : 'Total: ' + height + ' niveles internos × ' + n + ' + ' + n + ' hojas = ' + (height * n + n) + ' = O(n log n).';
+  }
+  binaryButton.addEventListener('click', () => { mode = 'binary'; render(); });
+  mergeButton.addEventListener('click', () => { mode = 'merge'; render(); });
+  sizeSelect.addEventListener('change', render);
+  depthInput.addEventListener('input', render);
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador Examen 1</title>
+<style>
+  :root {
+    --bg: #f7f7fb; --panel: #ffffff; --card: #f0f1f7; --text: #1d1f2b; --muted: #5d6178;
+    --border: #d9dbe7; --blue: #2f63c7; --green: #23864a; --red: #c43c4f; --yellow: #a87400;
+    --gray-node: #9aa0b8; --white-node: #ffffff; --black-node: #2b2d3a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1e1e2e; --panel: #252538; --card: #2d2d45; --text: #e0e2ee; --muted: #a0a4be;
+      --border: #3e405a; --blue: #89b4fa; --green: #a6e3a1; --red: #f38ba8; --yellow: #f9e2af;
+      --gray-node: #7f849c; --white-node: #e0e2ee; --black-node: #11111b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1e1e2e; --panel: #252538; --card: #2d2d45; --text: #e0e2ee; --muted: #a0a4be;
+    --border: #3e405a; --blue: #89b4fa; --green: #a6e3a1; --red: #f38ba8; --yellow: #f9e2af;
+    --gray-node: #7f849c; --white-node: #e0e2ee; --black-node: #11111b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--text);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  h1 { font-size: 1.15rem; margin: 0 0 2px; color: var(--blue); }
+  .sub { color: var(--muted); font-size: .85rem; margin: 0 0 12px; }
+  .tabs, .bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  button, select { font: inherit; font-size: .85rem; padding: 6px 12px; border-radius: 7px;
+    border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; }
+  button:hover { border-color: var(--blue); }
+  button.on { background: var(--blue); color: var(--panel); border-color: var(--blue); font-weight: 600; }
+  .grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px; min-width: 0; }
+  .panel h2 { font-size: .9rem; margin: 0 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  svg { width: 100%; height: auto; display: block; }
+  .adj { font-family: ui-monospace, Menlo, monospace; font-size: .82rem; white-space: pre-wrap; margin: 0; }
+  .task { background: var(--card); border-left: 3px solid var(--yellow); padding: 8px 10px; border-radius: 6px; font-size: .88rem; margin-bottom: 10px; }
+  ol.log { margin: 0; padding-left: 22px; font-size: .85rem; max-height: 300px; overflow-y: auto; }
+  ol.log li { margin-bottom: 3px; }
+  .result { margin-top: 10px; padding: 8px 10px; border-radius: 6px; background: var(--card); font-size: .88rem; }
+  .result b { color: var(--green); }
+  .hidden { display: none; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .q { font-size: 1rem; font-weight: 600; margin-bottom: 10px; }
+  .a { border-top: 1px dashed var(--border); padding-top: 10px; color: var(--text); }
+  .tag { display: inline-block; font-size: .72rem; padding: 1px 8px; border-radius: 10px; background: var(--card); color: var(--muted); margin-bottom: 8px; }
+  .legend { font-size: .78rem; color: var(--muted); margin-top: 6px; }
+</style>
+</head>
+<body>
+<h1>Simulador · Examen parcial 1</h1>
+<p class="sub">Haz la traza a mano en papel y después revela la solución paso a paso. Regla de desempate: vecinos en orden alfabético.</p>
+
+<div class="tabs">
+  <button class="on" data-tab="trazas">Práctica de trazas</button>
+  <button data-tab="tarjetas">Tarjetas de repaso</button>
+</div>
+
+<section id="trazas">
+  <div class="bar">
+    <select id="modo">
+      <option value="bfs">BFS · capas y bipartición (no dirigido)</option>
+      <option value="dfs">DFS · tiempos d/f y tipos de arista (dirigido)</option>
+      <option value="kahn">Kahn · orden topológico (DAG)</option>
+      <option value="topodfs">TopoSort-DFS · f decreciente (DAG)</option>
+    </select>
+    <button id="nuevo">Nuevo grafo</button>
+    <button id="paso">Siguiente paso</button>
+    <button id="todo">Mostrar todo</button>
+    <button id="reiniciar">Ocultar solución</button>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <h2>Grafo</h2>
+      <svg id="lienzo" viewBox="0 0 360 300" role="img" aria-label="Grafo de práctica"></svg>
+      <div class="legend" id="leyenda"></div>
+    </div>
+    <div class="panel">
+      <div class="task" id="tarea"></div>
+      <h2>Listas de adyacencia</h2>
+      <pre class="adj" id="adj"></pre>
+      <h2 style="margin-top:10px">Solución</h2>
+      <ol class="log" id="log"></ol>
+      <div class="result hidden" id="resultado"></div>
+    </div>
+  </div>
+</section>
+
+<section id="tarjetas" class="hidden">
+  <div class="bar">
+    <button id="prev">← Anterior</button>
+    <button id="ver">Ver respuesta</button>
+    <button id="next">Siguiente →</button>
+    <button id="mezclar">Mezclar</button>
+    <span class="sub" id="contador" style="margin:6px 0 0 6px"></span>
+  </div>
+  <div class="card">
+    <span class="tag" id="ctag"></span>
+    <div class="q" id="cq"></div>
+    <div class="a hidden" id="ca"></div>
+  </div>
+</section>
+
+<script>
+(function () {
+  // ---------- Pestañas ----------
+  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+    document.getElementById('trazas').classList.toggle('hidden', b.dataset.tab !== 'trazas');
+    document.getElementById('tarjetas').classList.toggle('hidden', b.dataset.tab !== 'tarjetas');
+  });
+
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const rnd = k => Math.floor(Math.random() * k);
+  const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+  let G = null, steps = [], shown = 0, final = '';
+
+  // ---------- Generación ----------
+  function genUndirected() {
+    const n = 7 + rnd(2), V = 'abcdefgh'.slice(0, n).split('');
+    const E = new Set();
+    const order = shuffle(V.slice());
+    for (let i = 1; i < n; i++) { const u = order[rnd(i)], v = order[i]; E.add([u, v].sort().join('')); }
+    const extra = 2 + rnd(3);
+    for (let t = 0; t < 40 && E.size < n - 1 + extra; t++) {
+      const u = V[rnd(n)], v = V[rnd(n)]; if (u !== v) E.add([u, v].sort().join(''));
+    }
+    return { V, E: [...E].map(s => [s[0], s[1]]), directed: false };
+  }
+  function genDirected(dag) {
+    const n = 7, V = 'abcdefg'.split('');
+    const pos = shuffle(V.slice()); const rank = {}; pos.forEach((v, i) => rank[v] = i);
+    const E = new Set();
+    for (let t = 0; t < 60 && E.size < 9 + rnd(2); t++) {
+      let u = V[rnd(n)], v = V[rnd(n)]; if (u === v) continue;
+      if (dag && rank[u] > rank[v]) [u, v] = [v, u];
+      if (E.has(v + u) && !dag) continue;
+      E.add(u + v);
+    }
+    return { V, E: [...E].map(s => [s[0], s[1]]), directed: true };
+  }
+  function adjacency(g) {
+    const A = {}; g.V.forEach(v => A[v] = []);
+    g.E.forEach(([u, v]) => { A[u].push(v); if (!g.directed) A[v].push(u); });
+    g.V.forEach(v => A[v].sort()); return A;
+  }
+
+  // ---------- Algoritmos (generan pasos) ----------
+  function runBFS(g) {
+    const A = adjacency(g), s = g.V[0], dist = { [s]: 0 }, par = { [s]: null }, q = [s], out = [], ann = {};
+    out.push({ t: `Inicio: L0 = {${s}}, cola = [${s}]`, ann: { [s]: 'L0' } });
+    while (q.length) {
+      const u = q.shift(), nuevos = [];
+      for (const v of A[u]) if (!(v in dist)) { dist[v] = dist[u] + 1; par[v] = u; q.push(v); nuevos.push(v); }
+      g.V.forEach(v => { if (v in dist) ann[v] = 'L' + dist[v]; });
+      out.push({ t: `Sacar ${u} (L${dist[u]}): descubre ${nuevos.length ? nuevos.join(', ') + ` → L${dist[u] + 1}` : 'nada nuevo'}. Cola = [${q.join(', ')}]`,
+        ann: { ...ann }, tree: g.V.filter(v => par[v]).map(v => par[v] + v) });
+    }
+    const capas = {}; g.V.forEach(v => (capas[dist[v]] = capas[dist[v]] || []).push(v));
+    const internas = g.E.filter(([u, v]) => dist[u] === dist[v]);
+    let res = 'Capas: ' + Object.keys(capas).map(k => `L${k}={${capas[k].join(',')}}`).join(' ');
+    res += internas.length
+      ? `<br><b>No bipartito</b>: la arista ${internas[0].join('–')} une dos vértices de la misma capa L${dist[internas[0][0]]} ⇒ ciclo impar (sube por el árbol BFS hasta su ancestro común).`
+      : '<br><b>Bipartito</b>: ninguna arista une vértices de la misma capa; colorea capas pares de un color e impares de otro.';
+    return { steps: out, final: res };
+  }
+  function runDFS(g, topo) {
+    const A = adjacency(g), col = {}, d = {}, f = {}, out = [], L = [], cls = []; let t = 0;
+    g.V.forEach(v => col[v] = 'B');
+    const ann = () => { const a = {}; g.V.forEach(v => { if (d[v]) a[v] = d[v] + '/' + (f[v] || '·'); }); return a; };
+    function visit(u) {
+      col[u] = 'G'; d[u] = ++t;
+      out.push({ t: `t=${t}: descubrir ${u} (blanco → gris)`, ann: ann(), col: { ...col }, tree: cls.filter(c => c[2] === 'árbol').map(c => c[0] + c[1]) });
+      for (const v of A[u]) {
+        let tipo;
+        if (col[v] === 'B') { tipo = 'árbol'; cls.push([u, v, tipo]); visit(v); continue; }
+        else if (col[v] === 'G') tipo = 'atrás';
+        else tipo = d[u] < d[v] ? 'adelante' : 'cruce';
+        cls.push([u, v, tipo]);
+        out.push({ t: `   arista ${u}→${v}: ${v} es ${col[v] === 'G' ? 'gris' : 'negro'} ⇒ arista de ${tipo}${tipo === 'atrás' ? ' (¡ciclo!)' : ''}`, ann: ann(), col: { ...col }, tree: cls.filter(c => c[2] === 'árbol').map(c => c[0] + c[1]) });
+      }
+      col[u] = 'N'; f[u] = ++t; L.unshift(u);
+      out.push({ t: `t=${t}: finalizar ${u} (gris → negro)${topo ? `; insertar al frente: L = [${L.join(', ')}]` : ''}`, ann: ann(), col: { ...col }, tree: cls.filter(c => c[2] === 'árbol').map(c => c[0] + c[1]) });
+    }
+    for (const v of g.V) if (col[v] === 'B') visit(v);
+    let res;
+    if (topo) res = `Orden topológico (f decreciente): <b>${L.join(' → ')}</b>. Verifica: en toda arista u→v se cumple u.f &gt; v.f.`;
+    else {
+      const resumen = ['árbol', 'atrás', 'adelante', 'cruce'].map(k => `${k}: ${cls.filter(c => c[2] === k).map(c => c[0] + '→' + c[1]).join(', ') || '—'}`).join('<br>');
+      const ciclo = cls.some(c => c[2] === 'atrás');
+      res = resumen + `<br><b>${ciclo ? 'Tiene ciclo dirigido (hay arista de atrás) ⇒ no es DAG' : 'Sin aristas de atrás ⇒ es un DAG'}</b>`;
+    }
+    return { steps: out, final: res };
+  }
+  function runKahn(g) {
+    const A = adjacency(g), indeg = {}, out = [], L = [];
+    g.V.forEach(v => indeg[v] = 0); g.E.forEach(([, v]) => indeg[v]++);
+    const q = g.V.filter(v => indeg[v] === 0);
+    out.push({ t: `Grados de entrada: ${g.V.map(v => v + ':' + indeg[v]).join('  ')}. Fuentes iniciales: [${q.join(', ')}]`, ann: { ...Object.fromEntries(g.V.map(v => [v, 'in ' + indeg[v]])) } });
+    while (q.length) {
+      const u = q.shift(); L.push(u); const nuevas = [];
+      for (const v of A[u]) { indeg[v]--; if (indeg[v] === 0) { q.push(v); nuevas.push(v); } }
+      const ann = {}; g.V.forEach(v => ann[v] = L.includes(v) ? '#' + (L.indexOf(v) + 1) : 'in ' + indeg[v]);
+      out.push({ t: `Sacar ${u}, L=[${L.join(', ')}]; restar 1 a ${A[u].join(', ') || '—'}${nuevas.length ? '; nuevas fuentes: ' + nuevas.join(', ') : ''}. Cola=[${q.join(', ')}]`, ann, done: L.slice() });
+    }
+    return { steps: out, final: `Orden topológico: <b>${L.join(' → ')}</b>. Como |L| = n, el grafo es un DAG (si |L| &lt; n habría un ciclo).` };
+  }
+
+  // ---------- Dibujo ----------
+  function draw(step) {
+    const svg = document.getElementById('lienzo'), n = G.V.length, P = {};
+    G.V.forEach((v, i) => { const a = -Math.PI / 2 + 2 * Math.PI * i / n; P[v] = [180 + 115 * Math.cos(a), 150 + 115 * Math.sin(a)]; });
+    const tree = new Set((step && step.tree) || []);
+    let h = `<defs><marker id="m" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${css('--muted')}"/></marker>
+      <marker id="mt" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${css('--blue')}"/></marker></defs>`;
+    G.E.forEach(([u, v]) => {
+      const [x1, y1] = P[u], [x2, y2] = P[v], dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy), r = 17;
+      const isT = tree.has(u + v) || (!G.directed && tree.has(v + u));
+      h += `<line x1="${x1 + dx * r / L}" y1="${y1 + dy * r / L}" x2="${x2 - dx * r / L}" y2="${y2 - dy * r / L}" stroke="${isT ? css('--blue') : css('--muted')}" stroke-width="${isT ? 3 : 1.4}" ${G.directed ? `marker-end="url(#${isT ? 'mt' : 'm'})"` : ''}/>`;
+    });
+    G.V.forEach(v => {
+      const [x, y] = P[v]; let fill = css('--card'), tc = css('--text');
+      if (step && step.col) { const c = step.col[v]; fill = c === 'G' ? css('--gray-node') : c === 'N' ? css('--black-node') : css('--white-node'); tc = c === 'N' ? '#ffffff' : '#11111b'; }
+      if (step && step.done && step.done.includes(v)) { fill = css('--green'); tc = '#11111b'; }
+      h += `<circle cx="${x}" cy="${y}" r="16" fill="${fill}" stroke="${css('--blue')}" stroke-width="1.5"/>`;
+      h += `<text x="${x}" y="${y + 5}" text-anchor="middle" font-size="15" font-weight="700" fill="${tc}">${v}</text>`;
+      if (step && step.ann && step.ann[v]) {
+        const ox = x < 180 ? -24 : 24;
+        h += `<text x="${x + ox}" y="${y - 18}" text-anchor="middle" font-size="12" font-weight="600" fill="${css('--red')}">${step.ann[v]}</text>`;
+      }
+    });
+    svg.innerHTML = h;
+  }
+
+  const TAREAS = {
+    bfs: 'Desde el vértice <b>a</b>: obtén las capas L0, L1, …, el árbol BFS y decide si el grafo es bipartito. Si no lo es, encuentra un ciclo impar.',
+    dfs: 'Ejecuta DFS recorriendo los vértices en orden alfabético. Anota d/f de cada vértice y clasifica cada arista (árbol, atrás, adelante, cruce). ¿Hay ciclo?',
+    kahn: 'Aplica el algoritmo de Kahn (cola FIFO de fuentes). Escribe el orden topológico y los grados de entrada en cada paso.',
+    topodfs: 'Aplica TopoSort-DFS: DFS en orden alfabético e inserta cada vértice al frente de L cuando termina. Escribe d/f y el orden final.'
+  };
+  const LEY = {
+    bfs: 'Azul grueso: árbol BFS · etiqueta roja: capa.',
+    dfs: 'Blanco: no descubierto · gris: en la pila · negro: terminado · etiqueta: d/f.',
+    kahn: 'Verde: ya en L (con su posición) · etiqueta: grado de entrada pendiente.',
+    topodfs: 'Blanco/gris/negro como en DFS · etiqueta: d/f.'
+  };
+
+  function nuevo() {
+    const m = document.getElementById('modo').value;
+    G = m === 'bfs' ? genUndirected() : genDirected(m !== 'dfs');
+    const r = m === 'bfs' ? runBFS(G) : m === 'kahn' ? runKahn(G) : runDFS(G, m === 'topodfs');
+    steps = r.steps; final = r.final; shown = 0;
+    document.getElementById('tarea').innerHTML = TAREAS[m];
+    document.getElementById('leyenda').textContent = LEY[m];
+    const A = adjacency(G);
+    document.getElementById('adj').textContent = G.V.map(v => `${v}: ${A[v].join(', ') || '—'}`).join('\n');
+    render();
+  }
+  function render() {
+    const log = document.getElementById('log');
+    log.innerHTML = steps.slice(0, shown).map(s => `<li>${s.t}</li>`).join('');
+    log.scrollTop = log.scrollHeight;
+    draw(shown ? steps[shown - 1] : null);
+    const res = document.getElementById('resultado');
+    res.classList.toggle('hidden', shown < steps.length);
+    res.innerHTML = final;
+  }
+  document.getElementById('nuevo').onclick = nuevo;
+  document.getElementById('modo').onchange = nuevo;
+  document.getElementById('paso').onclick = () => { if (shown < steps.length) shown++; render(); };
+  document.getElementById('todo').onclick = () => { shown = steps.length; render(); };
+  document.getElementById('reiniciar').onclick = () => { shown = 0; render(); };
+  nuevo();
+
+  // ---------- Tarjetas ----------
+  const C = [
+    ['Invariantes', '¿Cuáles son las tres partes de una prueba con invariante de ciclo?', 'Inicialización (vale antes de la primera iteración), mantenimiento (si vale antes de una iteración, vale antes de la siguiente) y terminación/salida (invariante + condición de salida ⇒ resultado). Aparte, una variante (cantidad entera ≥ 0 que decrece) prueba que el ciclo termina.'],
+    ['Invariantes', 'Invariante de minIter (acc = A[0]; for v in A: if v < acc: acc = v).', 'Antes de procesar A[i] (0 ≤ i ≤ n): acc ∈ A y acc ≤ A[j] para todo j < i (es decir, acc = min A[0..i−1], o A[0] si i = 0). Al salir, i = n ⇒ acc ≤ todos.'],
+    ['Invariantes', 'Diferencia entre corrección parcial y total.', 'Parcial: si termina, la respuesta es correcta. Total: parcial + terminación.'],
+    ['Invariantes', '¿Qué hipótesis inductiva usa minRec?', 'Para todo arreglo no vacío B con |B| < n (en particular A[0..n−2], de tamaño n−1), minRec(B) devuelve un elemento ≤ todos los de B.'],
+    ['Invariantes', 'Invariante de la cola de BFS.', 'Si la cola es [v1,…,vr], entonces dist(v1) ≤ … ≤ dist(vr) ≤ dist(v1)+1, y cada vértice marcado tiene dist correcta. Por eso BFS procesa por capas.'],
+    ['Asintótica', 'Definición de f ∈ O(g).', 'Existen c > 0 y n0 tales que 0 ≤ f(n) ≤ c·g(n) para todo n ≥ n0. (Techo.)'],
+    ['Asintótica', 'Demuestra 3n² + 5n + 2 ∈ Θ(n²).', 'Piso: 3n²+5n+2 ≥ 3n² (c1=3). Techo: para n ≥ 1, 5n ≤ 5n² y 2 ≤ 2n², así que ≤ 10n² (c2=10, n0=1).'],
+    ['Asintótica', 'Demuestra n² ∉ O(n).', 'Si n² ≤ c·n para todo n ≥ n0, dividiendo: n ≤ c para todo n ≥ n0, falso con n = max(n0, ⌈c⌉+1). Contradicción.'],
+    ['Asintótica', 'Ordena: n log n, 2ⁿ, n², log n, √n, n!, n.', 'log n < √n < n < n log n < n² < 2ⁿ < n!'],
+    ['Asintótica', '¿Es correcto decir «Merge Sort tarda al menos O(n log n)»?', 'No: una cota inferior se escribe con Ω. Lo correcto: Θ(n log n).'],
+    ['Asintótica', 'Criterio del cociente: lím f/g = L.', 'L = 0 ⇒ f ∈ O(g) pero no Ω. 0 < L < ∞ ⇒ f ∈ Θ(g). L = ∞ ⇒ f ∈ Ω(g) pero no O.'],
+    ['BFS', '¿Por qué BFS es O(n + m) con listas de adyacencia?', 'Cada vértice entra y sale de la cola a lo más una vez: O(n). Cada lista de adyacencia se recorre una vez cuando su vértice sale: Σ deg(u) = 2m: O(m). Con matriz de adyacencia sería O(n²).'],
+    ['BFS', 'Propiedad de las aristas que no son del árbol BFS.', 'Si {x,y} ∈ E con x ∈ Li, y ∈ Lj, entonces |i − j| ≤ 1.'],
+    ['BFS', '¿Cómo usa BFS la prueba de bipartición?', 'Colorea capas pares de rojo e impares de azul. Si ninguna arista une vértices de la misma capa, es bipartito. Si alguna lo hace, con su ancestro común z se forma un ciclo de longitud 2(j−i)+1: impar ⇒ no bipartito.'],
+    ['BFS', '¿Cómo probar conectividad fuerte en O(n+m)?', 'Elige s. BFS en G desde s (¿s llega a todos?) y BFS en G^R desde s (¿todos llegan a s?). Fuertemente conexo ⇔ ambas visitan todos los vértices.'],
+    ['DFS', 'Colores y tiempos en DFS.', 'Blanco: no descubierto. Gris: descubierto, llamada activa (u.d asignado). Negro: terminado (u.f asignado). Teorema del paréntesis: los intervalos [d,f] son anidados o disjuntos.'],
+    ['DFS', 'Tipos de arista (u,v) según el color de v al explorarla.', 'Blanco ⇒ árbol. Gris ⇒ atrás (ciclo). Negro con u.d < v.d ⇒ adelante. Negro con u.d > v.d ⇒ cruce. En grafos no dirigidos solo hay árbol y atrás.'],
+    ['DFS', 'G dirigido tiene ciclo ⇔ …', '… DFS encuentra una arista de atrás (v gris al explorar (u,v)).'],
+    ['Topológico', 'Lema: todo DAG tiene una fuente. Prueba.', 'Si ningún vértice tiene grado de entrada 0, caminamos hacia atrás por aristas entrantes: tras n+1 pasos se repite un vértice ⇒ ciclo dirigido. Contradicción.'],
+    ['Topológico', 'Si G tiene orden topológico, es DAG. Prueba.', 'Supón un ciclo v_{i1}→…→v_{ik}→v_{i1}. Sea v_j el de índice mínimo en el orden; la arista del ciclo que entra a v_j va de un índice mayor a uno menor: contradice el orden.'],
+    ['Topológico', 'Complejidad de Kahn y cómo detecta ciclos.', 'O(n+m): calcular grados de entrada O(m), cada vértice entra a la cola una vez y cada arista decrementa un contador una vez. Si al final |L| < n, quedan vértices con grado > 0 ⇒ hay ciclo.'],
+    ['Topológico', 'Por qué ordenar por f decreciente da orden topológico.', 'Para toda arista (u,v), al explorarla u es gris. v gris ⇒ ciclo (imposible en DAG). v blanco ⇒ v termina dentro de la llamada de u ⇒ v.f < u.f. v negro ⇒ v.f ya fijado < u.f. Así toda arista va de f mayor a f menor.'],
+    ['Aplicaciones', 'Componentes conexas en O(n+m).', 'Mientras quede un vértice no visitado s, lanzar BFS/DFS desde s y etiquetar todo lo alcanzado con un nuevo número de componente. Cada vértice y arista se procesa una vez en total.'],
+    ['Aplicaciones', 'Kosaraju para componentes fuertemente conexas.', '1) DFS en G anotando f. 2) Construir G^R. 3) DFS en G^R tomando raíces en orden de f decreciente; cada árbol es una SCC. Total O(n+m). La condensación G_cc es un DAG.'],
+    ['Recursión', 'Árbol de recursión de Merge Sort.', 'Nivel i: 2^i subproblemas de tamaño n/2^i, costo cn por nivel; log₂ n + 1 niveles ⇒ cn(log₂ n + 1) = Θ(n log n).'],
+    ['Recursión', 'Costo de minRec si A[0:-1] copia el arreglo.', 'T(n) = T(n−1) + Θ(n) ⇒ Θ(n²). Si se pasan índices en vez de copiar: T(n) = T(n−1) + Θ(1) ⇒ Θ(n).']
+  ];
+  let idx = 0, orden = C.map((_, i) => i);
+  function card() {
+    const [tag, q, a] = C[orden[idx]];
+    document.getElementById('ctag').textContent = tag;
+    document.getElementById('cq').textContent = q;
+    const ca = document.getElementById('ca'); ca.textContent = a; ca.classList.add('hidden');
+    document.getElementById('contador').textContent = `${idx + 1} / ${C.length}`;
+  }
+  document.getElementById('ver').onclick = () => document.getElementById('ca').classList.toggle('hidden');
+  document.getElementById('next').onclick = () => { idx = (idx + 1) % C.length; card(); };
+  document.getElementById('prev').onclick = () => { idx = (idx - 1 + C.length) % C.length; card(); };
+  document.getElementById('mezclar').onclick = () => { shuffle(orden); idx = 0; card(); };
+  card();
+})();
+</script>
+</body>
+</html>

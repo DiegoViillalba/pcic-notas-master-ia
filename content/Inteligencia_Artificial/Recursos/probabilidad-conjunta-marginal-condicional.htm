@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conjunta, marginal y condicional</title>
+<style>
+:root{color-scheme:light dark;--bg:#f8f7f3;--ink:#192a32;--muted:#52626a;--surface:#fff;--line:#ced7da;--accent:#186b80;--soft:#e1f0f2;--alt:#9d682b;--track:#e2e7e8}
+@media(prefers-color-scheme:dark){:root{--bg:#151e24;--ink:#e7eff2;--muted:#b5c4cb;--surface:#202d35;--line:#43545e;--accent:#68becb;--soft:#254650;--alt:#e3b475;--track:#34454d}}
+*{box-sizing:border-box}body{margin:0;padding:20px;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}main{max-width:980px;margin:auto}h1{font-size:1.45rem;margin:0 0 6px}h2{font-size:1.1rem;margin:12px 0}p{margin:8px 0}.muted{color:var(--muted);font-size:.9rem}button,select,input{font:inherit}button,select{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 12px}button{cursor:pointer}button[aria-pressed=true]{background:var(--accent);color:var(--bg);border-color:var(--accent)}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:3px}label{display:flex;flex-direction:column;gap:6px}.controls{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}.range{grid-column:1/-1}input[type=range]{width:100%;accent-color:var(--accent)}.steps{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.columns{display:grid;grid-template-columns:1fr 1fr;gap:28px}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}th{font-weight:600}td:last-child,th:last-child{text-align:right}.faded{opacity:.28}.chosen{background:var(--soft)}.barline{display:grid;grid-template-columns:72px 1fr 78px;gap:10px;align-items:center;margin:18px 0}.track{height:22px;background:var(--track)}.bar{height:100%;background:var(--accent);transition:width .25s}.value{font-variant-numeric:tabular-nums;text-align:right}.formula{font-family:ui-monospace,monospace;overflow-wrap:anywhere;padding:12px 0}.status{padding:12px 0;border-top:1px solid var(--line)}svg{width:100%;height:auto;display:block}svg text{font:14px system-ui,sans-serif;fill:var(--ink)}.mosaic-label{font-weight:600}.sun{fill:var(--accent);opacity:.24}.rain{fill:var(--alt);opacity:.3}.empty{color:var(--muted)}[hidden]{display:none!important}
+@media(max-width:680px){body{padding:14px}.columns,.controls{grid-template-columns:1fr}.range{grid-column:auto}.steps button{flex:1 1 40%;padding:8px}.barline{grid-template-columns:65px 1fr 66px}}
+@media(prefers-reduced-motion:reduce){.bar{transition:none}}
+</style>
+</head>
+<body><main id="probabilidad-lab">
+<h1>Conjunta → evidencia → suma → normalización</h1>
+<p class="muted">Tablas de temperatura y clima de las diapositivas 9–10 y 14. Valores discretos; cálculo exacto.</p>
+<div class="controls">
+<label>Variable consultada<select id="query"><option value="T">T · temperatura</option><option value="W">W · clima</option></select></label>
+<label>Evidencia observada<select id="evidence"></select></label>
+<label class="range">Mezcla entre modelos: <span id="mixlabel"></span><input id="mix" type="range" min="0" max="100" value="100" aria-label="Mezcla entre conjunta independiente y conjunta dependiente"><span class="muted">0: P₂ independiente · 1: P₁ de la presentación. Las marginales permanecen iguales.</span></label>
+</div>
+<nav class="steps" aria-label="Etapas del cálculo">
+<button type="button" data-step="0" aria-pressed="true">1. Conjunta</button><button type="button" data-step="1" aria-pressed="false">2. Evidencia</button><button type="button" data-step="2" aria-pressed="false">3. Sumar</button><button type="button" data-step="3" aria-pressed="false">4. Normalizar</button>
+</nav>
+<p id="instruction" aria-live="polite"></p>
+<div class="columns">
+<section><h2>Masas de los cuatro mundos</h2><svg id="mosaic" viewBox="0 0 420 265" role="img" aria-label="Área proporcional a cada probabilidad conjunta"></svg><div class="scroll"><table><thead><tr><th>T</th><th>W</th><th>P(T,W)</th></tr></thead><tbody id="joint"></tbody></table></div></section>
+<section><h2 id="result-title">Consulta</h2><p id="placeholder" class="empty">Avanza a «Sumar» para agrupar las filas de la consulta.</p><div id="result" hidden><table><thead><tr><th id="result-var">Valor</th><th>Peso</th><th id="last-col">Probabilidad</th></tr></thead><tbody id="groups"></tbody></table><div id="bars" aria-label="Comparación de resultados"></div><p class="muted">Escala de las barras: 0 a 1.</p><div class="formula" id="calculation"></div></div><div class="status"><p id="mass"></p><p id="independence"></p><p class="muted">Independencia: cada entrada debe coincidir con P(T) · P(W), para todos los valores.</p></div></section>
+</div>
+<p class="muted">Fuente: AI 13, diapositivas 9–10 y 14. La interpolación es un complemento didáctico; sin recursos externos.</p>
+</main>
+<script>
+(()=>{
+ const root=document.getElementById('probabilidad-lab'),el=id=>root.querySelector('#'+id);
+ const base=[{T:'hot',W:'sun',p:.4},{T:'hot',W:'rain',p:.1},{T:'cold',W:'sun',p:.2},{T:'cold',W:'rain',p:.3}],ind=[.3,.2,.3,.2];
+ let step=0;
+ const fmt=n=>n.toLocaleString('es-MX',{maximumFractionDigits:5});
+ function evidenceOptions(){const other=el('query').value==='T'?'W':'T',values=other==='W'?['sun','rain']:['hot','cold'];el('evidence').innerHTML='<option value="">Sin evidencia</option>'+values.map(v=>`<option value="${v}">${other} = ${v}</option>`).join('');}
+ function render(){
+  const q=el('query').value,o=q==='T'?'W':'T',e=el('evidence').value,a=Number(el('mix').value)/100,rows=base.map((r,i)=>({...r,p:a*r.p+(1-a)*ind[i]}));
+  const selected=rows.filter(r=>!e||r[o]===e),mass=selected.reduce((s,r)=>s+r.p,0),values=q==='T'?['hot','cold']:['sun','rain'];
+  const weights=values.map(v=>selected.filter(r=>r[q]===v).reduce((s,r)=>s+r.p,0));
+  root.dataset.mass=mass;root.dataset.posterior=JSON.stringify(weights.map(w=>w/mass));
+  el('mixlabel').textContent=fmt(a);
+  const names=['Toda la masa suma 1. Cada fila describe una asignación completa.','Selecciona las filas compatibles con la evidencia. Las demás no contribuyen a esta consulta.','Agrupa por el valor consultado y suma las probabilidades de las filas compatibles.','Divide cada peso entre la masa de la evidencia para obtener una distribución que suma 1.'];
+  el('instruction').textContent=names[step];
+  root.querySelectorAll('[data-step]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.step)===step)));
+  el('joint').innerHTML=rows.map(r=>`<tr class="${step>0?(selected.includes(r)?'chosen':'faded'):''}"><td>${r.T}</td><td>${r.W}</td><td>${fmt(r.p)}</td></tr>`).join('');
+  let svg='<title>Distribución conjunta: áreas proporcionales a la masa</title><desc>Dos filas de masa 0.5: hot y cold. Cada fila se divide entre sun y rain.</desc>';
+  rows.forEach((r,i)=>{const y=i<2?32:140,w=r.p*640,x=80+(i%2?rows[i-1].p*640:0),excluded=step>0&&!selected.includes(r);svg+=`<g opacity="${excluded?.22:1}"><rect x="${x}" y="${y}" width="${w}" height="94" class="${r.W}"/><text x="${x+w/2}" y="${y+40}" text-anchor="middle">${r.W}</text><text x="${x+w/2}" y="${y+65}" text-anchor="middle">${fmt(r.p)}</text></g>`;});
+  svg+='<text x="12" y="84" class="mosaic-label">hot</text><text x="12" y="192" class="mosaic-label">cold</text><text x="80" y="252">Área total = 1</text>';el('mosaic').innerHTML=svg;
+  el('result').hidden=step<2;el('placeholder').hidden=step>=2;el('result-title').textContent=`P(${q}${e?' | '+o+' = '+e:''})`;
+  el('last-col').textContent=step===3?'Probabilidad':'Sin normalizar';
+  el('groups').innerHTML=values.map((v,i)=>`<tr><td>${v}</td><td>${fmt(weights[i])}</td><td>${step===3?fmt(weights[i]/mass):'—'}</td></tr>`).join('');
+  el('bars').innerHTML=values.map((v,i)=>{const p=step===3?weights[i]/mass:weights[i];return `<div class="barline"><span>${v}</span><div class="track"><div class="bar" style="width:${p*100}%"></div></div><span class="value">${fmt(p)}</span></div>`;}).join('');
+  el('calculation').textContent=values.map((v,i)=>`${v}: `+selected.filter(r=>r[q]===v).map(r=>fmt(r.p)).join(' + ')+` = ${fmt(weights[i])}`+(step===3?` → ${fmt(weights[i])} / ${fmt(mass)} = ${fmt(weights[i]/mass)}`:'')).join('\n');el('calculation').style.whiteSpace='pre-wrap';
+  el('mass').textContent=e?`Masa de la evidencia P(${o}=${e}) = ${fmt(mass)}`:'Sin evidencia: masa seleccionada = 1';
+  el('independence').textContent=a<1e-10?'T y W son independientes en P₂.':`T y W son dependientes: máxima diferencia |P(t,w) − P(t)P(w)| = ${fmt(.1*a)}.`;
+ }
+ el('query').addEventListener('change',()=>{evidenceOptions();render();});el('evidence').addEventListener('change',render);el('mix').addEventListener('input',render);root.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{step=Number(b.dataset.step);render();}));evidenceOptions();render();
+})();
+</script></body></html>

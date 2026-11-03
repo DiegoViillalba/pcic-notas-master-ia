@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="390" viewBox="0 0 700 390" role="img" aria-labelledby="title desc">
+<title id="title">Una independencia reduce la tabla</title>
+<desc id="desc">R apunta a T; R apunta a U. T y U pueden estar asociados sin observar R.
+Dado R: P(T,U|R) = P(T|R) P(U|R).</desc>
+<style>
+svg{color-scheme:light dark;--bg:#fafbf9;--ink:#1d3035;--line:#536971;--node:#ffffff;--accent:#146879;--soft:#dceff0;--muted:#53646c}
+@media(prefers-color-scheme:dark){svg{--bg:#182228;--ink:#edf3f4;--line:#a9bdc5;--node:#23333c;--accent:#81d2dc;--soft:#264c56;--muted:#bdcbd0}}
+.canvas{fill:var(--bg)}text{font-family:system-ui,sans-serif;fill:var(--ink);text-anchor:middle} .heading{font-size:23px;font-weight:600}.label{font-size:18px}.small{font-size:16px;fill:var(--muted)}.symbol{font-size:24px;font-weight:600}.edge{stroke:var(--line);stroke-width:2;fill:none}.node{fill:var(--node);stroke:var(--line);stroke-width:1.7}.observed{fill:var(--soft);stroke:var(--accent);stroke-width:2.5}
+</style>
+<rect class="canvas" width="700" height="390" rx="12"/>
+<text class="heading" x="350" y="36">Una independencia reduce la tabla</text>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="var(--line)"/></marker></defs>
+<line class="edge" x1="325.65" y1="120.77" x2="208.15" y2="220.99" marker-end="url(#arrow)"/>
+<line class="edge" x1="374.35" y1="120.77" x2="491.85" y2="220.99" marker-end="url(#arrow)"/>
+<circle class="node " cx="350" cy="100" r="32"/><text class="symbol" x="350" y="108">R</text><text class="label" x="397" y="106" style="text-anchor:start">Lluvia</text>
+<circle class="node " cx="180" cy="245" r="32"/><text class="symbol" x="180" y="253">T</text><text class="label" x="180" y="303" style="text-anchor:middle">Tráfico</text>
+<circle class="node " cx="520" cy="245" r="32"/><text class="symbol" x="520" y="253">U</text><text class="label" x="520" y="303" style="text-anchor:middle">Paraguas</text>
+<text class="small" x="350" y="350">T y U pueden estar asociados sin observar R.</text>
+<text class="small" x="350" y="373">Dado R: P(T,U|R) = P(T|R) P(U|R).</text>
+</svg>

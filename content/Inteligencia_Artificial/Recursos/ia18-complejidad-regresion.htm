@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Complejidad y generalización en regresión</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; --bg: #f8fafc; --fg: #172033; --muted: #536176; --line: #cbd5e1; --true: #0c8291; --fit: #b45309; --point: #6343bd; --panel: #ffffff; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #151c2a; --fg: #edf2f8; --muted: #abb8cc; --line: #39465d; --true: #5ac4d0; --fit: #f6b05e; --point: #ba9aff; --panel: #202b3d; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 20px; background: var(--bg); color: var(--fg); }
+    main { max-width: 860px; margin: auto; }
+    h1 { margin: 0 0 8px; font-size: 1.25rem; }
+    p { margin: 0 0 16px; color: var(--muted); line-height: 1.45; }
+    .controls { display: flex; flex-wrap: wrap; align-items: end; gap: 14px 24px; margin-bottom: 14px; }
+    label { display: grid; gap: 5px; font-weight: 600; }
+    select, input { font: inherit; accent-color: var(--true); }
+    select { color: var(--fg); background: var(--panel); padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; }
+    input[type=range] { width: min(260px, 70vw); }
+    .metrics { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+    .metric { background: var(--panel); border: 1px solid var(--line); border-radius: 7px; padding: 8px 12px; min-width: 160px; }
+    .metric strong { display: block; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+    .metric span { color: var(--muted); font-size: .9rem; }
+    svg { display: block; width: 100%; height: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 7px; }
+    .grid { stroke: var(--line); stroke-width: 1; }
+    .axis-text { fill: var(--muted); font: 13px system-ui, sans-serif; }
+    .truth { stroke: var(--true); stroke-width: 3; fill: none; }
+    .fit { stroke: var(--fit); stroke-width: 3; fill: none; }
+    .point { fill: var(--point); opacity: .82; }
+    .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 10px; font-size: .92rem; }
+    .key { display: inline-block; width: 17px; height: 4px; vertical-align: middle; margin-right: 5px; border-radius: 3px; }
+    .note { margin: 12px 0 0; font-size: .9rem; }
+    @media (max-width: 480px) { body { padding: 12px; } .metric { min-width: 135px; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Complejidad del modelo y generalización</h1>
+  <p>Los puntos son mediciones con ruido de una relación cuadrática. El ajuste se calcula solo con los ejemplos de entrenamiento; la prueba usa otros casos.</p>
+  <div class="controls">
+    <label for="degree">Grado del polinomio
+      <select id="degree"><option value="1">1 · simple</option><option value="2" selected>2 · adecuado</option><option value="8">8 · flexible</option></select>
+    </label>
+    <label for="count">Ejemplos de entrenamiento: <output id="count-value">10</output>
+      <input id="count" type="range" min="10" max="80" step="1" value="10">
+    </label>
+  </div>
+  <div class="metrics" aria-live="polite">
+    <div class="metric"><strong id="train-error">—</strong><span>Error cuadrático medio · entrenamiento</span></div>
+    <div class="metric"><strong id="test-error">—</strong><span>Error cuadrático medio · prueba</span></div>
+  </div>
+  <svg id="plot" viewBox="0 0 760 370" role="img" aria-labelledby="plot-title plot-desc">
+    <title id="plot-title">Datos de entrenamiento, función real y ajuste polinomial</title>
+    <desc id="plot-desc">La curva del modelo cambia con su grado y con el número de ejemplos.</desc>
+    <defs><clipPath id="plot-clip"><rect x="55" y="20" width="675" height="305"></rect></clipPath></defs>
+    <g id="grid"></g>
+    <g clip-path="url(#plot-clip)"><path id="truth" class="truth"></path><path id="fitted" class="fit"></path><g id="points"></g></g>
+    <text class="axis-text" x="385" y="357" text-anchor="middle">Entrada x</text>
+    <text class="axis-text" x="15" y="180" text-anchor="middle" transform="rotate(-90 15 180)">Salida y</text>
+  </svg>
+  <div class="legend" aria-hidden="true"><span><i class="key" style="background:var(--true)"></i>Relación real</span><span><i class="key" style="background:var(--fit)"></i>Modelo ajustado</span><span><i class="key" style="background:var(--point);height:9px;width:9px;border-radius:50%"></i>Entrenamiento</span></div>
+  <p class="note" id="interpretation" aria-live="polite"></p>
+  <p class="note">Simulación didáctica con datos fijos. El error de prueba se calcula sobre 200 casos separados con ruido; no se usa para ajustar el modelo. La gráfica recorta valores fuera del eje vertical para conservar una escala comparable.</p>
+</main>
+<script>
+(() => {
+  const degree = document.getElementById('degree');
+  const count = document.getElementById('count');
+  const countValue = document.getElementById('count-value');
+  const trainError = document.getElementById('train-error');
+  const testError = document.getElementById('test-error');
+  const truthPath = document.getElementById('truth');
+  const fittedPath = document.getElementById('fitted');
+  const pointsGroup = document.getElementById('points');
+  const grid = document.getElementById('grid');
+  const interpretation = document.getElementById('interpretation');
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const W = { left: 55, right: 730, top: 20, bottom: 325, yMin: -1, yMax: 6 };
+  const sx = x => W.left + (x + 1) * (W.right - W.left) / 2;
+  const sy = y => W.bottom - (y - W.yMin) * (W.bottom - W.top) / (W.yMax - W.yMin);
+  const real = x => 1 + .4 * x + 2.2 * x * x;
+  function vdc(n) { let value = 0, denominator = 1; while (n) { denominator *= 2; value += (n % 2) / denominator; n = Math.floor(n / 2); } return value; }
+  const training = Array.from({length: 80}, (_, j) => { const i = j + 1, x = 2 * vdc(i) - 1; return {x, y: real(x) + .48 * Math.sin(i * 17.3) + .3 * Math.cos(i * 9.1)}; });
+  const testing = Array.from({length: 200}, (_, j) => { const i = j + 101, x = -1 + 2 * (j + .5) / 200; return {x, y: real(x) + .48 * Math.sin(i * 17.3) + .3 * Math.cos(i * 9.1)}; });
+  function basis(x, d) { const b = [1]; if (d > 0) b.push(x); for (let k = 2; k <= d; k++) b.push(2 * x * b[k - 1] - b[k - 2]); return b; }
+  function solve(a, b) { const n = b.length; for (let k = 0; k < n; k++) { let pivot = k; for (let i = k + 1; i < n; i++) if (Math.abs(a[i][k]) > Math.abs(a[pivot][k])) pivot = i; [a[k], a[pivot]] = [a[pivot], a[k]]; [b[k], b[pivot]] = [b[pivot], b[k]]; const divisor = a[k][k]; for (let j = k; j < n; j++) a[k][j] /= divisor; b[k] /= divisor; for (let i = 0; i < n; i++) if (i !== k) { const m = a[i][k]; for (let j = k; j < n; j++) a[i][j] -= m * a[k][j]; b[i] -= m * b[k]; } } return b; }
+  function fit(data, d) { const m = d + 1, a = Array.from({length: m}, () => Array(m).fill(0)), b = Array(m).fill(0); for (const item of data) { const row = basis(item.x, d); for (let i = 0; i < m; i++) { b[i] += row[i] * item.y; for (let j = 0; j < m; j++) a[i][j] += row[i] * row[j]; } } for (let i = 0; i < m; i++) a[i][i] += 1e-8; return solve(a, b); }
+  function predict(x, coefficients) { return basis(x, coefficients.length - 1).reduce((sum, value, i) => sum + value * coefficients[i], 0); }
+  function mse(data, coefficients) { return data.reduce((sum, item) => sum + (item.y - predict(item.x, coefficients)) ** 2, 0) / data.length; }
+  function path(f) { let d = ''; for (let i = 0; i <= 200; i++) { const x = -1 + i / 100; d += (i ? 'L' : 'M') + sx(x).toFixed(2) + ',' + sy(f(x)).toFixed(2); } return d; }
+  function drawGrid() { for (const y of [0, 2, 4, 6]) { const line = document.createElementNS(svgNS, 'line'); line.setAttribute('x1', W.left); line.setAttribute('x2', W.right); line.setAttribute('y1', sy(y)); line.setAttribute('y2', sy(y)); line.setAttribute('class', 'grid'); grid.appendChild(line); const label = document.createElementNS(svgNS, 'text'); label.setAttribute('x', 47); label.setAttribute('y', sy(y) + 4); label.setAttribute('text-anchor', 'end'); label.setAttribute('class', 'axis-text'); label.textContent = y; grid.appendChild(label); } for (const x of [-1, -.5, 0, .5, 1]) { const label = document.createElementNS(svgNS, 'text'); label.setAttribute('x', sx(x)); label.setAttribute('y', 343); label.setAttribute('text-anchor', 'middle'); label.setAttribute('class', 'axis-text'); label.textContent = x; grid.appendChild(label); } }
+  function render() { const d = Number(degree.value), n = Number(count.value), data = training.slice(0, n), coefficients = fit(data, d), train = mse(data, coefficients), test = mse(testing, coefficients); countValue.textContent = n; trainError.textContent = train.toFixed(3); testError.textContent = test.toFixed(3); truthPath.setAttribute('d', path(real)); fittedPath.setAttribute('d', path(x => predict(x, coefficients))); pointsGroup.replaceChildren(); for (const item of data) { const circle = document.createElementNS(svgNS, 'circle'); circle.setAttribute('cx', sx(item.x)); circle.setAttribute('cy', sy(item.y)); circle.setAttribute('r', 4); circle.setAttribute('class', 'point'); pointsGroup.appendChild(circle); } interpretation.textContent = d === 1 ? 'Grado 1: la recta no puede representar toda la curvatura; observa el error de prueba.' : d === 2 ? 'Grado 2: la familia coincide con la forma de la relación real, aunque las mediciones tienen ruido.' : (test > train * 2 ? 'Grado 8: el error de entrenamiento es pequeño frente al de prueba; el modelo está siguiendo detalles de la muestra.' : 'Grado 8: con más ejemplos disminuye la diferencia entre entrenamiento y prueba.'); }
+  drawGrid(); render(); degree.addEventListener('change', render); count.addEventListener('input', render);
+})();
+</script>
+</body>
+</html>

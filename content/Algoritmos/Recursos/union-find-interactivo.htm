@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Union-Find interactivo</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#f6f7fb, #0f1420);
+      --surface: light-dark(#ffffff, #182132);
+      --surface-2: light-dark(#eef2f8, #222d41);
+      --text: light-dark(#172033, #edf2fb);
+      --muted: light-dark(#5e697b, #abb7ca);
+      --border: light-dark(#c9d1df, #46546c);
+      --accent: light-dark(#3157c8, #93abff);
+      --accent-soft: light-dark(#e5eaff, #273762);
+      --good: light-dark(#147a50, #67d6aa);
+      --good-soft: light-dark(#e2f5ec, #173e32);
+      --warn: light-dark(#9a5b00, #f0b45b);
+      --warn-soft: light-dark(#fff1d7, #493516);
+      --bad: light-dark(#b42318, #ff9189);
+      --bad-soft: light-dark(#fde7e5, #4b2426);
+      --shadow: light-dark(0 9px 25px rgba(36, 49, 77, .10), 0 9px 25px rgba(0, 0, 0, .28));
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 18px; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.45; }
+    main { max-width: 1000px; margin: 0 auto; }
+    h1 { margin: 0 0 5px; font-size: clamp(1.35rem, 3vw, 2rem); }
+    h2 { margin: 0 0 8px; font-size: 1.05rem; }
+    .lead { color: var(--muted); margin: 0 0 15px; }
+    button, select, input { min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 9px; color: var(--text); background: var(--surface); font: inherit; }
+    button, select { cursor: pointer; }
+    input.num { width: 70px; }
+    button:hover, select:hover { border-color: var(--accent); }
+    button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 2px; }
+    button:disabled { opacity: .45; cursor: default; }
+    button.primary { color: light-dark(#ffffff, #101624); background: var(--accent); border-color: var(--accent); }
+    .panel { padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); margin-bottom: 14px; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .sep { width: 1px; height: 30px; background: var(--border); margin: 0 4px; }
+    .muted { color: var(--muted); }
+    .status { min-height: 54px; margin: 12px 0; padding: 9px 11px; border-left: 4px solid var(--accent); border-radius: 0 9px 9px 0; background: var(--surface-2); }
+    .status.good { border-left-color: var(--good); background: var(--good-soft); }
+    .status.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+    .status.bad { border-left-color: var(--bad); background: var(--bad-soft); }
+    .status strong { display: block; margin-bottom: 2px; }
+    .box { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); }
+    svg { display: block; width: 100%; height: auto; min-width: 520px; }
+    svg text { font-family: ui-sans-serif, system-ui, sans-serif; fill: var(--text); }
+    .ed { stroke: var(--muted); stroke-width: 2; }
+    .ed.path { stroke: var(--warn); stroke-width: 3.5; }
+    .nd { fill: var(--surface); stroke: var(--muted); stroke-width: 1.6; }
+    .nd.root { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2.4; }
+    .nd.path { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 3; }
+    .nv { font-size: 14px; font-weight: 800; }
+    .sz { font-size: 10px; fill: var(--accent) !important; font-weight: 700; }
+    .arr { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; align-items: stretch; }
+    .lab { align-self: center; color: var(--muted); font-size: .85rem; margin-right: 4px; min-width: 64px; }
+    .cell { min-width: 40px; text-align: center; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 3px 4px; font-variant-numeric: tabular-nums; }
+    .cell b { display: block; font-size: 1.05rem; }
+    .cell small { color: var(--muted); font-size: .72rem; }
+    .cell.chg { border-color: var(--warn); background: var(--warn-soft); }
+    .metric-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 10px; }
+    .metric { min-width: 120px; padding: 7px 11px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
+    .metric span { display: block; color: var(--muted); font-size: .8rem; }
+    .metric strong { font-variant-numeric: tabular-nums; font-size: 1.05rem; }
+    table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+    th, td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+    th { color: var(--muted); font-weight: 600; font-size: .85rem; }
+    tr.cur td { background: var(--accent-soft); font-weight: 700; }
+    td.best { color: var(--good); font-weight: 800; }
+    .log { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .82rem; color: var(--muted); margin-top: 8px; word-break: break-word; }
+    .ge { stroke: var(--border); stroke-width: 2.5; fill: none; }
+    .ge.in { stroke: var(--accent); stroke-width: 5; }
+    .ge.out { stroke: var(--bad); stroke-width: 2; stroke-dasharray: 6 5; opacity: .75; }
+    .ge.cur { stroke: var(--warn); stroke-width: 5.5; }
+    .gw { font-size: 13px; font-weight: 800; paint-order: stroke; stroke: var(--bg); stroke-width: 5px; stroke-linejoin: round; }
+    .gn { stroke-width: 2.4; }
+    @media (max-width: 760px) { body { padding: 12px; } .sep { display: none; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Union-Find interactivo</h1>
+  <p class="lead">Las cuatro implementaciones de la clase sobre la misma secuencia de operaciones. El <b>costo</b> cuenta entradas del arreglo leídas o escritas, para comparar dónde paga cada versión.</p>
+
+  <section class="panel">
+    <h2>1 · Explorador de implementaciones</h2>
+    <div class="row">
+      <label>Implementación
+        <select id="variant">
+          <option value="qf">Quick-find (fast find)</option>
+          <option value="qu">Quick-union (fast union)</option>
+          <option value="wqu">Unión ponderada (weighted)</option>
+          <option value="pc" selected>Ponderada + compresión</option>
+        </select>
+      </label>
+      <label>n
+        <select id="n"><option>6</option><option selected>8</option><option>10</option><option>12</option></select>
+      </label>
+      <button id="reset">⟲ Reiniciar</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <span>UNION(</span><input id="ux" class="num" type="number" value="1" min="1"><span>,</span><input id="uy" class="num" type="number" value="2" min="1"><span>)</span>
+      <button id="doU" class="primary">union</button>
+      <span class="sep"></span>
+      <span>FIND(</span><input id="fx" class="num" type="number" value="1" min="1"><span>)</span>
+      <button id="doF">find</button>
+      <span class="sep"></span>
+      <button id="chain">Secuencia: cadena</button>
+      <button id="pow">Secuencia: potencias de 2</button>
+      <button id="rand">Secuencia aleatoria</button>
+    </div>
+    <div id="status" class="status"></div>
+    <div class="box"><svg id="forest" viewBox="0 0 720 260"></svg></div>
+    <div id="arrays"></div>
+    <div class="metric-row" id="metrics"></div>
+    <h2 style="margin-top:16px">Misma secuencia en las cuatro implementaciones</h2>
+    <div id="cmp"></div>
+    <div id="log" class="log"></div>
+  </section>
+
+  <section class="panel">
+    <h2>2 · Kruskal con Union-Find (ponderada + compresión)</h2>
+    <p class="muted" style="margin:0 0 8px">Grafo de la diapositiva 52. Las aristas se examinan por costo creciente; se acepta una arista si <code>FIND(u) ≠ FIND(v)</code>. Con <i>k</i> &gt; 1 se detiene antes: clustering de un solo enlace.</p>
+    <div class="row">
+      <label>Detener con k componentes
+        <select id="k"><option selected>1</option><option>2</option><option>3</option><option>4</option></select>
+      </label>
+      <button id="kReset">⟲ Reiniciar</button>
+      <button id="kBack">◀</button>
+      <button id="kStep" class="primary">Paso ▶</button>
+      <button id="kPlay">▶ Reproducir</button>
+      <button id="kAll">Terminar ⇥</button>
+    </div>
+    <div id="kStatus" class="status"></div>
+    <div class="box"><svg id="kSvg" viewBox="0 0 640 330"></svg></div>
+    <div id="kArr"></div>
+    <div id="kTable" style="margin-top:10px"></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const el = id => document.getElementById(id);
+  const NAMES = { qf: "Quick-find", qu: "Quick-union", wqu: "Ponderada", pc: "Ponderada + compresión" };
+
+  // ---------- Estructuras ----------
+  function makeUF(kind, n) {
+    const U = { kind, n, p: [], size: [], cost: 0, last: 0, path: [], changed: new Set() };
+    for (let i = 0; i <= n; i++) { U.p[i] = i; U.size[i] = 1; }
+    U.find = x => {
+      let c = 0; U.path = [x]; U.changed = new Set();
+      if (kind === "qf") { U.last = 1; U.cost += 1; U.path = [x, U.p[x]]; return U.p[x]; }
+      let r = x; c++;
+      while (U.p[r] !== r) { r = U.p[r]; c++; U.path.push(r); }
+      if (kind === "pc") {
+        let y = x;
+        while (U.p[y] !== r) { const nx = U.p[y]; U.p[y] = r; U.changed.add(y); c++; y = nx; }
+      }
+      U.last = c; U.cost += c; return r;
+    };
+    U.union = (x, y) => {
+      if (kind === "qf") {
+        const a = U.p[x], b = U.p[y]; let c = 2;
+        U.changed = new Set(); U.path = [];
+        if (a !== b) for (let z = 1; z <= n; z++) { c++; if (U.p[z] === a) { U.p[z] = b; c++; U.changed.add(z); } }
+        U.last = c; U.cost += c; return a !== b;
+      }
+      const fx = U.find(x), cx = U.last, px = U.path.slice(), chx = new Set(U.changed);
+      const fy = U.find(y), cy = U.last; const py = U.path.slice();
+      U.path = [...px, ...py]; U.changed = new Set([...chx, ...U.changed]);
+      let c = cx + cy;
+      if (fx === fy) { U.last = c; return false; }
+      let r = fx, s = fy;
+      if (kind !== "qu") { c += 2; if (U.size[r] > U.size[s]) [r, s] = [s, r]; }
+      U.p[r] = s; U.size[s] += U.size[r]; c++; U.changed.add(r); U.linked = [r, s];
+      U.cost += c - cx - cy; U.last = c; return true;
+    };
+    U.depth = x => { let d = 0; while (U.p[x] !== x) { x = U.p[x]; d++; } return d; };
+    U.height = () => { let h = 0; for (let i = 1; i <= n; i++) h = Math.max(h, U.depth(i)); return h; };
+    U.sets = () => { let k = 0; for (let i = 1; i <= n; i++) if (U.p[i] === i) k++; return k; };
+    return U;
+  }
+
+  // ---------- Panel 1 ----------
+  let n = 8, ops = [], uf, lastMsg = "", lastKind = "";
+  function replayAll() {
+    return Object.keys(NAMES).map(k => {
+      const U = makeUF(k, n);
+      ops.forEach(([t, a, b]) => t === "U" ? U.union(a, b) : U.find(a));
+      return [k, U];
+    });
+  }
+  function reset() {
+    n = Number(el("n").value); ops = [];
+    uf = makeUF(el("variant").value, n);
+    ["ux", "uy", "fx"].forEach(id => el(id).max = n);
+    lastMsg = `<strong>${n} conjuntos unitarios</strong>MAKE-SET para cada elemento: cada uno es su propio representante.`; lastKind = "";
+    render();
+  }
+  function apply(op, silent) {
+    const [t, a, b] = op;
+    if (a < 1 || a > n || (t === "U" && (b < 1 || b > n))) return;
+    ops.push(op);
+    if (t === "U") {
+      const ok = uf.union(a, b);
+      lastMsg = ok
+        ? `<strong>UNION(${a}, ${b}) — costo ${uf.last}</strong>${uf.kind === "qf" ? `Se recorrió todo el arreglo para reetiquetar el conjunto de ${a}.` : `Se enlazó la raíz ${uf.linked[0]} bajo la raíz ${uf.linked[1]}${uf.kind === "qu" ? " (sin mirar tamaños)" : " (árbol menor bajo el mayor)"}.`}`
+        : `<strong>UNION(${a}, ${b}) — costo ${uf.last}</strong>Ya estaban en el mismo conjunto: no se hace nada.`;
+      lastKind = ok ? "good" : "warn";
+    } else {
+      const r = uf.find(a);
+      lastMsg = `<strong>FIND(${a}) = ${r} — costo ${uf.last}</strong>${uf.kind === "qf" ? "Una sola lectura de id[x]." : `Camino recorrido: ${uf.path.join(" → ")}.`}${uf.changed.size ? ` Compresión: ${[...uf.changed].join(", ")} ahora apuntan a ${r}.` : ""}`;
+      lastKind = "";
+    }
+    if (!silent) render();
+  }
+
+  function layoutForest(U) {
+    const kids = Array.from({ length: n + 1 }, () => []);
+    const roots = [];
+    for (let i = 1; i <= n; i++) (U.p[i] === i ? roots : kids[U.p[i]]).push(i);
+    const pos = {}; let leaf = 0, maxD = 0;
+    const place = (v, d) => {
+      maxD = Math.max(maxD, d);
+      if (!kids[v].length) { pos[v] = [leaf++, d]; return pos[v][0]; }
+      const xs = kids[v].map(c => place(c, d + 1));
+      pos[v] = [(Math.min(...xs) + Math.max(...xs)) / 2, d]; return pos[v][0];
+    };
+    roots.forEach(r => { place(r, 0); leaf += .6; });
+    return { pos, leaves: Math.max(1, leaf - .6), maxD };
+  }
+
+  function render() {
+    const st = el("status"); st.className = "status " + lastKind; st.innerHTML = lastMsg;
+    const { pos, leaves, maxD } = layoutForest(uf);
+    const W = 720, H = 60 + Math.max(1, maxD) * 62 + 20;
+    const X = x => 30 + (leaves <= 1 ? (W - 60) / 2 : x * (W - 60) / (leaves - 1 || 1));
+    const Y = d => 34 + d * 62;
+    const onPath = new Set(uf.path);
+    let s = "";
+    for (let i = 1; i <= n; i++) if (uf.p[i] !== i) {
+      const [x1, d1] = pos[i], [x2, d2] = pos[uf.p[i]];
+      s += `<line class="ed ${onPath.has(i) && onPath.has(uf.p[i]) ? "path" : ""}" x1="${X(x1)}" y1="${Y(d1)}" x2="${X(x2)}" y2="${Y(d2)}"/>`;
+    }
+    for (let i = 1; i <= n; i++) {
+      const [x, d] = pos[i];
+      const cls = onPath.has(i) ? "path" : uf.p[i] === i ? "root" : "";
+      s += `<circle class="nd ${cls}" cx="${X(x)}" cy="${Y(d)}" r="17"/><text class="nv" x="${X(x)}" y="${Y(d) + 5}" text-anchor="middle">${i}</text>`;
+      if (uf.p[i] === i && uf.kind !== "qf") s += `<text class="sz" x="${X(x)}" y="${Y(d) - 22}" text-anchor="middle">tam ${uf.size[i]}</text>`;
+    }
+    el("forest").setAttribute("viewBox", `0 0 ${W} ${H}`);
+    el("forest").innerHTML = s;
+
+    const label = uf.kind === "qf" ? "id[x]" : "parent[x]";
+    const cells = (arr, lab) => `<div class="arr"><span class="lab">${lab}</span>` + Array.from({ length: n }, (_, k) =>
+      `<div class="cell ${uf.changed.has(k + 1) ? "chg" : ""}"><b>${arr[k + 1]}</b><small>[${k + 1}]</small></div>`).join("") + `</div>`;
+    el("arrays").innerHTML = cells(uf.p, label) + (uf.kind === "wqu" || uf.kind === "pc"
+      ? `<div class="arr"><span class="lab">size (raíces)</span>` + Array.from({ length: n }, (_, k) =>
+        `<div class="cell"><b>${uf.p[k + 1] === k + 1 ? uf.size[k + 1] : "·"}</b><small>[${k + 1}]</small></div>`).join("") + `</div>` : "");
+
+    el("metrics").innerHTML = `<div class="metric"><span>conjuntos</span><strong>${uf.sets()}</strong></div>
+      <div class="metric"><span>altura máxima</span><strong>${uf.height()}</strong></div>
+      <div class="metric"><span>⌊log₂ n⌋</span><strong>${Math.floor(Math.log2(n))}</strong></div>
+      <div class="metric"><span>costo acumulado</span><strong>${uf.cost}</strong></div>`;
+
+    const all = replayAll();
+    const best = Math.min(...all.map(([, U]) => U.cost));
+    el("cmp").innerHTML = `<table><thead><tr><th>Implementación</th><th>costo total</th><th>altura máxima</th><th>conjuntos</th></tr></thead><tbody>` +
+      all.map(([k, U]) => `<tr class="${k === uf.kind ? "cur" : ""}"><td>${NAMES[k]}</td><td class="${U.cost === best && ops.length ? "best" : ""}">${U.cost}</td><td>${U.height()}</td><td>${U.sets()}</td></tr>`).join("") +
+      `</tbody></table>`;
+    el("log").textContent = ops.length ? "Secuencia: " + ops.map(([t, a, b]) => t === "U" ? `U(${a},${b})` : `F(${a})`).join(" ") : "";
+  }
+
+  function runSeq(seq, msg) {
+    reset();
+    seq.forEach(op => apply(op, true));
+    lastMsg = `<strong>${msg}</strong>${ops.length} operaciones ejecutadas. Cambia de implementación para ver la misma secuencia y compara el costo total en la tabla.`; lastKind = "";
+    render();
+  }
+  el("variant").addEventListener("change", () => { const keep = ops.slice(); uf = makeUF(el("variant").value, n); ops = []; keep.forEach(op => apply(op, true)); lastMsg = `<strong>${NAMES[uf.kind]}</strong>Se volvió a ejecutar la misma secuencia con esta implementación.`; lastKind = ""; render(); });
+  el("n").addEventListener("change", reset);
+  el("reset").addEventListener("click", reset);
+  el("doU").addEventListener("click", () => apply(["U", Number(el("ux").value), Number(el("uy").value)]));
+  el("doF").addEventListener("click", () => apply(["F", Number(el("fx").value)]));
+  el("chain").addEventListener("click", () => {
+    const seq = []; for (let i = 1; i < n; i++) seq.push(["U", i, i + 1]);
+    for (let i = 1; i <= n; i++) seq.push(["F", i]);
+    runSeq(seq, "Cadena U(1,2), U(2,3), …, seguida de FIND de cada elemento");
+  });
+  el("pow").addEventListener("click", () => {
+    const seq = [];
+    for (let w = 1; w < n; w *= 2) for (let i = 1; i + w <= n; i += 2 * w) seq.push(["U", i, i + w]);
+    seq.push(["F", 1]);
+    runSeq(seq, "Uniones de árboles del mismo tamaño (peor caso de la ponderada)");
+  });
+  el("rand").addEventListener("click", () => {
+    const seq = [];
+    for (let t = 0; t < n + 4; t++) {
+      const a = 1 + Math.floor(Math.random() * n), b = 1 + Math.floor(Math.random() * n);
+      seq.push(Math.random() < .7 ? ["U", a, b] : ["F", a]);
+    }
+    runSeq(seq, "Secuencia aleatoria");
+  });
+  reset();
+
+  // ---------- Panel 2: Kruskal ----------
+  const NODES = { 1: [90, 70], 2: [320, 70], 3: [550, 70], 4: [90, 235], 5: [320, 235], 6: [550, 235] };
+  const EDGES = [[1,2,6],[2,3,8],[1,4,3],[1,5,5],[2,5,4],[3,6,2],[4,5,7],[5,6,9],[4,6,1]];
+  const sorted = EDGES.slice().sort((a, b) => a[2] - b[2]);
+  let kf = [], kc = 0, ktimer = null;
+
+  function buildKruskal() {
+    const k = Number(el("k").value);
+    const U = makeUF("pc", 6);
+    const status = sorted.map(() => "");
+    let comps = 6, cost = 0;
+    const snap = (msg, kind, cur) => kf.push({ status: status.slice(), p: U.p.slice(), size: U.size.slice(), comps, cost, msg, kind, cur });
+    kf = [];
+    snap(`<strong>Inicio</strong>MAKE-SET para los 6 nodos; las aristas se recorren en orden: ${sorted.map(e => e[2]).join(", ")}.`, "", -1);
+    for (let i = 0; i < sorted.length; i++) {
+      if (comps <= k) break;
+      const [u, v, w] = sorted[i];
+      const ru = U.find(u), rv = U.find(v);
+      if (ru !== rv) {
+        U.union(u, v); comps--; cost += w; status[i] = "in";
+        snap(`<strong>Arista ${u}–${v} (costo ${w}): FIND(${u}) = ${ru} ≠ FIND(${v}) = ${rv}</strong>Componentes distintas ⇒ es la arista más barata que cruza el corte: se agrega (regla azul) y UNION(${u}, ${v}). Quedan ${comps} componentes.`, "good", i);
+      } else {
+        status[i] = "out";
+        snap(`<strong>Arista ${u}–${v} (costo ${w}): FIND(${u}) = FIND(${v}) = ${ru}</strong>Mismo componente ⇒ cerraría un ciclo en el que es la más cara: se descarta (regla roja).`, "bad", i);
+      }
+    }
+    snap(k === 1
+      ? `<strong>Árbol generador mínimo</strong>${6 - comps} aristas = n − 1, costo total ${cost}. Las aristas restantes ni siquiera hace falta examinarlas.`
+      : `<strong>${k}-clustering de separación máxima</strong>Se detuvo con ${comps} componentes. La separación es el costo de la siguiente arista que uniría dos grupos distintos.`, "good", -1);
+  }
+
+  function kRender() {
+    const f = kf[kc];
+    const st = el("kStatus"); st.className = "status " + (f.kind || ""); st.innerHTML = f.msg + `<span class="muted" style="display:block;font-size:.8rem;margin-top:3px">Paso ${kc} de ${kf.length - 1}</span>`;
+    const palette = ["var(--accent)", "var(--good)", "var(--warn)", "var(--bad)", "light-dark(#7a3fbf,#c6a0ff)", "light-dark(#0b7a8a,#6ad3e0)"];
+    const root = x => { while (f.p[x] !== x) x = f.p[x]; return x; };
+    const color = {}; let ci = 0;
+    for (let v = 1; v <= 6; v++) { const r = root(v); if (!(r in color)) color[r] = palette[ci++ % palette.length]; }
+    let s = "";
+    EDGES.forEach(([u, v, w]) => {
+      const i = sorted.findIndex(e => e[0] === u && e[1] === v);
+      const cls = f.cur === i ? "cur" : f.status[i];
+      const [x1, y1] = NODES[u], [x2, y2] = NODES[v];
+      let d, lx, ly;
+      if (u === 4 && v === 6) { d = `M${x1},${y1} Q320,330 ${x2},${y2}`; lx = 320; ly = 288; }
+      else { d = `M${x1},${y1} L${x2},${y2}`; lx = (x1 + x2) / 2; ly = (y1 + y2) / 2 + 4; }
+      s += `<path class="ge ${cls}" d="${d}"/><text class="gw" x="${lx}" y="${ly}" text-anchor="middle">${w}</text>`;
+    });
+    for (const [id, [x, y]] of Object.entries(NODES)) {
+      const r = root(Number(id));
+      s += `<circle class="gn" cx="${x}" cy="${y}" r="21" style="fill:var(--surface);stroke:${color[r]}"/>
+        <text class="nv" x="${x}" y="${y + 5}" text-anchor="middle">${id}</text>`;
+    }
+    el("kSvg").innerHTML = s;
+    el("kArr").innerHTML = `<div class="arr"><span class="lab">parent[x]</span>` + [1,2,3,4,5,6].map(i =>
+      `<div class="cell"><b>${f.p[i]}</b><small>[${i}]</small></div>`).join("") +
+      `<span class="lab" style="margin-left:12px">componentes: <b>${f.comps}</b> · costo: <b>${f.cost}</b></span></div>`;
+    el("kTable").innerHTML = `<table><thead><tr><th>orden</th><th>arista</th><th>costo</th><th>decisión</th></tr></thead><tbody>` +
+      sorted.map(([u, v, w], i) => `<tr class="${f.cur === i ? "cur" : ""}"><td>${i + 1}</td><td>${u}–${v}</td><td>${w}</td><td>${f.status[i] === "in" ? "✔ agregada" : f.status[i] === "out" ? "✘ ciclo" : "—"}</td></tr>`).join("") + `</tbody></table>`;
+    el("kBack").disabled = kc === 0;
+    el("kStep").disabled = el("kAll").disabled = kc === kf.length - 1;
+  }
+  function kStop() { if (ktimer) { clearInterval(ktimer); ktimer = null; el("kPlay").textContent = "▶ Reproducir"; } }
+  function kLoad() { kStop(); buildKruskal(); kc = 0; kRender(); }
+  el("k").addEventListener("change", kLoad);
+  el("kReset").addEventListener("click", () => { kStop(); kc = 0; kRender(); });
+  el("kBack").addEventListener("click", () => { kStop(); if (kc > 0) { kc--; kRender(); } });
+  el("kStep").addEventListener("click", () => { if (kc < kf.length - 1) { kc++; kRender(); } });
+  el("kAll").addEventListener("click", () => { kStop(); kc = kf.length - 1; kRender(); });
+  el("kPlay").addEventListener("click", () => {
+    if (ktimer) return kStop();
+    el("kPlay").textContent = "⏸ Pausa";
+    ktimer = setInterval(() => { if (kc >= kf.length - 1) return kStop(); kc++; kRender(); }, 1200);
+  });
+  kLoad();
+})();
+</script>
+</body>
+</html>

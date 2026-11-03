@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>D-separación paso a paso</title>
+<style>
+:root{color-scheme:light dark;--bg:#fafbf9;--ink:#1d3035;--muted:#53646c;--line:#bccbd0;--node:#fff;--accent:#146879;--soft:#dceff0;--blocked:#a14928}
+@media(prefers-color-scheme:dark){:root{--bg:#182228;--ink:#edf3f4;--muted:#bdcbd0;--line:#657e89;--node:#23333c;--accent:#81d2dc;--soft:#264c56;--blocked:#efba94}}
+*{box-sizing:border-box}body{margin:0;padding:18px;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}main{max-width:880px;margin:auto}h1{font-size:1.35rem;margin:0 0 8px}h2{font-size:1.05rem;margin:18px 0 8px}p{margin:8px 0}label{display:flex;gap:6px;flex-direction:column}button,select{font:inherit;color:var(--ink);background:var(--node);border:1px solid var(--line);border-radius:6px;padding:8px 10px;max-width:100%}button{cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:3px}button:disabled{opacity:.5;cursor:default}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.fields label:first-child{grid-column:1/-1}.check{display:inline-flex;flex-direction:row;align-items:center;gap:8px;min-height:40px}.check input{width:18px;height:18px;accent-color:var(--accent)}.muted{color:var(--muted)}.small{font-size:.9rem}.steps{margin:14px 0}.steps span{font-variant-numeric:tabular-nums}#graph{width:100%;height:auto;display:block}#graph text{fill:var(--ink);font-family:system-ui,sans-serif}#graph .edge{stroke:var(--line);stroke-width:1.7;fill:none}#graph .path-edge{stroke:var(--accent);stroke-width:3;fill:none}#graph .node{fill:var(--node);stroke:var(--line);stroke-width:1.6}#graph .observed{fill:var(--soft);stroke:var(--accent);stroke-width:2.5}#graph .endpoint{stroke:var(--ink);stroke-width:3}#graph .blocker{stroke:var(--blocked);stroke-width:3;stroke-dasharray:5 3}.result{font-weight:600;color:var(--accent)}.route{border-top:1px solid var(--line);padding:10px 0}.route button{margin-bottom:5px}.route p{margin:4px 0}.route.selected button{background:var(--soft)}ul{padding-left:22px;margin:5px 0}footer{border-top:1px solid var(--line);margin-top:16px;padding-top:12px}#query-line{overflow-wrap:anywhere}#observations{gap:4px 18px}@media(max-width:450px){body{padding:12px}.fields{grid-template-columns:1fr}.fields label:first-child{grid-column:auto}.steps{gap:8px}button{min-height:42px}}
+</style>
+</head>
+<body><main id="dsep14">
+<h1>D-separación: seguir todos los caminos</h1>
+<p class="small muted">Recorre los casos guiados o cambia la consulta y las observaciones. Los valores observados pueden ser verdaderos o falsos: para d-separación importa qué variables se conocen.</p>
+<div class="fields">
+<label>Red<select id="model"></select></label>
+<label>Primera variable<select id="from"></select></label>
+<label>Segunda variable<select id="to"></select></label>
+</div>
+<div class="row steps"><button id="previous" type="button">← Anterior</button><span id="step-label"></span><button id="next" type="button">Siguiente →</button><button id="restart" type="button">Reiniciar casos</button></div>
+<p id="step-description"></p>
+<h2>Evidencia observada</h2><div class="row" id="observations"></div>
+<svg id="graph" role="img" aria-labelledby="graph-title graph-desc"></svg>
+<p class="small muted" id="graph-key"></p>
+<p class="small muted">Relleno: observado · contorno grueso: extremos consultados · trazo destacado: camino seleccionado · contorno discontinuo: nodo que bloquea ese camino.</p>
+<div aria-live="polite"><p id="query-line"></p><p id="verdict" class="result"></p><p id="count" class="small muted"></p></div>
+<h2>Revisar cada camino</h2><div id="routes"></div>
+<footer class="small muted">Diagramas recreados de AI 14, diapositivas 17 y 20–29. Algoritmo de caminos activos: CS 188, §6.5. «No garantizada» permite dependencia; las tablas concretas pueden producir independencias adicionales. No se calculan probabilidades en este explorador.</footer>
+</main>
+<script>
+(()=>{
+const root=document.getElementById('dsep14'),el=id=>root.querySelector('#'+id);
+const models={
+ chain:{name:'1 · Cadena de tres nodos',nodes:{X:'Baja presión',Y:'Lluvia',Z:'Tráfico'},edges:[['X','Y'],['Y','Z']],layers:[['X'],['Y'],['Z']],cases:[['X','Z',[],'Sin evidencia, los dos segmentos forman una cadena activa.'],['X','Z',['Y'],'Observar Y bloquea el único camino.']]},
+ fork:{name:'2 · Causa común',nodes:{Y:'Entrega próxima',X:'Foro activo',Z:'Laboratorio lleno'},edges:[['Y','X'],['Y','Z']],layers:[['Y'],['X','Z']],cases:[['X','Z',[],'La causa compartida Y permite asociación entre los efectos.'],['X','Z',['Y'],'Con la causa Y observada, el camino queda bloqueado.']]},
+ collider:{name:'3 · Ejemplo 1: efecto común',nodes:{R:'Lluvia',B:'Partido',T:'Tráfico',Tp:'Reporte'},edges:[['R','T'],['B','T'],['T','Tp']],layers:[['R','B'],['T'],['Tp']],cases:[['R','B',[],'T es colisionador y no hay evidencia en T ni en sus descendientes.'],['R','B',['T'],'Observar el efecto T abre el camino entre sus causas.'],['R','B',['Tp'],'También se abre T al observar su descendiente T′.'],['R','Tp',['T'],'Para la consulta R–T′, T es un no colisionador: observarlo bloquea.']]},
+ four:{name:'4 · Cadena de cuatro nodos',nodes:{X:'Raíz',Y:'Segundo',Z:'Tercero',W:'Último'},edges:[['X','Y'],['Y','Z'],['Z','W']],layers:[['X'],['Y'],['Z'],['W']],cases:[['X','W',[],'El camino tiene dos tripletas; ambas deben estar activas.'],['X','W',['Y'],'Basta bloquear en Y para inactivar el camino completo.'],['X','W',['Z'],'También basta bloquear en Z.']]},
+ extended:{name:'5 · Ejemplo 2: abrir y bloquear',nodes:{L:'Baja presión',R:'Lluvia',D:'Goteo',B:'Partido',T:'Tráfico',Tp:'Reporte'},edges:[['L','R'],['R','D'],['R','T'],['B','T'],['T','Tp']],layers:[['L'],['R','B'],['D','T'],['Tp']],cases:[['L','Tp',['T'],'En L→R→T→T′, T observado es un no colisionador que bloquea.'],['L','B',[],'En L→R→T←B, el colisionador T bloquea.'],['L','B',['T'],'Observar T abre el camino; R sigue sin observarse.'],['L','B',['Tp'],'El descendiente T′ observado también abre T.'],['L','B',['T','R'],'T abre, pero R observado bloquea: una sola tripleta inactiva basta.']]},
+ diamond:{name:'6 · Ejemplo 3: dos caminos',nodes:{R:'Lluvia',T:'Tráfico',D:'Goteo',S:'Tristeza'},edges:[['R','T'],['R','D'],['T','S'],['D','S']],layers:[['R'],['T','D'],['S']],cases:[['T','D',[],'El camino por R está activo; el camino por S está bloqueado.'],['T','D',['R'],'R bloquea el camino superior y S mantiene bloqueado el inferior.'],['T','D',['R','S'],'S observado abre el camino inferior: vuelve a permitirse dependencia.'],['T','D',['S'],'Con S observado ambos caminos están activos.']]},
+ mit:{name:'7 · MIT: perro, ladrón y mapache',nodes:{B:'Ladrón',R:'Mapache',D:'Perro ladra'},edges:[['B','D'],['R','D']],layers:[['B','R'],['D']],cases:[['B','R',[],'Las dos causas son independientes en esta estructura.'],['B','R',['D'],'El ladrido observado abre el colisionador; conocer una causa modifica la otra.']]}
+};
+const pretty=n=>n==='Tp'?'T′':n;
+let key='chain',step=0,observed=new Set(),selected=0;
+const model=()=>models[key];
+function allPaths(g,start,end){const neighbors=Object.fromEntries(Object.keys(g.nodes).map(n=>[n,[]]));g.edges.forEach(([a,b])=>{neighbors[a].push(b);neighbors[b].push(a);});const paths=[];function walk(v,path){if(v===end){paths.push(path);return;}neighbors[v].forEach(n=>{if(!path.includes(n))walk(n,[...path,n]);});}walk(start,[start]);return paths;}
+function descendants(g,n){const found=new Set(),stack=[n];while(stack.length){const cur=stack.pop();g.edges.filter(([a])=>a===cur).forEach(([,b])=>{if(!found.has(b)){found.add(b);stack.push(b);}});}return found;}
+function analyze(g,path,evidence){const has=(a,b)=>g.edges.some(([u,v])=>u===a&&v===b);return path.slice(1,-1).map((n,i)=>{const a=path[i],c=path[i+2],collider=has(a,n)&&has(c,n),activeDesc=[...descendants(g,n)].filter(d=>evidence.has(d));const active=collider?(evidence.has(n)||activeDesc.length>0):!evidence.has(n);let why=collider?(evidence.has(n)?'colisionador observado: abre':activeDesc.length?'colisionador abierto por descendiente observado '+activeDesc.map(pretty).join(', '):'colisionador sin evidencia propia ni descendiente: bloquea'):(evidence.has(n)?'no colisionador observado: bloquea':'no colisionador no observado: deja pasar');return{n,collider,active,why};});}
+function useCase(){const c=model().cases[step];el('from').value=c[0];el('to').value=c[1];observed=new Set(c[2]);selected=0;render();}
+function setup(){const ns=Object.keys(model().nodes);['from','to'].forEach(id=>{el(id).innerHTML=ns.map(n=>`<option value="${n}">${pretty(n)} · ${model().nodes[n]}</option>`).join('');});step=0;useCase();}
+function graph(paths){
+ const g=model(),width=Math.max(280,Math.floor(el('graph').getBoundingClientRect().width)),nrows=g.layers.length,height=45+nrows*100;
+ const positions={};g.layers.forEach((layer,i)=>layer.forEach((n,j)=>{positions[n]=[(j+1)*width/(layer.length+1),50+i*100];}));
+ const current=paths[selected]||[],analysis=analyze(g,current,observed),blockers=new Set(analysis.filter(t=>!t.active).map(t=>t.n)),a=el('from').value,b=el('to').value;
+ const onPath=(u,v)=>current.some((n,i)=>i<current.length-1&&((n===u&&current[i+1]===v)||(n===v&&current[i+1]===u)));
+ let html='<title id="graph-title">'+g.name+'</title><desc id="graph-desc">'+el('query-line').textContent+'. '+el('verdict').textContent+'</desc><defs><marker id="dsep14-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="context-stroke"/></marker></defs>';
+ g.edges.forEach(([u,v])=>{const[x,y]=positions[u],[xx,yy]=positions[v],dx=xx-x,dy=yy-y,len=Math.hypot(dx,dy);html+=`<line class="${onPath(u,v)?'path-edge':'edge'}" x1="${x+dx/len*28}" y1="${y+dy/len*28}" x2="${xx-dx/len*34}" y2="${yy-dy/len*34}" marker-end="url(#dsep14-arrow)"/>`;});
+ Object.keys(g.nodes).forEach(n=>{const[x,y]=positions[n];html+=`<circle class="node ${observed.has(n)?'observed':''} ${n===a||n===b?'endpoint':''} ${blockers.has(n)?'blocker':''}" cx="${x}" cy="${y}" r="27"/><text x="${x}" y="${y+6}" text-anchor="middle" font-size="19">${pretty(n)}</text>`;});
+ el('graph-key').textContent=Object.entries(g.nodes).map(([n,name])=>pretty(n)+': '+name).join(' · ');
+ el('graph').setAttribute('viewBox',`0 0 ${width} ${height}`);el('graph').innerHTML=html;
+}
+function render(){
+ const g=model(),a=el('from').value,b=el('to').value;observed.delete(a);observed.delete(b);
+ el('from').querySelectorAll('option').forEach(o=>o.disabled=o.value===b);el('to').querySelectorAll('option').forEach(o=>o.disabled=o.value===a);
+ el('observations').innerHTML=Object.keys(g.nodes).filter(n=>n!==a&&n!==b).map(n=>`<label class="check"><input type="checkbox" data-node="${n}" ${observed.has(n)?'checked':''}> ${pretty(n)} · ${g.nodes[n]}</label>`).join('');
+ el('observations').querySelectorAll('input').forEach(box=>box.addEventListener('change',()=>{if(box.checked)observed.add(box.dataset.node);else observed.delete(box.dataset.node);step=-1;render();}));
+ const paths=allPaths(g,a,b),details=paths.map(p=>analyze(g,p,observed)),active=details.map(ds=>ds.every(t=>t.active)),count=active.filter(Boolean).length;
+ if(selected>=paths.length)selected=0;
+ el('query-line').textContent=`Consulta: ¿${pretty(a)} ⟂ ${pretty(b)}${observed.size?' | '+[...observed].map(pretty).join(', '):''}?`;
+ el('verdict').textContent=count?'Independencia no garantizada por el grafo.':'Independencia garantizada por d-separación.';
+ el('count').textContent=`${count} de ${paths.length} caminos activos. ${count?'Un solo camino activo basta para perder la garantía.':'Todos los caminos están bloqueados.'}`;
+ root.dataset.activeCount=count;root.dataset.pathCount=paths.length;root.dataset.independent=String(!count);
+ el('step-label').textContent=step<0?'Exploración libre':`Caso ${step+1} / ${g.cases.length}`;el('step-description').textContent=step<0?'Aplica las reglas al camino seleccionado.':g.cases[step][3];
+ el('previous').disabled=step<=0;el('next').disabled=step===g.cases.length-1;el('next').textContent=step<0?'Volver al primer caso →':'Siguiente →';
+ el('routes').innerHTML=paths.length?paths.map((path,i)=>`<section class="route ${i===selected?'selected':''}"><button type="button" data-route="${i}" aria-pressed="${i===selected}">Camino ${i+1}: ${path.map(pretty).join(' — ')}</button><p><strong>${active[i]?'Activo':'Bloqueado'}</strong></p>${details[i].length?'<ul>'+details[i].map(t=>`<li>${pretty(t.n)}: ${t.why}.</li>`).join('')+'</ul>':'<p>Arista directa: no hay nodos internos que puedan bloquearla.</p>'}</section>`).join(''):'<p>No hay ningún camino entre los extremos.</p>';
+ el('routes').querySelectorAll('[data-route]').forEach(button=>button.addEventListener('click',()=>{selected=Number(button.dataset.route);render();}));graph(paths);
+}
+el('model').innerHTML=Object.entries(models).map(([k,g])=>`<option value="${k}">${g.name}</option>`).join('');
+el('model').addEventListener('change',()=>{key=el('model').value;setup();});['from','to'].forEach(id=>el(id).addEventListener('change',()=>{step=-1;selected=0;render();}));
+el('previous').addEventListener('click',()=>{if(step>0){step--;useCase();}});el('next').addEventListener('click',()=>{step=step<0?0:Math.min(step+1,model().cases.length-1);useCase();});el('restart').addEventListener('click',()=>{step=0;useCase();});
+new ResizeObserver(()=>graph(allPaths(model(),el('from').value,el('to').value))).observe(el('graph').parentElement);
+window.ia14Dsep={models,allPaths,analyze,descendants};setup();
+})();
+</script>
+</body></html>

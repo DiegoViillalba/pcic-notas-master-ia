@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="900" viewBox="0 0 840 900" role="img" aria-labelledby="title desc">
+<title id="title">Las tres tripletas y el efecto de observar Y</title><desc id="desc">En cadenas y causas comunes, observar Y bloquea el camino entre X y Z. En el colisionador, el camino se bloquea sin observar Y ni sus descendientes, y se activa al observar Y.</desc>
+<style>
+:root{color-scheme:light dark;--bg:#f8f7f3;--text:#192a32;--muted:#52626a;--node:#ffffff;--line:#9aaeb7;--accent:#186b80;--soft:#d9edf1;--blocked:#798992}
+@media(prefers-color-scheme:dark){:root{--bg:#151e24;--text:#e7eff2;--muted:#b5c4cb;--node:#202d35;--line:#8a9fa9;--accent:#68becb;--soft:#254650;--blocked:#a2b0b6}}
+text{font-family:system-ui,-apple-system,sans-serif;fill:var(--text)}
+.title{font-size:26px;font-weight:600}.heading{font-size:21px;font-weight:600}.label{font-size:18px}.symbol{font-size:23px;font-weight:600}.caption{font-size:18px;fill:var(--muted)}.status{font-size:19px;font-weight:600}.factor{font-size:19px}
+.node{fill:var(--node);stroke:var(--line);stroke-width:1.5}.observed{fill:var(--soft);stroke:var(--accent);stroke-width:2.5}
+.edge{fill:none;stroke:var(--line);stroke-width:2}.active{stroke:var(--accent);stroke-width:2.5}.blocked{stroke:var(--blocked);stroke-dasharray:7 6;stroke-width:2}.separator{stroke:var(--line);stroke-width:1;opacity:.5}
+</style>
+<defs>
+<marker id="arrow-normal" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 Z" fill="var(--line)"/></marker>
+<marker id="arrow-active" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 Z" fill="var(--accent)"/></marker>
+<marker id="arrow-blocked" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 Z" fill="var(--blocked)"/></marker>
+</defs>
+<rect width="840" height="900" rx="10" fill="var(--bg)"/>
+<text x="30" y="42" class="title" text-anchor="start">Las tres tripletas y el efecto de observar Y</text>
+<text x="220" y="86" class="heading" text-anchor="middle">Sin evidencia</text>
+<text x="620" y="86" class="heading" text-anchor="middle">Y observado</text>
+<text x="30" y="127" class="heading" text-anchor="start">Cadena</text>
+<line x1="118.00" y1="185.00" x2="187.00" y2="185.00" class="edge active" marker-end="url(#arrow-active)"/>
+<line x1="253.00" y1="185.00" x2="322.00" y2="185.00" class="edge active" marker-end="url(#arrow-active)"/>
+<ellipse cx="85" cy="185" rx="33" ry="33" class="node "/>
+<text x="85" y="192" class="symbol" text-anchor="middle">X</text>
+<ellipse cx="220" cy="185" rx="33" ry="33" class="node "/>
+<text x="220" y="192" class="symbol" text-anchor="middle">Y</text>
+<ellipse cx="355" cy="185" rx="33" ry="33" class="node "/>
+<text x="355" y="192" class="symbol" text-anchor="middle">Z</text>
+<text x="220" y="283" class="status" text-anchor="middle">Camino activo</text>
+<text x="220" y="316" class="caption" text-anchor="middle">Independencia no garantizada</text>
+<line x1="518.00" y1="185.00" x2="587.00" y2="185.00" class="edge blocked" marker-end="url(#arrow-blocked)"/>
+<line x1="653.00" y1="185.00" x2="722.00" y2="185.00" class="edge blocked" marker-end="url(#arrow-blocked)"/>
+<ellipse cx="485" cy="185" rx="33" ry="33" class="node "/>
+<text x="485" y="192" class="symbol" text-anchor="middle">X</text>
+<ellipse cx="620" cy="185" rx="33" ry="33" class="node observed"/>
+<text x="620" y="192" class="symbol" text-anchor="middle">Y</text>
+<text x="620" y="245" class="caption" text-anchor="middle">observado</text>
+<ellipse cx="755" cy="185" rx="33" ry="33" class="node "/>
+<text x="755" y="192" class="symbol" text-anchor="middle">Z</text>
+<text x="620" y="283" class="status" text-anchor="middle">Camino bloqueado</text>
+<text x="620" y="316" class="caption" text-anchor="middle">X ⊥ Z | Y</text>
+<line x1="30" y1="350" x2="810" y2="350" class="separator"/>
+<text x="30" y="372" class="heading" text-anchor="start">Causa común</text>
+<line x1="187.00" y1="430.00" x2="118.00" y2="430.00" class="edge active" marker-end="url(#arrow-active)"/>
+<line x1="253.00" y1="430.00" x2="322.00" y2="430.00" class="edge active" marker-end="url(#arrow-active)"/>
+<ellipse cx="85" cy="430" rx="33" ry="33" class="node "/>
+<text x="85" y="437" class="symbol" text-anchor="middle">X</text>
+<ellipse cx="220" cy="430" rx="33" ry="33" class="node "/>
+<text x="220" y="437" class="symbol" text-anchor="middle">Y</text>
+<ellipse cx="355" cy="430" rx="33" ry="33" class="node "/>
+<text x="355" y="437" class="symbol" text-anchor="middle">Z</text>
+<text x="220" y="528" class="status" text-anchor="middle">Camino activo</text>
+<text x="220" y="561" class="caption" text-anchor="middle">Independencia no garantizada</text>
+<line x1="587.00" y1="430.00" x2="518.00" y2="430.00" class="edge blocked" marker-end="url(#arrow-blocked)"/>
+<line x1="653.00" y1="430.00" x2="722.00" y2="430.00" class="edge blocked" marker-end="url(#arrow-blocked)"/>
+<ellipse cx="485" cy="430" rx="33" ry="33" class="node "/>
+<text x="485" y="437" class="symbol" text-anchor="middle">X</text>
+<ellipse cx="620" cy="430" rx="33" ry="33" class="node observed"/>
+<text x="620" y="437" class="symbol" text-anchor="middle">Y</text>
+<text x="620" y="490" class="caption" text-anchor="middle">observado</text>
+<ellipse cx="755" cy="430" rx="33" ry="33" class="node "/>
+<text x="755" y="437" class="symbol" text-anchor="middle">Z</text>
+<text x="620" y="528" class="status" text-anchor="middle">Camino bloqueado</text>
+<text x="620" y="561" class="caption" text-anchor="middle">X ⊥ Z | Y</text>
+<line x1="30" y1="595" x2="810" y2="595" class="separator"/>
+<text x="30" y="617" class="heading" text-anchor="start">Efecto común · colisionador</text>
+<line x1="118.00" y1="675.00" x2="187.00" y2="675.00" class="edge blocked" marker-end="url(#arrow-blocked)"/>
+<line x1="322.00" y1="675.00" x2="253.00" y2="675.00" class="edge blocked" marker-end="url(#arrow-blocked)"/>
+<ellipse cx="85" cy="675" rx="33" ry="33" class="node "/>
+<text x="85" y="682" class="symbol" text-anchor="middle">X</text>
+<ellipse cx="220" cy="675" rx="33" ry="33" class="node "/>
+<text x="220" y="682" class="symbol" text-anchor="middle">Y</text>
+<ellipse cx="355" cy="675" rx="33" ry="33" class="node "/>
+<text x="355" y="682" class="symbol" text-anchor="middle">Z</text>
+<text x="220" y="773" class="status" text-anchor="middle">Camino bloqueado</text>
+<text x="220" y="806" class="caption" text-anchor="middle">X ⊥ Z</text>
+<line x1="518.00" y1="675.00" x2="587.00" y2="675.00" class="edge active" marker-end="url(#arrow-active)"/>
+<line x1="722.00" y1="675.00" x2="653.00" y2="675.00" class="edge active" marker-end="url(#arrow-active)"/>
+<ellipse cx="485" cy="675" rx="33" ry="33" class="node "/>
+<text x="485" y="682" class="symbol" text-anchor="middle">X</text>
+<ellipse cx="620" cy="675" rx="33" ry="33" class="node observed"/>
+<text x="620" y="682" class="symbol" text-anchor="middle">Y</text>
+<text x="620" y="735" class="caption" text-anchor="middle">observado</text>
+<ellipse cx="755" cy="675" rx="33" ry="33" class="node "/>
+<text x="755" y="682" class="symbol" text-anchor="middle">Z</text>
+<text x="620" y="773" class="status" text-anchor="middle">Camino activo</text>
+<text x="620" y="806" class="caption" text-anchor="middle">Independencia no garantizada</text>
+<text x="420" y="878" class="caption" text-anchor="middle">Colisionador: también se activa si observamos un descendiente de Y.</text>
+</svg>

@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Heap binario y heapsort</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#f6f7fb, #0f1420);
+      --surface: light-dark(#ffffff, #182132);
+      --surface-2: light-dark(#eef2f8, #222d41);
+      --text: light-dark(#172033, #edf2fb);
+      --muted: light-dark(#5e697b, #abb7ca);
+      --border: light-dark(#c9d1df, #46546c);
+      --accent: light-dark(#3157c8, #93abff);
+      --accent-soft: light-dark(#e5eaff, #273762);
+      --good: light-dark(#147a50, #67d6aa);
+      --good-soft: light-dark(#e2f5ec, #173e32);
+      --warn: light-dark(#9a5b00, #f0b45b);
+      --warn-soft: light-dark(#fff1d7, #493516);
+      --bad: light-dark(#b42318, #ff9189);
+      --bad-soft: light-dark(#fde7e5, #4b2426);
+      --shadow: light-dark(0 9px 25px rgba(36, 49, 77, .10), 0 9px 25px rgba(0, 0, 0, .28));
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 18px; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.45; }
+    main { max-width: 1000px; margin: 0 auto; }
+    h1 { margin: 0 0 5px; font-size: clamp(1.35rem, 3vw, 2rem); }
+    h2 { margin: 0 0 8px; font-size: 1.05rem; }
+    .lead { color: var(--muted); margin: 0 0 15px; }
+    button, input { min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 9px; color: var(--text); background: var(--surface); font: inherit; }
+    button { cursor: pointer; }
+    input.num { width: 82px; }
+    input.list { width: min(320px, 100%); }
+    button:hover { border-color: var(--accent); }
+    button:focus-visible, input:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 2px; }
+    button:disabled { opacity: .45; cursor: default; }
+    button.primary { color: light-dark(#ffffff, #101624); background: var(--accent); border-color: var(--accent); }
+    .panel { padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); margin-bottom: 14px; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .sep { width: 1px; height: 30px; background: var(--border); margin: 0 4px; }
+    .muted { color: var(--muted); }
+    .status { min-height: 54px; margin: 12px 0; padding: 9px 11px; border-left: 4px solid var(--accent); border-radius: 0 9px 9px 0; background: var(--surface-2); }
+    .status.good { border-left-color: var(--good); background: var(--good-soft); }
+    .status.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+    .status strong { display: block; margin-bottom: 2px; }
+    .tree { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); }
+    svg { display: block; width: 100%; height: auto; min-width: 520px; }
+    svg text { font-family: ui-sans-serif, system-ui, sans-serif; fill: var(--text); }
+    .ed { stroke: var(--border); stroke-width: 2; }
+    .ed.dim { stroke-dasharray: 4 4; opacity: .5; }
+    .nd { fill: var(--surface); stroke: var(--muted); stroke-width: 1.6; }
+    .nd.cmp { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 3; }
+    .nd.sw { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 3.5; }
+    .nd.done { fill: var(--good-soft); stroke: var(--good); }
+    .nd.root { stroke-width: 2.6; }
+    .nv { font-size: 14px; font-weight: 800; }
+    .ni { font-size: 10px; fill: var(--muted) !important; }
+    .arr { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+    .cell { min-width: 44px; text-align: center; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 3px 4px; font-variant-numeric: tabular-nums; }
+    .cell b { display: block; font-size: 1.05rem; }
+    .cell small { color: var(--muted); font-size: .72rem; }
+    .cell.cmp { border-color: var(--accent); background: var(--accent-soft); }
+    .cell.sw { border-color: var(--warn); background: var(--warn-soft); }
+    .cell.done { border-color: var(--good); background: var(--good-soft); }
+    .metric-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 10px; }
+    .metric { min-width: 120px; padding: 7px 11px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
+    .metric span { display: block; color: var(--muted); font-size: .8rem; }
+    .metric strong { font-variant-numeric: tabular-nums; font-size: 1.05rem; }
+    @media (max-width: 760px) { body { padding: 12px; } .sep { display: none; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Heap binario y heapsort</h1>
+  <p class="lead">El árbol y el arreglo son la misma estructura: el nodo en la posición <i>i</i> tiene hijos en 2<i>i</i> y 2<i>i</i>+1. Azul = comparación, ámbar = intercambio, verde = posición definitiva.</p>
+
+  <section class="panel" id="p1">
+    <h2>1 · Cola de prioridad con heap de mínimos</h2>
+    <div class="row">
+      <input id="val" class="num" type="number" value="1" aria-label="Valor a insertar">
+      <button id="ins" class="primary">insert</button>
+      <button id="ext">extract_min</button>
+      <span class="sep"></span>
+      <input id="list" class="list" value="9, 4, 7, 1, 8, 2, 6, 3" aria-label="Arreglo inicial">
+      <button id="bld">build_heap (O(n))</button>
+      <button id="rnd">Aleatorio</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button id="p1back">◀</button>
+      <button id="p1step">Paso ▶</button>
+      <button id="p1play">▶ Reproducir</button>
+      <button id="p1all">Terminar ⇥</button>
+    </div>
+    <div id="p1status" class="status"></div>
+    <div class="tree"><svg id="p1svg" viewBox="0 0 720 300"></svg></div>
+    <div id="p1arr" class="arr"></div>
+    <div class="metric-row" id="p1m"></div>
+  </section>
+
+  <section class="panel" id="p2">
+    <h2>2 · Heapsort (heap de máximos, en el lugar)</h2>
+    <div class="row">
+      <input id="hsList" class="list" value="5, 2, 9, 1, 7, 3" aria-label="Arreglo a ordenar">
+      <button id="hsLoad">Cargar</button>
+      <button id="hsRnd">Aleatorio</button>
+      <span class="sep"></span>
+      <button id="p2back">◀</button>
+      <button id="p2step" class="primary">Paso ▶</button>
+      <button id="p2play">▶ Reproducir</button>
+      <button id="p2all">Terminar ⇥</button>
+    </div>
+    <div id="p2status" class="status"></div>
+    <div class="tree"><svg id="p2svg" viewBox="0 0 720 300"></svg></div>
+    <div id="p2arr" class="arr"></div>
+    <div class="metric-row" id="p2m"></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const el = id => document.getElementById(id);
+  const parseList = s => s.split(/[\s,;]+/).map(Number).filter(x => Number.isFinite(x)).slice(0, 31);
+  const randList = k => Array.from({ length: k }, () => 1 + Math.floor(Math.random() * 60));
+
+  // ---------- Dibujo compartido ----------
+  function drawTree(svg, f) {
+    const n = f.a.length - 1;
+    const levels = Math.max(1, Math.floor(Math.log2(Math.max(1, n))) + 1);
+    const W = 720, H = 50 + levels * 64;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    const pos = i => {
+      const d = Math.floor(Math.log2(i)), k = i - 2 ** d;
+      return [(k + .5) * W / 2 ** d, 32 + d * 64];
+    };
+    const heapN = f.n ?? n;
+    let s = "";
+    for (let i = 2; i <= n; i++) {
+      const [x1, y1] = pos(Math.floor(i / 2)), [x2, y2] = pos(i);
+      s += `<line class="ed ${i > heapN ? "dim" : ""}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+    }
+    for (let i = 1; i <= n; i++) {
+      const [x, y] = pos(i);
+      let c = i > heapN ? "done" : "";
+      if (f.cmp && f.cmp.includes(i)) c = "cmp";
+      if (f.sw && f.sw.includes(i)) c = "sw";
+      s += `<circle class="nd ${c} ${i === 1 ? "root" : ""}" cx="${x}" cy="${y}" r="18"/>
+        <text class="nv" x="${x}" y="${y + 5}" text-anchor="middle">${f.a[i]}</text>
+        <text class="ni" x="${x}" y="${y + 32}" text-anchor="middle">${i}</text>`;
+    }
+    if (n === 0) s = `<text x="${W / 2}" y="44" text-anchor="middle" class="ni">heap vacío</text>`;
+    svg.innerHTML = s;
+  }
+  function drawArr(div, f) {
+    const n = f.a.length - 1, heapN = f.n ?? n;
+    div.innerHTML = Array.from({ length: n }, (_, k) => {
+      const i = k + 1;
+      let c = i > heapN ? "done" : "";
+      if (f.cmp && f.cmp.includes(i)) c = "cmp";
+      if (f.sw && f.sw.includes(i)) c = "sw";
+      return `<div class="cell ${c}"><b>${f.a[i]}</b><small>[${i}]</small></div>`;
+    }).join("");
+  }
+
+  // ---------- Reproductor genérico ----------
+  function Player(prefix, onRender) {
+    const P = { frames: [], cur: 0, timer: null };
+    const btn = s => el(prefix + s);
+    P.stop = () => { if (P.timer) { clearInterval(P.timer); P.timer = null; btn("play").textContent = "▶ Reproducir"; } };
+    P.render = () => {
+      onRender(P.frames[P.cur]);
+      btn("back").disabled = P.cur === 0;
+      btn("step").disabled = btn("all").disabled = P.cur >= P.frames.length - 1;
+    };
+    P.load = (frames, autoplay) => { P.stop(); P.frames = frames; P.cur = 0; P.render(); if (autoplay) P.play(); };
+    P.play = () => {
+      if (P.timer) return P.stop();
+      btn("play").textContent = "⏸ Pausa";
+      P.timer = setInterval(() => { if (P.cur >= P.frames.length - 1) return P.stop(); P.cur++; P.render(); }, 750);
+    };
+    btn("back").addEventListener("click", () => { P.stop(); if (P.cur > 0) { P.cur--; P.render(); } });
+    btn("step").addEventListener("click", () => { if (P.cur < P.frames.length - 1) { P.cur++; P.render(); } });
+    btn("all").addEventListener("click", () => { P.stop(); P.cur = P.frames.length - 1; P.render(); });
+    btn("play").addEventListener("click", P.play);
+    return P;
+  }
+
+  // ---------- Generador de cuadros ----------
+  function Recorder(a, n) {
+    const R = { a, n, frames: [], comps: 0, swaps: 0 };
+    R.snap = (msg, extra = {}) => R.frames.push({ a: R.a.slice(), n: R.n, comps: R.comps, swaps: R.swaps, msg, ...extra });
+    R.swap = (i, j) => { [R.a[i], R.a[j]] = [R.a[j], R.a[i]]; R.swaps++; };
+    // less(x, y) define el orden: mínimos (x < y) o máximos (x > y)
+    R.up = (i, less) => {
+      while (i > 1) {
+        const p = Math.floor(i / 2);
+        R.comps++;
+        if (less(R.a[i], R.a[p])) {
+          R.snap(`<strong>heapify_up</strong>${R.a[i]} en [${i}] viola el orden con su padre ${R.a[p]} en [${p}]: se intercambian.`, { cmp: [i, p] });
+          R.swap(i, p);
+          R.snap(`<strong>Intercambio</strong>${R.a[p]} sube a la posición ${p}.`, { sw: [i, p] });
+          i = p;
+        } else {
+          R.snap(`<strong>heapify_up termina</strong>El padre ${R.a[p]} en [${p}] ya respeta el orden con ${R.a[i]}.`, { cmp: [i, p], kind: "good" });
+          return;
+        }
+      }
+      R.snap(`<strong>heapify_up termina</strong>El valor llegó a la raíz.`, { cmp: [1], kind: "good" });
+    };
+    R.down = (i, less, name = "heapify_down") => {
+      while (2 * i <= R.n) {
+        let j = 2 * i;
+        if (j + 1 <= R.n) { R.comps++; if (less(R.a[j + 1], R.a[j])) j++; }
+        const kids = 2 * i + 1 <= R.n ? [2 * i, 2 * i + 1] : [2 * i];
+        R.comps++;
+        if (less(R.a[j], R.a[i])) {
+          R.snap(`<strong>${name}</strong>En [${i}] está ${R.a[i]}; el hijo ${less(1, 2) ? "menor" : "mayor"} es ${R.a[j]} en [${j}] y viola el orden.`, { cmp: [i, ...kids] });
+          R.swap(i, j);
+          R.snap(`<strong>Intercambio</strong>${R.a[i]} sube a [${i}] y ${R.a[j]} baja a [${j}].`, { sw: [i, j] });
+          i = j;
+        } else {
+          R.snap(`<strong>${name} termina</strong>${R.a[i]} en [${i}] ya respeta el orden con sus hijos.`, { cmp: [i, ...kids], kind: "good" });
+          return;
+        }
+      }
+      R.snap(`<strong>${name} termina</strong>${R.a[i]} llegó a una hoja (posición ${i}).`, { cmp: [i], kind: "good" });
+    };
+    return R;
+  }
+  const minLess = (x, y) => x < y, maxLess = (x, y) => x > y;
+  const metrics = (div, f, extra = "") => {
+    div.innerHTML = `<div class="metric"><span>tamaño del heap</span><strong>${f.n}</strong></div>
+      <div class="metric"><span>comparaciones</span><strong>${f.comps}</strong></div>
+      <div class="metric"><span>intercambios</span><strong>${f.swaps}</strong></div>
+      <div class="metric"><span>altura ⌊log₂ n⌋</span><strong>${f.n ? Math.floor(Math.log2(f.n)) : "—"}</strong></div>${extra}`;
+  };
+
+  // ---------- Panel 1 ----------
+  let heap = [null];
+  const P1 = Player("p1", f => {
+    const st = el("p1status"); st.className = "status " + (f.kind || ""); st.innerHTML = f.msg;
+    drawTree(el("p1svg"), f); drawArr(el("p1arr"), f); metrics(el("p1m"), f);
+  });
+  const commit = R => { heap = R.a.slice(0, R.n + 1); P1.load(R.frames, true); };
+
+  function buildFrom(list) {
+    const R = Recorder([null, ...list], list.length);
+    R.snap(`<strong>Arreglo inicial</strong>Las posiciones ${Math.floor(R.n / 2) + 1}…${R.n} son hojas: ya son heaps. Se aplica heapify_down de [${Math.floor(R.n / 2)}] a [1].`);
+    for (let i = Math.floor(R.n / 2); i >= 1; i--) R.down(i, minLess, `heapify_down(${i})`);
+    R.snap(`<strong>Heap construido</strong>El mínimo ${R.a[1] ?? "—"} quedó en la raíz con ${R.comps} comparaciones (cota lineal ≈ 2n = ${2 * R.n}).`, { kind: "good" });
+    commit(R);
+  }
+  el("bld").addEventListener("click", () => buildFrom(parseList(el("list").value)));
+  el("rnd").addEventListener("click", () => { const l = randList(10); el("list").value = l.join(", "); buildFrom(l); });
+  el("ins").addEventListener("click", () => {
+    const v = Number(el("val").value);
+    if (!Number.isFinite(v) || heap.length > 31) return;
+    const R = Recorder([...heap, v], heap.length);
+    R.snap(`<strong>insert(${v})</strong>Se coloca al final, en la posición ${R.n}, para conservar la forma casi completa.`, { sw: [R.n] });
+    R.up(R.n, minLess);
+    commit(R);
+    el("val").value = 1 + Math.floor(Math.random() * 60);
+  });
+  el("ext").addEventListener("click", () => {
+    if (heap.length <= 1) return;
+    const R = Recorder(heap.slice(), heap.length - 1);
+    const m = R.a[1];
+    R.snap(`<strong>extract_min</strong>El mínimo es la raíz: ${m}.`, { cmp: [1] });
+    R.a[1] = R.a[R.n]; R.a.pop(); R.n--;
+    if (R.n === 0) { R.snap(`<strong>Se devolvió ${m}</strong>El heap quedó vacío.`, { kind: "good" }); return commit(R); }
+    R.snap(`<strong>Mover el último a la raíz</strong>Se devuelve ${m}; ${R.a[1]} ocupa la raíz y probablemente es demasiado grande.`, { sw: [1] });
+    R.down(1, minLess);
+    commit(R);
+  });
+
+  // ---------- Panel 2: heapsort ----------
+  const P2 = Player("p2", f => {
+    const st = el("p2status"); st.className = "status " + (f.kind || ""); st.innerHTML = f.msg;
+    drawTree(el("p2svg"), f); drawArr(el("p2arr"), f);
+    metrics(el("p2m"), f, `<div class="metric"><span>fase</span><strong>${f.phase}</strong></div>`);
+  });
+  function heapsort(list) {
+    const R = Recorder([null, ...list], list.length);
+    const snap0 = R.snap;
+    let phase = "construir";
+    R.snap = (msg, extra = {}) => snap0(msg, { phase, ...extra });
+    R.snap(`<strong>Fase 1: construir heap de máximos</strong>heapify_down desde [${Math.floor(R.n / 2)}] hasta [1].`);
+    for (let i = Math.floor(R.n / 2); i >= 1; i--) R.down(i, maxLess, `heapify_down(${i})`);
+    R.snap(`<strong>Heap de máximos listo</strong>El máximo ${R.a[1]} está en la raíz. Empieza la fase de extracción.`, { kind: "good" });
+    phase = "extraer";
+    for (let fin = R.n; fin >= 2; fin--) {
+      R.swap(1, fin); R.n = fin - 1;
+      R.snap(`<strong>Intercambio raíz ↔ [${fin}]</strong>${R.a[fin]} (el máximo del heap) va a su lugar definitivo; el heap se encoge a ${R.n}.`, { sw: [1, fin] });
+      R.down(1, maxLess);
+    }
+    R.n = 0;
+    phase = "listo";
+    R.snap(`<strong>Ordenado</strong>[${R.a.slice(1).join(", ")}] con ${R.comps} comparaciones; n·log₂n ≈ ${Math.round(list.length * Math.log2(Math.max(2, list.length)))}.`, { kind: "good" });
+    P2.load(R.frames, false);
+  }
+  el("hsLoad").addEventListener("click", () => heapsort(parseList(el("hsList").value)));
+  el("hsRnd").addEventListener("click", () => { const l = randList(9); el("hsList").value = l.join(", "); heapsort(l); });
+
+  buildFrom(parseList(el("list").value));
+  P1.stop(); P1.cur = P1.frames.length - 1; P1.render();
+  heapsort(parseList(el("hsList").value));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dijkstra paso a paso</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#f6f7fb, #0f1420);
+      --surface: light-dark(#ffffff, #182132);
+      --surface-2: light-dark(#eef2f8, #222d41);
+      --text: light-dark(#172033, #edf2fb);
+      --muted: light-dark(#5e697b, #abb7ca);
+      --border: light-dark(#c9d1df, #46546c);
+      --accent: light-dark(#3157c8, #93abff);
+      --accent-soft: light-dark(#e5eaff, #273762);
+      --good: light-dark(#147a50, #67d6aa);
+      --good-soft: light-dark(#e2f5ec, #173e32);
+      --warn: light-dark(#9a5b00, #f0b45b);
+      --warn-soft: light-dark(#fff1d7, #493516);
+      --bad: light-dark(#b42318, #ff9189);
+      --bad-soft: light-dark(#fde7e5, #4b2426);
+      --shadow: light-dark(0 9px 25px rgba(36, 49, 77, .10), 0 9px 25px rgba(0, 0, 0, .28));
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 18px; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.45; }
+    main { max-width: 1000px; margin: 0 auto; }
+    h1 { margin: 0 0 5px; font-size: clamp(1.35rem, 3vw, 2rem); }
+    h2 { margin: 0 0 8px; font-size: 1.05rem; }
+    .lead { color: var(--muted); margin: 0 0 15px; }
+    button, select { min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 9px; color: var(--text); background: var(--surface); font: inherit; cursor: pointer; }
+    button:hover, select:hover { border-color: var(--accent); }
+    button:focus-visible, select:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 2px; }
+    button:disabled { opacity: .45; cursor: default; }
+    button.primary { color: light-dark(#ffffff, #101624); background: var(--accent); border-color: var(--accent); }
+    .panel { padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); margin-bottom: 14px; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .muted { color: var(--muted); }
+    .status { min-height: 58px; margin: 12px 0; padding: 9px 11px; border-left: 4px solid var(--accent); border-radius: 0 9px 9px 0; background: var(--surface-2); }
+    .status.good { border-left-color: var(--good); background: var(--good-soft); }
+    .status.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+    .status.bad { border-left-color: var(--bad); background: var(--bad-soft); }
+    .status strong { display: block; margin-bottom: 2px; }
+    .graph { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); }
+    svg { display: block; width: 100%; height: auto; min-width: 560px; }
+    svg text { font-family: ui-sans-serif, system-ui, sans-serif; fill: var(--text); }
+    .e { stroke: var(--border); stroke-width: 2; fill: none; }
+    .e.tree { stroke: var(--good); stroke-width: 4; }
+    .e.cur { stroke: var(--warn); stroke-width: 4.5; }
+    .e.path { stroke: var(--accent); stroke-width: 5; }
+    .w { font-size: 13px; font-weight: 700; paint-order: stroke; stroke: var(--bg); stroke-width: 5px; stroke-linejoin: round; }
+    .n { fill: var(--surface); stroke: var(--muted); stroke-width: 1.6; }
+    .n.front { fill: var(--accent-soft); stroke: var(--accent); }
+    .n.done { fill: var(--good-soft); stroke: var(--good); stroke-width: 2.4; }
+    .n.now { stroke: var(--warn); stroke-width: 4; }
+    .nl { font-size: 15px; font-weight: 800; }
+    .pl { font-size: 12px; font-weight: 700; fill: var(--accent) !important; }
+    .pl.done { fill: var(--good) !important; }
+    .node { cursor: pointer; }
+    .queue { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 44px; padding: 8px; border: 1px dashed var(--border); border-radius: 10px; background: var(--bg); }
+    .qchip { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); font-variant-numeric: tabular-nums; }
+    .qchip.min { border-color: var(--warn); background: var(--warn-soft); font-weight: 700; }
+    .qchip.chg { border-color: var(--good); background: var(--good-soft); font-weight: 700; }
+    table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+    th, td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: center; }
+    th { color: var(--muted); font-weight: 600; font-size: .85rem; }
+    td.done { background: var(--good-soft); font-weight: 700; }
+    td.chg { background: var(--warn-soft); font-weight: 700; }
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .85rem; color: var(--muted); margin-top: 8px; }
+    .legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; border: 2px solid var(--muted); }
+    .legend .lf::before { background: var(--accent-soft); border-color: var(--accent); }
+    .legend .ld::before { background: var(--good-soft); border-color: var(--good); }
+    .legend .lt::before { border-radius: 2px; height: 4px; width: 18px; background: var(--good); border: 0; vertical-align: 3px; }
+    .legend .lc::before { border-radius: 2px; height: 4px; width: 18px; background: var(--warn); border: 0; vertical-align: 3px; }
+    .grid2 { display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px; }
+    @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } body { padding: 12px; } }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .pseudo { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); font-size: .85rem; line-height: 1.6; white-space: pre; overflow-x: auto; }
+    .pseudo .hl { background: var(--warn-soft); border-radius: 4px; outline: 1px solid var(--warn); }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Dijkstra paso a paso</h1>
+  <p class="lead">Grafo de las diapositivas de Wayne (Greedy Algorithms II). Avanza una operación a la vez: cada <b>extracción</b> fija una distancia definitiva y cada <b>relajación</b> puede bajar un valor π[v]. Haz clic en un nodo para ver su camino más corto.</p>
+
+  <section class="panel">
+    <div class="row">
+      <label>Instancia
+        <select id="preset">
+          <option value="slides">Diapositivas (8 nodos)</option>
+          <option value="neg">Contraejemplo: arista negativa</option>
+        </select>
+      </label>
+      <label>Fuente s
+        <select id="source"></select>
+      </label>
+      <button id="reset">⟲ Reiniciar</button>
+      <button id="back">◀ Atrás</button>
+      <button id="step" class="primary">Paso ▶</button>
+      <button id="play">▶ Reproducir</button>
+      <button id="all">Terminar ⇥</button>
+    </div>
+    <div id="status" class="status"></div>
+    <div class="graph"><svg id="svg" viewBox="0 0 720 440" role="img" aria-label="Grafo dirigido con longitudes"></svg></div>
+    <div class="legend">
+      <span class="ld">explorado (en S): π definitiva</span>
+      <span class="lf">en la cola con π finita</span>
+      <span>π = ∞</span>
+      <span class="lt">arista pred[v]</span>
+      <span class="lc">arista que se relaja</span>
+    </div>
+  </section>
+
+  <div class="grid2">
+    <section class="panel">
+      <h2>Cola de prioridad (min-π)</h2>
+      <div id="pq" class="queue"></div>
+      <h2 style="margin-top:14px">Tabla π / pred</h2>
+      <div id="table"></div>
+    </section>
+    <section class="panel">
+      <h2>Pseudocódigo</h2>
+<div class="pseudo" id="code"></div>
+      <p class="muted" style="font-size:.85rem;margin:8px 0 0">Costo con heap binario: <i>n</i> INSERT + <i>n</i> DEL-MIN + ≤ <i>m</i> DECREASE-KEY, cada una O(log <i>n</i>) ⇒ O(<i>m</i> log <i>n</i>).</p>
+    </section>
+  </div>
+</main>
+
+<script>
+(() => {
+  const el = id => document.getElementById(id);
+  const PRESETS = {
+    slides: {
+      nodes: { 0: [80, 205], 1: [260, 85], 3: [575, 85], 7: [265, 230], 2: [475, 235], 5: [385, 330], 4: [80, 395], 6: [640, 395] },
+      edges: [[0,1,5],[0,7,8],[0,4,9],[1,3,15],[1,7,4],[1,2,12],[7,2,7],[7,5,6],[4,7,5],[4,5,4],[4,6,20],[5,2,1],[5,6,13],[2,3,3],[2,6,11],[3,6,9]],
+      source: "0"
+    },
+    neg: {
+      nodes: { s: [110, 220], a: [430, 90], b: [430, 350] },
+      edges: [["s","a",2],["s","b",3],["b","a",-2]],
+      source: "s"
+    }
+  };
+  const CODE = [
+    "π[v] ← ∞ para v ≠ s;  π[s] ← 0",
+    "INSERT todos los v en pq con llave π[v]",
+    "MIENTRAS pq no esté vacía:",
+    "  u ← DEL-MIN(pq)        ▷ π[u] es definitiva",
+    "  PARA cada arista e = (u, v) que sale de u:",
+    "    SI π[v] > π[u] + ℓe:",
+    "      DECREASE-KEY(pq, v, π[u] + ℓe)",
+    "      π[v] ← π[u] + ℓe;  pred[v] ← u"
+  ];
+
+  let preset, frames = [], cur = 0, timer = null, target = null;
+  const fmt = x => x === Infinity ? "∞" : String(x);
+
+  function build() {
+    const P = PRESETS[preset];
+    const s = el("source").value;
+    const ids = Object.keys(P.nodes);
+    const adj = Object.fromEntries(ids.map(v => [v, []]));
+    P.edges.forEach(([u, v, w]) => adj[u].push([String(v), w]));
+    const pi = Object.fromEntries(ids.map(v => [v, Infinity]));
+    const pred = Object.fromEntries(ids.map(v => [v, null]));
+    const S = new Set();
+    pi[s] = 0;
+    const snap = (extra) => ({ pi: { ...pi }, pred: { ...pred }, S: new Set(S), ...extra });
+    frames = [snap({ line: [0, 1], msg: `<strong>Inicialización</strong>π[${s}] = 0 y π[v] = ∞ para los demás. Todos los nodos entran a la cola.`, kind: "" })];
+    while (S.size < ids.length) {
+      const rest = ids.filter(v => !S.has(v));
+      const u = rest.reduce((a, b) => (pi[b] < pi[a] ? b : a));
+      if (pi[u] === Infinity) {
+        frames.push(snap({ line: [3], msg: `<strong>Fin</strong>Los nodos restantes tienen π = ∞: no son alcanzables desde ${s}.`, kind: "warn", end: true }));
+        break;
+      }
+      S.add(u);
+      frames.push(snap({ now: u, line: [3], msg: `<strong>DEL-MIN → ${u}</strong>π[${u}] = ${fmt(pi[u])} es mínima entre los no explorados; por el invariante es la distancia exacta d(s, ${u}). Se agrega a S.`, kind: "good" }));
+      for (const [v, w] of adj[u]) {
+        const cand = pi[u] + w;
+        if (S.has(v)) {
+          const wrong = cand < pi[v];
+          frames.push(snap({ now: u, edge: [u, v], line: [4], msg: wrong
+            ? `<strong>Arista (${u}, ${v}), ℓ = ${w}</strong>${v} ya está en S con π = ${pi[v]}, pero π[${u}] + ℓ = ${cand} es <b>menor</b>. Dijkstra ya no corrige nodos explorados: con longitudes negativas la distancia fijada era incorrecta.`
+            : `<strong>Arista (${u}, ${v}), ℓ = ${w}</strong>${v} ya está explorado: su π es definitiva y no se toca.`, kind: wrong ? "bad" : "" }));
+          continue;
+        }
+        if (cand < pi[v]) {
+          const old = pi[v];
+          pi[v] = cand; pred[v] = u;
+          frames.push(snap({ now: u, edge: [u, v], chg: v, line: [5, 6, 7], msg: `<strong>Relajar (${u}, ${v}), ℓ = ${w}</strong>π[${v}] = ${fmt(old)} &gt; π[${u}] + ℓ = ${pi[u]} + ${w} = ${cand}. DECREASE-KEY: π[${v}] ← ${cand}, pred[${v}] ← ${u}.`, kind: "warn" }));
+        } else {
+          frames.push(snap({ now: u, edge: [u, v], line: [5], msg: `<strong>Relajar (${u}, ${v}), ℓ = ${w}</strong>π[${u}] + ℓ = ${cand} no mejora π[${v}] = ${fmt(pi[v])}. Sin cambio.`, kind: "" }));
+        }
+      }
+    }
+    const last = frames[frames.length - 1];
+    if (!last.end) {
+      let extra = "";
+      if (preset === "neg") extra = " Pero la distancia real a <b>a</b> es 1 (s → b → a = 3 − 2): con aristas negativas el invariante falla porque un camino puede abaratarse después de salir de S.";
+      frames.push(snap({ line: [2], msg: `<strong>Terminado</strong>Las aristas verdes forman el árbol de caminos más cortos. Haz clic en un nodo para resaltar su camino.${extra}`, kind: preset === "neg" ? "bad" : "good", end: true }));
+    }
+  }
+
+  function arrowPath(a, b, r) {
+    const [x1, y1] = a, [x2, y2] = b;
+    const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy);
+    const ux = dx / L, uy = dy / L;
+    return [x1 + ux * r, y1 + uy * r, x2 - ux * (r + 6), y2 - uy * (r + 6)];
+  }
+
+  function pathEdges(f) {
+    const set = new Set();
+    if (target == null) return set;
+    let v = target;
+    while (f.pred[v] != null) { set.add(f.pred[v] + ">" + v); v = f.pred[v]; }
+    return set;
+  }
+
+  function render() {
+    const P = PRESETS[preset];
+    const f = frames[cur];
+    const st = el("status");
+    st.className = "status " + (f.kind || "");
+    st.innerHTML = f.msg + `<span class="muted" style="display:block;font-size:.8rem;margin-top:3px">Paso ${cur} de ${frames.length - 1}</span>`;
+    const pe = pathEdges(f);
+    const R = 22;
+    let svg = `<defs>
+      <marker id="m0" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--border)"/></marker>
+      <marker id="m1" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--good)"/></marker>
+      <marker id="m2" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--warn)"/></marker>
+      <marker id="m3" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--accent)"/></marker>
+    </defs>`;
+    P.edges.forEach(([u, v, w]) => {
+      u = String(u); v = String(v);
+      const [x1, y1, x2, y2] = arrowPath(P.nodes[u], P.nodes[v], R);
+      const isCur = f.edge && f.edge[0] === u && f.edge[1] === v;
+      const isPath = pe.has(u + ">" + v);
+      const isTree = f.pred[v] === u;
+      const cls = isCur ? "cur" : isPath ? "path" : isTree ? "tree" : "";
+      const mk = isCur ? "m2" : isPath ? "m3" : isTree ? "m1" : "m0";
+      svg += `<line class="e ${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" marker-end="url(#${mk})"/>`;
+      const mx = (P.nodes[u][0] + P.nodes[v][0]) / 2, my = (P.nodes[u][1] + P.nodes[v][1]) / 2;
+      svg += `<text class="w" x="${mx}" y="${my + 4}" text-anchor="middle">${w}</text>`;
+    });
+    for (const [id, [x, y]] of Object.entries(P.nodes)) {
+      const done = f.S.has(id);
+      const front = !done && f.pi[id] !== Infinity;
+      const cls = (done ? "done" : front ? "front" : "") + (f.now === id ? " now" : "");
+      svg += `<g class="node" data-id="${id}"><circle class="n ${cls}" cx="${x}" cy="${y}" r="${R}"/>
+        <text class="nl" x="${x}" y="${y + 5}" text-anchor="middle">${id}</text>
+        <text class="pl ${done ? "done" : ""}" x="${x}" y="${y - R - 7}" text-anchor="middle">π=${fmt(f.pi[id])}</text></g>`;
+    }
+    el("svg").innerHTML = svg;
+    el("svg").querySelectorAll(".node").forEach(g => g.addEventListener("click", () => {
+      target = target === g.dataset.id ? null : g.dataset.id; render();
+    }));
+
+    const inQ = Object.keys(P.nodes).filter(v => !f.S.has(v)).sort((a, b) => f.pi[a] - f.pi[b]);
+    el("pq").innerHTML = inQ.length
+      ? inQ.map((v, i) => `<span class="qchip ${f.chg === v ? "chg" : i === 0 && f.pi[v] !== Infinity ? "min" : ""}">${v} : ${fmt(f.pi[v])}</span>`).join("")
+      : `<span class="muted">vacía</span>`;
+
+    const ids = Object.keys(P.nodes);
+    el("table").innerHTML = `<table><thead><tr><th>v</th>${ids.map(v => `<th>${v}</th>`).join("")}</tr></thead><tbody>
+      <tr><th>π[v]</th>${ids.map(v => `<td class="${f.S.has(v) ? "done" : f.chg === v ? "chg" : ""}">${fmt(f.pi[v])}</td>`).join("")}</tr>
+      <tr><th>pred</th>${ids.map(v => `<td>${f.pred[v] ?? "—"}</td>`).join("")}</tr></tbody></table>` +
+      (target != null ? `<p class="muted" style="font-size:.85rem;margin:8px 0 0">Camino a <b>${target}</b>: ${pathText(f)}</p>` : "");
+
+    el("code").innerHTML = CODE.map((l, i) => `<span class="${f.line && f.line.includes(i) ? "hl" : ""}">${l}</span>`).join("\n");
+    el("back").disabled = cur === 0;
+    el("step").disabled = el("all").disabled = cur === frames.length - 1;
+  }
+
+  function pathText(f) {
+    if (f.pi[target] === Infinity) return "aún no alcanzado (π = ∞).";
+    const seq = [target];
+    let v = target;
+    while (f.pred[v] != null) { v = f.pred[v]; seq.unshift(v); }
+    const done = f.S.has(target);
+    return `${seq.join(" → ")} con longitud ${f.pi[target]}${done ? " (definitiva)" : " (provisional)"}.`;
+  }
+
+  function stop() { if (timer) { clearInterval(timer); timer = null; el("play").textContent = "▶ Reproducir"; } }
+  function loadPreset() {
+    stop();
+    preset = el("preset").value;
+    const P = PRESETS[preset];
+    el("source").innerHTML = Object.keys(P.nodes).map(v => `<option ${v === P.source ? "selected" : ""}>${v}</option>`).join("");
+    target = null; restart();
+  }
+  function restart() { stop(); build(); cur = 0; render(); }
+
+  el("preset").addEventListener("change", loadPreset);
+  el("source").addEventListener("change", () => { target = null; restart(); });
+  el("reset").addEventListener("click", () => { stop(); cur = 0; render(); });
+  el("back").addEventListener("click", () => { stop(); if (cur > 0) { cur--; render(); } });
+  el("step").addEventListener("click", () => { if (cur < frames.length - 1) { cur++; render(); } });
+  el("all").addEventListener("click", () => { stop(); cur = frames.length - 1; render(); });
+  el("play").addEventListener("click", () => {
+    if (timer) return stop();
+    el("play").textContent = "⏸ Pausa";
+    timer = setInterval(() => { if (cur >= frames.length - 1) return stop(); cur++; render(); }, 1100);
+  });
+  loadPreset();
+})();
+</script>
+</body>
+</html>

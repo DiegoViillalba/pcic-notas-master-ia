@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El orden de eliminación y el tamaño de los factores</title>
+<style>
+:root{color-scheme:light dark;--ink:light-dark(#192e37,#e6edf1);--muted:light-dark(#52616b,#b9c5cd);--line:light-dark(#ccd7dc,#45545e);--surface:light-dark(#f1f6f7,#23353e);--accent:light-dark(#0f637c,#89d4e4)}
+*{box-sizing:border-box}body{margin:0;padding:20px;color:var(--ink);background:transparent;font:16px/1.5 system-ui,sans-serif}main{max-width:1000px;margin:auto}h1{font-size:1.35rem;font-weight:600;margin:0 0 8px}h2{font-size:1.1rem;font-weight:600;margin:18px 0 8px}p{margin:8px 0}.muted{color:var(--muted)}.controls{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0}label{display:flex;flex:1 1 210px;flex-direction:column;gap:5px}select,button{font:inherit;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:5px;padding:8px 10px;max-width:100%}select{background:var(--surface)}input{width:100%;accent-color:var(--accent)}button:disabled{opacity:.45}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:3px}.stepper{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0}output{font-variant-numeric:tabular-nums}svg{display:block;width:100%;height:auto}svg text{fill:var(--ink);font:13px system-ui,sans-serif}.node{fill:var(--surface);stroke:var(--line);stroke-width:1.5}.query{stroke:var(--accent);stroke-width:2.5}.current{fill:var(--accent);fill-opacity:.18;stroke:var(--accent);stroke-width:2}.removed{opacity:.35}.link{stroke:var(--line);stroke-width:1.3}.new{stroke:var(--accent);stroke-width:1.8}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line)}th{font-weight:600}.scope{font-family:ui-monospace,monospace;overflow-wrap:anywhere}.factor-list{display:flex;flex-wrap:wrap;gap:8px}.factor-item{padding:2px 0}.factor-item+.factor-item:before{content:' · ';color:var(--muted)}@media(max-width:520px){body{padding:12px}label{flex-basis:100%}}@media(pointer:coarse){button,select{min-height:44px}input{min-height:44px}}
+</style>
+</head>
+<body>
+<main id="ia15-order-lab">
+<h1>El orden cambia el tamaño de los factores</h1>
+<p class="muted">Todas las variables son booleanas. Las Y están observadas; la consulta es Xₙ. El dibujo representa la interacción entre factores después de fijar la evidencia.</p>
+<div class="controls">
+ <label>Ramas: <output id="n-value">6</output><input id="n" type="range" min="3" max="12" step="1" value="6"></label>
+ <label>Orden de eliminación<select id="order"><option value="leaves">Ramas X primero; Z al final</option><option value="center">Z primero; después las ramas</option></select></label>
+</div>
+<p id="sequence" class="scope"></p>
+<div class="stepper"><button type="button" id="prev">Anterior</button><output id="position"></output><button type="button" id="next">Siguiente</button></div>
+<section aria-live="polite" aria-atomic="true"><h2 id="title"></h2><p id="description"></p></section>
+<svg id="graph" role="img" aria-label="Grafo de interacción de los factores"></svg>
+<p class="muted">Contorno destacado: consulta. Nodo relleno y aristas destacadas: producto de la eliminación actual. Nodos atenuados: variables ya sumadas.</p>
+<div class="table-wrap"><table><thead><tr><th>Tabla de este paso</th><th>Alcance</th><th>Entradas</th></tr></thead><tbody id="sizes"></tbody></table></div>
+<h2>Factores después de este paso</h2><div id="factors" class="factor-list"></div>
+<h2>Comparación para este número de ramas</h2>
+<div class="table-wrap"><table><thead><tr><th>Orden</th><th>Mayor producto</th><th>Mayor resumen</th></tr></thead><tbody id="comparison"></tbody></table></div>
+<p class="muted">Contamos tablas densas: un alcance de k variables booleanas requiere 2ᵏ entradas. Se muestran tamaños; la diapositiva 29 no especifica CPT numéricas.</p>
+<noscript>Con seis ramas, eliminar Z primero requiere un producto de 128 entradas y produce un resumen de 64. Eliminar las ramas primero mantiene productos de 4 entradas y resúmenes de 2.</noscript>
+</main>
+<script>
+(()=>{
+'use strict';
+const root=document.getElementById('ia15-order-lab'),el=id=>root.querySelector('#'+id),NS='http://www.w3.org/2000/svg';
+const scopeText=s=>'{'+s.join(', ')+'}';
+function trace(n,mode){
+ const xs=Array.from({length:n},(_,i)=>'X'+(i+1));
+ const order=mode==='center'?['Z',...xs.slice(0,-1)]:[...xs.slice(0,-1),'Z'];
+ let factors=[{name:'P(Z)',scope:['Z']},...xs.flatMap((x,i)=>[{name:'P('+x+' | Z)',scope:['Z',x]},{name:'P(y'+(i+1)+' | '+x+')',scope:[x]}])],removed=[];
+ const steps=[{x:null,scope:[],result:[],factors:[...factors],before:[...factors],removed:[]}];
+ for(const x of order){
+  const before=[...factors],used=factors.filter(f=>f.scope.includes(x)),scope=[...new Set(used.flatMap(f=>f.scope))],result=scope.filter(v=>v!==x);
+  factors=[...factors.filter(f=>!f.scope.includes(x)),{name:'m'+(steps.length),scope:result}];
+  steps.push({x,scope,result,factors:[...factors],before,used,removed:[...removed]});removed.push(x);
+ }
+ return{xs,order,steps};
+}
+let run,index=0;
+function draw(){
+ const svg=el('graph'),s=run.steps[index],w=Math.max(280,svg.getBoundingClientRect().width),compact=w<500,cols=compact?3:6,rows=Math.ceil(run.xs.length/cols),h=90+rows*90;
+ svg.setAttribute('viewBox','0 0 '+w+' '+h);svg.innerHTML='';
+ function add(type,attrs,text){const e=document.createElementNS(NS,type);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,String(v)));if(text!==undefined)e.textContent=text;svg.appendChild(e);return e;}
+ add('title',{},s.x?'Eliminar '+s.x:'Factores después de observar todas las Y');
+ add('desc',{},'Cada arista indica que dos variables aparecen juntas en algún factor actual. Se omiten las variables Y porque ya están fijadas.');
+ const coords={Z:[w/2,30]};run.xs.forEach((x,i)=>{const row=Math.floor(i/cols),num=Math.min(cols,run.xs.length-row*cols);coords[x]=[(i%cols+.5)*w/num,115+row*85];});
+ const links=new Set();s.before.forEach(f=>{for(let i=0;i<f.scope.length;i++)for(let j=i+1;j<f.scope.length;j++)links.add([f.scope[i],f.scope[j]].sort().join('|'));});
+ links.forEach(key=>{const[a,b]=key.split('|'),[x1,y1]=coords[a],[x2,y2]=coords[b],current=s.scope.includes(a)&&s.scope.includes(b);add('line',{x1,y1,x2,y2,class:current?'new':'link'});});
+ Object.entries(coords).forEach(([x,[cx,cy]])=>{const removed=s.removed.includes(x);let cls='node';if(x===run.xs.at(-1))cls+=' query';if(x===s.x)cls+=' current';if(removed)cls+=' removed';add('circle',{cx,cy,r:22,class:cls});add('text',{x:cx,y:cy+5,'text-anchor':'middle',opacity:removed?.35:1},x);if(x===run.xs.at(-1))add('text',{x:cx,y:cy+40,'text-anchor':'middle'},'consulta');});
+}
+function render(){
+ const n=Number(el('n').value),s=run.steps[index];el('n-value').textContent=String(n);el('sequence').textContent='Orden: '+run.order.join(' → ');el('position').textContent=index===0?'Estado inicial':'Eliminación '+index+' de '+run.order.length;el('prev').disabled=index===0;el('next').disabled=index===run.steps.length-1;
+ el('title').textContent=index===0?'Factores iniciales con la evidencia fijada':'Eliminar '+s.x;
+ el('description').textContent=index===0?'Cada rama contiene P(Xᵢ | Z) y P(yᵢ | Xᵢ). Todas las ramas comparten Z.':s.x==='Z'&&index===1?'Reunir las CPT que mencionan Z conecta todas las X en un solo producto. El resumen conserva esa relación entre ramas.':'Se multiplican los factores que mencionan '+s.x+' y se suma esa variable. El resumen conserva las otras variables del producto.';
+ el('sizes').innerHTML=index===0?'<tr><td>Mayor factor inicial</td><td>{Z, Xᵢ}</td><td>4</td></tr>':'<tr><td>Producto antes de sumar</td><td class="scope">'+scopeText(s.scope)+'</td><td>'+2**s.scope.length+'</td></tr><tr><td>Resumen después de sumar '+s.x+'</td><td class="scope">'+scopeText(s.result)+'</td><td>'+2**s.result.length+'</td></tr>';
+ el('factors').innerHTML=s.factors.map(f=>'<span class="factor-item">'+f.name+' <span class="scope">'+scopeText(f.scope)+'</span></span>').join('');
+ el('comparison').innerHTML='<tr><td>Ramas primero</td><td>4</td><td>2</td></tr><tr><td>Z primero</td><td>'+2**(n+1)+'</td><td>'+2**n+'</td></tr>';
+ root.dataset.n=String(n);root.dataset.mode=el('order').value;root.dataset.step=String(index);root.dataset.scopeSize=String(s.scope.length);root.dataset.productRows=String(index?2**s.scope.length:4);root.dataset.summaryRows=String(index?2**s.result.length:0);draw();
+}
+function restart(){run=trace(Number(el('n').value),el('order').value);index=0;render();}
+el('prev').addEventListener('click',()=>{if(index>0){index--;render();}});el('next').addEventListener('click',()=>{if(index<run.steps.length-1){index++;render();}});el('n').addEventListener('input',restart);el('order').addEventListener('change',restart);new ResizeObserver(draw).observe(el('graph'));window.ia15Ordering={trace};restart();
+})();
+</script>
+</body>
+</html>

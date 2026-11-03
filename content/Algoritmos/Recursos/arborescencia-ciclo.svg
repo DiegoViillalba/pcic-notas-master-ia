@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="330" viewBox="0 0 860 330" role="img" aria-label="Edmonds: las entradas mínimas forman el ciclo A a B a C a A; al entrar por B se rompe el ciclo">
+<title>Edmonds: romper el ciclo de entradas mínimas</title>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#425f9c"/></marker><marker id="red" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#b5483d"/></marker></defs>
+<rect width="860" height="330" fill="#fbfcff"/>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#18243a}.title{font-size:22px;font-weight:700}.label{font-size:16px;font-weight:700}.small{font-size:14px}.node{fill:#fff;stroke:#314b79;stroke-width:2.5}.base{fill:none;stroke:#425f9c;stroke-width:3;marker-end:url(#arrow)}.cycle{fill:none;stroke:#b5483d;stroke-width:4;marker-end:url(#red)}</style>
+<text x="430" y="36" class="title" text-anchor="middle">Edmonds: un ciclo impide llegar desde la raíz</text>
+<path class="base" d="M115 155 L305 90"/><path class="base" d="M115 175 L305 235"/><path class="base" d="M115 165 L575 165"/>
+<path class="cycle" d="M330 107 L330 218"/><path class="cycle" d="M355 240 L575 175"/><path class="cycle" d="M575 155 L355 90"/>
+<circle class="node" cx="90" cy="165" r="25"/><circle class="node" cx="330" cy="80" r="25"/><circle class="node" cx="330" cy="245" r="25"/><circle class="node" cx="600" cy="165" r="25"/>
+<text x="90" y="171" class="label" text-anchor="middle">r</text><text x="330" y="86" class="label" text-anchor="middle">A</text><text x="330" y="251" class="label" text-anchor="middle">B</text><text x="600" y="171" class="label" text-anchor="middle">C</text>
+<text x="205" y="106" class="small" text-anchor="middle">5 (4)</text><text x="205" y="225" class="small" text-anchor="middle">4 (3)</text><text x="430" y="153" class="small" text-anchor="middle">8 (7)</text>
+<text x="303" y="171" class="small" text-anchor="middle">1 (0)</text><text x="480" y="228" class="small" text-anchor="middle">1 (0)</text><text x="478" y="97" class="small" text-anchor="middle">1 (0)</text>
+<text x="430" y="295" class="small" text-anchor="middle">Costo original (reducido). Entrar por B y retirar A→B da 4+1+1=6.</text>
+</svg>

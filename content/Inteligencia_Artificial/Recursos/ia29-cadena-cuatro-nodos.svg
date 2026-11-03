@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="485" viewBox="0 0 840 485" role="img" aria-labelledby="title desc">
+<title id="title">Cadena de cuatro nodos: observar bloquea el camino</title><desc id="desc">X a Y a Z a W. Sin evidencia el camino entre X y W está activo. Observar Z bloquea el único camino y garantiza X independiente de W dado Z.</desc>
+<style>
+:root{color-scheme:light dark;--bg:#f8f7f3;--text:#192a32;--muted:#52626a;--node:#ffffff;--line:#9aaeb7;--accent:#186b80;--soft:#d9edf1;--blocked:#798992}
+@media(prefers-color-scheme:dark){:root{--bg:#151e24;--text:#e7eff2;--muted:#b5c4cb;--node:#202d35;--line:#8a9fa9;--accent:#68becb;--soft:#254650;--blocked:#a2b0b6}}
+text{font-family:system-ui,-apple-system,sans-serif;fill:var(--text)}
+.title{font-size:26px;font-weight:600}.heading{font-size:21px;font-weight:600}.label{font-size:18px}.symbol{font-size:23px;font-weight:600}.caption{font-size:18px;fill:var(--muted)}.status{font-size:19px;font-weight:600}.factor{font-size:19px}
+.node{fill:var(--node);stroke:var(--line);stroke-width:1.5}.observed{fill:var(--soft);stroke:var(--accent);stroke-width:2.5}
+.edge{fill:none;stroke:var(--line);stroke-width:2}.active{stroke:var(--accent);stroke-width:2.5}.blocked{stroke:var(--blocked);stroke-dasharray:7 6;stroke-width:2}.separator{stroke:var(--line);stroke-width:1;opacity:.5}
+</style>
+<defs>
+<marker id="arrow-normal" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 Z" fill="var(--line)"/></marker>
+<marker id="arrow-active" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 Z" fill="var(--accent)"/></marker>
+<marker id="arrow-blocked" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 Z" fill="var(--blocked)"/></marker>
+</defs>
+<rect width="840" height="485" rx="10" fill="var(--bg)"/>
+<text x="30" y="42" class="title" text-anchor="start">Cadena de cuatro nodos: observar bloquea el camino</text>
+<text x="30" y="84" class="heading" text-anchor="start">Sin evidencia</text>
+<line x1="142.00" y1="145.00" x2="271.00" y2="145.00" class="edge active" marker-end="url(#arrow-active)"/>
+<line x1="355.00" y1="145.00" x2="484.00" y2="145.00" class="edge active" marker-end="url(#arrow-active)"/>
+<line x1="568.00" y1="145.00" x2="697.00" y2="145.00" class="edge active" marker-end="url(#arrow-active)"/>
+<ellipse cx="100" cy="145" rx="42" ry="42" class="node "/>
+<text x="100" y="152" class="symbol" text-anchor="middle">X</text>
+<ellipse cx="313" cy="145" rx="42" ry="42" class="node "/>
+<text x="313" y="152" class="symbol" text-anchor="middle">Y</text>
+<ellipse cx="526" cy="145" rx="42" ry="42" class="node "/>
+<text x="526" y="152" class="symbol" text-anchor="middle">Z</text>
+<ellipse cx="739" cy="145" rx="42" ry="42" class="node "/>
+<text x="739" y="152" class="symbol" text-anchor="middle">W</text>
+<text x="420" y="243" class="status" text-anchor="middle">Camino activo: no se garantiza X ⊥ W</text>
+<text x="30" y="294" class="heading" text-anchor="start">Con Z observado</text>
+<line x1="142.00" y1="355.00" x2="271.00" y2="355.00" class="edge blocked" marker-end="url(#arrow-blocked)"/>
+<line x1="355.00" y1="355.00" x2="484.00" y2="355.00" class="edge blocked" marker-end="url(#arrow-blocked)"/>
+<line x1="568.00" y1="355.00" x2="697.00" y2="355.00" class="edge blocked" marker-end="url(#arrow-blocked)"/>
+<ellipse cx="100" cy="355" rx="42" ry="42" class="node "/>
+<text x="100" y="362" class="symbol" text-anchor="middle">X</text>
+<ellipse cx="313" cy="355" rx="42" ry="42" class="node "/>
+<text x="313" y="362" class="symbol" text-anchor="middle">Y</text>
+<ellipse cx="526" cy="355" rx="42" ry="42" class="node observed"/>
+<text x="526" y="362" class="symbol" text-anchor="middle">Z</text>
+<text x="526" y="424" class="caption" text-anchor="middle">observado</text>
+<ellipse cx="739" cy="355" rx="42" ry="42" class="node "/>
+<text x="739" y="362" class="symbol" text-anchor="middle">W</text>
+<text x="420" y="453" class="status" text-anchor="middle">Camino bloqueado: X ⊥ W | Z</text>
+<line x1="30" y1="263" x2="810" y2="263" class="separator"/>
+</svg>

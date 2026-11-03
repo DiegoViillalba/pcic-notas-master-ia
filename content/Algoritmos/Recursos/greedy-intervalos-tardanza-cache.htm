@@ -395,12 +395,13 @@
     document.getElementById('select-next').addEventListener('click', () => {
       if (selectStep >= selectJobs.length) return;
       const job = selectJobs[selectStep];
+      const previousFinish = selectLastFinish;
       const accepted = job.s >= selectLastFinish;
       selectDecisions.set(job.id, accepted ? 'accepted' : 'rejected');
       if (accepted) selectLastFinish = job.f;
       selectStep += 1;
       document.getElementById('select-status').innerHTML = accepted
-        ? `<strong>${job.id} se acepta.</strong>Empieza en ${job.s}, después del último final ${selectLastFinish === job.f ? job.s === 1 ? '−∞' : selectJobs.filter(x => selectDecisions.get(x.id) === 'accepted' && x.id !== job.id).at(-1)?.f ?? '−∞' : selectLastFinish}. El nuevo final de referencia es ${job.f}.`
+        ? `<strong>${job.id} se acepta.</strong>Empieza en ${job.s}, después del último final ${previousFinish === -Infinity ? '−∞' : previousFinish}. El nuevo final de referencia es ${job.f}.`
         : `<strong>${job.id} se descarta.</strong>Empieza en ${job.s}, antes de que termine el último elegido en ${selectLastFinish}.`;
       renderSelect(job.id);
     });

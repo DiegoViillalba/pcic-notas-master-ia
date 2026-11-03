@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frontera de decisión: lineal y XOR</title>
+<style>
+  :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+  body { margin: 0; padding: 1rem; background: transparent; color: CanvasText; }
+  .wrap { max-width: 760px; margin: auto; }
+  h2 { font-size: 1.12rem; margin: 0 0 .7rem; }
+  .controls { display: flex; flex-wrap: wrap; gap: .8rem 1.2rem; align-items: end; margin-bottom: .8rem; }
+  label { display: grid; gap: .25rem; min-width: 130px; flex: 1; font-size: .92rem; }
+  select, input { width: 100%; box-sizing: border-box; }
+  select { padding: .35rem; }
+  .plot { width: 100%; max-width: 480px; display: block; margin: 0 auto; border: 1px solid #8b8b8b; }
+  .readout { margin: .7rem 0 0; font-size: .94rem; line-height: 1.45; }
+  .legend { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: .45rem; font-size: .85rem; }
+  .dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; vertical-align: middle; margin-right: .3rem; }
+  .class0 { background: #176b9a; } .class1 { background: #d45437; }
+  .hint { font-size: .85rem; opacity: .85; margin: .5rem 0 0; }
+  output { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>Frontera de decisión de una regresión logística</h2>
+  <div class="controls">
+    <label>Datos
+      <select id="dataset">
+        <option value="linear">Separables</option>
+        <option value="xor">XOR</option>
+      </select>
+    </label>
+    <label>Peso w₁: <output id="w1out">2.0</output>
+      <input id="w1" type="range" min="-6" max="6" step="0.1" value="2" aria-label="Peso de x uno">
+    </label>
+    <label>Peso w₂: <output id="w2out">2.0</output>
+      <input id="w2" type="range" min="-6" max="6" step="0.1" value="2" aria-label="Peso de x dos">
+    </label>
+    <label>Sesgo b: <output id="bout">0.0</output>
+      <input id="b" type="range" min="-6" max="6" step="0.1" value="0" aria-label="Sesgo">
+    </label>
+  </div>
+  <canvas class="plot" id="plot" width="480" height="480" role="img" aria-label="Plano de dos características con probabilidades y ejemplos de dos clases"></canvas>
+  <div class="legend"><span><i class="dot class0"></i>Clase 0</span><span><i class="dot class1"></i>Clase 1</span><span>Línea negra: P(clase 1) = 0.5</span></div>
+  <p class="readout" id="result" aria-live="polite"></p>
+  <p class="hint">El fondo muestra la probabilidad predicha por el modelo. La pérdida es entropía cruzada promedio de los cuatro puntos.</p>
+</div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const canvas = $('plot'), ctx = canvas.getContext('2d');
+  const inputs = ['w1','w2','b'].map($);
+  const sets = {
+    linear: [
+      {x:-.85,y:-.68,c:0},{x:-.57,y:-.35,c:0},
+      {x:.42,y:.48,c:1},{x:.78,y:.74,c:1}
+    ],
+    xor: [
+      {x:-.7,y:-.7,c:0},{x:.7,y:.7,c:0},
+      {x:-.7,y:.7,c:1},{x:.7,y:-.7,c:1}
+    ]
+  };
+  const W=480, H=480, P=36, S=W-2*P;
+  const px=x=>P+(x+1)*S/2, py=y=>H-P-(y+1)*S/2;
+  const sigmoid=z=>z>=0 ? 1/(1+Math.exp(-z)) : Math.exp(z)/(1+Math.exp(z));
+  const softplus=z=>Math.max(z,0)+Math.log1p(Math.exp(-Math.abs(z)));
+  function render() {
+    const [w1,w2,b]=inputs.map(e=>Number(e.value));
+    ['w1out','w2out','bout'].forEach((id,i)=>$(id).value=[w1,w2,b][i].toFixed(1));
+    const data=sets[$('dataset').value];
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#f3f4f5'; ctx.fillRect(0,0,W,H);
+    const cells=80, step=S/cells;
+    for (let iy=0;iy<cells;iy++) for(let ix=0;ix<cells;ix++) {
+      const x=-1+(ix+.5)*2/cells, y=1-(iy+.5)*2/cells;
+      const p=sigmoid(w1*x+w2*y+b), a=.07+.25*Math.abs(2*p-1);
+      ctx.fillStyle=p>=.5?`rgba(212,84,55,${a})`:`rgba(23,107,154,${a})`;
+      ctx.fillRect(P+ix*step,P+iy*step,step+1,step+1);
+    }
+    ctx.strokeStyle='#aaa'; ctx.lineWidth=1;
+    for(const t of [-1,-.5,0,.5,1]) {
+      ctx.beginPath();ctx.moveTo(px(t),P);ctx.lineTo(px(t),H-P);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(P,py(t));ctx.lineTo(W-P,py(t));ctx.stroke();
+    }
+    ctx.strokeStyle='#333';ctx.lineWidth=1.4;ctx.strokeRect(P,P,S,S);
+    if (Math.hypot(w1,w2)>1e-8) {
+      const pts=[];
+      if(Math.abs(w2)>1e-8) for(const x of [-1,1]) {const y=(-b-w1*x)/w2;if(y>=-1&&y<=1)pts.push([x,y]);}
+      if(Math.abs(w1)>1e-8) for(const y of [-1,1]) {const x=(-b-w2*y)/w1;if(x>=-1&&x<=1)pts.push([x,y]);}
+      if(pts.length>=2){ctx.beginPath();ctx.moveTo(px(pts[0][0]),py(pts[0][1]));ctx.lineTo(px(pts[1][0]),py(pts[1][1]));ctx.strokeStyle='#111';ctx.lineWidth=3;ctx.stroke();}
+    }
+    ctx.fillStyle='#292929';ctx.font='13px system-ui';
+    ctx.fillText('x₁',W-27,H-P+19);ctx.fillText('x₂',P-22,22);
+    ctx.fillText('−1',P-9,H-P+18);ctx.fillText('0',px(0)-4,H-P+18);ctx.fillText('1',W-P-4,H-P+18);
+    let correct=0, loss=0;
+    for(const d of data) {
+      const z=w1*d.x+w2*d.y+b, p=sigmoid(z), pred=p>=.5?1:0;
+      if(pred===d.c)correct++;
+      loss+=softplus(z)-d.c*z;
+      ctx.beginPath();ctx.arc(px(d.x),py(d.y),11,0,Math.PI*2);
+      ctx.fillStyle=d.c?'#d45437':'#176b9a';ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle='#fff';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(String(d.c),px(d.x),py(d.y));
+      ctx.textAlign='start';ctx.textBaseline='alphabetic';
+    }
+    $('result').textContent=`z = ${w1.toFixed(1)}x₁ ${w2<0?'−':'+'} ${Math.abs(w2).toFixed(1)}x₂ ${b<0?'−':'+'} ${Math.abs(b).toFixed(1)} · Aciertos: ${correct}/4 · Pérdida: ${(loss/data.length).toFixed(3)}`;
+    canvas.setAttribute('aria-label',`${$('dataset').value==='xor'?'Datos XOR':'Datos separables'}: ${correct} de 4 ejemplos clasificados correctamente; pérdida promedio ${(loss/data.length).toFixed(3)}.`);
+  }
+  $('dataset').addEventListener('change',()=>{if($('dataset').value==='xor'){inputs[0].value=0;inputs[1].value=0;}else{inputs[0].value=2;inputs[1].value=2;}inputs[2].value=0;render();});
+  for(const input of inputs) input.addEventListener('input',render);
+  render();
+})();
+</script>
+</body>
+</html>
