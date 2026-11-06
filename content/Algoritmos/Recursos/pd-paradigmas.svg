@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 390" role="img" aria-labelledby="t d">
+  <title id="t">Subproblemas independientes y superpuestos</title>
+  <desc id="d">Dos árboles comparan divide y vencerás, con hijos independientes, y programación dinámica, donde dos rutas llegan al mismo estado OPT(3).</desc>
+  <style>
+    :root{color-scheme:light dark} .bg{fill:#f8fafc}.panel{fill:#fff;stroke:#d6dfe8;stroke-width:2}.node{fill:#e9f2ff;stroke:#5177a4;stroke-width:2}.shared{fill:#fce7b5;stroke:#a56a07;stroke-width:3}.edge{stroke:#64748b;stroke-width:2.5;fill:none}.title{font:700 22px system-ui,sans-serif;fill:#17253b}.label{font:600 18px system-ui,sans-serif;fill:#17253b}.small{font:15px system-ui,sans-serif;fill:#42546c}.pill{fill:#eef2f7}.caption{font:600 15px system-ui,sans-serif;fill:#7d5000}
+    @media(prefers-color-scheme:dark){.bg{fill:#111827}.panel{fill:#1c2738;stroke:#46566d}.node{fill:#284565;stroke:#8bb9f4}.shared{fill:#65491c;stroke:#f8c46c}.edge{stroke:#a9b7c9}.title,.label{fill:#eaf2fc}.small{fill:#c0cede}.pill{fill:#263449}.caption{fill:#ffd78c}}
+  </style>
+  <rect class="bg" width="980" height="390" rx="18"/>
+  <rect class="panel" x="14" y="14" width="460" height="362" rx="16"/>
+  <rect class="panel" x="506" y="14" width="460" height="362" rx="16"/>
+  <text class="title" x="42" y="54">Divide y vencerás</text>
+  <text class="small" x="42" y="81">Cada rama tiene su propio subproblema.</text>
+  <path class="edge" d="M244 143 L131 198 M244 143 L356 198 M131 241 L81 294 M131 241 L181 294 M356 241 L306 294 M356 241 L406 294"/>
+  <rect class="node" x="192" y="108" width="104" height="44" rx="10"/><text class="label" x="213" y="136">D(n)</text>
+  <rect class="node" x="82" y="199" width="98" height="44" rx="10"/><text class="label" x="104" y="227">D(L)</text>
+  <rect class="node" x="306" y="199" width="100" height="44" rx="10"/><text class="label" x="327" y="227">D(R)</text>
+  <rect class="node" x="35" y="295" width="94" height="44" rx="10"/><text class="small" x="55" y="323">L₁</text>
+  <rect class="node" x="135" y="295" width="94" height="44" rx="10"/><text class="small" x="156" y="323">L₂</text>
+  <rect class="node" x="259" y="295" width="94" height="44" rx="10"/><text class="small" x="279" y="323">R₁</text>
+  <rect class="node" x="359" y="295" width="94" height="44" rx="10"/><text class="small" x="380" y="323">R₂</text>
+  <text class="title" x="534" y="54">Programación dinámica</text>
+  <text class="small" x="534" y="81">Dos rutas consultan el mismo estado.</text>
+  <path class="edge" d="M736 147 L633 199 M736 147 L820 294 M633 245 L820 294 M633 245 L581 295"/>
+  <rect class="node" x="681" y="108" width="110" height="44" rx="10"/><text class="label" x="699" y="136">OPT(5)</text>
+  <rect class="node" x="576" y="199" width="113" height="44" rx="10"/><text class="label" x="594" y="227">OPT(4)</text>
+  <rect class="node" x="530" y="295" width="105" height="44" rx="10"/><text class="small" x="548" y="323">OPT(2)</text>
+  <rect class="shared" x="765" y="295" width="111" height="44" rx="10"/><text class="label" x="783" y="323">OPT(3)</text>
+  <text class="caption" x="680" y="367">Una respuesta, dos consultas</text>
+</svg>

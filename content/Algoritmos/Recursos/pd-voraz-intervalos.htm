@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Por qué falla la elección voraz con pesos</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color-scheme:light dark;--bg:#f4f7fb;--card:#fff;--ink:#17253b;--muted:#485a73;--line:#cbd5e1;--blue:#245e9e;--soft:#e8f2ff;--gold:#fff1d0;--amber:#a36100}
+@media(prefers-color-scheme:dark){:root{--bg:#121a28;--card:#1d293a;--ink:#e9f1fc;--muted:#c1cede;--line:#45566e;--blue:#8bbfff;--soft:#273d58;--gold:#5c4827;--amber:#ffd078}}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--ink)}main{max-width:920px;margin:auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}h1{font-size:1.35rem;margin:0 0 5px}p{line-height:1.5;margin:6px 0 14px;color:var(--muted)}.control{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:12px 0}.control label{font-weight:650}.control input{flex:1;min-width:170px;accent-color:var(--blue)}.control output{font-variant-numeric:tabular-nums;font-weight:700;min-width:55px}.button{font:inherit;border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--ink);padding:6px 10px}.button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}.chart{width:100%;height:auto;border-bottom:1px solid var(--line)}.grid{stroke:var(--line);stroke-width:1}.bar{stroke-width:2;rx:8}.bar.greedy{fill:var(--soft);stroke:var(--blue)}.bar.big{fill:var(--gold);stroke:var(--amber)}.bar.win{stroke-width:4}.svgtext{font:600 18px system-ui,sans-serif;fill:var(--ink)}.tick{font:14px system-ui,sans-serif;fill:var(--muted)}.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:16px 0}.result{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--soft)}.result strong{display:block;font-size:1.15rem;margin:4px 0}.result.opt{background:var(--gold)}.explainer{border-left:4px solid var(--amber);padding:8px 12px;background:var(--gold);line-height:1.5}.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;color:var(--muted);font-size:.9rem}.swatch{display:inline-block;width:13px;height:13px;border-radius:3px;vertical-align:-2px;margin-right:4px}.swatch.a{background:var(--soft);border:1px solid var(--blue)}.swatch.b{background:var(--gold);border:1px solid var(--amber)}
+</style>
+</head>
+<body><main>
+<h1>Terminar antes puede perder casi todo el peso</h1>
+<p>Contraejemplo de la diapositiva 8. Cambia solamente el peso de <b>b</b>; los intervalos permanecen fijos.</p>
+<div class="control"><label for="peso">Peso de b</label><input id="peso" type="range" min="0" max="1200" step="1" value="999"><output id="pesoValor" for="peso">999</output><button class="button" id="restablecer" type="button">Caso de la diapositiva</button></div>
+<svg class="chart" viewBox="0 0 830 310" role="img" aria-label="Línea temporal: a de cero a tres, b de cero a diez, h de ocho a once">
+<g id="ticks"></g>
+<text class="svgtext" x="16" y="62">b</text><rect id="barraB" class="bar big" x="73" y="38" width="660" height="38"></rect><text class="svgtext" id="etB" x="82" y="64">peso 999</text>
+<text class="svgtext" x="16" y="133">a</text><rect id="barraA" class="bar greedy" x="73" y="109" width="198" height="38"></rect><text class="svgtext" x="82" y="135">peso 1</text>
+<text class="svgtext" x="16" y="204">h</text><rect id="barraH" class="bar greedy" x="601" y="180" width="198" height="38"></rect><text class="svgtext" x="610" y="206">peso 1</text>
+<line x1="73" y1="251" x2="799" y2="251" stroke="var(--ink)" stroke-width="2"></line><text class="tick" x="73" y="294">tiempo →</text>
+</svg>
+<div class="legend"><span><i class="swatch a"></i>Intervalos elegidos por la regla voraz</span><span><i class="swatch b"></i>Intervalo largo b</span><span>Trazo grueso: solución óptima actual</span></div>
+<div class="results"><div class="result"><span>Terminar primero</span><strong id="greedy">{a, h} · peso 2</strong><span>Elige a, descarta b, después elige h.</span></div><div class="result opt"><span>Mejor solución</span><strong id="optimo">{b} · peso 999</strong><span id="razon">b se traslapa con a y con h.</span></div></div>
+<div class="explainer" id="conclusion" aria-live="polite">Con peso 999, b por sí solo supera los dos trabajos de la elección voraz: 999 &gt; 2.</div>
+</main>
+<script>
+const slider=document.getElementById('peso');const out=document.getElementById('pesoValor');const best=document.getElementById('optimo');const reason=document.getElementById('razon');const conclusion=document.getElementById('conclusion');const b=document.getElementById('barraB');const a=document.getElementById('barraA');const h=document.getElementById('barraH');const ticks=document.getElementById('ticks');
+for(let t=0;t<=11;t++){const x=73+t*66;const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',x);line.setAttribute('x2',x);line.setAttribute('y1',25);line.setAttribute('y2',251);line.setAttribute('class','grid');ticks.appendChild(line);const label=document.createElementNS('http://www.w3.org/2000/svg','text');label.setAttribute('x',x-5);label.setAttribute('y',273);label.setAttribute('class','tick');label.textContent=t;ticks.appendChild(label)}
+function update(){const w=Number(slider.value);out.textContent=w;document.getElementById('etB').textContent='peso '+w;const chooseB=w>2;best.textContent=chooseB?`{b} · peso ${w}`:'{a, h} · peso 2';reason.textContent=chooseB?'b se traslapa con a y con h.':'a y h son compatibles entre sí.';conclusion.textContent=chooseB?`Con peso ${w}, b por sí solo supera a la elección voraz: ${w} > 2.`:w===2?'Con peso 2 hay empate: {b} y {a, h} pesan 2. La regla voraz acierta en valor, pero no es una prueba general.':`Con peso ${w}, los dos trabajos breves pesan 2 y son mejores que b.`;b.classList.toggle('win',chooseB);a.classList.toggle('win',!chooseB);h.classList.toggle('win',!chooseB)}
+slider.addEventListener('input',update);document.getElementById('restablecer').addEventListener('click',()=>{slider.value=999;update()});update();
+</script></body></html>

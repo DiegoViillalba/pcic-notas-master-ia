@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 310" role="img" aria-labelledby="t d">
+  <title id="t">Elección binaria para OPT(j)</title>
+  <desc id="d">Desde OPT(j) salen dos opciones: excluir el trabajo j y usar OPT(j menos 1), o incluirlo, sumar su peso y continuar en OPT(p(j)).</desc>
+  <style>
+    :root{color-scheme:light dark}.bg{fill:#f8fafc}.box{fill:#fff;stroke:#5379a8;stroke-width:2.5}.choice{fill:#e9f2ff;stroke:#5379a8;stroke-width:2}.gold{fill:#fff0cd;stroke:#b47412;stroke-width:2}.line{stroke:#667b94;stroke-width:3;fill:none}.title{font:700 24px system-ui,sans-serif;fill:#17253b}.text{font:600 20px system-ui,sans-serif;fill:#17253b}.small{font:16px system-ui,sans-serif;fill:#44546b}.edgeLabel{font:700 17px system-ui,sans-serif;fill:#194c86}.goldtext{font:700 17px system-ui,sans-serif;fill:#825300}
+    @media(prefers-color-scheme:dark){.bg{fill:#111827}.box{fill:#1c2738;stroke:#8bb9f4}.choice{fill:#284565;stroke:#8bb9f4}.gold{fill:#65491c;stroke:#ffd37d}.line{stroke:#a9b7c9}.title,.text{fill:#eaf2fc}.small{fill:#c0cede}.edgeLabel{fill:#9ec8ff}.goldtext{fill:#ffe1a3}}
+  </style>
+  <rect class="bg" width="960" height="310" rx="18"/>
+  <text class="title" x="38" y="43">¿Qué hacemos con el trabajo j?</text>
+  <rect class="box" x="402" y="64" width="156" height="62" rx="14"/><text class="text" x="443" y="103">OPT(j)</text>
+  <path class="line" d="M438 127 L256 190 M522 127 L710 190"/>
+  <text class="edgeLabel" x="83" y="173">Excluir j: +0</text>
+  <text class="goldtext" x="711" y="173">Incluir j: +wⱼ</text>
+  <rect class="choice" x="71" y="191" width="365" height="65" rx="13"/><text class="text" x="196" y="219">OPT(j−1)</text><text class="small" x="103" y="244">Podemos usar todos los anteriores</text>
+  <rect class="gold" x="524" y="191" width="365" height="65" rx="13"/><text class="text" x="634" y="219">OPT(p(j))</text><text class="small" x="545" y="244">Solo el prefijo compatible con j</text>
+  <text class="small" x="287" y="290">Tomamos el mayor de los dos valores.</text>
+</svg>
