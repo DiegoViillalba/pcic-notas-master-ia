@@ -1,0 +1,527 @@
+% ============================================================
+\newpage
+\section{Parte B — Procedimientos}
+
+\subsection{Probabilidad}
+
+\begin{solucion}{B1 · Conjunta, marginales e independencia}
+\textbf{(a)} $P(+t)=0.216+0.024+0.014+0.126=0.38$; $P(+p)=0.216+0.054+0.014+0.056=0.34$;
+$P(+t,+p)=0.216+0.014=0.23$. Como $P(+t)P(+p)=0.1292\ne0.23$, \textbf{no} son independientes (el tráfico sugiere lluvia y la lluvia, paraguas).
+
+\textbf{(b)} $P(+l\mid+t)=\dfrac{0.216+0.024}{0.38}=0.6316$; \quad $P(+l\mid+t,+p)=\dfrac{0.216}{0.23}=0.9391$. Dos indicios de la misma causa refuerzan la creencia.
+
+\textbf{(c)} Con $P(+l)=0.3$ y $P(-l)=0.7$:
+\begin{center}\small
+\begin{tabular}{c|ccc}
+ & $P(+t,+p\mid L)$ & $P(+t\mid L)$ & $P(+p\mid L)$\\\hline
+$+l$ & $0.216/0.3=0.72$ & $0.24/0.3=0.8$ & $0.27/0.3=0.9$\\
+$-l$ & $0.014/0.7=0.02$ & $0.14/0.7=0.2$ & $0.07/0.7=0.1$
+\end{tabular}
+\end{center}
+$0.8\cdot0.9=0.72$ y $0.2\cdot0.1=0.02$; las otras tres combinaciones de cada estrato se siguen por complemento (p.\,ej.\ $P(+t,-p\mid+l)=0.024/0.3=0.08=0.8\cdot0.1$).
+Por tanto $T\indep P\mid L$.
+
+\textbf{(d)} Causa común $T\leftarrow L\to P$: $1+2+2=5$ parámetros frente a $2^3-1=7$.
+\end{solucion}
+
+\begin{solucion}{B2 · Bayes con dos pruebas}
+\textbf{(a)} $P(+)=0.02(0.95)+0.98(0.08)=0.019+0.0784=0.0974$; $P(\text{enf}\mid+)=0.019/0.0974=\mathbf{0.1951}$.
+A pesar de la buena sensibilidad, la mayoría de los positivos son falsos porque la enfermedad es rara.
+
+\textbf{(b)} Conjunta: $\dfrac{0.02(0.95)^2}{0.02(0.95)^2+0.98(0.08)^2}=\dfrac{0.01805}{0.01805+0.006272}=\mathbf{0.7421}$.
+Secuencial: usar $0.1951$ como nueva previa: $\dfrac{0.1951(0.95)}{0.1951(0.95)+0.8049(0.08)}=0.7421$. Coinciden porque las pruebas son
+condicionalmente independientes dada la enfermedad.
+
+\textbf{(c)} $\dfrac{0.02(0.95)(0.05)}{0.02(0.95)(0.05)+0.98(0.08)(0.92)}=\dfrac{0.00095}{0.073078}=\mathbf{0.0130}$.
+
+\textbf{(d)} $\text{Prueba}_1\leftarrow\text{Enf}\to\text{Prueba}_2$ (causa común).
+\end{solucion}
+
+\begin{solucion}{B3 · Factorización y conteo}
+\textbf{(a)} $P(A)P(B)P(C\mid A,B)P(D\mid C)P(E\mid C)P(F\mid E)$.
+\textbf{(b)} $A$: $1$; $B$: $2$; $C$: $(2-1)\cdot2\cdot3=6$; $D$: $(4-1)\cdot2=6$; $E$: $(2-1)\cdot2=2$; $F$: $(3-1)\cdot2=4$. Total $\mathbf{21}$.
+\textbf{(c)} Conjunta: $2\cdot3\cdot2\cdot4\cdot2\cdot3-1=\mathbf{287}$.
+\textbf{(d)} $F$ pasa a tener padres $E,A$: $(3-1)\cdot2\cdot2=8$ en vez de 4: \textbf{4 parámetros más}.
+\end{solucion}
+
+\subsection{Redes bayesianas e independencia}
+
+\begin{solucion}{B4 · Red del estudiante}
+\textbf{(a)} $P(D)P(I)P(C\mid D,I)P(E\mid I)P(R\mid C)$: $1+1+4+2+2=10$ parámetros frente a $2^5-1=31$.
+
+\textbf{(b)} $P(-d)P(+i)P(+c\mid-d,+i)P(-e\mid+i)P(+r\mid+c)=0.6(0.3)(0.9)(0.2)(0.9)=\mathbf{0.02916}$.
+
+\textbf{(c)} $P(+c)=0.4(0.3)(0.7)+0.4(0.7)(0.1)+0.6(0.3)(0.9)+0.6(0.7)(0.4)=0.084+0.028+0.162+0.168=\mathbf{0.442}$.
+
+\textbf{(d)} $D\indep I$: sí (único camino $D\to C\leftarrow I$, colisionador sin evidencia).
+$D\indep I\mid R$: no garantizada ($R$ es descendiente de $C$ y abre el colisionador).
+$D\indep E$: sí ($D\to C\leftarrow I\to E$ bloqueado en $C$).
+$R\indep E\mid C$: sí ($R\leftarrow C\leftarrow I\to E$, cadena bloqueada en $C$ observado).
+\end{solucion}
+
+\begin{solucion}{B5 · d-separación}
+Notación: \textcolor{verde}{A} = tripleta activa, \textcolor{rojo}{B} = bloqueada.
+\begin{center}\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\linewidth}{l X c}
+\toprule
+Consulta & Caminos y tripletas & ¿Garantizada?\\\midrule
+(a) $A\indep B$ & $A\to C\leftarrow B$: colisionador $C$ sin evidencia ni descendientes observados \textcolor{rojo}{B}. $A\to C\to E\to G\leftarrow F\leftarrow D\leftarrow B$: colisionador $G$ \textcolor{rojo}{B}. & \textbf{Sí}\\
+(b) $A\indep B\mid H$ & $A\to C\leftarrow B$: $H$ es descendiente de $C$ ($C\to E\to G\to H$) $\Rightarrow$ \textcolor{verde}{A}. & \textbf{No}\\
+(c) $A\indep D$ & $A\to C\leftarrow B\to D$: $C$ \textcolor{rojo}{B}. $A\to C\to E\to G\leftarrow F\leftarrow D$: $G$ \textcolor{rojo}{B}. & \textbf{Sí}\\
+(d) $A\indep D\mid G$ & $A\to C\leftarrow B\to D$: $C$ abierto por su descendiente $G$; $B$ (bifurcación) no observado \textcolor{verde}{A}. & \textbf{No}\\
+(e) $A\indep D\mid G,B$ & Primer camino bloqueado en $B$. Pero $A\to C\to E\to G\leftarrow F\leftarrow D$: $C,E$ cadenas no observadas, $G$ colisionador observado, $F$ no observado \textcolor{verde}{A}. & \textbf{No}\\
+(f) $C\indep F\mid B$ & $C\leftarrow B\to D\to F$: $B$ observado \textcolor{rojo}{B}. $C\to E\to G\leftarrow F$: $G$ y $H$ no observados \textcolor{rojo}{B}. & \textbf{Sí}\\
+(g) $E\indep F\mid G,D$ & $E\to G\leftarrow F$: colisionador observado \textcolor{verde}{A}. (El camino por $C,B,D$ se bloquea en $D$.) & \textbf{No}\\
+(h) $A\indep H\mid E$ & $A\to C\to E\to G\to H$: $E$ observado \textcolor{rojo}{B}. Pero $A\to C\leftarrow B\to D\to F\to G\to H$: $C$ abierto porque su descendiente $E$ está observado; el resto no observado \textcolor{verde}{A}. & \textbf{No}\\
+(i) $A\indep F\mid C$ & $A\to C\leftarrow B\to D\to F$: $C$ colisionador observado \textcolor{verde}{A}. & \textbf{No}\\
+(j) $B\indep G\mid E,F$ & $B\to C\to E\to G$: $E$ \textcolor{rojo}{B}. $B\to D\to F\to G$: $F$ \textcolor{rojo}{B}. $B\to C\leftarrow A$ no llega a $G$. & \textbf{Sí}\\\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{(k)} $\mathrm{MB}(C)=\{A,B,E\}$; $\mathrm{MB}(D)=\{B,F\}$; $\mathrm{MB}(F)=\{D,G,E\}$ ($E$ es otro padre de $G$); $\mathrm{MB}(G)=\{E,F,H\}$.
+\begin{nota}
+Las trampas son (e) y (h): observar algo puede bloquear un camino y, a la vez, abrir otro. Siempre revisa \emph{todos} los caminos.
+\end{nota}
+\end{solucion}
+
+\begin{solucion}{B6 · Alarma: explicar a la otra causa}
+Pesos $P(b,e,+a)=P(b)P(e)P(+a\mid b,e)$:
+\begin{center}\small
+\begin{tabular}{cc|l}
+$B$ & $E$ & $P(b,e,+a)$\\\hline
+$+b$ & $+e$ & $0.001(0.002)(0.95)=0.0000019$\\
+$+b$ & $-e$ & $0.001(0.998)(0.94)=0.00093812$\\
+$-b$ & $+e$ & $0.999(0.002)(0.29)=0.00057942$\\
+$-b$ & $-e$ & $0.999(0.998)(0.001)=0.000997002$
+\end{tabular}
+\end{center}
+\textbf{(a)} $P(+a)=\mathbf{0.002516442}$.
+\textbf{(b)} $P(+b\mid+a)=\frac{0.0000019+0.00093812}{0.002516442}=\mathbf{0.3736}$; \quad $P(+e\mid+a)=\frac{0.0000019+0.00057942}{0.002516442}=\mathbf{0.2310}$.
+\textbf{(c)} $P(+e\mid+a,+b)=\frac{0.0000019}{0.00094002}=\mathbf{0.0020}$; \quad $P(+e\mid+a,-b)=\frac{0.00057942}{0.001576422}=\mathbf{0.3676}$.
+Saber que hubo robo «explica» la alarma y la probabilidad de terremoto cae de 0.23 a casi su previa (0.002).
+\textbf{(d)} $J$ y $M$ son descendientes de $A$ no observados ni consultados: $\sum_jP(j\mid a)=\sum_mP(m\mid a)=1$.
+\end{solucion}
+
+\subsection{Inferencia exacta}
+
+\begin{solucion}{B7 · Enumeración en una cadena}
+\textbf{(a)}
+\begin{center}\small
+\begin{tabular}{ccc|l@{\qquad}ccc|l}
+$R$&$T$&$L$& & $R$&$T$&$L$&\\\hline
+$+$&$+$&$+$& $0.1(0.8)(0.3)=0.024$ & $-$&$+$&$+$& $0.9(0.1)(0.3)=0.027$\\
+$+$&$+$&$-$& $0.056$ & $-$&$+$&$-$& $0.063$\\
+$+$&$-$&$+$& $0.1(0.2)(0.1)=0.002$ & $-$&$-$&$+$& $0.9(0.9)(0.1)=0.081$\\
+$+$&$-$&$-$& $0.018$ & $-$&$-$&$-$& $0.729$
+\end{tabular}
+\end{center}
+\textbf{(b)} $P(+l)=0.024+0.002+0.027+0.081=0.134$.
+$P(+r\mid+l)=\frac{0.024+0.002}{0.134}=\mathbf{0.1940}$ (sube desde 0.1). $P(+t\mid+l)=\frac{0.024+0.027}{0.134}=\mathbf{0.3806}$.
+\textbf{(c)} $P(+l\mid+r)=0.8(0.3)+0.2(0.1)=\mathbf{0.26}$. Al condicionar en la raíz, $\sum_tP(t\mid+r)P(L\mid t)$ ya es una distribución
+(producto de CPT que suman 1): normalizar dividiría entre $P(+r)/P(+r)=1$.
+\end{solucion}
+
+\begin{solucion}{B8 · Eliminación de variables en la red del estudiante}
+\textbf{(a)} $P(D)$, $P(I)$, $P(C\mid D,I)$, $P(E\mid I)$, $P(+r\mid C)$ (este último es un factor $f(C)=(0.9,0.2)$).
+\textbf{(b)} $E$ es hoja sin evidencia: $\sum_eP(e\mid I)=1$.
+\textbf{(c)} Eliminar $D$: $f_1(C,I)=\sum_dP(d)P(C\mid d,I)$:
+\begin{center}\small
+\begin{tabular}{cc|l}
+$C$ & $I$ & $f_1$\\\hline
+$+c$ & $+i$ & $0.4(0.7)+0.6(0.9)=0.82$\\
+$-c$ & $+i$ & $0.4(0.3)+0.6(0.1)=0.18$\\
+$+c$ & $-i$ & $0.4(0.1)+0.6(0.4)=0.28$\\
+$-c$ & $-i$ & $0.4(0.9)+0.6(0.6)=0.72$
+\end{tabular}
+\end{center}
+\textbf{(d)} Eliminar $C$: $f_2(I)=\sum_cf_1(c,I)P(+r\mid c)$: $f_2(+i)=0.82(0.9)+0.18(0.2)=0.774$; $f_2(-i)=0.28(0.9)+0.72(0.2)=0.396$.
+\textbf{(e)} $P(+i)f_2(+i)=0.2322$, $P(-i)f_2(-i)=0.2772$; suma $=P(+r)=0.5094$. $P(+i\mid+r)=\mathbf{0.4558}$.
+\end{solucion}
+
+\begin{solucion}{B9 · Orden de eliminación}
+Factores iniciales: $P(A)$, $P(B)$, $P(C\mid A,B)$, $P(D\mid C)$, $P(E\mid C)$, $f(D,E)=P(+f\mid D,E)$.
+\begin{center}\small
+\begin{tabular}{l l l l}
+\toprule
+Orden & Elimina & Alcance del producto & Factor nuevo\\\midrule
+(i) & $B$ & $\{A,B,C\}$ (8) & $f_1(A,C)$\\
+ & $D$ & $\{C,D,E\}$ (8) & $f_2(C,E)$\\
+ & $E$ & $\{C,E\}$ (4) & $f_3(C)$\\
+ & $C$ & $\{A,C\}$ (4) & $f_4(A)$\\\midrule
+(ii) & $C$ & $\{A,B,C,D,E\}$ (\textbf{32}) & $f_1(A,B,D,E)$ (16)\\
+ & $B$ & $\{A,B,D,E\}$ (16) & $f_2(A,D,E)$\\
+ & $D$ & $\{A,D,E\}$ (8) & $f_3(A,E)$\\
+ & $E$ & $\{A,E\}$ (4) & $f_4(A)$\\\midrule
+(iii) & $D$ & $\{C,D,E\}$ (8) & $f_1(C,E)$\\
+ & $E$ & $\{C,E\}$ (4) & $f_2(C)$\\
+ & $C$ & $\{A,B,C\}$ (8) & $f_3(A,B)$\\
+ & $B$ & $\{A,B\}$ (4) & $f_4(A)$\\\bottomrule
+\end{tabular}
+\end{center}
+Al final se multiplica por $P(A)$ y se normaliza. Mayor factor: (i) 8, (ii) 32, (iii) 8. Se recomiendan (i) o (iii): eliminar primero
+$C$, que conecta a todos, crea un factor sobre todos sus vecinos.
+\end{solucion}
+
+\subsection{Muestreo}
+
+\begin{solucion}{B10 · Muestreo previo y rechazo}
+Regla: $+x$ si $u<P(+x\mid\text{padres})$.
+\begin{center}\small
+\begin{tabular}{c|llll|c}
+\# & $C$ ($P(+c)=0.5$) & $S$ & $R$ & $W$ & Mundo\\\hline
+1 & $0.31\Rightarrow+c$ & $0.62\ge0.1\Rightarrow-s$ & $0.12<0.8\Rightarrow+r$ & $0.45<0.90\Rightarrow+w$ & $+c,-s,+r,+w$\\
+2 & $0.77\Rightarrow-c$ & $0.08<0.5\Rightarrow+s$ & $0.91\ge0.2\Rightarrow-r$ & $0.50<0.90\Rightarrow+w$ & $-c,+s,-r,+w$\\
+3 & $0.18\Rightarrow+c$ & $0.35\Rightarrow-s$ & $0.66<0.8\Rightarrow+r$ & $0.97\ge0.90\Rightarrow-w$ & $+c,-s,+r,-w$\\
+4 & $0.52\Rightarrow-c$ & $0.44<0.5\Rightarrow+s$ & $0.15<0.2\Rightarrow+r$ & $0.03<0.99\Rightarrow+w$ & $-c,+s,+r,+w$\\
+5 & $0.05\Rightarrow+c$ & $0.06<0.1\Rightarrow+s$ & $0.70<0.8\Rightarrow+r$ & $0.88<0.99\Rightarrow+w$ & $+c,+s,+r,+w$
+\end{tabular}
+\end{center}
+\textbf{(a)} $\hat P(+w)=4/5=\mathbf{0.8}$ (exacto 0.65).
+\textbf{(b)} Se aceptan 1, 2, 4, 5; con $+c$: 1 y 5. $\hat P(+c\mid+w)=2/4=\mathbf{0.5}$ (exacto 0.5746).
+\textbf{(c)} No: ninguna muestra tiene $-r,-w$; la razón sería $0/0$, indefinida (no es cero).
+\end{solucion}
+
+\begin{solucion}{B11 · Verosimilitud con pesos}
+\textbf{(a)}
+\begin{center}\small
+\begin{tabular}{c|cc|l}
+\# & $C$ & $R$ & $w=P(+s\mid c)P(+w\mid+s,r)$\\\hline
+1 & $+c$ ($0.21$) & $+r$ ($0.40<0.8$) & $0.1(0.99)=0.099$\\
+2 & $-c$ & $+r$ ($0.10<0.2$) & $0.5(0.99)=0.495$\\
+3 & $+c$ & $-r$ ($0.93$) & $0.1(0.90)=0.09$\\
+4 & $-c$ & $-r$ ($0.75$) & $0.5(0.90)=0.45$\\
+5 & $+c$ & $-r$ ($0.85$) & $0.1(0.90)=0.09$
+\end{tabular}
+\end{center}
+\textbf{(b)} $\hat P(+c\mid+s,+w)=\frac{0.099+0.09+0.09}{1.224}=\frac{0.279}{1.224}=\mathbf{0.2279}$.
+\textbf{(c)} $P(+c,+s,+w)=0.5(0.1)[0.8(0.99)+0.2(0.9)]=0.0486$; $P(-c,+s,+w)=0.5(0.5)[0.2(0.99)+0.8(0.9)]=0.2295$;
+exacto $0.0486/0.2781=\mathbf{0.1748}$. Con 5 muestras la diferencia es esperable.
+\textbf{(d)} $S$ es evidencia: no se sortea, se fija. Su probabilidad depende del $C$ muestreado, y el peso corrige que el
+procedimiento no la tuvo en cuenta al generar $C$ (sin él, $C$ seguiría su previa 0.5 y no la posterior).
+\end{solucion}
+
+\begin{solucion}{B12 · Dos barridos de Gibbs}
+\textbf{(a)} Con $+w$ fijo:
+$P(C\mid s,r)\propto P(C)P(s\mid C)P(r\mid C)$;\quad
+$P(S\mid c,r,+w)\propto P(S\mid c)P(+w\mid S,r)$;\quad
+$P(R\mid c,s,+w)\propto P(R\mid c)P(+w\mid s,R)$.
+
+\textbf{(b)}
+\begin{center}\small
+\begin{tabular}{c c l l c c}
+\toprule
+Paso & Var. & Peso $+$ & Peso $-$ & $P(+)$ & Nuevo estado $(C,S,R)$\\\midrule
+1 & $C$ & $0.5(0.9)(0.2)=0.09$ & $0.5(0.5)(0.8)=0.2$ & 0.3103 & $u=0.60\Rightarrow(-c,-s,-r)$\\
+2 & $S$ & $0.5(0.90)=0.45$ & $0.5(0.01)=0.005$ & 0.9890 & $u=0.20\Rightarrow(-c,+s,-r)$\\
+3 & $R$ & $0.2(0.99)=0.198$ & $0.8(0.90)=0.72$ & 0.2157 & $u=0.30\Rightarrow(-c,+s,-r)$\\
+4 & $C$ & $0.5(0.1)(0.2)=0.01$ & $0.5(0.5)(0.8)=0.2$ & 0.0476 & $u=0.90\Rightarrow(-c,+s,-r)$\\
+5 & $S$ & $0.45$ & $0.005$ & 0.9890 & $u=0.55\Rightarrow(-c,+s,-r)$\\
+6 & $R$ & $0.198$ & $0.72$ & 0.2157 & $u=0.40\Rightarrow(-c,+s,-r)$\\\bottomrule
+\end{tabular}
+\end{center}
+\textbf{(c)} Ambos estados tras cada barrido tienen $-c$: $\hat P(+c\mid+w)=0$, lejos de 0.5746. Son pocas muestras, muy correlacionadas
+y sin calentamiento; la cadena se quedó en una región ($+s$ explica $+w$). Hace falta correr mucho más.
+\end{solucion}
+
+\subsection{Aprendizaje de parámetros}
+
+\begin{solucion}{B13 · MLE y Laplace con dos padres}
+\textbf{(a)} Conteos: $S=5$, $N=4$, $Ll=3$. MLE: $(5/12,4/12,3/12)=(0.4167,0.3333,0.25)$. Laplace ($k=3$): $(6/15,5/15,4/15)=(0.4,0.3333,0.2667)$.
+\textbf{(b), (c)} Filas $P(\text{sí}\mid\text{Clima},\text{Día})$ (Laplace con $k=2$: $\frac{N(\text{sí})+1}{N+2}$):
+\begin{center}\small
+\begin{tabular}{cc|ccc}
+Clima & Día & $N$ (sí/total) & MLE & Laplace\\\hline
+S & L & 2/3 & 0.6667 & 3/5 = 0.6\\
+S & F & 2/2 & 1 & 3/4 = 0.75\\
+N & L & 1/2 & 0.5 & 2/4 = 0.5\\
+N & F & 1/2 & 0.5 & 2/4 = 0.5\\
+Ll & L & 1/3 & 0.3333 & 2/5 = 0.4\\
+Ll & F & 0/0 & \textbf{indefinida} & 1/2 = 0.5
+\end{tabular}
+\end{center}
+La fila (Ll, F) nunca aparece; con Laplace queda uniforme. Nota que MLE da $P(\text{no}\mid S,F)=0$: certeza sacada de dos datos.
+\textbf{(d)} Clima 2 + Día 1 + Bici $1\cdot3\cdot2=6$: \textbf{9} parámetros libres.
+\end{solucion}
+
+\begin{solucion}{B14 · Una iteración de EM}
+\textbf{(a)} Paso E: $w_j=\frac{P(a)P(r_1\mid a)P(r_2\mid a)}{P(a)P(r_1\mid a)P(r_2\mid a)+P(b)P(r_1\mid b)P(r_2\mid b)}$.
+\begin{center}\small
+\begin{tabular}{c|ll|c}
+Registro & $a$: $0.5\cdot\cdot$ & $b$: $0.5\cdot\cdot$ & $w_j$\\\hline
+$(1,1)$ & $0.5(0.8)(0.7)=0.28$ & $0.5(0.3)(0.4)=0.06$ & 0.8235\\
+$(1,0)$ & $0.5(0.8)(0.3)=0.12$ & $0.5(0.3)(0.6)=0.09$ & 0.5714\\
+$(0,0)$ & $0.5(0.2)(0.3)=0.03$ & $0.5(0.7)(0.6)=0.21$ & 0.1250\\
+$(1,1)$ & 0.28 & 0.06 & 0.8235\\
+$(0,1)$ & $0.5(0.2)(0.7)=0.07$ & $0.5(0.7)(0.4)=0.14$ & 0.3333
+\end{tabular}
+\end{center}
+\textbf{(b)} $\sum_jw_j=2.6768$, $\sum_j(1-w_j)=2.3232$.
+$P(a)=2.6768/5=\mathbf{0.5354}$.
+$P(R_1{=}1\mid a)=\frac{0.8235+0.5714+0.8235}{2.6768}=\mathbf{0.8288}$; \quad
+$P(R_1{=}1\mid b)=\frac{0.1765+0.4286+0.1765}{2.3232}=\mathbf{0.3364}$.
+$P(R_2{=}1\mid a)=\frac{0.8235+0.8235+0.3333}{2.6768}=\mathbf{0.7398}$; \quad
+$P(R_2{=}1\mid b)=\frac{0.1765+0.1765+0.6667}{2.3232}=\mathbf{0.4389}$.
+\textbf{(c)} Antes: $P(r_1,r_2)$ = suma de las dos columnas: $0.34,0.21,0.24,0.34,0.21$; $\sum\log=\mathbf{-6.7059}$.
+Después: $\mathbf{-6.6613}$. Aumenta, como garantiza EM (la siguiente iteración da $-6.6611$: ya casi convergió).
+\end{solucion}
+
+\subsection{Aprendizaje supervisado}
+
+\begin{solucion}{B15 · Regresión lineal y descenso de gradiente}
+\textbf{(a)} $X=\begin{pmatrix}1&0\\1&1\\1&2\\1&3\end{pmatrix}$, $X^\mathsf TX=\begin{pmatrix}4&6\\6&14\end{pmatrix}$, $X^\mathsf T\mathbf y=\begin{pmatrix}16\\35\end{pmatrix}$, $\det=20$.
+$\hat\theta=\frac1{20}\begin{pmatrix}14&-6\\-6&4\end{pmatrix}\begin{pmatrix}16\\35\end{pmatrix}=\begin{pmatrix}\mathbf{0.7}\\\mathbf{2.2}\end{pmatrix}$.
+
+\textbf{(b)} $\hat y=(0.7,2.9,5.1,7.3)$; residuos $(0.3,0.1,-1.1,0.7)$; $J=0.09+0.01+1.21+0.49=\mathbf{1.8}$. $\hat y(5)=0.7+11=\mathbf{11.7}$.
+
+\textbf{(c)} $\nabla J=2X^\mathsf T(X\theta-\mathbf y)$.
+Paso 1: en $\theta=(0,0)$, $\nabla J=-2(16,35)=(-32,-70)$; $\theta_1=(0.32,0.70)$; $J_0=90$, $J_1=\mathbf{40.7176}$.
+Paso 2: residuos $X\theta_1-\mathbf y=(-0.68,-1.98,-2.28,-5.58)$; $\nabla J=(-21.04,-46.56)$; $\theta_2=(0.5304,1.1656)$; $J_2=\mathbf{19.0000}$.
+La pérdida baja y $\theta$ se acerca a $(0.7,2.2)$.
+\end{solucion}
+
+\begin{solucion}{B16 · Regresión logística}
+\textbf{(a)} $z=X\theta=(1,-2,1)$; $\pi=(0.7311,0.1192,0.7311)$; pérdidas $-\ln0.7311=0.3133$, $-\ln(1-0.1192)=0.1269$, $0.3133$; $J=\mathbf{0.7535}$.
+\textbf{(b)} $\boldsymbol\pi-\mathbf y=(-0.2689,0.1192,-0.2689)$.
+$\nabla J=\big(\sum(\pi-y),\ \sum x_1(\pi-y),\ \sum x_2(\pi-y)\big)=\big(-0.4187,\ 2(-0.2689)+1(-0.2689),\ 1(-0.2689)+2(0.1192)\big)=(\mathbf{-0.4187},\mathbf{-0.8068},\mathbf{-0.0305})$.
+\textbf{(c)} $\theta_1=\theta-0.5\nabla J=(0.2093,1.4034,-0.9847)$; $z=(2.0314,-1.7601,1.6128)$, $\pi=(0.8841,0.1468,0.8338)$; $J_1=\mathbf{0.4637}$.
+\textbf{(d)} Antes: $x_1-x_2=0$, es decir $x_2=x_1$. Después: $0.2093+1.4034x_1-0.9847x_2=0$, es decir $x_2=0.2126+1.4252x_1$.
+\end{solucion}
+
+\begin{solucion}{B17 · Softmax}
+\textbf{(a)} $e^{\mathbf z}=(7.3891,2.7183,0.3679)$, suma $10.4752$; $\mathbf p=(0.7054,0.2595,0.0351)$; $\ell=-\ln0.2595=\mathbf{1.3490}$.
+\textbf{(b)} $\mathbf p-\mathbf t=(0.7054,-0.7405,0.0351)$: sube el logit correcto, bajan los demás.
+\textbf{(c)} $\tau=2$: softmax de $(1,0.5,-0.5)$ $=(0.5465,0.3315,0.1220)$. $\tau=0.5$: softmax de $(4,2,-2)$ $=(0.8789,0.1189,0.0022)$.
+Con $\tau\to0$ toda la masa va al máximo (voraz).
+\textbf{(d)} $\frac{e^{z_j-m}}{\sum_ke^{z_k-m}}=\frac{e^{-m}e^{z_j}}{e^{-m}\sum_ke^{z_k}}=p_j$; evita desbordes numéricos.
+\end{solucion}
+
+\begin{solucion}{B18 · XOR}
+\textbf{(a)} Supón salida 1 si $w_1x_1+w_2x_2+b>0$. Se requiere $b\le0$ (para $00$), $w_2+b>0$ (01), $w_1+b>0$ (10), $w_1+w_2+b\le0$ (11).
+Sumando las del medio: $w_1+w_2+2b>0\Rightarrow w_1+w_2+b>-b\ge0$, contradicción con la última.
+\textbf{(b)}
+\begin{center}\small
+\begin{tabular}{cc|cc|c}
+$x_1$&$x_2$&$h_1$&$h_2$&$h_1-2h_2$\\\hline
+0&0&0&0&0\\0&1&1&0&1\\1&0&1&0&1\\1&1&2&1&0
+\end{tabular}
+\end{center}
+\textbf{(c)} Oculta: 4 pesos + 2 sesgos; salida: 2 pesos + 1 sesgo (0): \textbf{9}. Las dos unidades miden «al menos uno encendido» y
+«ambos encendidos»; en el espacio $(h_1,h_2)$ los puntos $01$ y $10$ colapsan en $(1,0)$ y la salida es lineal.
+\end{solucion}
+
+\subsection{No supervisado y vecinos}
+
+\begin{solucion}{B19 · Distancias y $k$-NN}
+\textbf{(a)}
+\begin{center}\small
+\begin{tabular}{c|c|ccc}
+Punto & $x-q$ & $L_1$ & $L_2$ & $L_\infty$\\\hline
+$P_1(6,3)[+]$ & $(3,0)$ & 3 & 3.000 & 3\\
+$P_2(5,5)[-]$ & $(2,2)$ & 4 & 2.828 & 2\\
+$P_3(-1,4)[+]$ & $(-4,1)$ & 5 & 4.123 & 4\\
+$P_4(1,-1)[-]$ & $(-2,-4)$ & 6 & 4.472 & 4
+\end{tabular}
+\end{center}
+\textbf{(b)} $L_1$: 1-NN $P_1\Rightarrow\mathbf{+}$; 3-NN $\{P_1,P_2,P_3\}\Rightarrow\mathbf{+}$ (2 a 1).
+$L_2$: 1-NN $P_2\Rightarrow\mathbf{-}$; 3-NN $\{P_2,P_1,P_3\}\Rightarrow\mathbf{+}$.
+$L_\infty$: 1-NN $P_2\Rightarrow\mathbf{-}$; 3-NN: $P_2,P_1$ y empate $P_3/P_4$ a distancia 4: la regla de desempate decide ($+$ con $P_3$, $-$ con $P_4$).
+La métrica cambia la respuesta.
+\textbf{(c)} Difieren en tamaño y material: Hamming $=\mathbf2$.
+\end{solucion}
+
+\begin{solucion}{B20 · $k$-means}
+\textbf{Iteración 1} ($\mu_1=(1,1)$, $\mu_2=(1,3)$), $d^2$:
+\begin{center}\small
+\begin{tabular}{c|cccccc}
+ & $P_1$ & $P_2$ & $P_3$ & $P_4$ & $P_5$ & $P_6$\\\hline
+$\mu_1$ & \textbf{0} & \textbf{1} & 4 & 25 & 41 & 41\\
+$\mu_2$ & 4 & 5 & \textbf{0} & \textbf{17} & \textbf{29} & \textbf{25}
+\end{tabular}
+\end{center}
+Grupos $\{P_1,P_2\}$, $\{P_3,P_4,P_5,P_6\}$; $J=72$. Actualización: $\mu_1=(1.5,1)$, $\mu_2=(4.25,4.5)$; $J=20.25$.
+
+\textbf{Iteración 2}:
+\begin{center}\small
+\begin{tabular}{c|cccccc}
+ & $P_1$ & $P_2$ & $P_3$ & $P_4$ & $P_5$ & $P_6$\\\hline
+$\mu_1$ & \textbf{0.25} & \textbf{0.25} & \textbf{4.25} & 21.25 & 36.25 & 37.25\\
+$\mu_2$ & 22.81 & 17.31 & 12.81 & \textbf{0.81} & \textbf{3.31} & \textbf{2.81}
+\end{tabular}
+\end{center}
+$P_3$ cambia de grupo. $J=11.6875$. Actualización: $\mu_1=(4/3,5/3)\approx(1.333,1.667)$, $\mu_2=(16/3,5)\approx(5.333,5)$; $J=\mathbf{6.0}$.
+
+\textbf{Iteración 3}: distancias de $P_1,P_2,P_3$ a $\mu_1$: $0.56,0.89,1.89$ (a $\mu_2$: $34.8,27.1,22.8$); de $P_4,P_5,P_6$ a $\mu_2$: $1.11,0.44,1.11$.
+Sin cambios: \textbf{convergió} con $\{P_1,P_2,P_3\}$, $\{P_4,P_5,P_6\}$, $J=6$.
+\end{solucion}
+
+\begin{solucion}{B21 · Silueta}
+$P_3=(1,3)$: $a=\frac{d(P_3,P_1)+d(P_3,P_2)}2=\frac{2+2.236}{2}=2.118$; $b=\frac{4.123+5.385+5}{3}=4.836$; $s=\frac{4.836-2.118}{4.836}=\mathbf{0.562}$.
+$P_1=(1,1)$: $a=\frac{1+2}{2}=1.5$; $b=\frac{5+6.403+6.403}3=5.935$; $s=\mathbf{0.747}$. $P_1$ está mejor agrupado; $P_3$ es el más periférico de su grupo.
+\end{solucion}
+
+\begin{solucion}{B22 · Agrupamiento jerárquico}
+\begin{center}\small
+\begin{tabular}{c|ll|ll|ll}
+\toprule
+Paso & Simple & altura & Completo & altura & Promedio & altura\\\midrule
+1 & $A+B$ & 2 & $A+B$ & 2 & $A+B$ & 2\\
+2 & $D+E$ & 3 & $D+E$ & 3 & $D+E$ & 3\\
+3 & $C+DE$ & $\min(4,5)=4$ & $C+DE$ & $\max(4,5)=5$ & $C+DE$ & $\frac{4+5}2=4.5$\\
+4 & $AB+CDE$ & $\min=5$ & $AB+CDE$ & $\max=10$ & $AB+CDE$ & $\frac{47}6=7.83$\\\bottomrule
+\end{tabular}
+\end{center}
+En el paso 3 se compara $C$ con $AB$ (simple 5, completo 6, promedio 5.5) frente a $C$ con $DE$; gana $DE$ en los tres.
+En el paso 4 promedio: $(6+10+9+5+9+8)/6=47/6$. Corte en 4.2: simple $\{AB\},\{CDE\}$ (\textbf{2}); completo y promedio $\{AB\},\{C\},\{DE\}$ (\textbf{3}).
+Mismo orden de uniones, distintas alturas: el corte cambia el número de grupos.
+\end{solucion}
+
+\subsection{Aprendizaje por refuerzo}
+
+\begin{solucion}{B23 · Retornos, MC y TD(0)}
+\textbf{(a)} Hacia atrás con $\gamma=0.5$. Ep.\,1: $G_3=4$ ($B$), $G_2=-1+0.5(4)=1$ ($A$), $G_1=2+0.5(1)=2.5$ ($B$), $G_0=1+0.5(2.5)=2.25$ ($A$).
+Ep.\,2: $G_1=1$ ($A$), $G_0=3+0.5(1)=3.5$ ($B$).
+\textbf{(b)} Primera visita: $V(A)=\frac{2.25+1}{2}=\mathbf{1.625}$, $V(B)=\frac{2.5+3.5}2=\mathbf{3.0}$.
+Todas las visitas: $V(A)=\frac{2.25+1+1}3=\mathbf{1.4167}$, $V(B)=\frac{2.5+4+3.5}3=\mathbf{3.3333}$.
+\textbf{(c)} $V(s)\leftarrow V(s)+0.5[r+0.5V(s')-V(s)]$:
+\begin{center}\small
+\begin{tabular}{c|c|c|cc}
+Transición & Objetivo & Actualiza & $V(A)$ & $V(B)$\\\hline
+$A\xrightarrow{1}B$ & $1+0.5(0)=1$ & $A$: $0\to0.5$ & 0.5 & 0\\
+$B\xrightarrow{2}A$ & $2+0.5(0.5)=2.25$ & $B$: $0\to1.125$ & 0.5 & 1.125\\
+$A\xrightarrow{-1}B$ & $-1+0.5(1.125)=-0.4375$ & $A$: $0.5\to0.03125$ & 0.0313 & 1.125\\
+$B\xrightarrow{4}T$ & $4$ & $B$: $1.125\to2.5625$ & 0.0313 & 2.5625\\
+$B\xrightarrow{3}A$ & $3+0.5(0.03125)=3.0156$ & $B$: $\to2.7891$ & 0.0313 & 2.7891\\
+$A\xrightarrow{1}T$ & $1$ & $A$: $\to0.5156$ & 0.5156 & 2.7891
+\end{tabular}
+\end{center}
+\end{solucion}
+
+\begin{solucion}{B24 · Evaluación exacta de «siempre derecha»}
+\textbf{(a)} $V_1=0.8(-1+0.9V_2)+0.2(2)=-0.4+0.72V_2$;\quad
+$V_2=0.8(-1+0.9V_3)+0.2(-1+0.9V_1)=-1+0.72V_3+0.18V_1$;\quad
+$V_3=0.8(10)+0.2(-1+0.9V_2)=7.8+0.18V_2$.
+Sustituyendo $V_1$ y $V_3$ en $V_2$: $V_2=-1+0.72(7.8+0.18V_2)+0.18(-0.4+0.72V_2)=4.544+0.2592V_2$, así
+$V_2=\mathbf{6.1339}$, $V_1=\mathbf{4.0164}$, $V_3=\mathbf{8.9041}$.
+
+\textbf{(b)} $Q^\pi(s,a)=\sum T[R+0.9V^\pi(s')]$:
+\begin{center}\small
+\begin{tabular}{c|cc}
+$s$ & izq & der\\\hline
+1 & $0.8(2)+0.2(-1+0.9V_2)=2.5041$ & 4.0164\\
+2 & $0.8(-1+0.9V_1)+0.2(-1+0.9V_3)=3.4946$ & 6.1339\\
+3 & $0.8(-1+0.9V_2)+0.2(10)=5.6164$ & 8.9041
+\end{tabular}
+\end{center}
+Ningún estado mejora: la política es voraz respecto de su propio valor, satisface Bellman de optimalidad y es \textbf{óptima}.
+\end{solucion}
+
+\begin{solucion}{B25 · Iteración de valores en el corredor}
+\begin{center}\small
+\begin{tabular}{c|cc|cc|cc|c}
+\toprule
+$k$ & $Q(1,\text{izq})$ & $Q(1,\text{der})$ & $Q(2,\text{izq})$ & $Q(2,\text{der})$ & $Q(3,\text{izq})$ & $Q(3,\text{der})$ & $V_k=(V_1,V_2,V_3)$\\\midrule
+1 & 1.4 & $-0.4$ & $-1$ & $-1$ & 1.2 & 7.8 & $(1.4,-1,7.8)$\\
+2 & 1.22 & $-1.12$ & 1.412 & 4.868 & 0.48 & 7.62 & $(1.22,4.868,7.62)$\\
+3 & 2.2762 & 3.105 & 1.25 & 4.706 & 4.705 & 8.6762 & $(3.105,4.706,8.6762)$\\\bottomrule
+\end{tabular}
+\end{center}
+Ejemplo ($k=2$): $Q(2,\text{der})=0.8(-1+0.9\cdot7.8)+0.2(-1+0.9\cdot1.4)=0.8(6.02)+0.2(0.26)=4.868$.
+Políticas voraces: $k=1$: (izq, empate, der); $k=2$: (izq, der, der); $k=3$: (der, der, der), que ya es la óptima.
+$V_k$ es el mejor retorno con $k$ pasos: desde 1 hacen falta 3 movimientos para entrar a $R$, así que con $k\le2$ el $+2$ de $L$ es lo mejor alcanzable.
+\end{solucion}
+
+\begin{solucion}{B26 · Q-learning en el automóvil}
+\textbf{(a)} $Q\leftarrow Q+0.5[y-Q]$, $y=r+0.9\max_{a'}Q(s',a')$ ($O$ terminal: $y=r$).
+\begin{center}\small
+\begin{tabular}{c|c|c|c}
+Transición & $y$ & Anterior & Nuevo\\\hline
+$(C,F,+2,W)$ & $2+0.9\max(0,0)=2$ & 0 & $Q(C,F)=1$\\
+$(W,S,+1,C)$ & $1+0.9\max(0,1)=1.9$ & 0 & $Q(W,S)=0.95$\\
+$(C,F,+2,C)$ & $2+0.9(1)=2.9$ & 1 & $Q(C,F)=1.95$\\
+$(C,S,+1,C)$ & $1+0.9(1.95)=2.755$ & 0 & $Q(C,S)=1.3775$\\
+$(C,F,+2,W)$ & $2+0.9(0.95)=2.855$ & 1.95 & $Q(C,F)=2.4025$\\
+$(W,F,-10,O)$ & $-10$ & 0 & $Q(W,F)=-5$
+\end{tabular}
+\end{center}
+\textbf{(b)} $C$: Fast ($2.4025>1.3775$); $W$: Slow ($0.95>-5$).
+\textbf{(c)} Coincide con la óptima (Fast en Cool, Slow en Warm), pero los valores están lejos de $Q^*$ ($V^*=(15.5,14.5)$ con $\gamma=0.9$).
+Para converger: visitar todos los pares muchas veces, explorar y reducir $\alpha$ adecuadamente.
+\end{solucion}
+
+\begin{solucion}{B27 · $\varepsilon$-voraz, SARSA y Q-learning}
+\textbf{(a)} $\mathcal G=\{a_2,a_3\}$, $\varepsilon/m=0.05$, $(1-\varepsilon)/|\mathcal G|=0.4$: $\mu=(\mathbf{0.05},\mathbf{0.45},\mathbf{0.45},\mathbf{0.05})$.
+\textbf{(b)} Q-learning: $y=0+0.9\max(6,-2)=5.4$; $Q=2+0.5(3.4)=\mathbf{3.7}$. SARSA: $y=0+0.9(-2)=-1.8$; $Q=2+0.5(-3.8)=\mathbf{0.1}$.
+Q-learning aprende el valor de la voraz (fuera de política); SARSA el de la política que explora (en política), por eso es más
+conservador cerca de acciones peligrosas.
+\end{solucion}
+
+\begin{solucion}{B28 · Q-learning lineal}
+\textbf{(a)} $\hat Q(s,a)=1+2-2=1$. En $s'$: $1+0-1=0$ y $1+4+0=5$; objetivo $y=3+0.9(5)=7.5$; $\delta=6.5$.
+\textbf{(b)} $\mathbf w'=(1,2,-1)+0.1(6.5)(1,1,2)=(\mathbf{1.65},\mathbf{2.65},\mathbf{0.3})$; ahora $\hat Q(s,a)=4.9$.
+\textbf{(c)} En $s'$ pasan a $1.95$ y $6.95$ (ambos $+1.95$): generalización por las características compartidas (sesgo y $\phi_1$).
+Semigradiente: se deriva $\frac12(y-\hat Q)^2$ tratando $y$ como constante, aunque también depende de $\mathbf w$.
+\end{solucion}
+
+\subsection{Aprendizaje profundo y evaluación}
+
+\begin{solucion}{B29 · Retropropagación 2–2–1}
+\textbf{(a)} $\mathbf z_1=W_1\mathbf x+\mathbf b_1=(1-2+0,\ 0.5+1-1)=(-1,0.5)$; $\mathbf h=(0,0.5)$; $z_2=2(0)-1(0.5)+0.5=0$; $p=0.5$; $\ell=\ln2=\mathbf{0.6931}$.
+\textbf{(b)} $\delta_2=p-y=-0.5$; $\partial\ell/\partial\mathbf w_2=\delta_2\mathbf h=(0,-0.25)$; $\partial\ell/\partial b_2=-0.5$.
+$\boldsymbol\delta_1=(\mathbf w_2\delta_2)\odot\mathrm{ReLU}'(\mathbf z_1)=(2(-0.5)\cdot0,\ -1(-0.5)\cdot1)=(0,0.5)$.
+$\partial\ell/\partial W_1=\boldsymbol\delta_1\mathbf x^\mathsf T=\begin{pmatrix}0&0\\0.5&1\end{pmatrix}$; $\partial\ell/\partial\mathbf b_1=(0,0.5)$.
+\textbf{(c)} $\eta=0.5$: $W_1=\begin{pmatrix}1&-1\\0.25&0\end{pmatrix}$, $\mathbf b_1=(0,-1.25)$, $\mathbf w_2=(2,-0.875)$, $b_2=0.75$.
+Nuevo forward: $\mathbf z_1=(-1,-1)$, $\mathbf h=(0,0)$, $z_2=0.75$, $p=0.6792$, $\ell=\mathbf{0.3869}$. La pérdida baja (aunque ahora ambas ocultas se apagaron
+para este ejemplo y solo $b_2$ podrá seguir aprendiendo con él).
+\textbf{(d)} La primera unidad oculta tiene $z=-1<0$: ReLU$'=0$ corta el gradiente hacia su fila de $W_1$ y su sesgo.
+\end{solucion}
+
+\begin{solucion}{B30 · Conteo y composición}
+\textbf{(a)} $(8\cdot4+8)+(8\cdot8+8)+(3\cdot8+3)=40+72+27=\mathbf{139}$.
+\textbf{(b)} $32\,000\cdot256=\mathbf{8\,192\,000}$.
+\textbf{(c)} $W_2(W_1\mathbf x+\mathbf b_1)+\mathbf b_2=(W_2W_1)\mathbf x+(W_2\mathbf b_1+\mathbf b_2)=\widetilde W\mathbf x+\widetilde{\mathbf b}$.
+\textbf{(d)} $(3\cdot2+3)+(2\cdot3+2)=\mathbf{17}$. Cada unidad ReLU divide el plano con una recta; 3 rectas en posición general forman a lo sumo $1+3+3=7$ regiones, en cada una la red es afín.
+\end{solucion}
+
+\begin{solucion}{B31 · Atención causal}
+\textbf{(a)} $S=\frac1{\sqrt2}\begin{pmatrix}1&1&0\\0&1&1\\1&2&1\end{pmatrix}=\begin{pmatrix}0.7071&0.7071&0\\0&0.7071&0.7071\\0.7071&1.4142&0.7071\end{pmatrix}$.
+\textbf{(b)} Con máscara, fila 1: $(1,0,0)$; fila 2: softmax$(0,0.7071)=(0.3302,0.6698,0)$; fila 3: softmax$(0.7071,1.4142,0.7071)=(0.2483,0.5035,0.2483)$.
+\textbf{(c)} $\mathbf o_1=(1,0)$; $\mathbf o_2=0.3302(1,0)+0.6698(0,1)=(0.3302,0.6698)$; $\mathbf o_3=0.2483(1,0)+0.5035(0,1)+0.2483(1,1)=(0.4966,0.7517)$.
+\textbf{(d)} Sin máscara la fila 2 sería softmax$(0,0.7071,0.7071)=(0.1978,0.4011,0.4011)$ y $\mathbf o_2=(0.5989,0.8022)$: la posición 2 «vería el futuro».
+\end{solucion}
+
+\begin{solucion}{B32 · Matriz de confusión y umbral}
+\begin{center}\small
+\begin{tabular}{c|cccc|ccccc}
+\toprule
+Umbral & $TP$ & $FP$ & $FN$ & $TN$ & Exactitud & Precisión & Recall & Especif. & $F_1$\\\midrule
+0.50 & 3 & 2 & 2 & 3 & 0.6 & 0.6 & 0.6 & 0.6 & 0.6\\
+0.35 & 4 & 3 & 1 & 2 & 0.6 & 0.5714 & 0.8 & 0.4 & 0.6667\\
+0.75 & 2 & 1 & 3 & 4 & 0.6 & 0.6667 & 0.4 & 0.8 & 0.5\\\bottomrule
+\end{tabular}
+\end{center}
+La exactitud no distingue los tres umbrales. Enfermedad grave: un falso negativo es muy costoso $\Rightarrow$ umbral bajo (0.35, recall 0.8).
+Spam: perder un correo legítimo es costoso $\Rightarrow$ umbral alto (0.75, precisión y especificidad mayores).
+\end{solucion}
+
+\subsection{IA en el contexto social}
+
+\begin{solucion}{B33 · Métricas de equidad}
+\textbf{(a)}
+\begin{center}\small
+\begin{tabular}{c|cccccc}
+Grupo & Tasa base & Aprobación & TPR & FPR & PPV & Exactitud\\\hline
+A & $50/100=0.5$ & $50/100=0.5$ & $40/50=0.8$ & $10/50=0.2$ & $40/50=0.8$ & 0.8\\
+B & $30/100=0.3$ & $20/100=0.2$ & $15/30=0.5$ & $5/70=0.0714$ & $15/20=0.75$ & 0.8
+\end{tabular}
+\end{center}
+\textbf{(b)} Paridad: no ($0.5$ vs $0.2$). Igualdad de oportunidades: no ($0.8$ vs $0.5$: la mitad de los buenos pagadores de B son rechazados).
+\emph{Equalized odds}: no (además FPR $0.2$ vs $0.071$).
+\textbf{(c)} No. La exactitud igual oculta \emph{quién} sufre los errores: en B dominan los falsos negativos (personas que pagarían y no reciben
+crédito). Hay que reportar métricas desagregadas y decidir qué error importa.
+\end{solucion}
+
+\begin{solucion}{B34 · Energía y rebote}
+\textbf{(a)} $10\,\mathrm W\times100\,\mathrm h=1\,\mathrm{kWh}$. $100\,000\times700\,\mathrm W=70\,\mathrm{MW}$; en 24 h: $\mathbf{1\,680\ MWh}$ (solo GPU, sin refrigeración).
+\textbf{(b)} $25(0.3)=7.5$ Wh por tarea; por tarea correcta $7.5/0.75=\mathbf{10\ Wh}$ (los intentos fallidos también consumen).
+\textbf{(c)} $0.4\times3=1.2$: el consumo total \textbf{sube 20\,\%} pese a la eficiencia (efecto rebote).
+\end{solucion}

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tabla de la mochila</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color-scheme:light dark;--bg:#f4f7fb;--card:#fff;--ink:#17253b;--muted:#485a73;--line:#cbd5e1;--blue:#245e9e;--soft:#e8f2ff;--gold:#fff1d0;--amber:#a36100;--red:#b23b2a;--redsoft:#fde8e4;--green:#1f7a4d;--greensoft:#e2f5ea}
+@media(prefers-color-scheme:dark){:root{--bg:#121a28;--card:#1d293a;--ink:#e9f1fc;--muted:#c1cede;--line:#45566e;--blue:#8bbfff;--soft:#273d58;--gold:#5c4827;--amber:#ffd078;--red:#ff9c8a;--redsoft:#4a2a26;--green:#7fdcaa;--greensoft:#1f3b2e}}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--ink)}
+main{max-width:980px;margin:auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+h1{font-size:1.3rem;margin:0 0 4px}h2{font-size:1.05rem;margin:20px 0 6px}p{line-height:1.5;margin:6px 0 12px;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.button{font:inherit;border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--ink);padding:6px 10px;cursor:pointer}.button:disabled{opacity:.45;cursor:default}
+.button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;font-variant-numeric:tabular-nums;margin:6px 0}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;min-width:38px}
+th{background:var(--soft);font-weight:650;white-space:nowrap}
+td.empty{color:transparent}
+td.cur{outline:3px solid var(--blue);outline-offset:-3px;background:var(--soft);font-weight:700}
+td.up{background:var(--greensoft)}
+td.diag{background:var(--gold)}
+td.path{background:var(--redsoft);font-weight:700}
+td.take{background:var(--redsoft);font-weight:700;color:var(--red)}
+.explainer{border-left:4px solid var(--amber);padding:8px 12px;background:var(--gold);line-height:1.55;margin:10px 0;border-radius:0 8px 8px 0}
+.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:.9rem}.sw{display:inline-block;width:13px;height:13px;border-radius:3px;vertical-align:-2px;margin-right:4px;border:1px solid var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0}.card{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--soft)}.card strong{display:block;font-size:1.1rem;margin:3px 0}.card.opt{background:var(--gold)}
+input[type=number]{font:inherit;width:70px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+</style>
+</head>
+<body><main>
+<h1>Mochila 0/1: llenar la tabla M[i, w]</h1>
+<p>Instancia de las diapositivas 32–37: cinco objetos y límite <b>W = 11</b>. Cada casilla decide si el objeto <i>i</i> entra o no, usando sólo la fila anterior.</p>
+<div class="row"><button class="button" id="prev">◀ Casilla</button><button class="button" id="next">Casilla ▶</button><button class="button" id="fila">Fila completa ▶▶</button><button class="button" id="fin">Llenar todo</button><button class="button" id="reset">Reiniciar</button><button class="button" id="trace">Reconstruir solución</button></div>
+<div class="legend"><span><span class="sw" style="background:var(--soft);outline:2px solid var(--blue)"></span>casilla actual</span><span><span class="sw" style="background:var(--greensoft)"></span>no tomar: M[i−1, w]</span><span><span class="sw" style="background:var(--gold)"></span>tomar: v<sub>i</sub> + M[i−1, w−w<sub>i</sub>]</span><span><span class="sw" style="background:var(--redsoft)"></span>camino de reconstrucción</span></div>
+<div class="scroll"><table id="t"></table></div>
+<div class="explainer" id="exp"></div>
+
+<h2>¿Y si fuéramos voraces? (quiz 2, diapositiva 33)</h2>
+<p>Las tres reglas voraces toman objetos en un orden fijo y agregan cada uno si todavía cabe. Ninguna alcanza el óptimo en esta instancia.</p>
+<div class="cards" id="greedy"></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const v=[0,1,6,18,22,28],w=[0,1,2,5,6,7],n=5,W=11;
+const M=Array.from({length:n+1},()=>Array(W+1).fill(0));
+for(let i=1;i<=n;i++)for(let c=0;c<=W;c++)M[i][c]=w[i]>c?M[i-1][c]:Math.max(M[i-1][c],v[i]+M[i-1][c-w[i]]);
+let k=0;const total=n*(W+1);let tracing=false;
+function pos(k){return{i:Math.floor(k/(W+1))+1,c:k%(W+1)}}
+function render(){
+ const filled=k;const cur=k>0&&k<=total?pos(k-1):null;
+ const path=new Map();let taken=[];
+ if(tracing){let c=W;for(let i=n;i>=1;i--){const t=M[i][c]>M[i-1][c];path.set(i+','+c,t);if(t){taken.push(i);c-=w[i]}}path.set('0,'+c,false)}
+ let h='<tr><th>objetos \\ w</th>'+Array.from({length:W+1},(_,c)=>`<th>${c}</th>`).join('')+'</tr>';
+ for(let i=0;i<=n;i++){
+  const lab=i===0?'{ }':`{1..${i}} · v=${v[i]}, w=${w[i]}`;
+  h+=`<tr><th>${lab}</th>`;
+  for(let c=0;c<=W;c++){
+   const idx=(i-1)*(W+1)+c;const shown=i===0||idx<filled;let cls=[];
+   if(cur&&!tracing){if(i===cur.i&&c===cur.c)cls.push('cur');if(i===cur.i-1&&c===cur.c)cls.push('up');if(i===cur.i-1&&w[cur.i]<=cur.c&&c===cur.c-w[cur.i])cls.push('diag')}
+   if(tracing&&path.has(i+','+c))cls.push(path.get(i+','+c)?'take':'path');
+   if(!shown)cls.push('empty');
+   h+=`<td class="${cls.join(' ')}">${shown?M[i][c]:'·'}</td>`}
+  h+='</tr>'}
+ $('t').innerHTML=h;
+ let e;
+ if(tracing){e=`<b>Reconstrucción</b> (diapositiva 38): desde M[5, 11] = ${M[n][W]}, el objeto <i>i</i> se toma si y sólo si M[i, w] &gt; M[i−1, w]; en ese caso saltamos a w − w<sub>i</sub>. Celdas rojas con texto rojo = objeto tomado. Resultado: objetos <b>{${taken.reverse().join(', ')}}</b>, valor ${M[n][W]}, peso ${taken.reduce((s,i)=>s+w[i],0)} kg.`}
+ else if(!cur)e='La fila { } vale 0 (sin objetos no hay valor). Avanza casilla por casilla: el orden es fila por fila, de izquierda a derecha, igual que el pseudocódigo de la diapositiva 36.';
+ else{const {i,c}=cur;if(w[i]>c)e=`<b>M[${i}, ${c}]</b>: el objeto ${i} pesa ${w[i]} &gt; ${c}, no cabe ⇒ M[${i}, ${c}] = M[${i-1}, ${c}] = <b>${M[i][c]}</b>.`;
+  else{const a=M[i-1][c],b=v[i]+M[i-1][c-w[i]];e=`<b>M[${i}, ${c}]</b> = max{ M[${i-1}, ${c}], v<sub>${i}</sub> + M[${i-1}, ${c}−${w[i]}] } = max{ ${a}, ${v[i]} + ${M[i-1][c-w[i]]} } = max{ ${a}, ${b} } = <b>${M[i][c]}</b> ⇒ ${b>a?'<b>conviene tomar</b> el objeto '+i:'no conviene tomar el objeto '+i}.`}}
+ if(k>=total&&!tracing)e+=` Tabla completa: ${(n+1)*(W+1)} casillas, O(1) cada una ⇒ Θ(nW). Respuesta: <b>M[5, 11] = ${M[n][W]}</b>.`;
+ $('exp').innerHTML=e;
+ $('prev').disabled=k<=0;$('next').disabled=k>=total;$('fila').disabled=k>=total;
+}
+$('next').onclick=()=>{tracing=false;k++;render()};$('prev').onclick=()=>{tracing=false;k--;render()};
+$('fila').onclick=()=>{tracing=false;k=Math.min(total,(Math.floor(k/(W+1))+1)*(W+1));render()};
+$('fin').onclick=()=>{tracing=false;k=total;render()};$('reset').onclick=()=>{tracing=false;k=0;render()};
+$('trace').onclick=()=>{k=total;tracing=true;render()};
+render();
+function greedy(name,key){const ord=[1,2,3,4,5].sort(key);let cap=W,val=0,pick=[],log=[];for(const i of ord){if(w[i]<=cap){cap-=w[i];val+=v[i];pick.push(i);log.push(`+${i}`)}else log.push(`<s>${i}</s>`)}return{name,val,pick,log,ord}}
+const G=[greedy('Mayor valor v<sub>i</sub>',(a,b)=>v[b]-v[a]),greedy('Menor peso w<sub>i</sub>',(a,b)=>w[a]-w[b]),greedy('Mayor razón v<sub>i</sub>/w<sub>i</sub>',(a,b)=>v[b]/w[b]-v[a]/w[a])];
+$('greedy').innerHTML=G.map(g=>`<div class="card">${g.name}<strong>$${g.val}</strong>orden: ${g.log.join(' ')}<br>toma {${g.pick.sort((a,b)=>a-b).join(', ')}}</div>`).join('')+`<div class="card opt">Programación dinámica<strong>$${M[n][W]}</strong>toma {3, 4}: 5 + 6 = 11 kg</div>`;
+</script>
+</body></html>

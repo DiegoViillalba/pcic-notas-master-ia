@@ -13,8 +13,10 @@ conceptos:
   - Compresión de caminos
   - Función inversa de Ackermann
   - Algoritmo de Kruskal
+  - Percolación y conectividad dinámica
 referencias:
   - "[[2026-10-20 ADA - bienary heap y heap sort]]"
+  - "[[15UnionFind.pdf]], diapositivas 4–42 (estructura) y 44–57 (percolación)"
   - "[[04GreedyAlgorithmsII.pdf]], diapositivas 46–47 (Kruskal) y 64 (clustering)"
   - "Kleinberg y Tardos, Algorithm Design, secciones 4.5–4.6"
   - "Wayne, K., presentación Union-Find (Kleinberg–Tardos)"
@@ -40,6 +42,11 @@ tags:
 > [!warning] Nota reconstruida
 > El desarrollo y los costos siguen Kleinberg–Tardos §4.6 y la presentación de Wayne. Las convenciones de desempate (qué raíz cuelga de cuál) son una elección; verifica la que usó el profesor.
 
+> [!info] Diapositivas añadidas para estudiar
+> La presentación de Sedgewick y Wayne **1.5 Union-Find** muestra paso a paso las mismas representaciones y después las aplica a percolación. El bloque de percolación de esta nota es un **complemento de estudio**, no un registro de lo visto en el pizarrón.
+
+![[15UnionFind.pdf]]
+
 ## Pregunta central
 
 Kruskal necesita preguntar una y otra vez “¿$u$ y $v$ ya están en la misma componente?” mientras las componentes se van fusionando. ¿Cómo representar una partición que solo **crece por uniones** para responder esa pregunta casi en tiempo constante?
@@ -53,10 +60,12 @@ Kruskal necesita preguntar una y otra vez “¿$u$ y $v$ ya están en la misma c
 
 En [[2026-09-03 ADA - grafos|grafos]] calculamos componentes conexas con BFS o DFS en $O(m+n)$. Pero en Kruskal el grafo **cambia**: se agregan aristas una por una y, antes de cada una, hay que saber si sus extremos ya están conectados.
 
-- Recalcular con BFS cada vez: $O(m+n)$ por consulta y $O(m(m+n))$ en total.
-- Con Union-Find: cada consulta y cada fusión cuestan casi $O(1)$.
+- Buscar un camino con BFS/DFS en el **bosque de aristas ya aceptadas**: $O(n)$ por consulta y $O(mn)$ para $m$ aristas examinadas.
+- Con Union-Find ponderado y compresión: la secuencia completa tiene costo **casi lineal**; el costo casi constante es **amortizado**, no una garantía para cada consulta aislada.
 
 La observación clave es que **nunca se quitan aristas**: las componentes solo se unen. Esa restricción es lo que permite una estructura tan eficiente.
+
+**Antes de pensar en arreglos:** si empezamos con $\{1\},\{2\},\{3\},\{4\}$ y añadimos las conexiones $(1,2)$ y $(2,3)$, el resultado es $\{1,2,3\},\{4\}$. Entonces `connected(1,3)` es verdadero aunque no se haya añadido directamente $(1,3)$; existe el camino $1\to2\to3$. En cambio, `connected(1,4)` sigue siendo falso. La estructura guarda **componentes**, no una lista de todos los caminos.
 
 ---
 
@@ -69,6 +78,8 @@ Union-Find mantiene una **partición** de un conjunto de $n$ elementos en conjun
 | `MAKE-SET(x)` | Crea el conjunto unitario $\{x\}$. |
 | `FIND-SET(x)` | Devuelve el **representante** del conjunto que contiene a $x$. |
 | `UNION(x, y)` | Reemplaza los conjuntos de $x$ y $y$ por su unión. |
+
+La conectividad es una **relación de equivalencia**: cada elemento está conectado consigo mismo (reflexividad), el sentido del camino no importa en este modelo no dirigido (simetría) y dos caminos que comparten un punto se concatenan (transitividad). Por eso los elementos conectados forman conjuntos disjuntos o **componentes**.
 
 La única propiedad que se exige al representante es que sea **canónico**:
 
@@ -231,7 +242,7 @@ antes:            8                después:          8
             1
 ```
 
-Ahora $1$ y $2$ cuelgan directamente de $8$: la próxima `FIND(1)` es de un paso. La compresión **no** actualiza `size` ni `rank`: siguen siendo cotas válidas.
+Ahora $1$ y $2$ cuelgan directamente de $8$: la próxima `FIND(1)` es de un paso. La compresión **no** cambia qué elementos pertenecen a cada árbol, así que `size` sigue siendo el **tamaño exacto** en cada raíz; `rank` sigue siendo una **cota superior** válida, aunque ya no sea la altura real.
 
 > [!example] Variante de una sola pasada
 > **Partición a la mitad** (*path halving*): mientras se sube, cada nodo apunta a su abuelo (`parent[x] = parent[parent[x]]`). Tiene la misma cota asintótica y evita la segunda pasada.
@@ -246,12 +257,12 @@ Ahora $1$ y $2$ cuelgan directamente de $8$: la próxima `FIND(1)` es de un paso
 > donde $\alpha$ es la **inversa de la función de Ackermann**.
 
 - $\alpha(n)$ crece tan lento que $\alpha(n)\le4$ para cualquier $n$ menor que el número de átomos del universo: en la práctica, cada operación cuesta **constante amortizado**.
-- Una cota más sencilla de demostrar (Hopcroft–Ullman, 1973) es $O(m\log^* n)$, con el logaritmo iterado de la diapositiva 57:
+- Una cota más sencilla de demostrar (Hopcroft–Ullman, 1973) es $O(m\log^* n)$, con el logaritmo iterado de la diapositiva **41 de `15UnionFind.pdf`**:
 $$
 \lg^* n=\begin{cases}0 & n\le1\\ 1+\lg^*(\lg n) & n>1\end{cases}
 \qquad \lg^*(2^{65536})=5 .
 $$
-- **No se puede llegar a $O(m)$:** Fredman y Saks (1989) demostraron que $\Omega(m\,\alpha(m,n))$ es una cota inferior en el modelo de sondeo de celdas. La estructura es óptima.
+- **No se garantiza $O(m)$ para todas las secuencias:** Fredman y Saks (1989) demostraron una cota inferior $\Omega(m\,\alpha(m,n))$ en el modelo de sondeo de celdas. La estructura alcanza esa cota asintótica.
 
 ---
 
@@ -305,7 +316,7 @@ Kruskal es un caso particular del algoritmo voraz de colorear aristas (diapositi
 
 ### 8.3 Costo
 
-- Ordenar: $O(m\log m)=O(m\log n)$, porque $m\le n^2$.
+- Ordenar: $O(m\log m)=O(m\log n)$ para un **grafo simple**, donde $m\le n(n-1)/2$. Si se permiten aristas paralelas sin límite, se conserva la expresión $O(m\log m)$.
 - $n$ `MAKE-SET`, $2m$ `FIND` y $n-1$ `UNION`: $O(m\log n)$ con unión ponderada, u $O(m\,\alpha(n))$ con compresión.
 
 Total: $O(m\log m)$, dominado por el ordenamiento. Si las aristas ya vienen ordenadas, Kruskal con Union-Find óptimo es casi lineal.
@@ -314,17 +325,17 @@ Total: $O(m\log m)$, dominado por el ordenamiento. Si las aristas ya vienen orde
 
 Grafo de la diapositiva 52, con aristas ordenadas por costo:
 
-| Arista | Costo | `FIND(u)` vs `FIND(v)` | Decisión | Componentes |
-|---|---:|---|---|---|
-| $4$–$6$ | 1 | distintas | ✔ agregar | $\{4,6\}$ |
-| $3$–$6$ | 2 | distintas | ✔ agregar | $\{3,4,6\}$ |
-| $1$–$4$ | 3 | distintas | ✔ agregar | $\{1,3,4,6\}$ |
-| $2$–$5$ | 4 | distintas | ✔ agregar | $\{1,3,4,6\},\{2,5\}$ |
-| $1$–$5$ | 5 | distintas | ✔ agregar | $\{1,2,3,4,5,6\}$ |
-| $1$–$2$ | 6 | iguales | ✘ ciclo $1$–$2$–$5$ | — |
-| $4$–$5$ | 7 | iguales | ✘ | — |
-| $2$–$3$ | 8 | iguales | ✘ | — |
-| $5$–$6$ | 9 | iguales | ✘ | — |
+| Arista  | Costo | `FIND(u)` vs `FIND(v)` | Decisión            | Componentes           |
+| ------- | ----: | ---------------------- | ------------------- | --------------------- |
+| $4$–$6$ |     1 | distintas              | ✔ agregar           | $\{4,6\}$             |
+| $3$–$6$ |     2 | distintas              | ✔ agregar           | $\{3,4,6\}$           |
+| $1$–$4$ |     3 | distintas              | ✔ agregar           | $\{1,3,4,6\}$         |
+| $2$–$5$ |     4 | distintas              | ✔ agregar           | $\{1,3,4,6\},\{2,5\}$ |
+| $1$–$5$ |     5 | distintas              | ✔ agregar           | $\{1,2,3,4,5,6\}$     |
+| $1$–$2$ |     6 | iguales                | ✘ ciclo $1$–$2$–$5$ | —                     |
+| $4$–$5$ |     7 | iguales                | ✘                   | —                     |
+| $2$–$3$ |     8 | iguales                | ✘                   | —                     |
+| $5$–$6$ |     9 | iguales                | ✘                   | —                     |
 
 MST con $n-1=5$ aristas y costo $1+2+3+4+5=15$. Puede detenerse en cuanto $T$ tiene $n-1$ aristas.
 
@@ -384,6 +395,32 @@ MST con $n-1=5$ aristas y costo $1+2+3+4+5=15$. Puede detenerse en cuanto $T$ ti
 
 ---
 
+## Aplicación adicional de las diapositivas: percolación (44–57)
+
+**Pregunta:** en una cuadrícula $L\times L$, ¿existe un camino de casillas **abiertas** desde la fila superior hasta la inferior? Solo se permite caminar en las cuatro direcciones; una casilla diagonal no cuenta como vecina. Este es otro problema de conectividad que cambia por **inserciones**: al abrir una casilla pueden fusionarse componentes, pero ninguna se separa.
+
+### Modelar la cuadrícula con Union-Find
+
+1. Numera la casilla $(r,c)$ como $rL+c$, con $0\le r,c<L$. Reserva los índices $L^2$ y $L^2+1$ para dos nodos virtuales: **arriba** y **abajo**.
+2. Al abrir $(r,c)$, márcala como abierta. Únela solo con sus vecinos ortogonales que **ya estén abiertos**. Si está en la primera fila, únela con **arriba**; si está en la última, con **abajo**.
+3. Después de cada apertura, la cuadrícula percola exactamente cuando `find(arriba) == find(abajo)`.
+
+**Ejemplo $3\times3$.** Abre $(0,1)$, luego $(1,1)$ y por último $(2,1)$. Tras la primera apertura, arriba está conectado con la casilla $1$, pero no con abajo. La segunda une $1$ con $4$. La tercera une $4$ con $7$ y $7$ con el nodo virtual de abajo. Ahora existe el camino vertical $1\leftrightarrow4\leftrightarrow7$ y la consulta devuelve **sí**. Si $(1,1)$ permaneciera bloqueada, las otras dos casillas no bastarían.
+
+> [!important] ¿Por qué sirven los nodos virtuales?
+> Sin ellos habría que buscar si **alguna** casilla abierta de arriba está conectada con **alguna** de abajo. Los dos nodos convierten esa condición en **una sola consulta** `connected(arriba, abajo)`. No deben conectarse por adelantado a casillas bloqueadas: eso produciría caminos falsos.
+
+Con $L^2$ aperturas como máximo y a lo sumo cuatro uniones por apertura, una prueba completa cuesta $O(L^2\alpha(L^2))$ con unión ponderada y compresión, más el costo de elegir las casillas. Para estimar el **umbral de percolación** de las diapositivas, se abren casillas en orden aleatorio hasta que aparece el primer camino, se registra la fracción abierta y se promedian muchas pruebas. Para la red cuadrada grande, las diapositivas sitúan el umbral cerca de $0.593$; en una cuadrícula pequeña la fracción observada cambia de una prueba a otra.
+
+> [!note] Dos consultas distintas
+> `connected(arriba, abajo)` responde si **el sistema percola**. Si además se pregunta si una casilla individual está conectada con arriba (*fullness*), el nodo virtual de abajo puede causar **backwash** tras la primera percolación: casillas inferiores abiertas parecen conectadas con arriba por la vía del nodo de abajo. Para esa consulta adicional se usa un segundo Union-Find **sin** el nodo virtual inferior. La consulta de percolación anterior sigue siendo correcta.
+
+<iframe src="percolacion-union-find.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+
+En el laboratorio, abre casillas y observa cuándo aparece un camino azul entre los extremos. Las casillas cerradas no participan en `UNION`.
+
+---
+
 ## Cierre de las dos presentaciones: la estructura detrás de Kruskal
 
 La secuencia de estudio queda cerrada aquí: [[2026-09-29 ADA - Contunuacion-scheduling|Dijkstra]] → [[2026-10-06 ADA - codigos-de-prefijos|cortes, ciclos y MST]] → [[2026-10-08 ADA - arboles-binarios-y-codigos-optimos|Prim y Kruskal]] → [[2026-10-13 ADA - algoritmo-de-huffman|Borůvka]] → [[2026-10-20 ADA - bienary heap y heap sort|clustering y arborescencias]] → **Union-Find**. Las arborescencias son dirigidas y requieren la contracción de ciclos de Edmonds; Union-Find resuelve otra necesidad: saber si los extremos de una arista **no dirigida** ya están conectados mientras Kruskal construye su bosque.
@@ -411,6 +448,7 @@ En la figura, las raíces de dos árboles codifican dos componentes. `find(u)≠
 - **Contracción de componentes:** idea relacionada con la [[2026-09-22 ADA - cierre-de-grafos-y-greedy-monedas|condensación de SCC]] y con Borůvka (diapositivas 50–54).
 - **Concepto transversal:** [[Algoritmo voraz|algoritmo voraz]].
 - **Recurso interactivo:** [[union-find-interactivo.htm|Union-Find interactivo]].
+- **Otra aplicación:** [[percolacion-union-find.htm|percolación interactiva]].
 
 ## Bibliografía
 
@@ -421,6 +459,7 @@ En la figura, las raíces de dos árboles codifican dos componentes. `find(u)≠
 5. Tarjan, R. E. (1975). “Efficiency of a Good but Not Linear Set Union Algorithm”. *Journal of the ACM*, 22(2), 215–225.
 6. Fredman, M. L. y Saks, M. E. (1989). “The Cell Probe Complexity of Dynamic Data Structures”. *Proceedings of STOC ’89*, 345–354.
 7. Kruskal, J. B. (1956). “On the Shortest Spanning Subtree of a Graph and the Traveling Salesman Problem”. *Proceedings of the AMS*, 7(1), 48–50.
+8. Sedgewick, R. y Wayne, K. *Algorithms, 4th Edition*, presentación **1.5 Union-Find** (`15UnionFind.pdf`), diapositivas 4–57.
 
 ## Resumen después de clase
 

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mínimos cuadrados segmentados</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color-scheme:light dark;--bg:#f4f7fb;--card:#fff;--ink:#17253b;--muted:#485a73;--line:#cbd5e1;--blue:#245e9e;--soft:#e8f2ff;--gold:#fff1d0;--amber:#a36100;--pt:#17253b}
+@media(prefers-color-scheme:dark){:root{--bg:#121a28;--card:#1d293a;--ink:#e9f1fc;--muted:#c1cede;--line:#45566e;--blue:#8bbfff;--soft:#273d58;--gold:#5c4827;--amber:#ffd078;--pt:#e9f1fc}}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--ink)}
+main{max-width:940px;margin:auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+h1{font-size:1.3rem;margin:0 0 4px}p{line-height:1.5;margin:6px 0 12px;color:var(--muted)}
+.control{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:10px 0}.control label{font-weight:650}.control input[type=range]{flex:1;min-width:180px;accent-color:var(--blue)}.control output{font-variant-numeric:tabular-nums;font-weight:700;min-width:70px}
+.button{font:inherit;border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--ink);padding:6px 10px;cursor:pointer}
+.button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+svg{width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.axis{stroke:var(--muted);stroke-width:1.5}.pt{fill:none;stroke:var(--pt);stroke-width:1.6}.seg{stroke-width:3.5;stroke-linecap:round}.res{stroke:var(--amber);stroke-width:1.2;opacity:.8}.brk{stroke:var(--line);stroke-dasharray:4 4}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:12px 0}.card{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--soft)}.card strong{display:block;font-size:1.15rem;margin-top:3px;font-variant-numeric:tabular-nums}
+.explainer{border-left:4px solid var(--amber);padding:8px 12px;background:var(--gold);line-height:1.5;margin:10px 0;border-radius:0 8px 8px 0}
+.scroll{overflow-x:auto}table{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.86rem}th,td{border:1px solid var(--line);padding:4px 6px;text-align:center;min-width:38px}th{background:var(--soft)}td.hl{background:var(--gold);font-weight:700}
+</style>
+</head>
+<body><main>
+<h1>Precisión contra número de rectas</h1>
+<p>Minimizamos <b>f = E + c·L</b>: <i>E</i> suma los errores cuadráticos de cada segmento y <i>L</i> cuenta las rectas. Mueve <i>c</i> y observa cómo la PD cambia la segmentación óptima. Los puntos son un ejemplo con la misma forma que la diapositiva 26.</p>
+<div class="control"><label for="c">Penalización c</label><input id="c" type="range" min="-2" max="3.5" step="0.05" value="0"><output id="cv">10</output><button class="button" id="ruido">Otros puntos</button><label><input type="checkbox" id="resid" checked> mostrar residuos</label></div>
+<svg id="plot" viewBox="0 0 860 420" role="img" aria-label="Puntos y rectas ajustadas"></svg>
+<div class="cards"><div class="card">Rectas L<strong id="L">—</strong></div><div class="card">Error total E<strong id="E">—</strong></div><div class="card">Costo c·L<strong id="CL">—</strong></div><div class="card">f = E + c·L<strong id="F">—</strong></div></div>
+<div class="explainer" id="exp"></div>
+<p><b>Tabla M[j]</b> (costo óptimo de los primeros <i>j</i> puntos) y el índice <i>i*</i> donde empieza el último segmento elegido. La reconstrucción sigue los saltos j → i* − 1 desde j = n.</p>
+<div class="scroll"><table id="mt"></table></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let seed=7;function rnd(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}
+let P=[];
+function gen(){P=[];const n=27;for(let k=0;k<n;k++){const x=1+k*0.75+rnd()*0.3;let y;if(x<7)y=1+0.45*x;else if(x<15.5)y=4.15+0.05*(x-7);else y=4.6+1.45*(x-15.5);y+=(rnd()-0.5)*0.75;P.push({x,y})}}
+function fitAll(){
+ const n=P.length,S={x:[0],y:[0],xx:[0],xy:[0],yy:[0]};
+ P.forEach(p=>{S.x.push(S.x.at(-1)+p.x);S.y.push(S.y.at(-1)+p.y);S.xx.push(S.xx.at(-1)+p.x*p.x);S.xy.push(S.xy.at(-1)+p.x*p.y);S.yy.push(S.yy.at(-1)+p.y*p.y)});
+ const e=[],ab=[];
+ for(let i=1;i<=n;i++){e[i]=[];ab[i]=[];for(let j=i;j<=n;j++){const m=j-i+1,sx=S.x[j]-S.x[i-1],sy=S.y[j]-S.y[i-1],sxx=S.xx[j]-S.xx[i-1],sxy=S.xy[j]-S.xy[i-1],syy=S.yy[j]-S.yy[i-1];const d=m*sxx-sx*sx;let a=0,b=sy/m;if(m>1&&Math.abs(d)>1e-12){a=(m*sxy-sx*sy)/d;b=(sy-a*sx)/m}const sse=Math.max(0,syy-a*sxy-b*sy);e[i][j]=m===1?0:sse;ab[i][j]=[a,b]}}
+ return{e,ab};
+}
+let F;
+function solve(c){
+ const n=P.length,M=[0],arg=[0];
+ for(let j=1;j<=n;j++){let best=Infinity,bi=1;for(let i=1;i<=j;i++){const v=F.e[i][j]+c+M[i-1];if(v<best-1e-12){best=v;bi=i}}M[j]=best;arg[j]=bi}
+ const segs=[];let j=n;while(j>0){const i=arg[j];segs.unshift([i,j]);j=i-1}
+ return{M,arg,segs};
+}
+const W=860,H=420,pad=40;
+function render(){
+ const c=Math.pow(10,+$('c').value);$('cv').textContent=c<1?c.toFixed(2):c<100?c.toFixed(1):Math.round(c);
+ const {M,arg,segs}=solve(c);
+ const xs=P.map(p=>p.x),ys=P.map(p=>p.y);const x0=0,x1=Math.max(...xs)+1,y0=Math.min(0,Math.min(...ys)-.5),y1=Math.max(...ys)+1;
+ const X=v=>pad+(v-x0)/(x1-x0)*(W-2*pad),Y=v=>H-pad-(v-y0)/(y1-y0)*(H-2*pad);
+ const pal=['#245e9e','#c0572b','#1f7a4d','#7d3fb0','#a36100','#0f7c8c','#b23b62','#5a6b12'];
+ let s=`<line class="axis" x1="${pad}" y1="${H-pad}" x2="${W-pad/2}" y2="${H-pad}"/><line class="axis" x1="${pad}" y1="${H-pad}" x2="${pad}" y2="${pad/2}"/><text x="${W-pad}" y="${H-12}" fill="currentColor" font-size="14">x</text><text x="14" y="${pad}" fill="currentColor" font-size="14">y</text>`;
+ let E=0;
+ segs.forEach(([i,j],k)=>{const [a,b]=F.ab[i][j];E+=F.e[i][j];const col=pal[k%pal.length];const xa=P[i-1].x-.3,xb=P[j-1].x+.3;
+  if($('resid').checked)for(let t=i;t<=j;t++){const p=P[t-1];s+=`<line class="res" x1="${X(p.x)}" y1="${Y(p.y)}" x2="${X(p.x)}" y2="${Y(a*p.x+b)}"/>`}
+  s+=`<line class="seg" stroke="${col}" x1="${X(xa)}" y1="${Y(a*xa+b)}" x2="${X(xb)}" y2="${Y(a*xb+b)}"/>`;
+  if(k>0)s+=`<line class="brk" x1="${X((P[i-2].x+P[i-1].x)/2)}" y1="${pad/2}" x2="${X((P[i-2].x+P[i-1].x)/2)}" y2="${H-pad}"/>`});
+ P.forEach((p,t)=>{s+=`<circle class="pt" cx="${X(p.x)}" cy="${Y(p.y)}" r="6"><title>p${t+1} = (${p.x.toFixed(2)}, ${p.y.toFixed(2)})</title></circle>`});
+ $('plot').innerHTML=s;
+ const L=segs.length;$('L').textContent=L;$('E').textContent=E.toFixed(3);$('CL').textContent=(c*L).toFixed(3);$('F').textContent=M[P.length].toFixed(3);
+ $('exp').innerHTML=`Segmentos elegidos: ${segs.map(([i,j])=>`p<sub>${i}</sub>…p<sub>${j}</sub>`).join(' · ')}. `+(L>=8?'Con <b>c pequeño</b> casi no cuesta añadir rectas: la PD parte los datos en muchos tramos para bajar <i>E</i> (en el extremo, un tramo por cada 1–2 puntos, con error 0).':L===1?'Con <b>c grande</b> cada recta extra cuesta más de lo que reduce el error: la PD prefiere una sola recta aunque ajuste mal.':'Para este <i>c</i>, añadir otra recta ya no baja el error lo suficiente para pagar su costo.');
+ const n=P.length;let h='<tr><th>j</th>'+Array.from({length:n+1},(_,j)=>`<th>${j}</th>`).join('')+'</tr>';
+ const ends=new Set(segs.map(s=>s[1]));ends.add(0);
+ h+='<tr><th>M[j]</th>'+M.map((v,j)=>`<td class="${ends.has(j)?'hl':''}">${v.toFixed(2)}</td>`).join('')+'</tr>';
+ h+='<tr><th>i*</th>'+arg.map((v,j)=>`<td class="${ends.has(j)&&j>0?'hl':''}">${j===0?'—':v}</td>`).join('')+'</tr>';
+ $('mt').innerHTML=h;
+}
+$('c').oninput=render;$('resid').onchange=render;$('ruido').onclick=()=>{seed=Math.floor(Math.random()*1e6)+1;gen();F=fitAll();render()};
+gen();F=fitAll();render();
+</script>
+</body></html>

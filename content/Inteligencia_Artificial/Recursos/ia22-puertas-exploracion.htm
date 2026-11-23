@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exploración: las dos puertas</title>
+<style>
+:root{color-scheme:light dark;--bg:var(--obsidian-bg,light-dark(#fbfcfa,#192127));--fg:var(--obsidian-text,light-dark(#24323c,#ecf0ec));--muted:var(--obsidian-text-muted,light-dark(#53636c,#bdc9cd));--line:var(--obsidian-border,light-dark(#c2cccb,#586a74));--soft:var(--obsidian-bg-2,light-dark(#edf2ed,#25333a));--accent:var(--obsidian-accent,light-dark(#246582,#92cfe5));font-family:var(--obsidian-font,system-ui,sans-serif)}
+*{box-sizing:border-box}body{margin:0;padding:18px;background:var(--bg);color:var(--fg)}main{max-width:920px;margin:auto}h1{font-size:1.25rem;margin:0 0 8px}h2{font-size:1.05rem;margin:20px 0 8px}p{line-height:1.5;margin:8px 0 12px}.muted{color:var(--muted)}.controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin:16px 0}label{display:grid;gap:5px;max-width:100%;min-width:0}button,input{font:inherit;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px;max-width:100%;min-height:40px}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}input[type=range]{width:180px;padding:0}input[type=number]{width:130px}.calculation{border-block:1px solid var(--line);padding:12px 0;line-height:1.6;overflow-wrap:anywhere}.number{font-variant-numeric:tabular-nums}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 6px;overflow-wrap:anywhere}th{font-weight:600}caption{text-align:left;margin:12px 0}.bar-row{display:grid;grid-template-columns:90px 1fr 60px;align-items:center;gap:10px;margin:12px 0}.track{height:20px;background:var(--soft)}.bar{height:100%;background:var(--accent);transition:width .2s}.bar-row output{text-align:right;font-variant-numeric:tabular-nums}.error{color:var(--fg);font-weight:600}@media(prefers-reduced-motion:reduce){.bar{transition:none}}@media(max-width:430px){body{padding:12px}.controls{gap:10px}th,td{padding:8px 3px;font-size:.9rem}.bar-row{grid-template-columns:75px 1fr 48px;gap:7px}}@media(pointer:coarse){button,input{min-height:44px}}
+</style></head>
+<body><main id="doors-lab">
+<h1>Explorar después de una mala primera muestra</h1>
+<p>La izquierda comienza con una visita de recompensa 0. La derecha, con recompensas 1, 3 y 2. Se estiman medias por acción.</p>
+<p class="muted">Distribuciones añadidas para el experimento: izquierda = 10 con probabilidad 0.4 y 0 con 0.6 (media 4); derecha = 1, 2 o 3 equiprobables (media 2). El PDF no revela estas distribuciones.</p>
+<div class="controls"><label for="epsilon">Exploración ε = <output id="epsilon-value">0.20</output><input id="epsilon" type="range" min="0" max="1" step="0.05" value="0.2"></label><label for="seed">Semilla<input id="seed" type="number" min="1" max="999999" step="1" value="22"></label></div>
+<div class="controls"><button id="one" type="button">Un intento ε-voraz</button><button id="many" type="button">200 intentos ε-voraces</button><button id="left" type="button">Probar izquierda</button><button id="right" type="button">Probar derecha</button><button id="reset" type="button">Reiniciar</button></div>
+<p class="muted">Cambiar ε o la semilla reinicia las observaciones al punto de partida. La exploración sortea entre ambas puertas; los empates codiciosos se resuelven uniformemente.</p>
+<div role="img" aria-label="Estimaciones de recompensa media por puerta; escala de 0 a 10"><div class="bar-row"><span>Izquierda</span><div class="track"><div id="bar-left" class="bar"></div></div><output id="mean-left">0</output></div><div class="bar-row"><span>Derecha</span><div class="track"><div id="bar-right" class="bar"></div></div><output id="mean-right">2</output></div></div>
+<p class="muted">Longitud de las barras: media estimada, escala 0–10.</p>
+<table><caption>Información usada por el agente y probabilidades del próximo intento automático.</caption><thead><tr><th scope="col">Puerta</th><th scope="col">Visitas</th><th scope="col">Q estimado</th><th scope="col">P de elegirla</th></tr></thead><tbody id="values"></tbody></table>
+<p id="detail" class="calculation number" aria-live="polite"></p>
+<p id="status" aria-live="polite"></p><p id="error" role="alert" hidden></p>
+</main><script>
+(()=>{'use strict';
+const root=document.getElementById('doors-lab'),el=id=>root.querySelector('#'+id),fmt=x=>Number(x.toFixed(4)).toLocaleString('es-MX',{maximumFractionDigits:4});
+let counts=[1,3],q=[0,2],rng=22,n=0,last=null;
+function random(){rng=(Math.imul(1664525,rng)+1013904223)>>>0;return rng/4294967296;}
+function probabilities(){const e=Number(el('epsilon').value);if(Math.abs(q[0]-q[1])<1e-12)return [.5,.5];const best=q[0]>q[1]?0:1;return [0,1].map(a=>e/2+(a===best?1-e:0));}
+function attempt(manual){const p=probabilities(),a=manual===undefined?(random()<p[0]?0:1):manual,r=a===0?(random()<.4?10:0):1+Math.floor(random()*3),old=q[a];counts[a]++;q[a]+= (r-q[a])/counts[a];n++;last={a,r,old,fresh:q[a],alpha:1/counts[a],manual:manual!==undefined};}
+function render(){const p=probabilities();el('epsilon-value').textContent=Number(el('epsilon').value).toFixed(2);el('values').innerHTML=[0,1].map(a=>`<tr><th scope="row">${a===0?'Izquierda':'Derecha'}</th><td class="number">${counts[a]}</td><td class="number">${fmt(q[a])}</td><td class="number">${fmt(p[a]*100)} %</td></tr>`).join('');for(const [a,name]of ['left','right'].entries()){el('bar-'+name).style.width=(q[a]*10)+'%';el('mean-'+name).textContent=fmt(q[a]);}
+el('detail').textContent=last?`${last.manual?'Elección manual':'Elección ε-voraz'}: ${last.a===0?'izquierda':'derecha'}, recompensa ${last.r}. Q anterior ${fmt(last.old)} + (1/${counts[last.a]}) × (${last.r} − ${fmt(last.old)}) = ${fmt(last.fresh)}.`:'Sin intentos nuevos. Q izquierda = 0; Q derecha = (1 + 3 + 2) / 3 = 2.';
+el('status').textContent=`${n} intentos nuevos · ${counts[0]+counts[1]} visitas totales. ${Number(el('epsilon').value)===0&&counts[0]===1?'La izquierda no vuelve a probarse automáticamente porque su estimación sigue siendo menor.':'Los valores verdaderos son 4 y 2; una muestra finita puede favorecer temporalmente la puerta equivocada.'}`;
+}
+function reset(){const seed=Number(el('seed').value);if(!Number.isInteger(seed)||seed<1||seed>999999){el('error').textContent='La semilla debe ser un entero entre 1 y 999999.';el('error').hidden=false;return false;}el('error').hidden=true;counts=[1,3];q=[0,2];rng=seed;n=0;last=null;render();return true;}
+function run(k,manual){if(!el('error').hidden)return;for(let i=0;i<k;i++)attempt(manual);render();}
+el('one').addEventListener('click',()=>run(1));el('many').addEventListener('click',()=>run(200));el('left').addEventListener('click',()=>run(1,0));el('right').addEventListener('click',()=>run(1,1));el('reset').addEventListener('click',reset);el('epsilon').addEventListener('input',reset);el('seed').addEventListener('change',reset);reset();
+})();
+</script></body></html>

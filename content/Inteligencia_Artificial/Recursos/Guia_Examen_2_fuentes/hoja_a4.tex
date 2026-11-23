@@ -1,0 +1,146 @@
+\documentclass[12pt,a4paper]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-noshorthands,es-nodecimaldot]{babel}
+\usepackage{lmodern}
+\usepackage[margin=0.65cm]{geometry}
+\usepackage{amsmath,amssymb,multicol,enumitem,xcolor,array,booktabs}
+\usepackage[most]{tcolorbox}
+\definecolor{azul}{HTML}{1F4E79}
+\definecolor{azulclaro}{HTML}{E8F0F8}
+\definecolor{naranja}{HTML}{B85C00}
+\definecolor{gris}{HTML}{555555}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}\setlength{\parskip}{0.8pt}
+\setlist{nosep,leftmargin=1em}
+\setlength{\columnsep}{0.32cm}\setlength{\columnseprule}{0.2pt}
+\renewcommand{\arraystretch}{1.05}
+\newcommand{\T}[1]{\par\vspace{2.5pt}{\color{white}\colorbox{azul}{\parbox{\dimexpr\linewidth-2\fboxsep}{\bfseries\MakeUppercase{#1}}}}\par\vspace{1pt}}
+\newcommand{\st}[1]{{\color{azul}\bfseries #1}}
+\newcommand{\ojo}[1]{{\color{naranja}\bfseries #1}}
+\newcommand{\indep}{\perp\!\!\!\perp}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\begin{document}
+% =============================== FRENTE ===============================
+\begin{multicols*}{3}
+{\large\bfseries\color{azul} IA · Examen 2 · Formulario}\par
+
+\T{Probabilidad}
+Marginal $P(x)=\sum_yP(x,y)$ · condicional $P(x|y)=\frac{P(x,y)}{P(y)}$ · producto $P(x,y)=P(x|y)P(y)$ ·
+Bayes $P(x|y)=\frac{P(y|x)P(x)}{\sum_{x'}P(y|x')P(x')}$ · cadena $P(x_{1..n})=\prod_iP(x_i|x_{<i})$.
+$X\indep Y$: $P(x,y)=P(x)P(y)$ \emph{para todo} par. $X\indep Y|Z$: $P(x,y|z)=P(x|z)P(y|z)$ para todo $z$.
+\ojo{Normalizar}: $P(q|e)=\alpha P(q,e)$, $\alpha=1/P(e)$. Conjunta de $n$ var.\ con $d$ valores: $d^n-1$ parámetros.
+Bayes secuencial = conjunta si las pruebas son cond.\ indep.\ dada la causa.
+
+\T{Redes bayesianas}
+$P(\mathbf x)=\prod_iP(x_i|\mathrm{pa}_i)$. Parámetros nodo: $(|X|-1)\prod_{\mathrm{pa}}|U|$.
+Local: nodo $\indep$ no-descendientes $|$ padres. \st{Manto de Markov}: padres + hijos + otros padres de los hijos.
+\st{d-separación}: $X\indep Y|\mathbf Z$ si \emph{todo} camino tiene una tripleta bloqueada.
+\begin{itemize}
+\item cadena $A\!\to\! B\!\to\! C$: bloquea si $B\in\mathbf Z$
+\item causa común $A\!\leftarrow\! B\!\to\! C$: bloquea si $B\in\mathbf Z$
+\item colisionador $A\!\to\! B\!\leftarrow\! C$: \ojo{activa} si $B$ o un descendiente $\in\mathbf Z$
+\end{itemize}
+Procedimiento: listar caminos simples $\to$ marcar cada nodo intermedio (cadena/bifurcación/colisionador) $\to$ un bloqueo basta por camino $\to$ un camino activo basta para «no garantizada».
+\ojo{Ojo}: camino activo $\ne$ dependencia probada. Observar puede bloquear uno y abrir otro.
+\st{Explicar a la otra causa}: dado el efecto, confirmar una causa positiva baja la otra; si una causa \emph{desfavorece} el efecto, confirmarla sube la otra.
+
+\T{Inferencia exacta}
+$P(Q|\mathbf e)=\alpha\sum_{\mathbf h}\prod_iP(x_i|\mathrm{pa}_i)$.
+\st{Enumeración}: tabla de mundos compatibles con $\mathbf e$, sumar por valor de $Q$, normalizar.
+\st{Eliminación}: 1) restringir a $\mathbf e$; 2) descartar hojas ocultas irrelevantes (repetir);
+3) por cada oculta $H$: unir factores con $H$ (alcance = unión) y sumar $H$; 4) multiplicar resto, normalizar.
+Costo = mayor factor ($2^{|\text{alcance}|}$). Eliminar primero el nodo que conecta todo $\to$ factor gigante.
+Poliárbol: lineal. General: NP-difícil.
+\textbf{Tabla tipo}: \texttt{paso | elimina | factores unidos | alcance | factor nuevo (valores)}.
+
+\T{Muestreo}
+Orden topológico; $+x$ si $u<P(+x|\mathrm{pa})$.
+\st{Previo}: frecuencias. \st{Rechazo}: tirar las que contradicen $\mathbf e$ (acepta $\approx NP(\mathbf e)$); $0/0$ = indefinido.
+\st{Pesos}: fijar $\mathbf e$, muestrear resto, $w=\prod_{E_i}P(e_i|\mathrm{pa}(E_i))$ \emph{con los padres de esa muestra}; $\hat P(q|\mathbf e)=\frac{\sum w[q]}{\sum w}$.
+\st{Gibbs}: fijar $\mathbf e$; para cada no-evidencia $X$: $P(x|\cdot)\propto P(x|\mathrm{pa}_X)\prod_{Y\in\mathrm{hijos}}P(y|\mathrm{pa}_Y)$; normalizar, sortear; calentamiento; muestras correlacionadas.
+
+\T{Aprendizaje de parámetros}
+MLE $\hat P(x|u)=\frac{N(x,u)}{N(u)}$ (denominador = filas con esos padres; $N(u)=0$: indefinida).
+Laplace $\frac{N(x,u)+\lambda}{N(u)+k\lambda}$ ($k=|X|$; fila vacía $\to$ uniforme).
+\st{EM}: E: $w_{jg}=\frac{P(g)\prod P(x_j|g)}{\sum_{g'}\cdots}$; M: $\hat P(g)=\frac{\sum_jw_{jg}}{m}$, $\hat P(x|g)=\frac{\sum_{j:x_j=x}w_{jg}}{\sum_jw_{jg}}$.
+Log-verosimilitud no decrece; óptimo local; etiquetas intercambiables.
+Monedas: $w=\frac{\theta_A^h(1-\theta_A)^{n-h}}{\theta_A^h(1-\theta_A)^{n-h}+\theta_B^h(1-\theta_B)^{n-h}}$, $\theta_A=\frac{\sum wh}{\sum wn}$.
+Estructura: $\max\log P(D|G,\hat\theta)-\rho\,\#\text{param}$; flechas $\ne$ causalidad.
+Naive Bayes: $\argmax_cP(c)\prod_jP(x_j|c)$; ceros $\Rightarrow$ Laplace.
+
+\T{Supervisado}
+$J=\|\mathbf y-X\theta\|^2$; $\nabla J=2X^{\!\top}(X\theta-\mathbf y)$; $X^{\!\top}X\theta=X^{\!\top}\mathbf y$.
+$2\times2$: $\begin{pmatrix}a&b\\c&d\end{pmatrix}^{-1}=\frac1{ad-bc}\begin{pmatrix}d&-b\\-c&a\end{pmatrix}$.
+1 var: $\theta_1=\frac{\sum(x-\bar x)(y-\bar y)}{\sum(x-\bar x)^2}$, $\theta_0=\bar y-\theta_1\bar x$.
+Polinomial: columnas $1,x,x^2$; $x$ simétricos $\Rightarrow$ sumas impares $=0$.
+Logística $\pi=\sigma(\mathbf x^{\!\top}\theta)$; $J=-\sum[y\ln\pi+(1-y)\ln(1-\pi)]$; $\nabla J=X^{\!\top}(\boldsymbol\pi-\mathbf y)$; frontera $\mathbf x^{\!\top}\theta=0$; separable $\Rightarrow\theta\to\infty$.
+$\sigma(0)=.5$, $\sigma(1)=.7311$, $\sigma(2)=.8808$, $\sigma(-z)=1-\sigma(z)$.
+Softmax $p_j=\frac{e^{z_j}}{\sum e^{z_k}}$; $\ell=-\ln p_{\text{ok}}$; $\nabla_{\mathbf z}=\mathbf p-\mathbf t$; $\tau$: $e^{z/\tau}$.
+$e^{0.5}=1.6487$, $e^{1}=2.7183$, $e^{2}=7.3891$, $e^{3}=20.086$, $e^{-1}=0.3679$, $e^{1/\sqrt2}=2.0281$, $e^{\sqrt2}=4.1133$; $\ln2=.6931$.
+Sobreajuste: train bajo, prueba alta. Subajuste: ambos altos.
+
+\T{No supervisado y vecinos}
+$L_1=\sum|\Delta|$, $L_2=\sqrt{\sum\Delta^2}$, $L_\infty=\max|\Delta|$, Hamming = \#distintas.
+$k$-NN (supervisado): votan $k$ vecinos; empates: regla explícita.
+\st{$k$-means}: repetir {asignar al $\mu$ más cercano ($d^2$); $\mu_j$ = media}. $J=\sum\|x-\mu_{c(x)}\|^2$ no sube; óptimo local; escalar antes.
+\textbf{Tabla tipo}: \texttt{punto | $d^2$ a cada $\mu$ | grupo}, luego $\mu$ nuevos y $J$.
+Silueta $s=\frac{b-a}{\max(a,b)}$; $a$ = media a su grupo (sin él), $b$ = menor media a otro grupo.
+Linkage: simple min (cadenas), completo max (compacto), promedio, centroide. Dendrograma: altura = distancia de unión; cortar en el mayor salto.
+
+\T{MDP}
+$\langle S,A,T,R,\gamma\rangle$; $G_t=R_{t+1}+\gamma G_{t+1}$; $|G|\le\frac{R_{\max}}{1-\gamma}$.
+$V^\pi(s)=\sum_a\pi(a|s)\sum_{s'}T[R+\gamma V^\pi(s')]$ (sistema lineal; despejar).
+$Q^\pi(s,a)=\sum_{s'}T[R+\gamma V^\pi(s')]$.
+$V^*(s)=\max_a\sum_{s'}T(s,a,s')[R+\gamma V^*(s')]$.
+\st{Iter.\ valores}: $V_{k+1}=\max_aQ_{k+1}$ usando \ojo{solo} $V_k$; $V_k$ = mejor retorno en $k$ pasos; terminal $=0$.
+Extraer $\pi(s)=\argmax_aQ(s,a)$ (necesita $T,R$ si solo hay $V$).
+\st{Iter.\ políticas}: evaluar $\pi$ exacto $\to$ $\pi'(s)=\argmax_aQ^\pi(s,a)$ (empates: conservar) $\to$ parar si no cambia (óptima).
+Contracción: $\|V_{k}-V^*\|\le\gamma^k\|V_0-V^*\|$.
+\textbf{Tabla tipo}: \texttt{$k$ | $Q_k(s,a)$ por par | $V_k$ | política}.
+
+\T{Aprendizaje por refuerzo}
+\st{MC}: retornos hacia atrás; primera visita vs todas; $V\leftarrow V+\frac1n(G-V)$; necesita episodios completos; insesgado, varianza alta.
+\st{TD(0)}: $V(s)\mathrel{+}=\alpha[r+\gamma V(s')-V(s)]$; bootstrap; batch TD = modelo de máx.\ verosimilitud.
+\st{Q-learning}: $Q(s,a)\mathrel{+}=\alpha[r+\gamma\max_{a'}Q(s',a')-Q(s,a)]$; \ojo{terminal: objetivo $=r$}; usar $Q$ \emph{actual} (incluye cambios previos).
+\st{SARSA}: $\gamma Q(s',a')$ con $a'$ realmente tomada (en política).
+$\varepsilon$-voraz: $\frac{\varepsilon}{m}+(1-\varepsilon)\frac{\mathbf1[a\in\mathcal G]}{|\mathcal G|}$ (2 acc., $\varepsilon=.2$: $.9/.1$).
+Convergencia: todos los $(s,a)$ $\infty$ veces, $\sum\alpha=\infty$, $\sum\alpha^2<\infty$.
+\st{Lineal}: $\hat Q=\mathbf w^{\!\top}\phi$; $\delta=r+\gamma\max\hat Q(s',\cdot)-\hat Q(s,a)$; $\mathbf w\mathrel{+}=\alpha\delta\phi(s,a)$ (semigradiente; cambia estados no visitados). DQN: replay + red objetivo.
+\textbf{Tabla tipo}: \texttt{$(s,a,r,s')$ | $y$ | $Q$ viejo | $Q$ nuevo}.
+
+\T{Redes neuronales}
+$\mathbf z^{(l)}=W\mathbf a^{(l-1)}+\mathbf b$; parámetros $d_ld_{l-1}+d_l$. ReLU$'=\mathbf1[z>0]$; $\sigma'=\sigma(1-\sigma)$.
+\st{Backprop}: $\boldsymbol\delta^{L}=\mathbf p-\mathbf y$; $\boldsymbol\delta^{l}=(W^{l+1\top}\boldsymbol\delta^{l+1})\odot\phi'(\mathbf z^l)$;
+$\partial W^l=\boldsymbol\delta^l\mathbf a^{l-1\top}$, $\partial\mathbf b^l=\boldsymbol\delta^l$; actualizar todo con los parámetros \emph{viejos}; $\theta\mathrel{-}=\eta\nabla$.
+ReLU apagada $\Rightarrow$ gradiente 0 a su fila. Sin activación: composición afín.
+XOR: $h_1=\mathrm{ReLU}(x_1+x_2)$, $h_2=\mathrm{ReLU}(x_1+x_2-1)$, $y=h_1-2h_2$.
+
+\T{Transformers}
+Emb.\ $E\in\mathbb R^{V\times d}$ ($Vd$ parám.). Atención: $A=\mathrm{softmax}_{\text{fila}}\!\big(\frac{QK^{\!\top}}{\sqrt{d_k}}+M\big)$, $O=AV$; $M_{ij}=-\infty$ si $j>i$; filas suman 1.
+LM: $p(t_{1..T})=\prod p(t_i|t_{<i})$; pérdida media $-\frac1N\sum\ln p$; perplejidad $e^{\text{pérdida}}$.
+Etapas: preentrenamiento $\to$ instrucciones $\to$ RLHF. Coseno $\frac{u\cdot v}{\|u\|\|v\|}$.
+
+\T{Métricas y equidad}
+Exactitud $\frac{TP+TN}{n}$ · precisión/PPV $\frac{TP}{TP+FP}$ · recall/TPR $\frac{TP}{TP+FN}$ · especificidad $\frac{TN}{TN+FP}$ · FPR $\frac{FP}{FP+TN}$ · $F_1=\frac{2TP}{2TP+FP+FN}$.
+Umbral bajo $\uparrow$recall; alto $\uparrow$precisión.
+\st{Paridad}: $P(\hat Y{=}1|G)$. \st{Oportunidad}: TPR. \st{Equalized odds}: TPR y FPR. Tasas base distintas $\Rightarrow$ no todo a la vez (con PPV).
+Fuentes de sesgo: muestreo, etiquetas históricas, medición, objetivo sustituto, \emph{proxies}, retroalimentación; etiquetas selectivas.
+UE: inaceptable / \ojo{alto} (crédito, empleo, educación) / limitado (transparencia) / mínimo.
+$E[\mathrm{kWh}]=P[\mathrm W]\,t[\mathrm h]/1000$; por tarea correcta $=E/\text{tasa de éxito}$; rebote $=$ (factor por uso)$\times$(factor de usos).
+4D: delegación, descripción, discernimiento, diligencia.
+
+\T{Checklist de examen}
+\begin{itemize}
+\item Escribir la fórmula antes de sustituir. Tabla por paso.
+\item Toda posterior: ¿normalicé? ¿suma 1?
+\item d-sep: todos los caminos, descendientes de colisionadores.
+\item VI: valores viejos; terminal 0. Q-learning: terminal sin $\max$.
+\item $k$-means: recalcular $J$ y verificar convergencia.
+\item Interpretar el número en una línea.
+\end{itemize}
+\vfill\columnbreak
+\T{Mis notas (completar a mano)}
+{\small\color{gris!70}Errores de los simulacros, valores que se te olvidan, trampas propias.}
+\end{multicols*}
+\end{document}

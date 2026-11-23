@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IA: cuatro futuros posibles</title>
+<style>
+  :root { color-scheme: light dark; --bg:#faf9f6; --ink:#202d32; --muted:#536267; --line:#c5cfcc; --surface:#eef1eb; --selected:#d8ebe2; --accent:#21624e; }
+  @media(prefers-color-scheme:dark) { :root { --bg:#192221; --ink:#eff3ef; --muted:#b8c7c2; --line:#536761; --surface:#273430; --selected:#304f43; --accent:#a4e0c2; } }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:22px; background:var(--bg); color:var(--ink); font:16px/1.5 system-ui,sans-serif; }
+  main { max-width:850px; margin:auto; }
+  h1 { font-size:1.35rem; margin:0 0 4px; font-weight:600; }
+  .intro { margin:0 0 20px; color:var(--muted); }
+  .matrix { display:grid; grid-template-columns:110px 1fr 1fr; gap:8px; align-items:stretch; }
+  .column,.row { font-size:.9rem; font-weight:600; padding:10px 3px; display:flex; align-items:center; justify-content:center; text-align:center; overflow-wrap:anywhere; }
+  .row { justify-content:flex-start; text-align:left; }
+  button { min-height:100px; width:100%; padding:16px 12px; border:1px solid var(--line); border-radius:7px; background:var(--surface); color:var(--ink); font:inherit; text-align:left; cursor:pointer; }
+  button strong { display:block; font-weight:600; }
+  button span { display:block; margin-top:5px; font-size:.85rem; }
+  button[aria-pressed="true"] { background:var(--selected); border:2px solid var(--accent); padding:15px 11px; }
+  button:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+  .detail { margin-top:22px; border-top:1px solid var(--line); padding-top:16px; }
+  h2 { margin:0 0 12px; font-size:1.12rem; font-weight:600; }
+  dl { margin:0; }
+  dt { font-weight:600; margin-top:12px; }
+  dd { margin:3px 0 0; }
+  footer { color:var(--muted); font-size:.85rem; margin-top:22px; }
+  @media(max-width:480px) { body { padding:14px; } .matrix { grid-template-columns:70px 1fr 1fr; gap:5px; } .column,.row { font-size:.78rem; padding:6px 0; } button { padding:10px 8px; min-height:130px; font-size:.9rem; } button[aria-pressed="true"] { padding:9px 7px; } button span { font-size:.78rem; } }
+</style>
+</head>
+<body>
+<main id="ia25-escenarios">
+  <h1>Capacidad y distribución: dos decisiones distintas</h1>
+  <p class="intro">Selecciona un escenario para examinar sus supuestos. Ningún cuadrante tiene una probabilidad asignada.</p>
+  <div class="matrix" role="group" aria-label="Cuatro escenarios: filas por transformación y columnas por distribución de beneficios">
+    <div aria-hidden="true"></div>
+    <div class="column">Beneficios compartidos</div>
+    <div class="column">Beneficios concentrados</div>
+    <div class="row">IA transformadora</div>
+    <button type="button" data-scenario="abundancia" aria-pressed="false" aria-controls="ia25-detail" aria-label="IA transformadora y beneficios compartidos: abundancia compartida"><strong>Abundancia compartida</strong><span>Gran transformación + reparto amplio</span></button>
+    <button type="button" data-scenario="concentracion" aria-pressed="false" aria-controls="ia25-detail" aria-label="IA transformadora y beneficios concentrados: concentración extrema"><strong>Concentración extrema</strong><span>Gran transformación + reparto estrecho</span></button>
+    <div class="row">IA gradual</div>
+    <button type="button" data-scenario="complemento" aria-pressed="true" aria-controls="ia25-detail" aria-label="IA gradual y beneficios compartidos: complemento"><strong>Complemento</strong><span>Mejora gradual + reparto amplio</span></button>
+    <button type="button" data-scenario="burbuja" aria-pressed="false" aria-controls="ia25-detail" aria-label="IA gradual y beneficios concentrados: burbuja y excusa"><strong>Burbuja y excusa</strong><span>Mejora gradual + reparto estrecho</span></button>
+  </div>
+  <section class="detail" id="ia25-detail" aria-live="polite" aria-atomic="true">
+    <h2 id="ia25-title">Complemento</h2>
+    <dl>
+      <dt>Supuesto</dt><dd id="ia25-assumption">La IA mejora tareas concretas; las personas conservan un papel central y reciben parte del beneficio.</dd>
+      <dt>Qué evidencia buscar</dt><dd id="ia25-evidence">Ahorros netos después de revisar errores, calidad sostenida y mejoras en salario, jornada o condiciones.</dd>
+      <dt>Qué decisión cambia el reparto</dt><dd id="ia25-decision">Negociar el uso del tiempo ahorrado, invertir en formación y evaluar el trabajo completo.</dd>
+      <dt>Pregunta para discutir</dt><dd id="ia25-question">¿Cómo distinguimos complementar a una persona de exigirle más producción en el mismo tiempo?</dd>
+    </dl>
+  </section>
+  <noscript><p>Sin JavaScript: la fila superior representa mayor transformación; la izquierda, beneficios más compartidos. El cuadro conserva los cuatro escenarios para comparar ambos ejes.</p></noscript>
+  <footer>Basado en la diapositiva 38 de la clase 25. Las señales de evidencia y preguntas son complementos didácticos, no pronósticos ni conclusiones empíricas.</footer>
+</main>
+<script>
+(() => {
+  const root = document.getElementById('ia25-escenarios');
+  const cases = {
+    abundancia: {
+      title:'Abundancia compartida',
+      assumption:'La IA transforma gran parte de la producción y los beneficios llegan de forma amplia a la población.',
+      evidence:'Mejoras sostenidas en tareas y sectores diversos, junto con acceso amplio, ingresos o tiempo libre repartidos.',
+      decision:'Definir acceso, reparto de ganancias y protección social, además de evaluar seguridad y límites de despliegue.',
+      question:'¿Qué instituciones permitirían que un gran aumento de capacidad se convierta en bienestar para muchas personas?'
+    },
+    concentracion: {
+      title:'Concentración extrema',
+      assumption:'La IA transforma gran parte de la producción, pero sus beneficios se concentran en pocos actores.',
+      evidence:'Ganancias de capacidad y producción acompañadas de concentración de rentas, desplazamiento o pérdida de poder de negociación.',
+      decision:'Examinar propiedad, competencia, negociación laboral y mecanismos de redistribución; sostener formación y seguridad.',
+      question:'¿Quién mantendría ingresos y poder de compra si la producción crece mientras muchas personas pierden oportunidades?'
+    },
+    complemento: {
+      title:'Complemento',
+      assumption:'La IA mejora tareas concretas; las personas conservan un papel central y reciben parte del beneficio.',
+      evidence:'Ahorros netos después de revisar errores, calidad sostenida y mejoras en salario, jornada o condiciones.',
+      decision:'Negociar el uso del tiempo ahorrado, invertir en formación y evaluar el trabajo completo.',
+      question:'¿Cómo distinguimos complementar a una persona de exigirle más producción en el mismo tiempo?'
+    },
+    burbuja: {
+      title:'Burbuja y excusa',
+      assumption:'La transformación productiva resulta limitada, mientras el poder y los beneficios de la adopción se concentran.',
+      evidence:'Inversión y promesas que superan las mejoras netas verificables, con costos transferidos a otras personas.',
+      decision:'Exigir resultados comparables, incluir revisión e integración en los costos y examinar quién gana y quién pierde.',
+      question:'¿Qué evidencia separa una mejora real de una promesa comercial o una justificación para recortar?'
+    }
+  };
+  const fields = ['title','assumption','evidence','decision','question'];
+  root.querySelectorAll('button[data-scenario]').forEach(button => {
+    button.addEventListener('click', () => {
+      const selected = cases[button.dataset.scenario];
+      root.querySelectorAll('button[data-scenario]').forEach(peer => peer.setAttribute('aria-pressed', String(peer === button)));
+      fields.forEach(field => { root.querySelector('#ia25-'+field).textContent = selected[field]; });
+    });
+  });
+})();
+</script>
+</body>
+</html>

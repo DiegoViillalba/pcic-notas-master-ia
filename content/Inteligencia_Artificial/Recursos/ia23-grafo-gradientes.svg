@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="340" viewBox="0 0 840 340" role="img" aria-labelledby="title desc">
+<title id="title">Forward, backward y actualización son tres operaciones distintas</title>
+<desc id="desc">El forward recorre entrada, capa afín, ReLU, capa afín, sigmoide y pérdida. El backward vuelve mediante derivadas locales. Un optimizador utiliza los gradientes para cambiar los parámetros.</desc>
+<style>:root{color-scheme:light dark;--bg:#fafcfb;--fg:#243840;--muted:#50636d;--line:#a6b8bc;--soft:#e8f1f0;--a:#217a78;--b:#a35438}@media(prefers-color-scheme:dark){:root{--bg:#192329;--fg:#eef3f1;--muted:#bdced2;--line:#71878c;--soft:#273c43;--a:#85d3c8;--b:#f0b59a}}text{font-family:system-ui,sans-serif;font-size:18px;fill:var(--fg)}.small{font-size:17px;fill:var(--muted)}.box{fill:var(--soft)}.forward{stroke:var(--a);stroke-width:2;fill:none;marker-end:url(#f)}.back{stroke:var(--b);stroke-width:2;fill:none;marker-end:url(#b)}</style>
+<defs><marker id="f" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="var(--a)"/></marker><marker id="b" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="var(--b)"/></marker></defs>
+<rect width="840" height="340" rx="10" fill="var(--bg)"/>
+<text x="26" y="36" font-size="23">1. Forward: calcular valores y pérdida</text>
+<path class="forward" d="M47 68H790"/>
+<g text-anchor="middle">
+<rect class="box" x="22" y="103" width="89" height="76" rx="6"/><text x="66" y="148">x</text>
+<rect class="box" x="139" y="103" width="124" height="76" rx="6"/><text x="201" y="132">Afín 1</text><text x="201" y="160">w₁x + b₁</text>
+<rect class="box" x="291" y="103" width="104" height="76" rx="6"/><text x="343" y="148">ReLU</text>
+<rect class="box" x="423" y="103" width="124" height="76" rx="6"/><text x="485" y="132">Afín 2</text><text x="485" y="160">w₂h + b₂</text>
+<rect class="box" x="575" y="103" width="104" height="76" rx="6"/><text x="627" y="148">Sigmoide</text>
+<rect class="box" x="707" y="103" width="111" height="76" rx="6"/><text x="762" y="132">Pérdida</text><text x="762" y="160">con y</text>
+</g>
+<path class="forward" d="M113 141h23"/><path class="forward" d="M265 141h23"/><path class="forward" d="M397 141h23"/><path class="forward" d="M549 141h23"/><path class="forward" d="M681 141h23"/>
+<path class="back" d="M790 210H49"/>
+<text x="26" y="245" font-size="23">2. Backward: propagar gradientes con la regla de la cadena</text>
+<text x="26" y="283">3. Optimización: θ ← θ − η∇J</text>
+<text x="26" y="314" class="small">Guardar valores → calcular todas las derivadas → actualizar simultáneamente.</text>
+</svg>

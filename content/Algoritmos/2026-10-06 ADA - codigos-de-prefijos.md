@@ -123,6 +123,14 @@ La cadena `01` puede leerse como $ab$ o como $c$. El código asigna cadenas dist
 
 ### 3.1 Código de prefijos
 
+Partamos de la siguiente definición:
+> [!important] Definicion
+> Una secuencia \(u\) es prefijo de otra secuencia \(v\) si \(v\) comienza exactamente con \(u\).
+Por ejemplo:
+
+![700](data:image/svg+xml;charset=utf-8,%3Csvg%20font-family%3D%22-apple-system-body%2C%20ui-sans-serif%2C%20-apple-system%2C%20system-ui%2C%20%26quot%3BSegoe%20UI%26quot%3B%2C%20Helvetica%2C%20%26quot%3BApple%20Color%20Emoji%26quot%3B%2C%20Arial%2C%20sans-serif%2C%20%26quot%3BSegoe%20UI%20Emoji%26quot%3B%2C%20%26quot%3BSegoe%20UI%20Symbol%26quot%3B%22%20font-weight%3D%22400%22%20data-d-component%3D%22svg%22%20fill%3D%22currentColor%22%20style%3D%22color%3Argb\(237%2C%20237%2C%20237\)%22%20viewBox%3D%220%200%20320%2082%22%20width%3D%22100%25%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20x%3D%2240%22%20y%3D%228%22%20width%3D%2248%22%20height%3D%2242%22%20rx%3D%227%22%20fill%3D%22%230F766E%22%20fill-opacity%3D%220.23%22%20stroke%3D%22%2314B8A6%22%20stroke-width%3D%221.5%22%2F%3E%3Ctext%20x%3D%2264%22%20y%3D%2235%22%20font-size%3D%2220%22%20text-anchor%3D%22middle%22%20fill%3D%22currentColor%22%3E0%3C%2Ftext%3E%3Crect%20x%3D%22100%22%20y%3D%228%22%20width%3D%2248%22%20height%3D%2242%22%20rx%3D%227%22%20fill%3D%22%2364748b%22%20fill-opacity%3D%220.13%22%20stroke%3D%22%2394A3B8%22%20stroke-width%3D%221.5%22%2F%3E%3Ctext%20x%3D%22124%22%20y%3D%2235%22%20font-size%3D%2220%22%20text-anchor%3D%22middle%22%20fill%3D%22currentColor%22%3E1%3C%2Ftext%3E%3Crect%20x%3D%22160%22%20y%3D%228%22%20width%3D%2248%22%20height%3D%2242%22%20rx%3D%227%22%20fill%3D%22%2364748b%22%20fill-opacity%3D%220.13%22%20stroke%3D%22%2394A3B8%22%20stroke-width%3D%221.5%22%2F%3E%3Ctext%20x%3D%22184%22%20y%3D%2235%22%20font-size%3D%2220%22%20text-anchor%3D%22middle%22%20fill%3D%22currentColor%22%3E1%3C%2Ftext%3E%3Crect%20x%3D%22220%22%20y%3D%228%22%20width%3D%2248%22%20height%3D%2242%22%20rx%3D%227%22%20fill%3D%22%2364748b%22%20fill-opacity%3D%220.13%22%20stroke%3D%22%2394A3B8%22%20stroke-width%3D%221.5%22%2F%3E%3Ctext%20x%3D%22244%22%20y%3D%2235%22%20font-size%3D%2220%22%20text-anchor%3D%22middle%22%20fill%3D%22currentColor%22%3E0%3C%2Ftext%3E%3Cpath%20d%3D%22M64%2052%20V64%20H119%22%20stroke%3D%22%2314B8A6%22%20stroke-width%3D%221.5%22%20fill%3D%22none%22%2F%3E%3Ctext%20x%3D%22125%22%20y%3D%2269%22%20font-size%3D%2212%22%20fill%3D%22%2314B8A6%22%3EPrefijo%3A%200%3C%2Ftext%3E%3C%2Fsvg%3E)
+De lo anterior podemos afirmar que:
+
 > [!important] Definición
 > Un código $\gamma$ es **de prefijos** si para todo par de símbolos distintos $x\neq y$, la secuencia $\gamma(x)$ **no es prefijo** de $\gamma(y)$.
 
@@ -157,20 +165,40 @@ con 14 bits en lugar de 18.
 
 ### 4.1 Algoritmo de la clase
 
-```text
-Alg. Decodificar(α)          // α: cadena de bits
-  β = ε,  dec = ε
+**Notación:**
+
+- $\alpha$: cadena de bits pendientes por decodificar.
+- $\beta$: cadena temporal donde se acumulan los bits leídos.
+- $\mathrm{dec}$: secuencia de símbolos ya decodificados.
+- $\varepsilon$: cadena vacía (sin símbolos ni bits).
+- $v$: siguiente bit leído de $\alpha$.
+- $x$: símbolo del alfabeto original.
+- $\gamma(x)$: palabra binaria asignada al símbolo $x$.
+- $\cdot$: operación de concatenación (unir secuencias). 
+
+```
+Alg. Decodificar(α)
+  β = ε, dec = ε
+
   while α ≠ ε
       quitar de α el primer bit v
       β = β · v
+
       if existe un símbolo x con γ(x) = β then
           dec = dec · x
           β = ε
   end while
+
   return dec
 ```
 
-Se acumulan bits en $\beta$ hasta que $\beta$ coincide con una palabra del código; en ese momento se emite el símbolo y se reinicia $\beta$.
+**Funcionamiento:** Se leen los bits de $\alpha$ uno por uno y se acumulan en $\beta$. Cuando $\beta$ coincide con una palabra código $\gamma(x)$, se agrega el símbolo $x$ a $\mathrm{dec}$ y se reinicia $\beta=\varepsilon$. El proceso termina cuando $\alpha=\varepsilon$.
+
+**Importante:** El algoritmo supone un código de prefijos y una entrada válida, lo que garantiza que cada símbolo se identifica sin ambigüedad.
+
+![[Pasted image 20261115190502.png]]
+
+
 
 ### 4.2 Traza
 
@@ -214,25 +242,63 @@ En Morse, `E` es `·` y `A` es `·−`; `T` es `−` y `M` es `−−`, `N` es `
 
 ## 6. Medir un código: promedio de bits por símbolo
 
-Supongamos un texto con $n$ símbolos en el que el símbolo $x$ aparece con frecuencia relativa $f_x$:
+Supongamos un texto de $n$ símbolos, donde cada símbolo $x\in\Sigma$ aparece con frecuencia relativa $f_x$, cumpliendo:
 
-$$
-0\le f_x\le 1,\qquad \sum_{x\in\Sigma}f_x=1 .
-$$
-
-El símbolo $x$ aparece $n f_x$ veces y cada aparición cuesta $|\gamma(x)|$ bits, de modo que
-
-$$
-\text{longitud del código}=\sum_{x\in\Sigma}n f_x|\gamma(x)|=n\sum_{x\in\Sigma}f_x|\gamma(x)| .
+$$  
+0\leq f_x\leq 1,\qquad \sum_{x\in\Sigma}f_x=1.  
 $$
 
-El factor $n$ no depende del código. Lo que importa es el **promedio de bits por símbolo**:
+El símbolo $x$ aparece $nf_x$ veces y cada aparición requiere $|\gamma(x)|$ bits, donde $\gamma(x)$ es su codificación binaria y $|\gamma(x)|$ su longitud. Por tanto, la **longitud total del texto codificado** es:
 
-$$
-\boxed{\operatorname{PBS}(\gamma)=\sum_{x\in\Sigma}f_x\,|\gamma(x)|}
+$$  
+L(\gamma)=\sum_{x\in\Sigma}nf_x|\gamma(x)|=n\sum_{x\in\Sigma}f_x|\gamma(x)|.  
 $$
 
-En Kleinberg–Tardos se llama *average number of bits per letter*, $\operatorname{ABL}(\gamma)$. Puede leerse como el valor esperado de $|\gamma(X)|$ cuando $X$ es un símbolo elegido al azar según las frecuencias.
+Como $n$ es una constante positiva que no depende del código elegido, **minimizar la longitud total equivale a minimizar el promedio de bits por símbolo (PBS)**:
+
+$$  
+\boxed{\operatorname{PBS}(\gamma)=\sum_{x\in\Sigma}f_x|\gamma(x)|}  
+$$
+
+En Kleinberg–Tardos se denomina _average number of bits per letter_ ($\operatorname{ABL}$). También puede interpretarse como el valor esperado de $|\gamma(X)|$, donde $X$ es un símbolo seleccionado aleatoriamente según las frecuencias $f_x$.
+
+### Ejemplo: comparación de dos códigos
+
+Consideremos un texto de $n=100$ símbolos con alfabeto $\Sigma={a,b,c}$ y las siguientes frecuencias y códigos de prefijos:
+
+|Símbolo|$f_x$|Apariciones|$\gamma_1$|$\gamma_2$|
+|---|---|---|---|---|
+|$a$|0.5|50|`0` (1 bit)|`00` (2 bits)|
+|$b$|0.3|30|`10` (2 bits)|`01` (2 bits)|
+|$c$|0.2|20|`11` (2 bits)|`1` (1 bit)|
+
+La longitud total del texto utilizando cada código es:
+
+$$  
+L(\gamma_1)=50(1)+30(2)+20(2)=150\text{ bits}  
+$$
+
+$$  
+L(\gamma_2)=50(2)+30(2)+20(1)=180\text{ bits}  
+$$
+
+Sin embargo, podemos comparar su eficiencia directamente mediante el promedio de bits por símbolo:
+
+$$  
+\operatorname{PBS}(\gamma_1)=0.5(1)+0.3(2)+0.2(2)=1.5  
+$$
+
+$$  
+\operatorname{PBS}(\gamma_2)=0.5(2)+0.3(2)+0.2(1)=1.8  
+$$
+
+Observamos que $\operatorname{PBS}(\gamma_1)<\operatorname{PBS}(\gamma_2)$, por lo que $\gamma_1$ es más eficiente. Además, como $L(\gamma)=n\operatorname{PBS}(\gamma)$ y $n>0$ es constante:
+
+$$  
+\boxed{\underset{\gamma}{\arg\min}\ L(\gamma)=\underset{\gamma}{\arg\min}\ \operatorname{PBS}(\gamma)}  
+$$
+
+**Conclusión:** Para comparar códigos sobre un mismo texto, no necesitamos considerar explícitamente $n$, pues únicamente escala la longitud total sin modificar cuál código es mejor. En cambio, si queremos conocer el número total de bits necesarios para almacenar el texto, sí debemos multiplicar el promedio por $n$. Esta equivalencia permite formular el problema de compresión como la minimización de $\operatorname{PBS}(\gamma)$, objetivo del **algoritmo de Huffman**.
 
 ### 6.1 Ejemplo de la clase
 

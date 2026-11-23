@@ -1,0 +1,909 @@
+\input{preambulo}
+\input{figuras}
+\fancyhead[L]{\small\textcolor{gris}{Inteligencia Artificial 2027-I · Guía para el Examen 2}}
+\fancyhead[R]{\small\textcolor{gris}{Enunciados}}
+\fancyfoot[C]{\small\thepage}
+
+\begin{document}
+
+% ======================= PORTADA =======================
+\begin{titlepage}
+\centering
+\vspace*{1.5cm}
+{\color{azul}\rule{\linewidth}{1.2pt}}\\[0.6cm]
+{\Huge\bfseries\color{azul} Guía de estudio para el Examen 2}\\[0.3cm]
+{\Large Ejercicios a mano de Inteligencia Artificial}\\[0.2cm]
+{\large Posgrado en Ciencias e Ingeniería de la Computación, UNAM · 2027-I}\\[0.2cm]
+{\large Examen: martes 24 de noviembre de 2026}\\[0.4cm]
+{\color{azul}\rule{\linewidth}{1.2pt}}\\[1.2cm]
+
+\begin{minipage}{0.86\linewidth}
+\large
+\textbf{Cobertura (de agentes probabilísticos en adelante):} probabilidad, independencia y
+Bayes; redes bayesianas (factorización, parámetros, d-separación, manto de Markov);
+inferencia exacta (enumeración, eliminación de variables, orden); muestreo (previo, rechazo,
+verosimilitud con pesos, Gibbs); aprendizaje de parámetros (MLE, Laplace, EM, estructura);
+regresión, clasificación logística, softmax y redes; agrupamiento ($k$-NN, $k$-means,
+silueta, jerárquico); MDP y aprendizaje por refuerzo (Bellman, evaluación, iteración de valores
+y de políticas, Monte Carlo, TD, Q-learning, $\varepsilon$-voraz, aproximación lineal);
+aprendizaje profundo (retropropagación, atención, transformers); IA en el contexto social
+(métricas de equidad, energía, regulación).
+
+\vspace{0.6cm}
+\textbf{Fuentes:} diapositivas 13–25 del curso y apuntes de clase (29 sep – 17 nov);
+Russell \& Norvig, \emph{AIMA}, 4.ª ed., caps.\ 12–14, 16–17, 19–23 y 27; Berkeley CS\,188.
+Los ejemplos del curso (alarma, aspersor, cadena $R\to T\to L$, automóvil Cool/Warm) se reutilizan
+con preguntas nuevas.
+\end{minipage}
+
+\vfill
+\begin{tabular}{ll}
+\dif{1} & Nivel 1 — conceptos y definiciones (respuesta corta)\\[2pt]
+\dif{2} & Nivel 2 — procedimientos a mano (tablas, trazas, una o dos iteraciones)\\[2pt]
+\dif{3} & Nivel 3 — tipo examen: modelar, ejecutar el algoritmo completo y justificar\\
+\end{tabular}
+
+\vspace{1cm}
+{\small Las respuestas completas están en el documento complementario
+\emph{Guía para el Examen 2 — Respuestas}. Intenta cada ejercicio antes de consultarlas.}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ======================= CÓMO USAR =======================
+\section*{Cómo usar esta guía}
+\addcontentsline{toc}{section}{Cómo usar esta guía}
+
+\begin{itemize}
+  \item \textbf{Qué esperar del examen.} En el Examen 1 de este año se pidió desarrollar
+  \emph{explícitamente} A* sobre un grafo o minimax a mano; en el de 2025 hubo cuatro preguntas de
+  25 puntos que combinaban modelar y ejecutar. El equivalente en este bloque es: \textbf{eliminar
+  variables mostrando cada factor, decidir d-separación camino por camino, muestrear con números
+  aleatorios dados, contar y normalizar, hacer respaldos de Bellman, actualizar una tabla Q,
+  iterar $k$-means y retropropagar en una red pequeña}. Esta guía está construida para eso.
+  \item \textbf{Orden.} Parte A (conceptos, \dif{1}), Parte B (procedimientos, \dif{2}), Parte C
+  (tipo examen, \dif{3}) y Parte D (dos exámenes simulados de 2 horas, con el formato de
+  cuatro preguntas de 25 puntos). Dentro de cada parte se sigue el orden del curso.
+  \item \textbf{Convenciones.} $+x$ significa $X$ verdadero y $-x$ falso. Al muestrear con un número
+  uniforme $u$, se asigna $+x$ si $u<P(+x\mid\text{padres})$. En $k$-means los empates se asignan al
+  grupo de menor índice. En RL, si no se dice otra cosa, $Q_0=0$, los terminales valen 0 y la
+  recompensa se cobra \emph{al hacer la transición}. Redondea a 4 cifras, pero arrastra más en
+  los cálculos intermedios.
+  \item \textbf{Cómo trabajar.} Escribe primero la fórmula que vas a aplicar (por ejemplo,
+  $Q(s,a)\leftarrow Q(s,a)+\alpha[r+\gamma\max_{a'}Q(s',a')-Q(s,a)]$) y luego una tabla con un renglón por
+  paso. En las tareas y en el Examen 1 se calificó el procedimiento; una tabla ordenada es la
+  forma más rápida de mostrarlo.
+  \item Un ejercicio de Nivel 3 toma entre 15 y 25 minutos. Cronométrate.
+\end{itemize}
+
+\subsection*{Plan de estudio (miércoles 18 → martes 24 de noviembre)}
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\linewidth}{>{\bfseries}l X r}
+\toprule
+Día & Actividades & Tiempo \\
+\midrule
+Mié 18 & Formulario (sección 1). Parte A: A1–A4. Parte B: B1–B9 (probabilidad, redes, d-separación, inferencia exacta). & 3–4 h\\
+Jue 19 & Parte B: B10–B14 (muestreo y aprendizaje de parámetros). Parte C: C1–C2 (red bayesiana completa a mano). & 3–4 h\\
+Vie 20 & Parte A: A5–A6. Parte B: B15–B22 (regresión, logística, softmax, $k$-NN, $k$-means, jerárquico). C3–C5. & 4 h\\
+Sáb 21 & Parte A: A7. Parte B: B23–B28 (RL). Parte C: C6–C10 (generalización, $k$-means, MDP, Q-learning, MC vs TD). & 5 h\\
+Dom 22 & Parte A: A8–A9. Parte B: B29–B34 (retropropagación, atención, métricas, equidad). C11–C13. & 4 h\\
+Lun 23 & Mañana: \textbf{Simulacro D1 cronometrado} (2 h) y corrección. Tarde: \textbf{Simulacro D2} (2 h) y corrección. Noche: repasar los errores y la hoja A4. & 5–6 h\\
+Mar 24 & Examen. Antes: releer la hoja A4 y las «trampas frecuentes» del formulario (20 min). & —\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{nota}
+\textbf{Si tienes poco tiempo} (el proyecto se entrega el 26), prioriza en este orden:
+C1 (red bayesiana a mano), B5 (d-separación), B8 (eliminación), B10–B12 (muestreo), C8 (iteración de
+valores y políticas), C9 (Q-learning), B20 ($k$-means), B29 (retropropagación) y los dos simulacros.
+Son los ejercicios que más se parecen a «desarrollar A* explícitamente» en este bloque.
+\end{nota}
+
+\newpage
+% ======================= FORMULARIO =======================
+\section{Formulario de repaso}
+
+\begin{formulario}
+\textbf{Probabilidad.} Marginal $P(x)=\sum_yP(x,y)$. Condicional $P(x\mid y)=P(x,y)/P(y)$.
+Producto $P(x,y)=P(x\mid y)P(y)$. Bayes $P(x\mid y)=P(y\mid x)P(x)/P(y)$.
+Cadena $P(x_1,\dots,x_n)=\prod_iP(x_i\mid x_{<i})$ (exacta, sin supuestos).
+$X\indep Y$ si $P(x,y)=P(x)P(y)$ \emph{para todo} $x,y$; $X\indep Y\mid Z$ si $P(x,y\mid z)=P(x\mid z)P(y\mid z)$ para todo $x,y,z$.
+Normalizar: $P(x\mid e)=\alpha\,P(x,e)$, con $\alpha=1/\sum_xP(x,e)$.
+\end{formulario}
+
+\begin{formulario}
+\textbf{Redes bayesianas.} $P(x_1,\dots,x_n)=\prod_iP(x_i\mid\mathrm{pa}(X_i))$.
+Parámetros libres del nodo $X_i$: $(|X_i|-1)\prod_{U\in\mathrm{Pa}(X_i)}|U|$; conjunta completa: $\prod_i|X_i|-1$.
+Cada nodo es independiente de sus no descendientes dados sus padres.
+\textbf{Manto de Markov} = padres + hijos + otros padres de los hijos; $X$ es independiente del resto dado su manto.
+
+\smallskip
+\textbf{d-separación.} $X\indep Y\mid\mathbf Z$ está garantizada si \emph{todo} camino (sin dirección) entre $X$ y $Y$ está bloqueado.
+Un camino está activo si \emph{todas} sus tripletas están activas:
+\begin{center}\small
+\begin{tabular}{lll}
+\toprule
+Tripleta & Activa cuando & Bloqueada cuando\\\midrule
+Cadena $A\to B\to C$ & $B\notin\mathbf Z$ & $B\in\mathbf Z$\\
+Causa común $A\leftarrow B\to C$ & $B\notin\mathbf Z$ & $B\in\mathbf Z$\\
+Efecto común $A\to B\leftarrow C$ & $B$ \emph{o un descendiente} $\in\mathbf Z$ & ni $B$ ni descendientes en $\mathbf Z$\\\bottomrule
+\end{tabular}
+\end{center}
+Un camino activo \emph{no prueba} dependencia: solo dice que el grafo no garantiza independencia.
+\end{formulario}
+
+\begin{formulario}
+\textbf{Inferencia exacta.} $P(Q\mid\mathbf e)=\alpha\sum_{\mathbf h}\prod_iP(x_i\mid\mathrm{pa}_i)$.
+\emph{Enumeración}: sumar mundos completos (tiempo $O(n\,d^n)$).
+\emph{Eliminación de variables}: (1) restringir factores a la evidencia; (2) para cada oculta $H$ en el orden elegido:
+unir (multiplicar) todos los factores que mencionan $H$ y sumar $H$; (3) multiplicar lo que queda y normalizar.
+El costo lo domina el factor más grande; el orden no cambia la respuesta. Un nodo oculto sin
+descendientes en consulta/evidencia es \emph{irrelevante}: $\sum_hP(h\mid\mathrm{pa})=1$.
+Inferencia exacta general: NP-difícil (\#P); poliárboles: lineal.
+\end{formulario}
+
+\begin{formulario}
+\textbf{Muestreo} (orden topológico; $+x$ si $u<P(+x\mid\mathrm{pa})$).
+\emph{Previo}: genera de $P(\mathbf X)$; $\hat P(x)=N(x)/N$.
+\emph{Rechazo}: descarta muestras incompatibles con $\mathbf e$; acepta $\approx N\,P(\mathbf e)$.
+\emph{Verosimilitud con pesos}: fija la evidencia, muestrea el resto, peso $w=\prod_{E_i}P(e_i\mid\mathrm{pa}(E_i))$;
+$\hat P(q\mid\mathbf e)=\sum w\,[q]/\sum w$.
+\emph{Gibbs}: fija $\mathbf e$, re-muestrea una variable a la vez con
+$P(x\mid\text{resto})\propto P(x\mid\mathrm{pa}(X))\prod_{Y\in\mathrm{hijos}}P(y\mid\mathrm{pa}(Y))$ (solo el manto de Markov).
+\end{formulario}
+
+\begin{formulario}
+\textbf{Aprendizaje de parámetros.} MLE: $\hat P(x\mid u)=N(x,u)/N(u)$ (indefinido si $N(u)=0$).
+Laplace: $\hat P(x\mid u)=\dfrac{N(x,u)+\lambda}{N(u)+k\lambda}$, $k=|X|$.
+\emph{EM} (oculta $G$): paso E $w_{jg}=P_\theta(g\mid\text{datos}_j)$; paso M: contar con pesos fraccionarios,
+$\hat P(g)=\sum_jw_{jg}/m$, $\hat P(x\mid g)=\sum_{j:x_j=x}w_{jg}/\sum_jw_{jg}$. La verosimilitud no decrece; óptimo local.
+Estructura: buscar DAG que maximice $\log P(D\mid G,\hat\theta)-\rho\,C(G)$.
+\end{formulario}
+
+\begin{formulario}
+\textbf{Aprendizaje supervisado.} Regresión: $J(\theta)=\|\mathbf y-X\theta\|^2$, $\nabla J=2X^\mathsf T(X\theta-\mathbf y)$,
+ecuaciones normales $X^\mathsf TX\hat\theta=X^\mathsf T\mathbf y$. Para una variable: $\hat\theta_1=\dfrac{\sum(x_i-\bar x)(y_i-\bar y)}{\sum(x_i-\bar x)^2}$, $\hat\theta_0=\bar y-\hat\theta_1\bar x$.
+Logística: $\pi=\sigma(\mathbf x^\mathsf T\theta)$, $\sigma(z)=1/(1+e^{-z})$, $\sigma'=\sigma(1-\sigma)$;
+$J=-\sum[y\log\pi+(1-y)\log(1-\pi)]$, $\nabla J=X^\mathsf T(\boldsymbol\pi-\mathbf y)$ (convexa). Frontera: $\mathbf x^\mathsf T\theta=0$.
+Softmax $p_j=e^{z_j}/\sum_ke^{z_k}$; $\ell=-\log p_{\text{correcta}}$; $\partial\ell/\partial\mathbf z=\mathbf p-\mathbf t$.
+Descenso: $\theta\leftarrow\theta-\alpha\nabla J$ (batch, mini-batch, online).
+\end{formulario}
+
+\begin{formulario}
+\textbf{No supervisado.} $d_p(x,y)=(\sum|x_j-y_j|^p)^{1/p}$; $L_1$, $L_2$, $L_\infty=\max_j|x_j-y_j|$; Hamming = número de coordenadas distintas.
+$k$-means: asignar al centroide más cercano, recalcular medias; $J=\sum_j\sum_{x\in C_j}\|x-\mu_j\|^2$ no aumenta; óptimo local.
+Silueta $s(i)=\dfrac{b(i)-a(i)}{\max\{a(i),b(i)\}}$ ($a$: media a su grupo; $b$: menor media a otro grupo).
+\emph{Linkage}: simple ($\min$), completo ($\max$), promedio, centroide. $k$-NN: votan los $k$ vecinos etiquetados (supervisado).
+\end{formulario}
+
+\begin{formulario}
+\textbf{MDP y RL.} $G_t=R_{t+1}+\gamma G_{t+1}$.
+$V^\pi(s)=\sum_a\pi(a\mid s)\sum_{s'}T(s,a,s')[R(s,a,s')+\gamma V^\pi(s')]$.
+$Q^*(s,a)=\sum_{s'}T(s,a,s')[R+\gamma V^*(s')]$, $V^*(s)=\max_aQ^*(s,a)$.
+\emph{Iteración de valores}: $V_{k+1}(s)=\max_a\sum_{s'}T[R+\gamma V_k(s')]$ (todos los estados con $V_k$ viejo).
+\emph{Iteración de políticas}: evaluar (sistema lineal) $\to$ mejorar $\pi'(s)=\argmax_aQ^\pi(s,a)$ $\to$ repetir hasta que no cambie.
+\emph{Monte Carlo}: $V(s)\leftarrow$ promedio de retornos (primera visita / todas las visitas); incremental $V\leftarrow V+\frac1n(G-V)$.
+\emph{TD(0)}: $V(s)\leftarrow V(s)+\alpha[r+\gamma V(s')-V(s)]$.
+\emph{Q-learning} (fuera de política): $Q(s,a)\leftarrow Q(s,a)+\alpha[r+\gamma\max_{a'}Q(s',a')-Q(s,a)]$; terminal: objetivo $=r$.
+\emph{SARSA} (en política): usa $Q(s',a')$ de la acción realmente tomada.
+$\varepsilon$-voraz: $\mu(a\mid s)=\varepsilon/m+(1-\varepsilon)\mathbf 1[a\in\mathcal G]/|\mathcal G|$.
+Lineal: $\hat Q=\mathbf w^\mathsf T\phi(s,a)$, $\delta=r+\gamma\max_{a'}\hat Q(s',a')-\hat Q(s,a)$, $w_i\leftarrow w_i+\alpha\delta\phi_i$.
+\end{formulario}
+
+\begin{formulario}
+\textbf{Aprendizaje profundo.} $\mathbf z^{(l)}=W^{(l)}\mathbf a^{(l-1)}+\mathbf b^{(l)}$, $\mathbf a^{(l)}=\phi(\mathbf z^{(l)})$.
+Parámetros por capa: $d_l d_{l-1}+d_l$. ReLU$'$ = $1[z>0]$.
+Retropropagación: $\boldsymbol\delta^{(L)}=\mathbf p-\mathbf y$ (softmax/sigmoide + entropía cruzada),
+$\boldsymbol\delta^{(l)}=(W^{(l+1)\mathsf T}\boldsymbol\delta^{(l+1)})\odot\phi'(\mathbf z^{(l)})$,
+$\partial\ell/\partial W^{(l)}=\boldsymbol\delta^{(l)}\mathbf a^{(l-1)\mathsf T}$, $\partial\ell/\partial\mathbf b^{(l)}=\boldsymbol\delta^{(l)}$.
+Atención: $A=\mathrm{softmax}_{\text{fila}}(QK^\mathsf T/\sqrt{d_k}+M)$, $O=AV$; máscara causal $M_{ij}=-\infty$ si $j>i$.
+Modelo de lenguaje: $p(t_1..t_T)=\prod_ip(t_i\mid t_{<i})$; temperatura $p_j\propto e^{z_j/\tau}$; perplejidad $=e^{\text{pérdida media}}$.
+Métricas: exactitud $\frac{TP+TN}{n}$, precisión $\frac{TP}{TP+FP}$, recall/TPR $\frac{TP}{TP+FN}$, especificidad $\frac{TN}{TN+FP}$, FPR $\frac{FP}{FP+TN}$, $F_1=\frac{2TP}{2TP+FP+FN}$.
+\end{formulario}
+
+\begin{formulario}
+\textbf{Equidad.} Paridad demográfica: $P(\hat Y=1\mid G)$ igual entre grupos. Igualdad de oportunidades:
+$P(\hat Y=1\mid Y=1,G)$ (TPR) igual. \emph{Equalized odds}: TPR y FPR iguales. Con tasas base distintas,
+estos criterios (y la calibración/PPV) no pueden cumplirse todos a la vez salvo casos triviales.
+Energía $E[\mathrm{kWh}]=P[\mathrm W]\cdot t[\mathrm h]/1000$; medir por tarea útil; efecto rebote.
+\end{formulario}
+
+\begin{nota}
+\textbf{Trampas frecuentes.} (1) Olvidar normalizar o normalizar dos veces. (2) Usar $P(x\mid y)$ por $P(y\mid x)$.
+(3) Declarar dependencia porque hay un camino activo. (4) Olvidar que observar un \emph{descendiente} abre un colisionador.
+(5) En Laplace, sumar $\lambda$ solo una vez en el denominador (es $k\lambda$). (6) En iteración de valores, usar valores ya
+actualizados de la misma iteración. (7) En Q-learning, sumar $\gamma\max Q$ en una transición terminal. (8) Confundir el
+$K$ de $k$-means con el $k$ de $k$-NN. (9) En retropropagación, olvidar que ReLU inactiva corta el gradiente. (10) Confundir
+precisión (\emph{precision}) con exactitud (\emph{accuracy}).
+\end{nota}
+
+\newpage
+% ======================= PARTE A =======================
+\section{Parte A — Conceptos \dif{1}}
+
+\begin{ejercicio}{A1 · Probabilidad e incertidumbre \dif{1}}
+\begin{enumerate}[label=\arabic*.]
+\item ¿Por qué un agente lógico puro no basta en un entorno parcialmente observable y estocástico? Da dos razones (pereza, ignorancia).
+\item Distingue $P(\mathrm{caries})$, $P(\mathrm{caries}\mid\mathrm{dolor})$ y $P(\mathrm{caries},\mathrm{dolor})$. ¿Cuál suma 1 sobre qué?
+\item ¿Cuántas filas y cuántos parámetros libres tiene la conjunta de 8 variables con 3 valores cada una?
+\item Verdadero o falso: «si $X\indep Y$ entonces $X\indep Y\mid Z$». Justifica con un ejemplo.
+\item ¿Qué afirma la regla de la cadena y qué agrega una red bayesiana sobre ella?
+\item Un agente racional bajo incertidumbre elige $\argmax_a\E[U\mid a,\mathbf e]$. ¿Qué dos piezas necesita?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A2 · Redes bayesianas e independencia \dif{1}}
+\begin{enumerate}[label=\arabic*.]
+\item ¿Qué garantiza la ausencia de una arista entre $X$ y $Y$? ¿Y la presencia?
+\item Enuncia la independencia local (de Markov) de un nodo y define el manto de Markov.
+\item Explica con un ejemplo cotidiano el fenómeno de «explicar» (\emph{explaining away}).
+\item Para cada tripleta (cadena, causa común, efecto común) di qué ocurre al observar el nodo central.
+\item ¿Las flechas de una red aprendida de datos indican causalidad? ¿Por qué?
+\item ¿Por qué el orden en que se agregan las variables al construir la red cambia su tamaño? (ejemplo: alarma con orden $M,J,A,B,E$).
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A3 · Inferencia exacta \dif{1}}
+\begin{enumerate}[label=\arabic*.]
+\item En $P(Q\mid\mathbf e)$, define consulta, evidencia y variables ocultas. ¿Qué papel tiene $\alpha$?
+\item ¿Qué trabajo repetido elimina la eliminación de variables respecto de la enumeración?
+\item Define las tres operaciones sobre factores: restringir, unir y eliminar (sumar).
+\item ¿Por qué el orden de eliminación cambia el costo pero no el resultado?
+\item ¿Qué es un poliárbol y por qué importa? ¿Cuál es la complejidad de la inferencia exacta en general?
+\item ¿Qué es una variable irrelevante (\emph{barren}) y cómo se detecta?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A4 · Muestreo y aprendizaje de parámetros \dif{1}}
+\begin{enumerate}[label=\arabic*.]
+\item ¿Por qué el muestreo por rechazo es ineficiente cuando $P(\mathbf e)$ es pequeña? ¿Cuántas muestras útiles esperas de $N$?
+\item En verosimilitud con pesos, ¿por qué no basta contar las muestras sin peso? ¿Qué problema aparece si la evidencia está «abajo» y es rara?
+\item ¿Qué necesita Gibbs para re-muestrear una variable? ¿Por qué sus muestras están correlacionadas y qué es el calentamiento?
+\item ¿Qué se maximiza en MLE? ¿Por qué con datos completos basta «contar y normalizar» cada fila de cada CPT?
+\item ¿Para qué sirve Laplace? ¿Qué ocurre con $\lambda\to\infty$?
+\item ¿Qué hacen los pasos E y M de EM? ¿Qué garantiza y qué no?
+\item ¿Por qué la verosimilitud sola no sirve para elegir la estructura de una red?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A5 · Aprendizaje supervisado \dif{1}}
+\begin{enumerate}[label=\arabic*.]
+\item Distingue clasificación de regresión. ¿Qué significa «lineal» en regresión polinomial?
+\item ¿Cuándo existe $(X^\mathsf TX)^{-1}$? ¿Qué se hace si no existe?
+\item Define sobreajuste y subajuste en términos de error de entrenamiento y de prueba.
+\item ¿Por qué la regresión logística minimiza entropía cruzada y no error cuadrático? ¿Qué propiedad tiene su pérdida?
+\item ¿Por qué un perceptrón (o la logística) no resuelve XOR? ¿Qué agrega una capa oculta?
+\item Compara descenso batch, mini-batch y en línea.
+\item ¿Qué afirma (y qué \emph{no}) el teorema de aproximación universal?
+\item ¿Qué aporta un proceso gaussiano frente a una predicción puntual?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A6 · Aprendizaje no supervisado \dif{1}}
+\begin{enumerate}[label=\arabic*.]
+\item ¿Por qué hay que escalar las características antes de usar distancias?
+\item ¿Qué minimiza $k$-means y por qué converge? ¿Converge al óptimo global?
+\item Interpreta una silueta de $0.8$, $0$ y $-0.3$.
+\item ¿Qué tipo de grupos favorece el \emph{linkage} simple y cuál el completo?
+\item ¿Cuándo preferirías DBSCAN a $k$-means?
+\item ¿$k$-NN es supervisado o no supervisado? ¿Qué es $k$ y qué es $K$?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A7 · MDP y aprendizaje por refuerzo \dif{1}}
+\begin{enumerate}[label=\arabic*.]
+\item Lista los componentes de un MDP. ¿Qué es la propiedad de Markov?
+\item ¿Por qué se usa descuento $\gamma<1$? Acota $|G_t|$ si $|R|\le R_{\max}$.
+\item Distingue $V^\pi$, $V^*$, $Q^\pi$, $Q^*$ y política. ¿Por qué con $Q^*$ no hace falta el modelo para actuar?
+\item ¿Por qué iteración de valores converge? (contracción con factor $\gamma$).
+\item Compara iteración de valores con iteración de políticas.
+\item ¿Qué diferencia hay entre planificación (MDP conocido) y aprendizaje por refuerzo? ¿Basado en modelo vs.\ libre de modelo?
+\item Compara Monte Carlo y TD: ¿qué necesita cada uno, qué sesgo y qué varianza tienen?
+\item ¿Por qué Q-learning es «fuera de política» y SARSA «en política»?
+\item ¿Por qué hay que explorar? ¿Qué condiciones requiere la convergencia de Q-learning tabular?
+\item ¿Qué problema resuelve la aproximación de funciones y qué se pierde? ¿Qué agrega DQN (repetición de experiencias, red objetivo)?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A8 · Aprendizaje profundo \dif{1}}
+\begin{enumerate}[label=\arabic*.]
+\item ¿Por qué componer capas lineales sin activación no aumenta la expresividad?
+\item ¿Qué problema de la sigmoide reduce ReLU? ¿Qué es una neurona muerta?
+\item ¿Qué calcula la retropropagación y por qué es eficiente?
+\item ¿Qué es un \emph{embedding}? ¿Qué mide la similitud coseno?
+\item En atención, ¿qué papel juegan consultas, claves y valores? ¿Por qué se divide entre $\sqrt{d_k}$? ¿Para qué es la máscara causal?
+\item Distingue preentrenamiento, ajuste por instrucciones y RLHF.
+\item ¿Qué efecto tiene la temperatura en la decodificación?
+\item Explica el compromiso sesgo–varianza.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}{A9 · IA en el contexto social \dif{1}}
+\begin{enumerate}[label=\arabic*.]
+\item Nombra cuatro fuentes de discriminación algorítmica (antes, durante y después del modelo).
+\item ¿Por qué eliminar el atributo protegido no garantiza equidad?
+\item Define paridad demográfica, igualdad de oportunidades y \emph{equalized odds}. ¿Por qué pueden ser incompatibles?
+\item ¿Qué es la inyección de instrucciones (\emph{prompt injection}) y qué controles la mitigan en un agente?
+\item Describe la pirámide de riesgo del Reglamento de IA de la UE con un ejemplo por nivel.
+\item Distingue potencia (W) de energía (kWh). ¿Qué es el efecto rebote?
+\item Distingue exposición de una ocupación a la IA y sustitución. ¿Qué es la deuda cognitiva?
+\item Enumera las «cuatro D» para colaborar con IA.
+\end{enumerate}
+\end{ejercicio}
+
+\newpage
+% ======================= PARTE B =======================
+\section{Parte B — Procedimientos a mano \dif{2}}
+
+\subsection{Probabilidad}
+
+\begin{ejercicio}{B1 · Conjunta, marginales e independencia \dif{2}\fuente{Clase 29 sep}}
+La conjunta de $L$ (lluvia), $T$ (tráfico) y $P$ (paraguas) es:
+\begin{center}\small
+\begin{tabular}{ccc|c@{\qquad}ccc|c}
+$L$ & $T$ & $P$ & $P(\cdot)$ & $L$ & $T$ & $P$ & $P(\cdot)$\\\hline
+$+$ & $+$ & $+$ & 0.216 & $-$ & $+$ & $+$ & 0.014\\
+$+$ & $+$ & $-$ & 0.024 & $-$ & $+$ & $-$ & 0.126\\
+$+$ & $-$ & $+$ & 0.054 & $-$ & $-$ & $+$ & 0.056\\
+$+$ & $-$ & $-$ & 0.006 & $-$ & $-$ & $-$ & 0.504
+\end{tabular}
+\end{center}
+(a) Calcula $P(+t)$, $P(+p)$, $P(+t,+p)$. ¿Son $T$ y $P$ independientes?
+(b) Calcula $P(+l\mid+t)$ y $P(+l\mid+t,+p)$. Interpreta.
+(c) Verifica si $T\indep P\mid L$ (ambos valores de $L$).
+(d) ¿Qué red de 3 nodos es consistente con lo anterior? ¿Cuántos parámetros ahorra frente a la conjunta?
+\end{ejercicio}
+
+\begin{ejercicio}{B2 · Bayes con dos pruebas \dif{2}\fuente{AIMA 12.x, estilo}}
+Una enfermedad tiene prevalencia del 2\,\%. Una prueba tiene sensibilidad $0.95$ y tasa de falsos positivos $0.08$.
+(a) Calcula $P(\text{enf}\mid+)$.
+(b) Se aplica una segunda prueba igual, condicionalmente independiente dada la enfermedad. Calcula
+$P(\text{enf}\mid+,+)$ de dos formas: con la conjunta y actualizando secuencialmente.
+(c) Calcula $P(\text{enf}\mid+,-)$.
+(d) Dibuja la red bayesiana que justifica el supuesto de (b).
+\end{ejercicio}
+
+\begin{ejercicio}{B3 · Factorización y conteo de parámetros \dif{2}}
+Variables con dominios $|A|=2$, $|B|=3$, $|C|=2$, $|D|=4$, $|E|=2$, $|F|=3$ y aristas $A\to C$, $B\to C$, $C\to D$, $C\to E$, $E\to F$.
+(a) Escribe la factorización. (b) Cuenta parámetros libres por nodo y en total. (c) Compara con la conjunta.
+(d) Si se agrega la arista $A\to F$, ¿cuántos parámetros más se requieren?
+\end{ejercicio}
+
+\subsection{Redes bayesianas e independencia}
+
+\begin{ejercicio}{B4 · Red del estudiante: mundos y marginales \dif{2}}
+\begin{center}\figEst\qquad\tabEst\end{center}
+$D$: curso difícil; $I$: estudiante inteligente; $C$: calificación alta; $E$: examen de admisión alto; $R$: buena carta de recomendación.
+(a) Escribe la factorización y cuenta parámetros (red vs.\ conjunta).
+(b) Calcula $P(-d,+i,+c,-e,+r)$.
+(c) Calcula $P(+c)$ sumando sobre $D$ e $I$.
+(d) Sin calcular, ¿$D\indep I$? ¿$D\indep I\mid R$? ¿$D\indep E$? ¿$R\indep E\mid C$?
+\end{ejercicio}
+
+\begin{ejercicio}{B5 · d-separación camino por camino \dif{2}\fuente{Estilo diapositivas 27–29}}
+\begin{center}\figDsep\end{center}
+Para cada consulta, lista los caminos simples relevantes, marca el estado de cada tripleta y concluye si la
+independencia está \emph{garantizada}:
+\begin{multicols}{2}
+\begin{enumerate}[label=(\alph*)]
+\item $A\indep B$
+\item $A\indep B\mid H$
+\item $A\indep D$
+\item $A\indep D\mid G$
+\item $A\indep D\mid G,B$
+\item $C\indep F\mid B$
+\item $E\indep F\mid G,D$
+\item $A\indep H\mid E$
+\item $A\indep F\mid C$
+\item $B\indep G\mid E,F$
+\end{enumerate}
+\end{multicols}
+(k) Da el manto de Markov de $C$, $D$, $F$ y $G$.
+\end{ejercicio}
+
+\begin{ejercicio}{B6 · Alarma: explicar a la otra causa \dif{2}\fuente{Clase, red de alarma}}
+\begin{center}\figAlarma\end{center}
+Usa las CPT del curso: $P(+b)=0.001$, $P(+e)=0.002$, $P(+a\mid B,E)=0.95,0.94,0.29,0.001$ para
+$(+b,+e),(+b,-e),(-b,+e),(-b,-e)$.
+(a) Calcula $P(+a)$. (b) Calcula $P(+b\mid+a)$ y $P(+e\mid+a)$.
+(c) Calcula $P(+e\mid+a,+b)$ y $P(+e\mid+a,-b)$. Explica el resultado en una línea.
+(d) ¿Por qué $J$ y $M$ no intervienen en (b) y (c)?
+\end{ejercicio}
+
+\subsection{Inferencia exacta}
+
+\begin{ejercicio}{B7 · Enumeración en una cadena \dif{2}\fuente{Clase 13 oct, diap.\ 18–22}}
+$R\to T\to L$ con $P(+r)=0.1$; $P(+t\mid+r)=0.8$, $P(+t\mid-r)=0.1$; $P(+l\mid+t)=0.3$, $P(+l\mid-t)=0.1$.
+(a) Construye la tabla de los 8 mundos. (b) Calcula $P(R\mid+l)$ y $P(T\mid+l)$ por enumeración.
+(c) Calcula $P(L\mid+r)$. ¿Por qué aquí no hace falta normalizar al final?
+\end{ejercicio}
+
+\begin{ejercicio}{B8 · Eliminación de variables, factor por factor \dif{2}}
+En la red del estudiante (B4) calcula $P(I\mid+r)$ por eliminación de variables con orden $D$, $C$.
+(a) Lista los factores iniciales tras restringir a $+r$. (b) Justifica por qué $P(E\mid I)$ puede descartarse.
+(c) Construye $f_1(C,I)=\sum_dP(d)P(C\mid d,I)$ (4 entradas). (d) Construye $f_2(I)=\sum_cf_1(c,I)P(+r\mid c)$.
+(e) Multiplica por $P(I)$ y normaliza.
+\end{ejercicio}
+
+\begin{ejercicio}{B9 · Orden de eliminación y tamaño de factores \dif{2}\fuente{Clase 13 oct, diap.\ 29}}
+\begin{center}\figOrden\end{center}
+Variables booleanas; se observa $+f$ y se consulta $P(A\mid+f)$. Para cada orden lista, en cada paso, los factores
+que se unen, el alcance del producto y el factor nuevo: (i) $B,D,E,C$; (ii) $C,B,D,E$; (iii) $D,E,C,B$.
+¿Cuál es el factor más grande de cada orden (en entradas)? ¿Cuál recomiendas y por qué?
+\end{ejercicio}
+
+\subsection{Muestreo}
+
+\begin{ejercicio}{B10 · Muestreo previo y rechazo con números dados \dif{2}\fuente{Clase 15 oct}}
+\begin{center}\figAsp\qquad\tabAsp\end{center}
+Genera 5 muestras en el orden $C,S,R,W$ usando, para cada muestra, los cuatro uniformes:
+\begin{center}\small
+\begin{tabular}{c|cccc}
+Muestra & $u_C$ & $u_S$ & $u_R$ & $u_W$\\\hline
+1 & 0.31 & 0.62 & 0.12 & 0.45\\
+2 & 0.77 & 0.08 & 0.91 & 0.50\\
+3 & 0.18 & 0.35 & 0.66 & 0.97\\
+4 & 0.52 & 0.44 & 0.15 & 0.03\\
+5 & 0.05 & 0.06 & 0.70 & 0.88
+\end{tabular}
+\end{center}
+(a) Estima $P(+w)$ (exacto: $0.65$). (b) Con rechazo, estima $P(+c\mid+w)$ (exacto: $0.5746$).
+(c) ¿Puedes estimar $P(+c\mid-r,-w)$ con estas muestras? ¿Por qué?
+\end{ejercicio}
+
+\begin{ejercicio}{B11 · Verosimilitud con pesos \dif{2}}
+Misma red. Evidencia: $+s,+w$. Consulta: $P(+c\mid+s,+w)$. Se muestrean solo $C$ y $R$, con los pares
+$(u_C,u_R)$: $(0.21,0.40)$, $(0.64,0.10)$, $(0.47,0.93)$, $(0.88,0.75)$, $(0.12,0.85)$.
+(a) Para cada muestra da $C$, $R$ y el peso $w=P(+s\mid c)\,P(+w\mid+s,r)$.
+(b) Estima $P(+c\mid+s,+w)$. (c) Calcula el valor exacto y compara. (d) ¿Por qué el peso incluye $P(+s\mid c)$?
+\end{ejercicio}
+
+\begin{ejercicio}{B12 · Dos barridos de Gibbs \dif{2}}
+Misma red. Evidencia $+w$. Estado inicial $(+c,-s,-r)$. Orden de actualización $C,S,R$, dos barridos, con uniformes
+$0.60,\ 0.20,\ 0.30,\ 0.90,\ 0.55,\ 0.40$ (en ese orden).
+(a) Escribe, para cada variable, la distribución condicional usando solo su manto de Markov.
+(b) Ejecuta los dos barridos mostrando pesos, probabilidad normalizada y nuevo valor.
+(c) ¿Qué estimación de $P(+c\mid+w)$ dan los dos estados? ¿Por qué no es confiable?
+\end{ejercicio}
+
+\subsection{Aprendizaje de parámetros}
+
+\begin{ejercicio}{B13 · MLE y Laplace con dos padres \dif{2}\fuente{Clase 20 oct, estilo}}
+Red $\text{Clima}\to\text{Bici}\leftarrow\text{Día}$, con Clima $\in\{S,N,Ll\}$ (sol, nublado, lluvia), Día $\in\{L,F\}$ (laboral, fin de semana), Bici $\in\{\text{sí},\text{no}\}$.
+\begin{center}\small
+\begin{tabular}{c|cccccccccccc}
+\# & 1&2&3&4&5&6&7&8&9&10&11&12\\\hline
+Clima & S&S&S&S&N&N&N&Ll&Ll&S&N&Ll\\
+Día & L&L&F&L&L&F&L&L&L&F&F&L\\
+Bici & sí&sí&sí&no&sí&no&no&no&no&sí&sí&sí
+\end{tabular}
+\end{center}
+(a) Estima $P(\text{Clima})$ por MLE y con Laplace $\lambda=1$.
+(b) Estima por MLE cada fila $P(\text{Bici}=\text{sí}\mid\text{Clima},\text{Día})$. ¿Qué fila queda indefinida?
+(c) Repite (b) con Laplace $\lambda=1$. (d) ¿Cuántos parámetros libres tiene la red?
+\end{ejercicio}
+
+\begin{ejercicio}{B14 · Una iteración de EM \dif{2}\fuente{Clase 20 oct, diap.\ 19–21}}
+Red $G\to R_1$, $G\to R_2$ con $G\in\{a,b\}$ oculta y $R_1,R_2\in\{0,1\}$ (le gustó o no). Datos:
+$(1,1),(1,0),(0,0),(1,1),(0,1)$. Parámetros iniciales: $P(a)=0.5$; $P(R_1{=}1\mid a)=0.8$, $P(R_1{=}1\mid b)=0.3$;
+$P(R_2{=}1\mid a)=0.7$, $P(R_2{=}1\mid b)=0.4$.
+(a) Paso E: calcula $w_j=P(a\mid r_{1j},r_{2j})$ para cada registro.
+(b) Paso M: reestima los cinco parámetros.
+(c) Calcula la log-verosimilitud $\sum_j\log P(r_{1j},r_{2j})$ antes y después. ¿Qué observas?
+\end{ejercicio}
+
+\subsection{Aprendizaje supervisado}
+
+\begin{ejercicio}{B15 · Regresión lineal y descenso de gradiente \dif{2}\fuente{Clase 22 oct}}
+Datos $(x,y)$: $(0,1)$, $(1,3)$, $(2,4)$, $(3,8)$; modelo $\hat y=\theta_0+\theta_1x$, $J=\sum(y-\hat y)^2$.
+(a) Escribe $X$, $X^\mathsf TX$ y $X^\mathsf T\mathbf y$; resuelve las ecuaciones normales.
+(b) Calcula predicciones, residuos y $J(\hat\theta)$. Predice para $x=5$.
+(c) Desde $\theta=(0,0)$, da dos pasos de descenso con $\alpha=0.01$ y reporta $J$ tras cada paso.
+\end{ejercicio}
+
+\begin{ejercicio}{B16 · Regresión logística: pérdida, gradiente y un paso \dif{2}\fuente{Clase 27 oct}}
+Tres ejemplos con $\mathbf x=(1,x_1,x_2)$: $(1,2,1)$ con $y=1$; $(1,0,2)$ con $y=0$; $(1,1,0)$ con $y=1$. Parámetros $\theta=(0,1,-1)$.
+(a) Calcula $z_i$, $\pi_i$ y la entropía cruzada total. (b) Calcula $\nabla J=X^\mathsf T(\boldsymbol\pi-\mathbf y)$.
+(c) Da un paso con $\alpha=0.5$ y recalcula la pérdida. (d) Escribe la frontera de decisión antes y después.
+\end{ejercicio}
+
+\begin{ejercicio}{B17 · Softmax, entropía cruzada y temperatura \dif{2}}
+Logits $\mathbf z=(2,1,-1)$, clase correcta = 2.
+(a) Calcula $\mathbf p$ y la pérdida. (b) Calcula $\partial\ell/\partial\mathbf z$.
+(c) Calcula $\mathbf p$ con temperatura $\tau=2$ y $\tau=0.5$. ¿Qué ocurre si $\tau\to0$?
+(d) Muestra que restar $\max_kz_k$ a todos los logits no cambia $\mathbf p$.
+\end{ejercicio}
+
+\begin{ejercicio}{B18 · XOR: imposibilidad lineal y red de dos capas \dif{2}}
+(a) Demuestra que no existen $w_1,w_2,b$ tales que $\mathrm{sign}(w_1x_1+w_2x_2+b)$ reproduzca XOR en $\{0,1\}^2$.
+(b) Verifica que $h_1=\mathrm{ReLU}(x_1+x_2)$, $h_2=\mathrm{ReLU}(x_1+x_2-1)$, $\hat y=h_1-2h_2$ calcula XOR.
+(c) Cuenta los parámetros de esa red y explica qué hace la capa oculta geométricamente.
+\end{ejercicio}
+
+\subsection{Aprendizaje no supervisado y vecinos}
+
+\begin{ejercicio}{B19 · Distancias y $k$-NN \dif{2}\fuente{Clase 29 oct}}
+Consulta $q=(3,3)$. Ejemplos etiquetados: $P_1=(6,3)\,[+]$, $P_2=(5,5)\,[-]$, $P_3=(-1,4)\,[+]$, $P_4=(1,-1)\,[-]$.
+(a) Calcula $L_1$, $L_2$ y $L_\infty$ de $q$ a cada punto. (b) Clasifica $q$ con 1-NN y 3-NN para cada distancia.
+(c) Calcula la distancia de Hamming entre (rojo, grande, metal, sí) y (rojo, chico, plástico, sí).
+\end{ejercicio}
+
+\begin{ejercicio}{B20 · $k$-means a mano \dif{2}}
+Puntos $P_1(1,1)$, $P_2(2,1)$, $P_3(1,3)$, $P_4(5,4)$, $P_5(6,5)$, $P_6(5,6)$; $K=2$; centroides iniciales $\mu_1=(1,1)$, $\mu_2=(1,3)$.
+Itera (asignación con distancia euclidiana al cuadrado, luego actualización) hasta converger. Reporta en cada iteración
+la tabla de distancias, la asignación, los nuevos centroides y $J$.
+\end{ejercicio}
+
+\begin{ejercicio}{B21 · Silueta \dif{2}}
+Con el agrupamiento final de B20, calcula $a(i)$, $b(i)$ y $s(i)$ para $P_3$ y para $P_1$. ¿Cuál está mejor agrupado?
+\end{ejercicio}
+
+\begin{ejercicio}{B22 · Agrupamiento jerárquico \dif{2}\fuente{Clase 29 oct, diap.\ 21–27}}
+Matriz de distancias:
+\begin{center}\small
+\begin{tabular}{c|ccccc}
+ & A & B & C & D & E\\\hline
+A & 0 & 2 & 6 & 10 & 9\\
+B & 2 & 0 & 5 & 9 & 8\\
+C & 6 & 5 & 0 & 4 & 5\\
+D & 10 & 9 & 4 & 0 & 3\\
+E & 9 & 8 & 5 & 3 & 0
+\end{tabular}
+\end{center}
+Ejecuta el aglomerativo con \emph{linkage} simple, completo y promedio; da el orden de uniones y sus alturas, y dibuja los
+dendrogramas. Si cortas a altura 4.2, ¿cuántos grupos da cada uno?
+\end{ejercicio}
+
+\subsection{Aprendizaje por refuerzo}
+
+\begin{ejercicio}{B23 · Retornos, Monte Carlo y TD(0) \dif{2}\fuente{Clase 5 nov}}
+$\gamma=0.5$. Episodio 1: $A\xrightarrow{+1}B\xrightarrow{+2}A\xrightarrow{-1}B\xrightarrow{+4}T$. Episodio 2: $B\xrightarrow{+3}A\xrightarrow{+1}T$ ($T$ terminal).
+(a) Calcula el retorno desde cada instante (hacia atrás).
+(b) Estima $V(A)$ y $V(B)$ con MC de primera visita y de todas las visitas.
+(c) Aplica TD(0) con $\alpha=0.5$ y $V_0=0$, en orden, a todas las transiciones de ambos episodios.
+\end{ejercicio}
+
+\begin{ejercicio}{B24 · Evaluación exacta de una política \dif{2}}
+\begin{center}\figCorredor\end{center}
+Corredor con estados $1,2,3$ y terminales $L$, $R$. Acciones izq/der: con probabilidad $0.8$ se mueve en la dirección
+pedida y con $0.2$ en la opuesta. Entrar a $L$ da $+2$, entrar a $R$ da $+10$, cualquier otro movimiento $-1$; $\gamma=0.9$.
+(a) Escribe las ecuaciones de Bellman para $\pi=$ «siempre derecha» y resuélvelas.
+(b) Calcula $Q^\pi(s,\text{izq})$ y $Q^\pi(s,\text{der})$. ¿Mejora la política algún estado? ¿Qué concluyes?
+\end{ejercicio}
+
+\begin{ejercicio}{B25 · Iteración de valores en el corredor \dif{2}}
+Mismo corredor. Desde $V_0=0$, ejecuta tres iteraciones de valores mostrando los seis valores $Q_k(s,a)$ por iteración.
+Extrae la política voraz tras cada iteración. ¿Por qué en las primeras iteraciones el estado 1 prefiere ir a la izquierda?
+\end{ejercicio}
+
+\begin{ejercicio}{B26 · Q-learning en el automóvil \dif{2}\fuente{Clase 3 y 5 nov}}
+\begin{center}\tabAuto\end{center}
+$\alpha=0.5$, $\gamma=0.9$, $Q_0=0$. Se observan, en orden:
+$(C,\text{F},+2,W)$, $(W,\text{S},+1,C)$, $(C,\text{F},+2,C)$, $(C,\text{S},+1,C)$, $(C,\text{F},+2,W)$, $(W,\text{F},-10,O)$.
+(a) Actualiza la tabla Q tras cada transición (objetivo, valor anterior, valor nuevo). (b) Da la política voraz final.
+(c) Compárala con la política óptima del curso. ¿Qué haría falta para que los valores converjan a $Q^*$?
+\end{ejercicio}
+
+\begin{ejercicio}{B27 · $\varepsilon$-voraz, SARSA y Q-learning \dif{2}}
+(a) Con $Q(s,\cdot)=(3,5,5,1)$ y $\varepsilon=0.2$, da $\mu(a\mid s)$ para las cuatro acciones.
+(b) $Q(s,a)=2$, $r=0$, $Q(s',a_1)=6$, $Q(s',a_2)=-2$, $\gamma=0.9$, $\alpha=0.5$. Por exploración, la siguiente acción
+realmente tomada es $a_2$. Calcula la actualización de Q-learning y la de SARSA. ¿Cuál aprende el valor de la política
+voraz y cuál el de la política que explora?
+\end{ejercicio}
+
+\begin{ejercicio}{B28 · Q-learning con aproximación lineal \dif{2}\fuente{Clase 5 nov, diap.\ 15–16}}
+$\hat Q(s,a)=\mathbf w^\mathsf T\phi(s,a)$ con $\mathbf w=(1,2,-1)$. Transición: $\phi(s,a)=(1,1,2)$, $r=3$; en $s'$ hay dos
+acciones con $\phi=(1,0,1)$ y $(1,2,0)$. $\gamma=0.9$, $\alpha=0.1$.
+(a) Calcula $\hat Q(s,a)$, el objetivo y $\delta$. (b) Actualiza $\mathbf w$. (c) ¿Cuánto cambian los valores de las acciones
+de $s'$ aunque no se hayan visitado? ¿Por qué se llama semigradiente?
+\end{ejercicio}
+
+\subsection{Aprendizaje profundo y evaluación}
+
+\begin{ejercicio}{B29 · Retropropagación en una red 2–2–1 \dif{2}\fuente{Clase 10 nov, estilo}}
+$\mathbf x=(1,2)$, $y=1$. Capa oculta ReLU con $W_1=\begin{pmatrix}1&-1\\0.5&0.5\end{pmatrix}$, $\mathbf b_1=(0,-1)$;
+salida sigmoide $p=\sigma(\mathbf w_2^\mathsf T\mathbf h+b_2)$, $\mathbf w_2=(2,-1)$, $b_2=0.5$; pérdida entropía cruzada binaria.
+(a) Forward: $\mathbf z_1,\mathbf h,z_2,p,\ell$. (b) Backward: $\delta_2$, $\partial\ell/\partial\mathbf w_2$, $\partial\ell/\partial b_2$, $\boldsymbol\delta_1$,
+$\partial\ell/\partial W_1$, $\partial\ell/\partial\mathbf b_1$. (c) Actualiza con $\eta=0.5$ y recalcula $p$ y $\ell$.
+(d) ¿Por qué la primera fila de $W_1$ no cambia?
+\end{ejercicio}
+
+\begin{ejercicio}{B30 · Conteo de parámetros y composición \dif{2}}
+(a) Cuenta los parámetros de una red $4\to8\to8\to3$. (b) ¿Cuántos parámetros tiene una tabla de \emph{embeddings} con
+$V=32\,000$ y $d=256$? (c) Demuestra que $W_2(W_1\mathbf x+\mathbf b_1)+\mathbf b_2$ es afín. (d) Si una red $2\to3\to2$ usa ReLU,
+¿cuántos parámetros tiene y cuántas regiones lineales puede tener como máximo su capa oculta en el plano? (cota: $\le 7$).
+\end{ejercicio}
+
+\begin{ejercicio}{B31 · Atención causal a mano \dif{2}\fuente{Clase 10 nov, §12}}
+Tres posiciones, $d_k=2$: $\mathbf q_1=(1,0)$, $\mathbf q_2=(0,1)$, $\mathbf q_3=(1,1)$; $\mathbf k_1=(1,0)$, $\mathbf k_2=(1,1)$, $\mathbf k_3=(0,1)$;
+$\mathbf v_1=(1,0)$, $\mathbf v_2=(0,1)$, $\mathbf v_3=(1,1)$.
+(a) Calcula $S=QK^\mathsf T/\sqrt2$. (b) Aplica la máscara causal y softmax por fila. (c) Calcula $O=AV$.
+(d) ¿Qué cambiaría en la fila 2 sin máscara?
+\end{ejercicio}
+
+\begin{ejercicio}{B32 · Matriz de confusión y umbral \dif{2}}
+Puntajes y etiquetas de 10 casos: $(0.95,1)$, $(0.85,1)$, $(0.80,0)$, $(0.70,1)$, $(0.55,0)$, $(0.45,1)$, $(0.40,0)$, $(0.30,0)$, $(0.20,1)$, $(0.10,0)$.
+Para umbrales $0.5$, $0.35$ y $0.75$ calcula $TP,FP,FN,TN$, exactitud, precisión, recall, especificidad y $F_1$.
+¿Qué umbral elegirías para detectar una enfermedad grave? ¿Y para un filtro de spam?
+\end{ejercicio}
+
+\subsection{IA en el contexto social}
+
+\begin{ejercicio}{B33 · Métricas de equidad por grupo \dif{2}\fuente{Clase 12 nov}}
+Un sistema de crédito ($\hat Y=1$: aprobar; $Y=1$: pagaría):
+\begin{center}\small
+\begin{tabular}{c|cccc}
+Grupo & $TP$ & $FN$ & $FP$ & $TN$\\\hline
+A & 40 & 10 & 10 & 40\\
+B & 15 & 15 & 5 & 65
+\end{tabular}
+\end{center}
+(a) Calcula por grupo: tasa base, tasa de aprobación, TPR, FPR, PPV y exactitud.
+(b) ¿Se cumple paridad demográfica? ¿Igualdad de oportunidades? ¿\emph{Equalized odds}?
+(c) La exactitud es igual en ambos grupos. ¿Basta eso para decir que el sistema es justo?
+\end{ejercicio}
+
+\begin{ejercicio}{B34 · Energía y efecto rebote \dif{2}\fuente{Clase 17 nov}}
+(a) ¿Cuántos kWh consume un LED de 10 W en 100 h? ¿Y 100\,000 GPU de 700 W en un día?
+(b) Un agente hace 25 llamadas de 0.3 Wh por tarea y acierta en el 75\,\% de las tareas. ¿Cuál es la energía por tarea
+completada correctamente? (c) Una mejora reduce la energía por llamada al 40\,\% pero los usos se triplican.
+¿Qué ocurre con el consumo total?
+\end{ejercicio}
+
+\newpage
+% ======================= PARTE C =======================
+\section{Parte C — Problemas tipo examen \dif{3}}
+
+\begin{ejercicio}{C1 · Diagnóstico de un servidor: modelar, d-separar y eliminar \dif{3}}
+Un servidor web puede sufrir un ataque ($A$) o recibir una actualización defectuosa ($U$); ambos pueden provocar CPU alta ($C$).
+La CPU alta dispara una alerta del monitor ($M$) y quejas de usuarios ($Q$).
+\begin{center}\figSrv\qquad\tabSrv\end{center}
+(a) \pts{4} Escribe la factorización, cuenta parámetros y compara con la conjunta.
+(b) \pts{5} Decide, camino por camino: $A\indep U$; $A\indep U\mid M$; $M\indep Q$; $M\indep Q\mid C$; $A\indep Q\mid C$.
+(c) \pts{8} Calcula $P(A\mid+m)$ por eliminación de variables (orden $C$, $U$; descarta $Q$). Muestra cada factor.
+(d) \pts{5} Calcula $P(A\mid+m,+u)$. Explica qué ocurrió.
+(e) \pts{3} Calcula $P(A\mid+m,+q)$. ¿Por qué la segunda señal aumenta la creencia de ataque menos de lo que podría esperarse?
+\end{ejercicio}
+
+\begin{ejercicio}{C2 · Enumeración frente a eliminación en la red del estudiante \dif{3}}
+Usa la red de B4. Consulta: $P(I\mid+r,+e)$.
+(a) \pts{8} Resuelve por enumeración: lista los 8 mundos compatibles con su probabilidad y normaliza.
+(b) \pts{8} Resuelve por eliminación con orden $D,C$, reutilizando los factores de B8.
+(c) \pts{4} ¿Cuántos productos de 5 factores hace la enumeración ingenua? ¿Cuántas entradas tiene el factor más grande de la eliminación?
+(d) \pts{5} Calcula $P(+i\mid+c)$, $P(+i\mid+c,+d)$ y $P(+i\mid+c,-d)$. Interpreta: ¿por qué saber que el curso era difícil
+\emph{aumenta} la creencia en la inteligencia? ¿Contradice esto el «explicar a la otra causa»?
+\end{ejercicio}
+
+\begin{ejercicio}{C3 · Comparar métodos de muestreo \dif{3}}
+Red del servidor (C1); consulta $P(+a\mid+m)$ (exacto en C1). La variable $Q$ es irrelevante y se omite.
+(a) \pts{6} \emph{Rechazo.} Se generaron 12 muestras previas $(A,U,C,M)$:
+\begin{center}\small
+\begin{tabular}{llll}
+$-a,-u,-c,-m$ & $-a,+u,+c,+m$ & $-a,-u,-c,-m$ & $+a,-u,+c,+m$\\
+$-a,-u,+c,-m$ & $-a,-u,-c,+m$ & $-a,-u,-c,-m$ & $-a,+u,-c,-m$\\
+$+a,-u,+c,-m$ & $-a,-u,-c,-m$ & $-a,-u,-c,-m$ & $-a,+u,+c,+m$
+\end{tabular}
+\end{center}
+¿Cuántas se aceptan y qué estimación dan? ¿Cuántas aceptadas esperarías de 12 en promedio?
+(b) \pts{7} \emph{Verosimilitud con pesos.} Con $M=+m$ fijo se muestrearon $(A,U,C)$:
+$(-a,-u,-c)$, $(-a,+u,+c)$, $(+a,-u,+c)$, $(-a,-u,-c)$, $(-a,-u,+c)$, $(-a,-u,-c)$, $(-a,-u,-c)$, $(-a,+u,-c)$.
+Calcula los pesos y la estimación.
+(c) \pts{6} \emph{Gibbs.} Estado $(-a,+u,+c)$ con $+m$. Calcula $P(A\mid\text{manto})$ y, si después se actualiza $C$ con $A=-a$, $P(C\mid\text{manto})$.
+(d) \pts{6} Compara los tres métodos en esta consulta: ¿cuál desperdicia más trabajo y por qué? ¿Cuál preferirías si la evidencia fuese $+m,+q$ y muy rara?
+\end{ejercicio}
+
+\begin{ejercicio}{C4 · Clasificador bayesiano ingenuo como red bayesiana \dif{3}\fuente{AIMA 20.2, estilo}}
+¿Se juega fútbol ($J$)? Datos:
+\begin{center}\small
+\begin{tabular}{c|cccccccccc}
+\# & 1&2&3&4&5&6&7&8&9&10\\\hline
+Cielo & sol&sol&nub&lluvia&lluvia&nub&sol&lluvia&nub&sol\\
+Viento & sí&no&no&sí&no&sí&no&sí&no&sí\\
+$J$ & no&sí&sí&no&sí&sí&sí&no&sí&no
+\end{tabular}
+\end{center}
+(a) \pts{4} Dibuja la red ($J\to\text{Cielo}$, $J\to\text{Viento}$) y escribe la regla de clasificación.
+(b) \pts{7} Estima por MLE $P(J)$, $P(\text{Cielo}\mid J)$ y $P(\text{Viento}\mid J)$.
+(c) \pts{7} Clasifica (lluvia, sí), (nub, sí) y (sol, no) con MLE. ¿Qué problema aparece?
+(d) \pts{7} Repite (c) con Laplace $\lambda=1$ en las CPT de los atributos ($P(J)$ por MLE). ¿Cambia alguna decisión o solo la confianza?
+\end{ejercicio}
+
+\begin{ejercicio}{C5 · EM con dos monedas \dif{3}\fuente{Do \& Batzoglou (2008), clásico}}
+Se eligió al azar (prob.\ $1/2$) una de dos monedas $A$, $B$ y se lanzó 10 veces; se repitió 5 veces. Solo se registró el número
+de caras: $5,9,8,4,7$. Parámetros iniciales $\theta_A=0.6$, $\theta_B=0.5$.
+(a) \pts{4} Plantea la red bayesiana (moneda oculta $\to$ resultados) y la verosimilitud marginal.
+(b) \pts{10} Paso E: calcula $w_j=P(A\mid h_j)$ para cada serie (usa $\theta^h(1-\theta)^{10-h}$).
+(c) \pts{6} Paso M: calcula las caras y cruces esperadas de cada moneda y reestima $\theta_A,\theta_B$.
+(d) \pts{5} Si se conociera qué moneda se usó en cada serie, ¿cómo se estimaría? ¿Qué pasa si se intercambian las etiquetas $A$ y $B$?
+\end{ejercicio}
+
+\begin{ejercicio}{C6 · Regresión polinomial y generalización \dif{3}}
+Entrenamiento: $x=-2,-1,0,1,2$ con $y=4.2,0.8,0.1,1.1,3.8$. Prueba: $(3,9.1)$ y $(-3,8.8)$.
+(a) \pts{6} Ajusta $\hat y=\theta_0+\theta_1x$ por ecuaciones normales. Calcula ECM de entrenamiento y de prueba.
+(b) \pts{9} Ajusta $\hat y=\theta_0+\theta_1x+\theta_2x^2$. (Pista: $X^\mathsf TX$ tiene muchos ceros por la simetría de los $x$.) Calcula ambos ECM.
+(c) \pts{5} Un polinomio de grado 4 interpola los cinco puntos con $\theta=(0.1,\,0.2333,\,0.8083,\,-0.0833,\,0.0417)$.
+Verifica su ECM de entrenamiento y calcula sus predicciones de prueba.
+(d) \pts{5} Ordena los tres modelos por error de entrenamiento y por error de prueba; nombra subajuste y sobreajuste.
+\end{ejercicio}
+
+\begin{ejercicio}{C7 · $k$-means y la escala de las características \dif{3}}
+Clientes (ingreso en miles, visitas por mes): $C_1(10,1)$, $C_2(12,9)$, $C_3(30,2)$, $C_4(32,8)$. $K=2$, centroides iniciales $C_1$ y $C_2$.
+(a) \pts{8} Ejecuta $k$-means sobre los datos crudos hasta converger; reporta $J$.
+(b) \pts{8} Divide el ingreso entre 10 y repite. ¿Qué grupos obtienes ahora?
+(c) \pts{5} Calcula la silueta de $C_1$ en cada solución (en su propia escala).
+(d) \pts{4} ¿Cuál agrupamiento es «correcto»? ¿Qué decide la respuesta?
+\end{ejercicio}
+
+\begin{ejercicio}{C8 · Robot de reciclaje: modelar y resolver el MDP \dif{3}\fuente{Sutton \& Barto, ej.\ 3.3, adaptado}}
+Un robot recolecta latas. Su batería está alta ($H$) o baja ($L$). En $H$ puede \emph{buscar} o \emph{esperar}; en $L$ puede \emph{buscar},
+\emph{esperar} o \emph{recargar}.
+\begin{itemize}
+\item Buscar en $H$: recompensa $+2$; queda en $H$ con prob.\ $0.7$ y pasa a $L$ con $0.3$.
+\item Buscar en $L$: con prob.\ $0.6$ recompensa $+2$ y sigue en $L$; con $0.4$ se agota, lo rescatan (recompensa $-3$) y vuelve a $H$.
+\item Esperar: recompensa $+1$ y no cambia de estado. Recargar (solo en $L$): recompensa $0$ y pasa a $H$. $\gamma=0.9$.
+\end{itemize}
+(a) \pts{5} Escribe el MDP: $S$, $A(s)$, $T$ y $R$ en una tabla; dibuja el diagrama de transiciones.
+(b) \pts{10} Iteración de políticas desde $\pi_0=(\text{esperar},\text{esperar})$: evalúa exactamente, mejora y repite hasta que no cambie.
+(c) \pts{6} Cuatro iteraciones de valores desde $V_0=0$. ¿Qué política voraz da $V_4$?
+(d) \pts{4} ¿Cómo cambiaría la política óptima si la penalización de rescate fuera $-20$? (Razona sin resolver todo.)
+\end{ejercicio}
+
+\begin{ejercicio}{C9 · Q-learning en el corredor y comparación con el óptimo \dif{3}}
+Corredor de B24 ($\gamma=0.9$), Q-learning con $\alpha=0.5$, $Q_0=0$. Episodios observados (estado, acción, recompensa, siguiente):
+\begin{enumerate}[label=Ep.\,\arabic*:,leftmargin=3em]
+\item $(2,\text{der},-1,3)$, $(3,\text{der},+10,R)$
+\item $(1,\text{der},-1,2)$, $(2,\text{der},-1,3)$, $(3,\text{izq},-1,2)$, $(2,\text{der},-1,3)$, $(3,\text{der},+10,R)$
+\item $(2,\text{izq},-1,1)$, $(1,\text{izq},+2,L)$
+\item $(1,\text{der},-1,2)$, $(2,\text{der},-1,3)$, $(3,\text{der},+10,R)$
+\end{enumerate}
+(a) \pts{12} Actualiza la tabla Q tras cada transición. (b) \pts{4} Da la política voraz final.
+(c) \pts{5} Compara con $Q^*$ (usa B24): ¿qué estado tiene la acción equivocada y por qué?
+(d) \pts{4} En el episodio 2 el agente eligió «izq» en el estado 3 (exploración). Explica por qué Q-learning sigue
+aprendiendo el valor de la política voraz y qué cambiaría con SARSA. Si hubiera pedido «der» y el ruido lo hubiera llevado a 2,
+¿qué tupla se registraría y qué entrada se actualizaría?
+\end{ejercicio}
+
+\begin{ejercicio}{C10 · Monte Carlo frente a TD: el ejemplo A–B \dif{3}\fuente{Sutton \& Barto, ej.\ 6.4}}
+$\gamma=1$. Ocho episodios: $A\xrightarrow{0}B\xrightarrow{0}T$; seis veces $B\xrightarrow{1}T$; una vez $B\xrightarrow{0}T$.
+(a) \pts{6} Estima $V(A)$ y $V(B)$ con Monte Carlo.
+(b) \pts{8} Estima $V(A)$ y $V(B)$ con TD en modo \emph{batch} (repitiendo los episodios hasta converger). Pista: busca el punto fijo.
+(c) \pts{6} ¿Cuál estimación de $V(A)$ prefieres y por qué? Relaciona con «modelo de máxima verosimilitud» y con el error en los datos.
+(d) \pts{5} Aplica una sola pasada de TD(0) en línea con $\alpha=0.5$, $V_0=0$, en el orden dado.
+\end{ejercicio}
+
+\begin{ejercicio}{C11 · Retropropagación con softmax \dif{3}}
+$\mathbf x=(1,-1)$, clase correcta 2 ($\mathbf t=(0,1)$). Oculta ReLU: $W_1=\begin{pmatrix}2&1\\1&-1\end{pmatrix}$, $\mathbf b_1=(0,-3)$.
+Salida: $\mathbf z_2=W_2\mathbf h+\mathbf b_2$, $W_2=\begin{pmatrix}1&-1\\0.5&1\end{pmatrix}$, $\mathbf b_2=(0,0)$, softmax y entropía cruzada.
+(a) \pts{6} Forward completo y pérdida. (b) \pts{10} Backward: $\boldsymbol\delta_2$, $\partial\ell/\partial W_2$, $W_2^\mathsf T\boldsymbol\delta_2$, $\boldsymbol\delta_1$, $\partial\ell/\partial W_1$.
+(c) \pts{5} Actualiza con $\eta=1$ y recalcula la pérdida. (d) \pts{4} ¿Qué parámetros no se actualizan y por qué? ¿Qué es una neurona muerta?
+\end{ejercicio}
+
+\begin{ejercicio}{C12 · Un transformer diminuto \dif{3}}
+Vocabulario $\{\text{el},\text{gato},\text{come},\text{pez},\langle/s\rangle\}$ (en ese orden). Se entrena con la secuencia
+«$\langle s\rangle$ el gato come $\langle/s\rangle$». Los logits por posición son:
+\begin{center}\small
+\begin{tabular}{l|ccccc}
+Prefijo & el & gato & come & pez & $\langle/s\rangle$\\\hline
+$\langle s\rangle$ & 2 & 0 & 0 & 0 & $-1$\\
+$\langle s\rangle$ el & 0 & 2 & 0 & 1 & 0\\
+$\langle s\rangle$ el gato & 1 & 0 & 2 & 0 & 0\\
+$\langle s\rangle$ el gato come & 0 & 0 & 1 & 0 & 3
+\end{tabular}
+\end{center}
+(a) \pts{8} Calcula la probabilidad del token correcto en cada posición, la pérdida media y la perplejidad.
+(b) \pts{4} Para el tercer prefijo, calcula la distribución con $\tau=0.5$ y $\tau=2$.
+(c) \pts{9} Atención causal de una cabeza con $Q=\begin{pmatrix}1&1\\0&2\\2&0\end{pmatrix}$, $K=\begin{pmatrix}1&0\\0&1\\1&1\end{pmatrix}$,
+$V=\begin{pmatrix}2&0\\0&2\\1&1\end{pmatrix}$: calcula $S$, $A$ y $O$.
+(d) \pts{4} Con $V=50\,000$, $d=512$ y una cabeza de $d_k=d_v=64$, cuenta los parámetros de la tabla de embeddings y de $W_Q,W_K,W_V,W_O$.
+\end{ejercicio}
+
+\begin{ejercicio}{C13 · Auditoría de un sistema de crédito \dif{3}}
+Resultados en dos grupos de 100 personas:
+\begin{center}\small
+\begin{tabular}{c|cccc}
+Grupo & $TP$ & $FN$ & $FP$ & $TN$\\\hline
+A & 48 & 12 & 8 & 32\\
+B & 18 & 12 & 2 & 68
+\end{tabular}
+\end{center}
+(a) \pts{8} Calcula exactitud global y, por grupo, tasa base, aprobación, TPR, FPR, PPV y exactitud.
+(b) \pts{6} ¿Qué criterios de equidad se violan? ¿Quién paga el costo de los errores en cada grupo?
+(c) \pts{4} ¿Por qué no se pueden igualar a la vez TPR, FPR y PPV aquí? ¿Qué es el problema de las etiquetas selectivas?
+(d) \pts{4} ¿En qué nivel de riesgo del Reglamento de IA de la UE cae este sistema y qué obligaciones implica?
+(e) \pts{3} El sistema usa un agente que hace 40 llamadas de 0.3 Wh por solicitud y resuelve bien el 80\,\%. Calcula la energía
+por solicitud bien resuelta y para 10\,000 solicitudes diarias.
+\end{ejercicio}
+
+\newpage
+% ======================= PARTE D =======================
+\section{Parte D — Exámenes simulados (2 horas cada uno)}
+
+\begin{nota}
+Resuelve cada simulacro de corrido, con cronómetro y con tu hoja A4. Cuatro preguntas de 25 puntos. Califícate con las
+respuestas: da la mitad de los puntos de un inciso si el procedimiento es correcto y solo falla la aritmética.
+\end{nota}
+
+\subsection*{Simulacro D1}
+\addcontentsline{toc}{subsection}{Simulacro D1}
+
+\begin{ejercicio}{D1.1 · El auto no arranca (25 pts) \dif{3}}
+\begin{center}\figCar\qquad
+{\small\begin{tabular}{l}
+$B$: batería bien ($P(+b)=0.9$); $F$: hay gasolina ($P(+f)=0.95$)\\
+$S$: arranca: $P(+s\mid+b,+f)=0.99$, $P(+s\mid+b,-f)=0$,\\
+\hspace{3.5em}$P(+s\mid-b,+f)=0.05$, $P(+s\mid-b,-f)=0$\\
+$L$: luces encienden: $P(+l\mid+b)=0.95$, $P(+l\mid-b)=0.1$
+\end{tabular}}\end{center}
+(a) \pts{4} Factorización y número de parámetros. (b) \pts{6} ¿$B\indep F$? ¿$B\indep F\mid S$? ¿$L\indep F$? ¿$L\indep F\mid S$? Justifica.
+(c) \pts{8} Calcula $P(-b\mid-s)$ y $P(-f\mid-s)$ por enumeración.
+(d) \pts{7} Calcula $P(-b\mid-s,+l)$ y $P(-f\mid-s,+l)$. Explica en una línea cómo las luces cambian el diagnóstico.
+\end{ejercicio}
+
+\begin{ejercicio}{D1.2 · Aprender y muestrear la red del auto (25 pts) \dif{3}}
+Registros $(B,F,S,L)$ con $1=$ verdadero: $(1,1,1,1)$, $(1,1,1,1)$, $(1,0,0,1)$, $(0,1,0,0)$, $(1,1,1,1)$, $(0,1,1,0)$, $(1,1,1,0)$, $(0,1,0,0)$.
+(a) \pts{10} Estima por MLE y con Laplace ($\lambda=1$) las cuatro filas de $P(+s\mid B,F)$ y las dos de $P(+l\mid B)$. ¿Qué fila es indefinida con MLE?
+(b) \pts{10} Con las CPT \emph{originales} de D1.1, verosimilitud con pesos para $P(+b\mid-s)$: se muestrearon $(B,F)=(1,1),(0,1),(1,0),(1,1),(0,1),(1,1)$.
+Calcula pesos y estimación; compara con el valor exacto.
+(c) \pts{5} ¿Por qué rechazo sería mala idea para $P(B\mid-s)$? Estima cuántas muestras previas necesitarías para aceptar 100.
+\end{ejercicio}
+
+\begin{ejercicio}{D1.3 · Inventario como MDP (25 pts) \dif{3}}
+Una tienda tiene $s\in\{0,1,2\}$ unidades. Cada día decide pedir $a\in\{0,1\}$ unidades (sin superar 2); el pedido llega antes de la
+demanda. La demanda es 1 o 0 con probabilidad $0.5$ cada una. Vender una unidad da $+4$, pedir cuesta $1$ por unidad y cada unidad
+que queda al final del día cuesta $0.5$. $\gamma=0.8$.
+(a) \pts{6} Escribe $T(s,a,s')$ y $R(s,a,s')$ para los 5 pares $(s,a)$ válidos.
+(b) \pts{9} Tres iteraciones de valores desde $V_0=0$ y la política voraz de $V_3$.
+(c) \pts{6} Evalúa exactamente $\pi=$ «pedir si $s<2$» y $\pi'=$ «pedir solo si $s=0$». ¿Cuál es mejor? ¿Es $\pi'$ óptima? (verifica con un paso de mejora).
+(d) \pts{4} ¿Qué cambia si $\gamma=0$?
+\end{ejercicio}
+
+\begin{ejercicio}{D1.4 · Q-learning tabular y aproximado (25 pts) \dif{3}}
+(a) \pts{12} Tabla inicial: $Q(s_1,a)=1$, $Q(s_1,b)=2$, $Q(s_2,a)=4$, $Q(s_2,b)=0$, $Q(s_3,a)=-1$, $Q(s_3,b)=3$; $\alpha=0.25$, $\gamma=0.8$.
+Transiciones: $(s_1,b,+1,s_2)$, $(s_2,a,-2,s_3)$, $(s_3,b,+5,T)$, $(s_1,a,0,s_3)$. Actualiza en orden.
+(b) \pts{5} Da la política $\varepsilon$-voraz ($\varepsilon=0.1$) en $s_1$ antes y después.
+(c) \pts{8} Aproximación lineal: $\mathbf w=(0.5,1,-2)$, $\phi(s,a)=(1,3,1)$, $r=-1$, acciones en $s'$ con $\phi=(1,1,0)$ y $(1,2,1)$,
+$\gamma=0.8$, $\alpha=0.1$. Calcula $\delta$ y el nuevo $\mathbf w$.
+\end{ejercicio}
+
+\subsection*{Simulacro D2}
+\addcontentsline{toc}{subsection}{Simulacro D2}
+
+\begin{ejercicio}{D2.1 · Lluvia, aspersor y tráfico (25 pts) \dif{3}}
+\begin{center}\figDdos\qquad
+{\small\begin{tabular}{l}
+$P(+n)=0.4$;\ $P(+r\mid+n)=0.7$, $P(+r\mid-n)=0.1$\\
+$P(+s\mid+n)=0.2$, $P(+s\mid-n)=0.6$\\
+$P(+w\mid R,S)$: $(+,+)\,0.95$, $(+,-)\,0.85$, $(-,+)\,0.8$, $(-,-)\,0.05$\\
+$P(+t\mid+r)=0.6$, $P(+t\mid-r)=0.2$
+\end{tabular}}\end{center}
+(a) \pts{8} d-separación: $S\indep T$; $S\indep T\mid R$; $S\indep T\mid W$; $S\indep T\mid R,W$; $N\indep W\mid R,S$; $T\indep W\mid R$.
+(b) \pts{10} $P(R\mid+w)$ por eliminación con orden $N,S$ (descarta $T$ justificando). Muestra cada factor.
+(c) \pts{7} $P(R\mid+w,+s)$. Compara con (b) y explica.
+\end{ejercicio}
+
+\begin{ejercicio}{D2.2 · Regresión, logística y métricas (25 pts) \dif{3}}
+(a) \pts{9} Ajusta $\hat y=\theta_0+\theta_1x$ a $(1,2),(2,3),(4,6),(5,9)$; da SSE y la predicción en $x=6$.
+(b) \pts{10} Logística con $\theta=(\theta_0,\theta_1)=(0,0)$ y datos $x=1,3$ (clase 1), $x=-1,-2$ (clase 0). Calcula la pérdida, el gradiente,
+un paso con $\alpha=0.5$ y la nueva pérdida. ¿Qué pasa con $\theta$ si se sigue iterando? ¿Por qué?
+(c) \pts{6} Con $TP=30$, $FP=10$, $FN=20$, $TN=140$ calcula exactitud, precisión, recall, especificidad y $F_1$.
+\end{ejercicio}
+
+\begin{ejercicio}{D2.3 · Agrupamiento (25 pts) \dif{3}}
+Puntos $A(0,0)$, $B(0,2)$, $C(3,0)$, $D(6,6)$, $E(7,6)$, $F(9,9)$.
+(a) \pts{12} $k$-means ($K=2$, euclidiana al cuadrado) con centroides iniciales $A$ y $B$ hasta converger; reporta $J$. Repite con $A$ y $D$. Comenta.
+(b) \pts{10} Con distancia Manhattan, aglomerativo con \emph{linkage} simple y completo: orden de uniones y alturas.
+(c) \pts{3} ¿Cuántos grupos sugiere cada dendrograma? ¿Por qué?
+\end{ejercicio}
+
+\begin{ejercicio}{D2.4 · Red neuronal, atención y equidad (25 pts) \dif{3}}
+(a) \pts{12} $\mathbf x=(2,1)$, $y=0$. $z_1=\mathbf w_1^\mathsf T\mathbf x+b_1$, $h=\mathrm{ReLU}(z_1)$, $p=\sigma(w_2h+b_2)$, entropía cruzada;
+$\mathbf w_1=(1,-1)$, $b_1=0$, $w_2=2$, $b_2=-1$. Forward, backward, actualización con $\eta=0.5$ y nueva pérdida.
+(b) \pts{7} Consulta $\mathbf q=(1,2)$, claves $(2,0),(0,1),(1,1)$, valores $(1,0),(0,1),(2,2)$, $d_k=2$. Calcula pesos y salida sin máscara.
+Si la consulta está en la posición 2 con máscara causal, ¿qué cambia?
+(c) \pts{6} Grupos H: $TP=30,FN=10,FP=15,TN=45$; M: $TP=20,FN=20,FP=5,TN=55$. Compara aprobación, TPR, FPR, PPV y exactitud. ¿Qué criterio se viola?
+\end{ejercicio}
+
+\end{document}

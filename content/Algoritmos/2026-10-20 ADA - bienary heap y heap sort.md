@@ -11,8 +11,11 @@ conceptos:
   - Heapify-up y heapify-down
   - Construcción de un heap en tiempo lineal
   - Heapsort
+  - Selección de los mayores elementos de un flujo
+  - Simulación por eventos
 referencias:
   - "[[2026-10-13 ADA - algoritmo-de-huffman]]"
+  - "[[24PriorityQueues.pdf]], diapositivas 3–49 (colas y heaps) y 51–68 (simulación por eventos)"
   - "[[2026-09-29 ADA - Contunuacion-scheduling]], §8 (Dijkstra)"
   - "[[04GreedyAlgorithmsII.pdf]], diapositivas 11–13 y 45, 58–83 (complemento de estudio)"
   - "Kleinberg y Tardos, Algorithm Design, sección 2.5"
@@ -38,6 +41,11 @@ tags:
 
 > [!warning] Nota reconstruida
 > Los apuntes de clase eran breves; el desarrollo sigue Kleinberg–Tardos §2.5 (heap de **mínimos**, índices desde $1$) y CLRS cap. 6 (heapsort con heap de **máximos**). Conviene verificar contra el pizarrón qué convención usó el profesor; los argumentos son idénticos cambiando $\le$ por $\ge$.
+
+> [!info] Diapositivas añadidas para estudiar
+> La presentación de Sedgewick y Wayne **2.4 Priority Queues** usa un heap de **máximos** para explicar la estructura y heapsort. Las aplicaciones de los mayores elementos de un flujo y de simulación por eventos, desarrolladas abajo, son **complementos de estudio**.
+
+![[24PriorityQueues.pdf]]
 
 > [!tip] Cobertura complementaria de *Greedy Algorithms II*
 > Más abajo se desarrolla **clustering y arborescencias (diapositivas 58–83)**, con prueba intuitiva, SVG, laboratorio cuando aporta una exploración útil y ejercicios tipo examen. Este bloque amplía la cobertura del material sin alterar el registro original de la sesión.
@@ -138,7 +146,7 @@ Se verifica el orden: $2\le5,3$; $5\le9,6$; $3\le4,8$.
 
 ## 4. Reparar el orden: *heapify-up* y *heapify-down*
 
-Todas las operaciones modifican **una sola posición** y luego reparan el orden por un camino del árbol. Kleinberg–Tardos lo formalizan con la noción de “casi heap”.
+Después de insertar, extraer o cambiar una llave, puede quedar **una sola posición fuera de lugar**. Reparar el orden exige recorrer a lo sumo un camino del árbol. Kleinberg–Tardos lo formalizan con la noción de “casi heap”.
 
 ### 4.1 *Heapify-up* (subir)
 
@@ -171,7 +179,7 @@ def heapify_down(H, i, n):
         i = j
 ```
 
-Hay que intercambiar con el **menor** de los hijos: así el que sube es menor o igual que su hermano y el orden se conserva en ese lado. **Costo:** $O(\log n)$, con dos comparaciones por nivel.
+Hay que intercambiar con el **menor** de los hijos: así el que sube es menor o igual que su hermano y el orden se conserva en ese lado. **Costo:** $O(\log n)$, con a lo sumo dos comparaciones por nivel.
 
 ### 4.3 Las operaciones
 
@@ -185,6 +193,9 @@ Hay que intercambiar con el **menor** de los hijos: así el que sube es menor o 
 
 > [!important] `decrease_key` necesita un arreglo de posiciones
 > Para bajar la llave del **nodo $v$** (Dijkstra, Prim), hay que saber dónde está $v$ dentro del heap. Se mantiene un arreglo auxiliar `pos[v]` que se actualiza en cada intercambio. Sin él, encontrar $v$ costaría $O(n)$.
+
+> [!warning] Llaves mutables y casos de borde (diapositivas 33–35)
+> Cambiar la prioridad de un objeto **por fuera** del heap rompe el orden sin que la estructura lo sepa: hay que usar una operación que actualice la llave y luego suba o baje el elemento. Extraer de una cola vacía debe manejarse explícitamente; si el arreglo interno se llena, se redimensiona o se señala el límite de capacidad. Las prioridades iguales se permiten y cualquiera de los máximos o mínimos empatados puede salir primero, salvo que se añada una regla de desempate.
 
 ### 4.4 Ejemplo
 
@@ -229,7 +240,8 @@ def build_heap(H, n):
 
 $$
 \sum_{h=0}^{\lfloor\log_2 n\rfloor}\left\lceil\frac{n}{2^{h+1}}\right\rceil O(h)
-=O\!\left(n\sum_{h\ge0}\frac{h}{2^{h}}\right)=O(2n)=O(n).
+=O\!\left(n\sum_{h\ge0}\frac{h}{2^{h+1}}+\sum_{h=0}^{\lfloor\log_2 n\rfloor}h\right)
+=O(n)+O(\log^2 n)=O(n).
 $$
 
 > [!tip] Intuición
@@ -301,7 +313,7 @@ en el **peor caso**, con $O(1)$ memoria extra. Como todo ordenamiento por compar
 
 ## 7. Variantes y conexión con la unidad voraz
 
-- **Heap $d$-ario:** cada nodo tiene $d$ hijos; la altura baja a $\log_d n$. Subir cuesta $O(\log_d n)$, pero bajar cuesta $O(d\log_d n)$ porque hay que hallar el menor de $d$ hijos. Dijkstra hace hasta $m$ `decrease_key` (subidas) y solo $n$ `extract_min` (bajadas); con $d\approx m/n$ se obtiene $O(m\log_{m/n} n)$ (diapositiva 13).
+- **Heap $d$-ario:** cada nodo tiene hasta $d$ hijos; la altura baja a $O(\log_d n)$. Subir cuesta $O(\log_d n)$, pero bajar cuesta $O(d\log_d n)$ porque hay que hallar el menor entre hasta $d$ hijos. En Dijkstra hay hasta $m$ disminuciones de llave y $n$ extracciones: $O((m+nd)\log_d n)$. Para un grafo conexo puede elegirse $d=\max\{2,\lceil m/n\rceil\}$; así se evita una base $1$ cuando $m\approx n$ y se obtiene $O(m\log_d n)$ (diapositivas 29–31 de `24PriorityQueues.pdf`).
 - **Heap de Fibonacci:** `decrease_key` en $O(1)$ amortizado; Dijkstra y Prim en $O(m+n\log n)$.
 - **Algoritmos voraces con heap:** partición de intervalos $O(n\log n)$, Huffman $O(k\log k)$, Dijkstra y Prim $O(m\log n)$. En todos, la regla voraz es “tomar el de menor llave”, y el heap la hace barata.
 
@@ -351,6 +363,50 @@ en el **peor caso**, con $O(1)$ memoria extra. Como todo ordenamiento por compar
 6. En la posición $2$ o $3$: es hijo de la raíz, porque todo elemento fuera de la raíz tiene un ancestro hijo de la raíz que es menor o igual que él.
 
 </details>
+
+---
+
+## Aplicación adicional: los $k$ mayores de un flujo (diapositivas 7–8)
+
+**Problema:** llegan $n$ valores uno por uno y solo hay memoria para conservar $1\le k\le n$ valores, normalmente con $k\ll n$. Queremos terminar con los $k$ mayores, sin guardar ni ordenar toda la entrada. La elección adecuada es un **heap de mínimos de tamaño $k$**: su raíz es el **menor de los candidatos actuales**, justo el que conviene descartar si llega un valor mejor.
+
+```text
+para cada valor x del flujo:
+    si el heap tiene menos de k elementos: insertar x
+    si ya tiene k y x > mínimo(heap): extraer mínimo; insertar x
+    en otro caso: descartar x
+```
+
+**Invariante:** después de leer $i$ valores, el heap contiene los $\min(i,k)$ mayores de ese prefijo. Si $x$ no supera la raíz, ya hay $k$ valores al menos tan grandes como $x$ y puede descartarse. Si la supera, sustituye al menor candidato. Por inducción, al final quedan los $k$ mayores; **no necesariamente ordenados** dentro del heap.
+
+| Valor leído | Candidatos después de procesarlo, para $k=3$ | Razón |
+|---:|---|---|
+| $8$ | $\{8\}$ | Aún hay espacio. |
+| $2$ | $\{2,8\}$ | Aún hay espacio. |
+| $11$ | $\{2,8,11\}$ | Ya hay tres candidatos. |
+| $5$ | $\{5,8,11\}$ | $5>2$: sale $2$. |
+| $9$ | $\{8,9,11\}$ | $9>5$: sale $5$. |
+| $1$ | $\{8,9,11\}$ | $1\le8$: se descarta. |
+
+Cada valor requiere a lo sumo una extracción y una inserción de $O(\log(k+1))$: tiempo $O(n\log(k+1))$ y espacio $O(k)$. Escribir $k+1$ incluye el caso $k=1$, que cuesta $O(n)$. La tabla muestra el **conjunto** de candidatos, no el arreglo interno exacto del heap. Si se necesitan ordenados, se extraen al final en $O(k\log(k+1))$.
+
+> [!tip] ¿Por qué heap de mínimos para buscar máximos?
+> Porque la raíz debe ser el **peor de los candidatos conservados**. Con un heap de máximos veríamos el mejor, pero para reemplazar al peor habría que buscarlo.
+
+## Aplicación adicional: simulación por eventos (diapositivas 51–68)
+
+En una simulación de partículas, revisar en cada instante pequeño $\Delta t$ si hubo una colisión obliga a repetir muchas comprobaciones; si $\Delta t$ es demasiado grande, incluso se pueden saltar colisiones. La alternativa de las diapositivas es mantener una **cola de prioridad de mínimos ordenada por tiempo**: la raíz indica el siguiente evento que debe procesarse.
+
+1. Se predicen colisiones posibles con paredes y otras partículas y se insertan como eventos `(tiempo, participantes)`.
+2. Se extrae el evento de menor tiempo. Si sigue siendo válido, se avanza el reloj hasta él y se actualiza el estado de los participantes.
+3. Se predicen los nuevos eventos que involucran a los participantes modificados y se insertan. Se repite hasta el tiempo final.
+
+**¿Por qué validar?** Supón que se predice que A chocará con B en $t=6$, pero A rebota antes en una pared en $t=4$. Su trayectoria cambió; el evento de $t=6$ quedó obsoleto aunque todavía esté en el heap. Una forma de detectarlo es guardar en cada evento el contador de colisiones de sus participantes al crearlo. Al extraerlo, si algún contador ya cambió, se descarta y se toma el siguiente. Así se evita buscar y borrar todos los eventos obsoletos dentro del heap.
+
+> [!important] Papel exacto de la cola de prioridad
+> El heap **ordena los eventos pendientes por tiempo**; no calcula si dos partículas chocarán ni resuelve la física del choque. Si hay $P$ eventos extraídos, $I$ insertados y a lo sumo $Q$ pendientes, las operaciones de cola cuestan $O((P+I)\log(Q+1))$, además del costo de predecir y actualizar eventos. Un evento inválido también se extrae, así que cuenta en $P$.
+
+Estas dos aplicaciones muestran por qué elegir **mínimo o máximo** depende de la pregunta: para conservar los mayores, se expulsa el mínimo candidato; para avanzar una simulación, se atiende el evento con el menor tiempo.
 
 ---
 
@@ -430,6 +486,7 @@ Usa el ejemplo guiado. **(a)** Calcula $y(A),y(B),y(C)$ y los costos reducidos d
 3. Wayne, K. (2020). *Greedy Algorithms II* (`04GreedyAlgorithmsII.pdf`), diapositivas 11–13 (colas de prioridad en Dijkstra) y 45 (Prim).
 4. Williams, J. W. J. (1964). “Algorithm 232: Heapsort”. *Communications of the ACM*, 7(6), 347–348.
 5. Floyd, R. W. (1964). “Algorithm 245: Treesort 3”. *Communications of the ACM*, 7(12), 701. Construcción del heap en tiempo lineal.
+6. Sedgewick, R. y Wayne, K. *Algorithms, 4th Edition*, presentación **2.4 Priority Queues** (`24PriorityQueues.pdf`), diapositivas 3–68.
 
 ## Resumen después de clase
 

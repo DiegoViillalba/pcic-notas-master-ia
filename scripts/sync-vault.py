@@ -51,7 +51,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CONTENT_DIR = REPO_ROOT / "content"
 
 VAULT_ROOT = Path(
-    "/Users/diegovillalba/Library/Mobile Documents/iCloud~md~obsidian/Documents/PCIC_Vault"
+    "/Users/diegovillalba/Library/Mobile Documents/com~apple~CloudDocs/PCIC_Vault_reconstruido"
 )
 VAULT_MATERIAS_DIR = VAULT_ROOT / "01_Materias"
 VAULT_CONCEPTOS_DIR = VAULT_ROOT / "03_Conceptos"

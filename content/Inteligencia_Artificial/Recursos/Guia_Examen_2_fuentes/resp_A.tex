@@ -1,0 +1,141 @@
+% ============================================================
+\section{Parte A — Conceptos}
+
+\begin{solucion}{A1 · Probabilidad e incertidumbre}
+\textbf{1.} \emph{Pereza}: enumerar todas las excepciones de una regla («dolor $\Rightarrow$ caries, salvo …») es
+inviable. \emph{Ignorancia}: teórica (no hay teoría completa del dominio) y práctica (no se observa todo). La
+probabilidad resume ambas en un grado de creencia, y la lógica pura no puede decidir entre acciones cuyo éxito no es seguro.
+\textbf{2.} $P(\mathrm{caries})$ es marginal (suma 1 sobre los valores de Caries); $P(\mathrm{caries}\mid\mathrm{dolor})$ es condicional
+(suma 1 sobre Caries \emph{para cada} valor fijo de Dolor); $P(\mathrm{caries},\mathrm{dolor})$ es conjunta (suma 1 sobre todas las parejas).
+\textbf{3.} $3^8=6\,561$ filas y $6\,560$ parámetros libres.
+\textbf{4.} Falso. En el colisionador $X\to Z\leftarrow Y$ (dos monedas y $Z$ = «salieron iguales»), $X\indep Y$ pero, dado $Z$,
+conocer $X$ determina $Y$. También es falso el recíproco: en una cadena $X\to Z\to Y$, $X\indep Y\mid Z$ pero no $X\indep Y$.
+\textbf{5.} La regla de la cadena factoriza \emph{cualquier} conjunta sin supuestos: $P(\mathbf x)=\prod_iP(x_i\mid x_{<i})$.
+La red agrega el supuesto $P(x_i\mid x_{<i})=P(x_i\mid\mathrm{pa}(X_i))$, que reduce el número de parámetros.
+\textbf{6.} Un modelo probabilístico (creencias $P(s'\mid a,\mathbf e)$) y una función de utilidad sobre resultados.
+\end{solucion}
+
+\begin{solucion}{A2 · Redes bayesianas e independencia}
+\textbf{1.} La ausencia de arista \emph{no} garantiza independencia: puede haber caminos indirectos; lo que la red
+garantiza son las independencias que se leen por d-separación. Una arista presente permite dependencia
+pero no la obliga (los parámetros podrían hacerla nula).
+\textbf{2.} Cada nodo es condicionalmente independiente de sus no descendientes dados sus padres. Manto de Markov:
+padres, hijos y otros padres de los hijos; dado el manto, el nodo es independiente de todo lo demás.
+\textbf{3.} El pasto está mojado: puede ser lluvia o aspersor. Si me dicen que el aspersor estuvo prendido, la
+probabilidad de lluvia \emph{baja}: una causa ya explica el efecto (ver B6 y C1(d)).
+\textbf{4.} Cadena y causa común: observar el nodo central \emph{bloquea}. Efecto común: observar el nodo central
+(o un descendiente) \emph{activa}.
+\textbf{5.} No necesariamente. Varias estructuras son equivalentes (mismas independencias: $X\to Y\to Z$ y
+$X\leftarrow Y\leftarrow Z$) y puede haber variables no observadas; la causalidad requiere supuestos o intervenciones adicionales.
+\textbf{6.} Si se agrega primero un efecto, sus causas deben depender de él y entre sí. Con orden $M,J,A,B,E$, $J$ necesita a $M$,
+$A$ necesita $J,M$, $B$ necesita $A$, y $E$ necesita $A,B$: 13 parámetros en vez de 10. El orden causal suele dar la red más compacta.
+\end{solucion}
+
+\begin{solucion}{A3 · Inferencia exacta}
+\textbf{1.} Consulta $Q$: la variable cuya distribución se busca; evidencia $\mathbf e$: valores observados; ocultas $\mathbf h$: el
+resto, que se suman. $\alpha=1/P(\mathbf e)$ normaliza los pesos $P(q,\mathbf e)$ para que sumen 1.
+\textbf{2.} En la enumeración, los productos de los factores que no dependen de la variable interior se recalculan para cada
+valor de las exteriores. Eliminar guarda la suma parcial como un factor y la reutiliza (programación dinámica).
+\textbf{3.} \emph{Restringir}: quedarse con las entradas compatibles con la evidencia. \emph{Unir}: multiplicar entradas
+compatibles; el alcance es la unión de alcances. \emph{Eliminar}: sumar sobre los valores de una variable; el alcance pierde esa variable.
+\textbf{4.} Suma y producto son conmutativos y distributivos, así que todo orden da el mismo número; cambia el tamaño de los
+factores intermedios (B9).
+\textbf{5.} Un poliárbol tiene a lo sumo un camino sin dirección entre dos nodos; en él la eliminación es lineal en el tamaño de
+la red. En general la inferencia exacta es NP-difícil (\#P-difícil al contar).
+\textbf{6.} Una oculta cuyos descendientes no están en la consulta ni en la evidencia: $\sum_hP(h\mid\mathrm{pa})=1$, de modo que
+sus factores desaparecen. Se detecta podando hojas que no son consulta ni evidencia, repetidamente.
+\end{solucion}
+
+\begin{solucion}{A4 · Muestreo y aprendizaje de parámetros}
+\textbf{1.} Se acepta una fracción $\approx P(\mathbf e)$ de las muestras: de $N$ se esperan $NP(\mathbf e)$ útiles. Con $P(\mathbf e)=10^{-3}$
+casi todo se desperdicia, y el número crece exponencialmente con la cantidad de evidencia.
+\textbf{2.} Las muestras se generan con la evidencia fija, no de $P(\mathbf z\mid\mathbf e)$; el peso $\prod P(e_i\mid\mathrm{pa})$ corrige esa
+diferencia. Si la evidencia está abajo, no influye en el sorteo de sus ancestros: la mayoría de las muestras recibe peso diminuto
+y pocas dominan (tamaño efectivo pequeño).
+\textbf{3.} Solo el manto de Markov de la variable. Cada estado se obtiene modificando el anterior en una variable, por lo
+que estados consecutivos se parecen; las primeras muestras dependen del estado inicial y se descartan (calentamiento).
+\textbf{4.} $P(D\mid\theta)$ (o su logaritmo). Con datos completos el log se separa en una suma de términos, uno por fila de cada CPT,
+cada uno maximizado por la frecuencia relativa.
+\textbf{5.} Evita probabilidades cero por muestras pequeñas (que anulan productos y dan certeza falsa). Con $\lambda\to\infty$ cada fila
+tiende a la uniforme (sesgo máximo).
+\textbf{6.} E: con $\theta$ actual, calcula la posterior de las variables ocultas (conteos fraccionarios). M: reestima $\theta$ como MLE con esos
+conteos. Garantiza que la verosimilitud observada no decrece; no garantiza el máximo global (depende de la inicialización).
+\textbf{7.} Agregar padres nunca baja la verosimilitud de entrenamiento (la red más densa contiene a la más simple): se sobreajusta.
+Hay que penalizar la complejidad o validar en datos no usados.
+\end{solucion}
+
+\begin{solucion}{A5 · Aprendizaje supervisado}
+\textbf{1.} Clasificación predice una clase; regresión, una cantidad. «Lineal» significa lineal en los parámetros: $\hat y=\phi(x)^\mathsf T\theta$ con $\phi(x)=(1,x,x^2,\dots)$.
+\textbf{2.} Si $X$ tiene rango columna completo. Si no (columnas dependientes o $n<d$), se usa pseudoinversa, regularización (ridge) o se eliminan columnas.
+\textbf{3.} Subajuste: ambos errores altos (modelo demasiado simple). Sobreajuste: entrenamiento bajo y prueba alta (modelo que sigue el ruido).
+\textbf{4.} La etiqueta es Bernoulli; maximizar su verosimilitud equivale a minimizar entropía cruzada. Esa pérdida es convexa en $\theta$
+(hessiana $X^\mathsf T\mathrm{diag}(\pi(1-\pi))X\succeq0$); el error cuadrático con sigmoide no lo es y da gradientes pequeños.
+\textbf{5.} Su frontera es una recta y XOR no es linealmente separable (B18). La capa oculta transforma el espacio en
+características donde las clases sí se separan.
+\textbf{6.} Batch usa todos los datos (gradiente exacto, caro); en línea uno (barato y ruidoso); mini-batch un subconjunto (compromiso, aprovecha GPU).
+\textbf{7.} Una capa oculta suficientemente ancha puede aproximar cualquier función continua en un compacto. No dice cuántas
+unidades, ni que el entrenamiento las encuentre, ni que generalice.
+\textbf{8.} Una distribución predictiva: media y varianza en cada punto; la varianza crece lejos de los datos (útil para aprendizaje activo).
+\end{solucion}
+
+\begin{solucion}{A6 · Aprendizaje no supervisado}
+\textbf{1.} La distancia suma diferencias en unidades distintas; la característica de mayor rango domina (C7).
+\textbf{2.} Minimiza $J=\sum_j\sum_{x\in C_j}\|x-\mu_j\|^2$. La asignación y la actualización no aumentan $J$ y hay un número finito de
+particiones, así que termina; solo en un óptimo local.
+\textbf{3.} $0.8$: bien agrupado; $0$: en la frontera; $-0.3$: más cerca, en promedio, de otro grupo (probablemente mal asignado).
+\textbf{4.} Simple: cadenas alargadas (une por el par más cercano). Completo: grupos compactos de diámetro pequeño.
+\textbf{5.} Con grupos de forma arbitraria (anillos, medias lunas), con ruido o cuando no se conoce $K$.
+\textbf{6.} Supervisado: usa etiquetas. $k$ = número de vecinos que votan; $K$ = número de grupos de $k$-means.
+\end{solucion}
+
+\begin{solucion}{A7 · MDP y aprendizaje por refuerzo}
+\textbf{1.} $S$, $A(s)$, $T(s,a,s')=P(s'\mid s,a)$, $R(s,a,s')$, $\gamma$, estado inicial y terminales. Markov: el futuro depende solo del estado y la acción actuales.
+\textbf{2.} Para que el retorno sea finito en horizontes infinitos y para preferir recompensas tempranas: $|G_t|\le R_{\max}/(1-\gamma)$.
+\textbf{3.} $V^\pi(s)$: retorno esperado siguiendo $\pi$; $V^*$: el máximo sobre políticas; $Q^\pi(s,a)$, $Q^*(s,a)$: igual pero tomando primero $a$.
+La política mapea estados a acciones. Con $Q^*$, $\pi^*(s)=\argmax_aQ^*(s,a)$ sin necesidad de $T$ ni $R$.
+\textbf{4.} El operador de Bellman es una contracción en norma máximo: $\|BV-BU\|_\infty\le\gamma\|V-U\|_\infty$; tiene un único punto fijo y la iteración converge geométricamente.
+\textbf{5.} Valores: un respaldo barato con $\max$ por iteración, muchas iteraciones. Políticas: evaluación exacta (sistema lineal, cara) y
+mejora; pocas iteraciones y termina exactamente cuando la política no cambia.
+\textbf{6.} Planificación: $T,R$ conocidos, se calcula sin actuar. RL: se aprende de experiencia; basado en modelo estima $T,R$ y planifica;
+libre de modelo estima $V$ o $Q$ directamente.
+\textbf{7.} MC necesita episodios completos; insesgado, varianza alta. TD actualiza en cada paso con $r+\gamma V(s')$ (\emph{bootstrap});
+sesgado mientras $V$ sea inexacto, menor varianza, sirve en tareas continuas.
+\textbf{8.} Q-learning usa $\max_{a'}Q(s',a')$: aprende el valor de la política voraz aunque se comporte explorando. SARSA usa la acción
+realmente tomada: aprende el valor de la política que ejecuta.
+\textbf{9.} Sin explorar, una mala estimación inicial nunca se corrige. Convergencia tabular: todos los pares $(s,a)$ visitados
+infinitas veces y tasas con $\sum\alpha=\infty$, $\sum\alpha^2<\infty$.
+\textbf{10.} Generalizar a estados no visitados con pocos parámetros; se pierde la garantía de convergencia y la capacidad de distinguir estados
+con las mismas características. DQN: red neuronal como $\hat Q$, \emph{replay} (rompe correlaciones, reutiliza datos) y red objetivo congelada (estabiliza el objetivo).
+\end{solucion}
+
+\begin{solucion}{A8 · Aprendizaje profundo}
+\textbf{1.} $W_2(W_1x+b_1)+b_2=(W_2W_1)x+(W_2b_1+b_2)$: sigue siendo afín.
+\textbf{2.} La saturación de la sigmoide (derivada $\le1/4$, casi cero en los extremos) que desvanece gradientes. Neurona muerta: ReLU con
+$z<0$ para todas las entradas relevantes; su gradiente es cero y no se recupera.
+\textbf{3.} El gradiente de la pérdida respecto de todos los parámetros, aplicando la regla de la cadena desde la salida hacia la entrada y
+reutilizando los $\boldsymbol\delta$; cuesta del orden de un forward.
+\textbf{4.} Un vector aprendido por token (fila de $E\in\R^{V\times d}$). Coseno: ángulo entre vectores, $\frac{\mathbf u^\mathsf T\mathbf v}{\|\mathbf u\|\|\mathbf v\|}$; no es una probabilidad.
+\textbf{5.} La consulta pregunta, las claves determinan la compatibilidad y los valores son lo que se mezcla. $\sqrt{d_k}$ evita puntajes
+grandes que saturan softmax. La máscara impide ver tokens futuros en entrenamiento autorregresivo.
+\textbf{6.} Preentrenamiento: predecir el siguiente token en mucho texto (autosupervisado). Instrucciones: ajuste supervisado con pares
+instrucción–respuesta. RLHF: un modelo de recompensa entrenado con preferencias humanas guía un ajuste por RL.
+\textbf{7.} $\tau<1$ concentra la distribución (más determinista); $\tau>1$ la aplana (más diversa); $\tau\to0$ es voraz.
+\textbf{8.} Error esperado $=$ sesgo$^2$ $+$ varianza $+$ ruido. Modelos simples: sesgo alto; complejos: varianza alta; se elige con validación.
+\end{solucion}
+
+\begin{solucion}{A9 · IA en el contexto social}
+\textbf{1.} Muestreo no representativo, etiquetas históricas sesgadas, medición (registrar reportes y no hechos), variable objetivo sustituta,
+variables \emph{proxy}, y retroalimentación del despliegue.
+\textbf{2.} Otras variables (código postal, historial) lo predicen, y las etiquetas pueden reflejar discriminación pasada.
+\textbf{3.} Paridad: misma tasa de aprobación. Oportunidad: misma TPR. \emph{Equalized odds}: misma TPR y FPR. Con tasas base distintas,
+igualar errores y mantener la calibración (PPV) a la vez es imposible salvo con un clasificador perfecto.
+\textbf{4.} Texto en datos externos (correo, página, archivo) que el agente interpreta como orden. Controles: tratar contenido externo como
+datos, mínimo privilegio, confirmación humana para acciones irreversibles, aislar herramientas y registrar acciones.
+\textbf{5.} Inaceptable (prohibido: puntuación social estatal); alto riesgo (crédito, empleo, educación: obligaciones de gestión de riesgos,
+datos, documentación, supervisión humana); riesgo limitado (chatbots, \emph{deepfakes}: transparencia); mínimo (filtros de spam, videojuegos).
+\textbf{6.} W mide rapidez de consumo; kWh energía acumulada ($E=Pt$). Rebote: una eficiencia por uso que aumenta tanto el número de usos
+que el consumo total crece (B34).
+\textbf{7.} Exposición: tareas susceptibles de ser afectadas; sustitución depende de complementariedad y organización. Deuda cognitiva:
+terminar tareas con ayuda sin construir la capacidad de resolverlas solo.
+\textbf{8.} Delegación (qué delegar), descripción (comunicar bien la tarea), discernimiento (evaluar el resultado), diligencia (hacerse responsable).
+\end{solucion}

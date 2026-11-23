@@ -1,0 +1,146 @@
+% ================= Figuras compartidas (guía y respuestas) — Examen 2 =================
+
+% ---- Red del estudiante ----
+\newcommand{\figEst}{%
+\begin{tikzpicture}[scale=0.95]
+  \node[bn] (D) at (0,2) {D};
+  \node[bn] (I) at (2.4,2) {I};
+  \node[bn] (C) at (1.2,0.8) {C};
+  \node[bn] (E) at (3.6,0.8) {E};
+  \node[bn] (R) at (1.2,-0.4) {R};
+  \draw[barc] (D) -- (C); \draw[barc] (I) -- (C); \draw[barc] (I) -- (E); \draw[barc] (C) -- (R);
+\end{tikzpicture}}
+
+\newcommand{\tabEst}{%
+{\small
+\begin{tabular}{c}
+$P(+d)=0.4$ \qquad $P(+i)=0.3$\\[3pt]
+\begin{tabular}{cc|c}
+$D$ & $I$ & $P(+c\mid D,I)$\\\hline
+$+d$ & $+i$ & 0.7\\ $+d$ & $-i$ & 0.1\\ $-d$ & $+i$ & 0.9\\ $-d$ & $-i$ & 0.4
+\end{tabular}\quad
+\begin{tabular}{c|c}
+$I$ & $P(+e\mid I)$\\\hline $+i$ & 0.8\\ $-i$ & 0.1
+\end{tabular}\quad
+\begin{tabular}{c|c}
+$C$ & $P(+r\mid C)$\\\hline $+c$ & 0.9\\ $-c$ & 0.2
+\end{tabular}
+\end{tabular}}}
+
+% ---- Grafo de d-separación (8 nodos) ----
+\newcommand{\figDsep}{%
+\begin{tikzpicture}[scale=0.95]
+  \node[bn] (A) at (0,3) {A};
+  \node[bn] (B) at (2.4,3) {B};
+  \node[bn] (C) at (1.2,1.8) {C};
+  \node[bn] (D) at (3.6,1.8) {D};
+  \node[bn] (E) at (1.2,0.6) {E};
+  \node[bn] (F) at (3.6,0.6) {F};
+  \node[bn] (G) at (2.4,-0.6) {G};
+  \node[bn] (H) at (2.4,-1.8) {H};
+  \draw[barc] (A)--(C); \draw[barc] (B)--(C); \draw[barc] (B)--(D); \draw[barc] (C)--(E);
+  \draw[barc] (D)--(F); \draw[barc] (E)--(G); \draw[barc] (F)--(G); \draw[barc] (G)--(H);
+\end{tikzpicture}}
+
+% ---- Red de alarma ----
+\newcommand{\figAlarma}{%
+\begin{tikzpicture}[scale=0.9]
+  \node[bn] (B) at (0,1.2) {B}; \node[bn] (E) at (2.4,1.2) {E};
+  \node[bn] (A) at (1.2,0) {A};
+  \node[bn] (J) at (0,-1.2) {J}; \node[bn] (M) at (2.4,-1.2) {M};
+  \draw[barc] (B)--(A); \draw[barc] (E)--(A); \draw[barc] (A)--(J); \draw[barc] (A)--(M);
+\end{tikzpicture}}
+
+% ---- Red del aspersor ----
+\newcommand{\figAsp}{%
+\begin{tikzpicture}[scale=0.9]
+  \node[bn] (C) at (1.2,1.2) {C};
+  \node[bn] (S) at (0,0) {S}; \node[bn] (R) at (2.4,0) {R};
+  \node[bn] (W) at (1.2,-1.2) {W};
+  \draw[barc] (C)--(S); \draw[barc] (C)--(R); \draw[barc] (S)--(W); \draw[barc] (R)--(W);
+\end{tikzpicture}}
+
+\newcommand{\tabAsp}{%
+{\small
+\begin{tabular}{c}
+$P(+c)=0.5$\qquad $P(+s\mid+c)=0.1$,\ $P(+s\mid-c)=0.5$\qquad $P(+r\mid+c)=0.8$,\ $P(+r\mid-c)=0.2$\\[3pt]
+\begin{tabular}{cc|cccc}
+$(S,R)$ & & $(+s,+r)$ & $(+s,-r)$ & $(-s,+r)$ & $(-s,-r)$\\\hline
+$P(+w\mid S,R)$ & & 0.99 & 0.90 & 0.90 & 0.01
+\end{tabular}
+\end{tabular}}}
+
+% ---- Red para el orden de eliminación ----
+\newcommand{\figOrden}{%
+\begin{tikzpicture}[scale=0.9]
+  \node[bn] (A) at (0,1.2) {A}; \node[bn] (B) at (2.4,1.2) {B};
+  \node[bn] (C) at (1.2,0) {C};
+  \node[bn] (D) at (0,-1.2) {D}; \node[bn] (E) at (2.4,-1.2) {E};
+  \node[bno] (F) at (1.2,-2.4) {F};
+  \draw[barc] (A)--(C); \draw[barc] (B)--(C); \draw[barc] (C)--(D); \draw[barc] (C)--(E);
+  \draw[barc] (D)--(F); \draw[barc] (E)--(F);
+\end{tikzpicture}}
+
+% ---- Red del servidor ----
+\newcommand{\figSrv}{%
+\begin{tikzpicture}[scale=0.9]
+  \node[bn] (A) at (0,1.2) {A}; \node[bn] (U) at (2.4,1.2) {U};
+  \node[bn] (C) at (1.2,0) {C};
+  \node[bn] (M) at (0,-1.2) {M}; \node[bn] (Q) at (2.4,-1.2) {Q};
+  \draw[barc] (A)--(C); \draw[barc] (U)--(C); \draw[barc] (C)--(M); \draw[barc] (C)--(Q);
+\end{tikzpicture}}
+
+\newcommand{\tabSrv}{%
+{\small
+\begin{tabular}{c}
+$P(+a)=0.05$\qquad $P(+u)=0.1$\\[3pt]
+\begin{tabular}{cc|c}
+$A$ & $U$ & $P(+c\mid A,U)$\\\hline
+$+a$ & $+u$ & 0.95\\ $+a$ & $-u$ & 0.80\\ $-a$ & $+u$ & 0.60\\ $-a$ & $-u$ & 0.05
+\end{tabular}\quad
+\begin{tabular}{c|cc}
+$C$ & $P(+m\mid C)$ & $P(+q\mid C)$\\\hline $+c$ & 0.9 & 0.7\\ $-c$ & 0.1 & 0.05
+\end{tabular}
+\end{tabular}}}
+
+% ---- Red del automóvil (simulacro 1) ----
+\newcommand{\figCar}{%
+\begin{tikzpicture}[scale=0.9]
+  \node[bn] (B) at (0,1.2) {B}; \node[bn] (F) at (2.4,1.2) {F};
+  \node[bn] (S) at (1.2,0) {S}; \node[bn] (L) at (-1.2,0) {L};
+  \draw[barc] (B)--(S); \draw[barc] (F)--(S); \draw[barc] (B)--(L);
+\end{tikzpicture}}
+
+% ---- Red del simulacro 2 ----
+\newcommand{\figDdos}{%
+\begin{tikzpicture}[scale=0.9]
+  \node[bn] (N) at (1.2,1.2) {N};
+  \node[bn] (R) at (0,0) {R}; \node[bn] (S) at (2.4,0) {S};
+  \node[bn] (W) at (1.2,-1.2) {W}; \node[bn] (T) at (-1.2,-1.2) {T};
+  \draw[barc] (N)--(R); \draw[barc] (N)--(S); \draw[barc] (R)--(W); \draw[barc] (S)--(W); \draw[barc] (R)--(T);
+\end{tikzpicture}}
+
+% ---- Corredor ----
+\newcommand{\figCorredor}{%
+\begin{tikzpicture}
+  \node[term] (L) at (0,0) {L};
+  \node[st] (s1) at (1.6,0) {1};
+  \node[st] (s2) at (3.2,0) {2};
+  \node[st] (s3) at (4.8,0) {3};
+  \node[term] (R) at (6.4,0) {R};
+  \node[font=\footnotesize] at (0,-0.75) {entrar: $+2$};
+  \node[font=\footnotesize] at (6.4,-0.75) {entrar: $+10$};
+  \node[font=\footnotesize] at (3.2,-0.75) {cualquier otro movimiento: $-1$};
+\end{tikzpicture}}
+
+% ---- MDP del automóvil (clase) ----
+\newcommand{\tabAuto}{%
+{\small
+\begin{tabular}{cccc}
+\toprule
+Estado & Acción & Sucesor (prob.) & Recompensa\\\midrule
+Cool ($C$) & Slow & $C$ (1) & $+1$\\
+Cool ($C$) & Fast & $C$ (0.5), $W$ (0.5) & $+2$\\
+Warm ($W$) & Slow & $C$ (0.5), $W$ (0.5) & $+1$\\
+Warm ($W$) & Fast & $O$ (1, terminal) & $-10$\\\bottomrule
+\end{tabular}}}

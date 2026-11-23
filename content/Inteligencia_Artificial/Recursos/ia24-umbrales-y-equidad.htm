@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Umbrales y equidad · IA 24</title>
+<style>
+:root{color-scheme:light dark;--bg:#fafaf8;--fg:#232a31;--muted:#58616c;--line:#d9dedf;--track:#e6e9e8;--a:#246b88;--b:#8d4c25;--surface:#fff; font:16px/1.5 system-ui,sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#161b20;--fg:#e6edf1;--muted:#aebbc5;--line:#3c4850;--track:#303b42;--a:#78bad5;--b:#e5b08e;--surface:#1e252c}}
+*{box-sizing:border-box}body{margin:0;padding:20px;background:var(--bg);color:var(--fg)}main{max-width:920px;margin:auto}h1{font-size:1.4rem;line-height:1.25;margin:0 0 8px}h2{font-size:1.05rem;margin:0 0 8px}p{margin:8px 0 16px}.muted{color:var(--muted)}.controls{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin:20px 0}label{display:block;font-weight:600}output{font-variant-numeric:tabular-nums}input{width:100%;accent-color:var(--a);min-height:44px}#tb{accent-color:var(--b)}.groups{display:grid;grid-template-columns:1fr 1fr;gap:28px}.a{--group:var(--a)}.b{--group:var(--b)}.group h2{color:var(--group)}.bar-row{display:grid;grid-template-columns:minmax(0,1fr) 4.5rem;gap:4px 12px;margin:12px 0}.bar-label{font-size:.92rem}.value{text-align:right;font-variant-numeric:tabular-nums}.track{grid-column:1 / -1;height:9px;background:var(--track)}.fill{height:100%;background:var(--group);width:0;transition:width .18s}table{border-collapse:collapse;width:100%;font-size:.9rem;margin:16px 0}th,td{text-align:left;padding:8px 5px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}th{font-weight:600}td.num{text-align:right;font-variant-numeric:tabular-nums}.summary{border-top:1px solid var(--line);padding-top:14px;margin-top:20px}.summary p{margin:4px 0}.data{margin-top:20px}summary{min-height:44px;padding:10px 0}a{color:var(--a)}.hint{font-size:.9rem} .metrics{margin-bottom:20px}.outcomes{font-variant-numeric:tabular-nums}button{font:inherit;min-height:44px;padding:7px 12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:5px}button:active{transform:translateY(1px)}
+@media(max-width:550px){body{padding:14px}.controls,.groups{grid-template-columns:1fr;gap:18px}.group+.group{border-top:1px solid var(--line);padding-top:18px}h1{font-size:1.25rem}th,td{padding:7px 3px}}@media(prefers-reduced-motion:reduce){.fill{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>Mismo puntaje, distintas consecuencias</h1>
+<p class="muted">Crédito ficticio · 10 personas por grupo · Datos sintéticos</p>
+<p>Se aprueba cuando el puntaje es <strong>mayor o igual al umbral</strong>. Los puntajes son valores ilustrativos de 0 a 100; no son probabilidades calibradas. La etiqueta indica quién pagaría, conocida aquí por construcción.</p>
+<div class="controls">
+ <div><label for="ta">Umbral de A: <output id="oa" for="ta">50</output></label><input type="range" id="ta" min="0" max="100" value="50" step="1"></div>
+ <div><label for="tb">Umbral de B: <output id="ob" for="tb">50</output></label><input type="range" id="tb" min="0" max="100" value="50" step="1"></div>
+</div>
+<div class="groups" id="groups" aria-label="Comparación de tasas entre grupos">
+ <section class="group a" id="ga"><h2>Grupo A</h2><div class="metrics" id="ma"></div><div class="outcomes" id="ca"></div></section>
+ <section class="group b" id="gb"><h2>Grupo B</h2><div class="metrics" id="mb"></div><div class="outcomes" id="cb"></div></section>
+</div>
+<div class="summary" aria-live="polite" aria-atomic="true" id="summary"></div>
+<p class="hint">Prueba A = 50 y B = 40. Se iguala la proporción de aprobaciones, pero las tasas de error siguen siendo diferentes. Comparar tasas hace visible una decisión normativa; no establece qué política sería justa o lícita en un caso real.</p>
+<button type="button" id="reset">Volver a 50 y 50</button>
+<details class="data"><summary>Ver los 20 registros y las decisiones actuales</summary><table><thead><tr><th>Persona</th><th>Puntaje</th><th>Pagaría</th><th>Decisión</th></tr></thead><tbody id="records"></tbody></table></details>
+<p class="hint muted">TP: aprueba y pagaría · FP: aprueba y no pagaría · FN: rechaza y pagaría · TN: rechaza y no pagaría. «Sin casos» indica denominador cero.</p>
+<p class="hint">Conceptos: <a href="https://fairmlbook.org/classification.html" target="_blank" rel="noopener noreferrer">Fairness and Machine Learning, clasificación</a>. Ejemplo didáctico del apunte del 12-11-2026; no contiene datos de personas ni consulta servicios externos.</p>
+</main>
+<script>
+(()=>{
+ 'use strict';
+ const data={a:[[90,1],[80,1],[75,1],[65,1],[60,0],[55,1],[45,1],[35,0],[25,1],[15,0]],b:[[92,1],[78,0],[68,1],[58,0],[48,1],[42,0],[32,1],[22,0],[12,0],[2,0]]};
+ const byId=id=>document.getElementById(id);
+ const metric=(n,d)=>d?n/d:null;
+ const percent=x=>x===null?'Sin casos':new Intl.NumberFormat('es-MX',{style:'percent',maximumFractionDigits:1}).format(x);
+ function compute(rows,t){
+   let tp=0,fp=0,fn=0,tn=0;
+   rows.forEach(([s,y])=>{if(s>=t){y?tp++:fp++;}else{y?fn++:tn++;}});
+   return {tp,fp,fn,tn,selected:metric(tp+fp,rows.length),tpr:metric(tp,tp+fn),fpr:metric(fp,fp+tn),ppv:metric(tp,tp+fp),accuracy:metric(tp+tn,rows.length)};
+ }
+ const metricNames=[['selected','Aprobaciones / todas las personas'],['tpr','TPR: aprobaciones / quienes pagarían'],['fpr','FPR: aprobaciones / quienes no pagarían'],['ppv','PPV: pagarían / aprobaciones']];
+ function drawGroup(key,stats){
+   byId('m'+key).innerHTML=metricNames.map(([name,label])=>`<div class="bar-row"><span class="bar-label">${label}</span><span class="value">${percent(stats[name])}</span><div class="track" role="img" aria-label="${label}: ${percent(stats[name])}"><div class="fill" style="width:${(stats[name]??0)*100}%"></div></div></div>`).join('');
+   byId('c'+key).innerHTML=`<table><thead><tr><th>Resultado</th><th>Cuenta</th></tr></thead><tbody><tr><td>TP · Aprueba y pagaría</td><td class="num">${stats.tp}</td></tr><tr><td>FP · Aprueba y no pagaría</td><td class="num">${stats.fp}</td></tr><tr><td>FN · Rechaza y pagaría</td><td class="num">${stats.fn}</td></tr><tr><td>TN · Rechaza y no pagaría</td><td class="num">${stats.tn}</td></tr></tbody></table><p>Exactitud: <strong>${percent(stats.accuracy)}</strong></p>`;
+ }
+ function update(){
+   const thresholds={a:Number(byId('ta').value),b:Number(byId('tb').value)};
+   byId('oa').value=thresholds.a;byId('ob').value=thresholds.b;
+   const a=compute(data.a,thresholds.a),b=compute(data.b,thresholds.b);
+   drawGroup('a',a);drawGroup('b',b);
+   const gap=Math.abs(a.selected-b.selected)*100;
+   byId('summary').innerHTML=`<p>Exactitud conjunta: <strong>${percent((a.tp+a.tn+b.tp+b.tn)/20)}</strong> · Brecha de aprobaciones: <strong>${new Intl.NumberFormat('es-MX',{maximumFractionDigits:1}).format(gap)} puntos porcentuales</strong>.</p><p>De quienes pagarían: A aprueba ${a.tp} de ${a.tp+a.fn}; B aprueba ${b.tp} de ${b.tp+b.fn}.</p>`;
+   byId('records').innerHTML=Object.entries(data).flatMap(([key,rows])=>rows.map(([score,y],i)=>`<tr><td>${key.toUpperCase()}${i+1}</td><td>${score}</td><td>${y?'Sí':'No'}</td><td>${score>=thresholds[key]?'Aprueba':'Rechaza'}</td></tr>`)).join('');
+ }
+ byId('ta').addEventListener('input',update);byId('tb').addEventListener('input',update);
+ byId('reset').addEventListener('click',()=>{byId('ta').value=50;byId('tb').value=50;update();});
+ update();
+})();
+</script>
+</body>
+</html>

@@ -13,19 +13,26 @@ conceptos:
   - Memoización
   - Tabulación
   - Reconstrucción de soluciones
+  - Subarreglo de suma máxima
+  - Algoritmo de Kadane
+  - Sumas acumuladas
+  - Rectángulo de suma máxima
 referencias:
-  - "06DynamicProgrammingI.pdf, diapositivas 1–18 (Kevin Wayne; Kleinberg y Tardos)"
+  - "06DynamicProgrammingI.pdf, diapositivas 1–23 (Kevin Wayne; Kleinberg y Tardos)"
 tags:
   - clase
   - algoritmos
   - programacion-dinamica
   - intervalos
+  - kadane
 ---
 
-# Clase 19 · Programación dinámica I: intervalos con pesos
+# Clase 19 · Programación dinámica I: intervalos con pesos y subarreglo máximo
 
 > [!info] Alcance y procedencia
-> Este apunte desarrolla **las diapositivas 1–18** de [[06DynamicProgrammingI.pdf|06DynamicProgrammingI.pdf]]. El apunte rápido de clase decía «llegamos a la página 22»; aquí se respeta el límite solicitado de la 18. Los intervalos, los pesos 1–999–1 y los valores de $p(j)$ indicados como «de las diapositivas» provienen del material. La tabla con ocho pesos numéricos es un **ejemplo didáctico añadido** para poder ejecutar la recurrencia completa.
+> Este apunte desarrolla **las diapositivas 1–23** de [[06DynamicProgrammingI.pdf|06DynamicProgrammingI.pdf]], que es hasta donde llegó la clase. Las secciones 1–9 cubren las diapositivas 1–18 (planificación ponderada de intervalos); las secciones 10–12, añadidas el 10 nov 2026, cubren las 19–23 (subarreglo máximo, Kadane, rectángulo máximo y Bentley). Cada sección abre con sus diapositivas en un bloque plegable. Los intervalos, los pesos 1–999–1, los valores de $p(j)$ indicados como «de las diapositivas», el arreglo de 15 números y la matriz $7\times7$ provienen del material. La tabla con ocho pesos numéricos es un **ejemplo didáctico añadido** para poder ejecutar la recurrencia completa.
+> 
+> Continúa en [[2026-11-10 ADA - Programacion dinamica II|Clase 20 · Programación dinámica II]] (diapositivas 24–41).
 
 ## Pregunta central
 
@@ -33,10 +40,25 @@ Si cada trabajo ocupa un intervalo de tiempo y produce una ganancia, ¿cómo ele
 
 > [!summary] Idea de la clase
 > Ordenamos los trabajos por hora de fin. Para cada prefijo $1,\ldots,j$ hacemos una elección binaria: **excluir** $j$ o **incluirlo** y continuar en el último prefijo compatible $p(j)$. La ecuación $OPT(j)=\max\{OPT(j-1),w_j+OPT(p(j))\}$ expresa la estructura del problema. Una recursión directa repite subproblemas; una tabla guarda cada valor una sola vez. Al final, otra pasada permite recuperar los trabajos elegidos.
+>
+> La segunda parte aplica la misma receta a un problema sin intervalos: el **subarreglo de suma máxima**. Elegir bien el estado («mejor suma que **termina** en $i$») baja el costo de $\Theta(n^3)$ a $O(n)$ (Kadane), y esa pieza se reutiliza para el rectángulo máximo en $O(n^3)$ (Bentley).
 
 ![[Screenshot 2026-11-03 at 11.43.56 a.m..png]]
 
 ## 1. ¿Por qué programación dinámica? (diapositivas 1–6)
+
+> [!example]+ Diapositivas 1–6
+> ![[06DP-slide-01.jpg]]
+>
+> ![[06DP-slide-02.jpg]]
+>
+> ![[06DP-slide-03.jpg]]
+>
+> ![[06DP-slide-04.jpg]]
+>
+> ![[06DP-slide-05.jpg]]
+>
+> ![[06DP-slide-06.jpg]]
 
 ### Del problema grande a los pequeños
 
@@ -65,6 +87,9 @@ En este ejemplo, el estado será simplemente el índice $j$ del último trabajo 
 
 ## 2. El problema de los intervalos con pesos (diapositiva 7)
 
+> [!example]+ Diapositiva 7
+> ![[06DP-slide-07.jpg]]
+
 Cada trabajo $j$ tiene inicio $s_j$, fin $f_j$ y peso o ganancia $w_j>0$. Modelamos el tiempo ocupado como $[s_j,f_j)$: si uno acaba justo cuando empieza otro, **sí son compatibles**. Buscamos un conjunto $S$ de trabajos sin traslapes que maximice
 
 $$
@@ -77,6 +102,9 @@ La diapositiva 7 dibuja ocho trabajos $a,\ldots,h$ sobre una línea de tiempo. P
 > Si todos los pesos valen $1$, maximizar la suma equivale a escoger el **mayor número** de intervalos. Con pesos diferentes queremos la **mayor ganancia total**, incluso si elegimos menos trabajos. No se debe confundir «más intervalos» con «más peso».
 
 ## 3. Por qué falla terminar primero (diapositiva 8)
+
+> [!example]+ Diapositiva 8
+> ![[06DP-slide-08.jpg]]
 
 El algoritmo voraz conocido para intervalos **sin pesos** ordena por fin ascendente y acepta un trabajo si no se traslapa con lo ya elegido. Su argumento de intercambio permite tomar uno que termina temprano sin reducir cuántos trabajos caben después. Con pesos, reemplazar un intervalo por otro que termina antes puede perder una gran ganancia.
 
@@ -97,6 +125,9 @@ Ordenar por fin escoge primero $a$. Después rechaza $b$ porque se traslapa con 
 <iframe src="pd-voraz-intervalos.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
 ## 4. Ordenar y calcular el predecesor $p(j)$ (diapositiva 9)
+
+> [!example]+ Diapositiva 9
+> ![[06DP-slide-09.jpg]]
 
 Ordenamos los trabajos por fin no decreciente y los renumeramos de modo que
 
@@ -147,6 +178,9 @@ para j ← 1 hasta n:
 
 ## 5. Estado, elección binaria y ecuación de Bellman (diapositiva 10)
 
+> [!example]+ Diapositiva 10
+> ![[06DP-slide-10.jpg]]
+
 Definimos $OPT(j)$ como el **peso máximo** que puede obtenerse usando exclusivamente trabajos con índices $1,\ldots,j$. No es el peso del trabajo $j$ ni exige incluirlo. La respuesta buscada es $OPT(n)$; para el conjunto vacío, $OPT(0)=0$.
 
 Para encontrar la recurrencia, consideramos una solución óptima cualquiera para el prefijo $1,\ldots,j$. Hay **exactamente dos casos**:
@@ -189,6 +223,13 @@ En el interactivo anterior, el control «Paso de la tabla» deja ver cómo cada 
 
 ## 6. Recursión directa: correcta pero lenta (diapositivas 11–13)
 
+> [!example]+ Diapositivas 11–13
+> ![[06DP-slide-11.jpg]]
+>
+> ![[06DP-slide-12.jpg]]
+>
+> ![[06DP-slide-13.jpg]]
+
 El pseudocódigo literal de la idea matemática es:
 
 ~~~text
@@ -209,7 +250,14 @@ La pregunta de la diapositiva 12 pide el **peor caso** de $COMPUTE\text{-}OPT(n)
 
 <iframe src="pd-superposicion-memo.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
-## 7. Memoización: resolver cada estado una vez (diapositivas 14–15)
+## 7. Memoización: resolver cada estado una vez (diapositivas 14–16)
+
+> [!example]+ Diapositivas 14–16
+> ![[06DP-slide-14.jpg]]
+>
+> ![[06DP-slide-15.jpg]]
+>
+> ![[06DP-slide-16.jpg]]
 
 La versión **top-down** conserva la recursión, pero usa una tabla $M$ para recordar el valor calculado de cada estado. Inicializamos $M[0]=0$ y marcamos $M[1],\ldots,M[n]$ como no calculados. Es importante usar una marca separada o un valor especial: un resultado $0$ no debe confundirse con «sin inicializar».
 
@@ -231,6 +279,9 @@ La diapositiva 16 condensa la motivación en una frase sobre no repetir el pasad
 
 ## 8. Recuperar los trabajos elegidos (diapositiva 17)
 
+> [!example]+ Diapositiva 17
+> ![[06DP-slide-17.jpg]]
+
 $M[n]$ solo dice cuánto vale la mejor solución. Para obtener los trabajos, repetimos la decisión que produjo cada máximo:
 
 ~~~text
@@ -250,6 +301,9 @@ En el ejemplo añadido: en $j=8$ excluimos (13<14), en $j=7$ excluimos (13<14), 
 > Una fila que dice «incluir» no significa que ese trabajo esté en la solución final. Solo es la elección óptima **para ese prefijo**. La reconstrucción debe comenzar en $n$ y seguir los saltos; no basta con reunir todas las filas marcadas «incluir».
 
 ## 9. Tabulación: desenrollar la recursión (diapositiva 18)
+
+> [!example]+ Diapositiva 18
+> ![[06DP-slide-18.jpg]]
 
 La versión **bottom-up** llena la tabla de izquierda a derecha:
 
@@ -272,7 +326,160 @@ Es válido este orden porque **ambas dependencias son anteriores a $j$**: $j-1<j
 | Costo total con ordenación y $p$ | Exponencial en el peor caso | $O(n\log n)$ | $O(n\log n)$ |
 | Memoria adicional | Pila $O(n)$ | Tablas y pila $O(n)$ | Tablas $O(n)$ |
 
-## 10. Guía para resolver un ejercicio similar
+## 10. Subarreglo de suma máxima: de $\Theta(n^3)$ a $\Theta(n^2)$ (diapositivas 19–20)
+
+> [!example]+ Diapositivas 19–20
+> ![[06DP-slide-19.jpg]]
+>
+> ![[06DP-slide-20.jpg]]
+
+**Problema.** Dado un arreglo $x$ de $n$ enteros (positivos o negativos), encontrar un subarreglo **contiguo** $x_i,x_{i+1},\ldots,x_j$ cuya suma sea máxima. Las diapositivas citan aplicaciones en visión por computadora, minería de datos, análisis de secuencias genómicas y, famosamente, entrevistas técnicas; el problema se popularizó en *Programming Pearls* de Jon Bentley.
+
+En el arreglo de la diapositiva
+
+$$
+x=(12,\;5,\;-1,\;31,\;-61,\;\underbrace{59,\;26,\;-53,\;58,\;97}_{187},\;-93,\;-23,\;84,\;-15,\;6)
+$$
+
+el mejor bloque ocupa las posiciones $6..10$ y suma $59+26-53+58+97=187$. Observa dos cosas: el bloque **incluye un negativo** ($-53$) porque lo que viene después lo compensa, y **excluye** el prefijo $12+5-1+31=47$ porque el $-61$ que sigue lo anula.
+
+> [!important] Contiguo ≠ subconjunto
+> Si pudiéramos escoger elementos sueltos, bastaría sumar todos los positivos. La restricción de contigüidad es lo que hace interesante el problema y lo que dictará el estado de la PD.
+
+**Fuerza bruta.** Para cada par $i\le j$ sumamos $x_i+\cdots+x_j$. Hay $\Theta(n^2)$ pares y cada suma cuesta hasta $\Theta(n)$: total **$\Theta(n^3)$**.
+
+**Truco de sumas acumuladas.** Precalculamos en $O(n)$ los prefijos
+
+$$
+S_0=0,\qquad S_k=x_1+\cdots+x_k,
+$$
+
+y entonces $x_i+\cdots+x_j=S_j-S_{i-1}$ en $O(1)$. El costo baja a **$\Theta(n^2)$** (sigue habiendo $\Theta(n^2)$ pares). En el ejemplo, $S_5=12+5-1+31-61=-14$ y $S_{10}=-14+59+26-53+58+97=173$, así que la suma del bloque $6..10$ es $S_{10}-S_5=173-(-14)=187$.
+
+*(La diapositiva indexa desde $0$ y escribe $S[j]-S[i-1]$; aquí usamos índices desde $1$ con $S_0=0$, que evita el caso especial $i=0$.)*
+
+## 11. Algoritmo de Kadane: el estado correcto da $O(n)$ (diapositiva 21)
+
+> [!example]+ Diapositiva 21
+> ![[06DP-slide-21.jpg]]
+
+**Estado.** $OPT(i)$ = mayor suma de un subarreglo cuyo **extremo derecho es exactamente $i$**.
+
+¿Por qué no usar «la mejor suma dentro de $x_1..x_i$», como el prefijo de intervalos? Porque ese valor no se puede extender: para pegar $x_{i+1}$ necesitamos saber si el mejor bloque **toca** la posición $i$. Fijar el extremo derecho resuelve justo eso: todo subarreglo que termina en $i$ es, o bien $x_i$ solo, o bien $x_i$ pegado a un subarreglo que termina en $i-1$.
+
+**Elección binaria y ecuación de Bellman.**
+
+- **Tomar sólo $x_i$:** empezar un bloque nuevo en $i$.
+- **Extender:** $x_i$ más el mejor bloque que termina en $i-1$. Si ese bloque no fuera el mejor que termina en $i-1$, reemplazarlo aumentaría la suma (subestructura óptima por corta-y-pega).
+
+$$
+OPT(i)=\begin{cases}
+x_1,& i=1,\\[1mm]
+\max\{\,x_i,\;x_i+OPT(i-1)\,\}, & i>1.
+\end{cases}
+$$
+
+Como $x_i$ aparece en ambas ramas, la regla equivale a: **extender si $OPT(i-1)>0$, reiniciar si $OPT(i-1)\le0$**. Un pasado con suma negativa sólo estorba.
+
+**Objetivo.** La respuesta es $\max_i OPT(i)$, **no** $OPT(n)$: el mejor bloque puede terminar en cualquier parte.
+
+**Traza completa con el arreglo de la diapositiva:**
+
+| $i$ | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
+|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| $x_i$ | 12 | 5 | −1 | 31 | −61 | 59 | 26 | −53 | 58 | 97 | −93 | −23 | 84 | −15 | 6 |
+| $OPT(i)$ | 12 | 17 | 16 | 47 | −14 | **59** | 85 | 32 | 90 | **187** | 94 | 71 | 155 | 140 | 146 |
+| decisión | base | ext. | ext. | ext. | ext. | **reinicia** | ext. | ext. | ext. | ext. | ext. | ext. | ext. | ext. | ext. |
+
+En $i=5$ todavía conviene extender ($47-61=-14>-61$), pero ese $-14$ es negativo, así que en $i=6$ se reinicia. El máximo de la fila es $OPT(10)=187$; el bloque empieza en el último reinicio antes de $10$, es decir, en $6$. Coincide con la diapositiva 19.
+
+**Pseudocódigo con memoria $O(1)$.** Cada $OPT(i)$ sólo usa $OPT(i-1)$, así que no hace falta guardar la tabla:
+
+~~~text
+KADANE(x[1..n]):
+    actual ← x[1];  mejor ← x[1]
+    inicio ← 1;  (bi, bj) ← (1, 1)
+    para i ← 2 hasta n:
+        si actual ≤ 0:  actual ← x[i];  inicio ← i     # reiniciar
+        si no:          actual ← actual + x[i]         # extender
+        si actual > mejor:
+            mejor ← actual;  (bi, bj) ← (inicio, i)
+    devolver mejor, (bi, bj)
+~~~
+
+**Costo.** Una pasada con trabajo constante por posición: **$O(n)$ tiempo** y **$O(1)$ memoria extra**. Pasamos de $\Theta(n^3)$ a $\Theta(n^2)$ con sumas acumuladas y a $O(n)$ con PD.
+
+> [!tip] Casos borde
+> Si todos los $x_i$ son negativos, la respuesta es el mayor elemento (un subarreglo no vacío de longitud 1). Si el enunciado permite el subarreglo vacío, la respuesta es $\max\{0,\max_i OPT(i)\}$. Conviene preguntar cuál de las dos versiones se pide.
+
+**Explora Kadane y Bentley.** Avanza casilla por casilla para ver cuándo se extiende y cuándo se reinicia; puedes escribir tu propio arreglo. La pestaña *Bentley* corresponde a la sección siguiente.
+
+<iframe src="pd-kadane-bentley.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+
+## 12. Rectángulo de suma máxima y algoritmo de Bentley (diapositivas 22–23)
+
+> [!example]+ Diapositivas 22–23
+> ![[06DP-slide-22.jpg]]
+>
+> ![[06DP-slide-23.jpg]]
+
+**Problema.** Dada una matriz $A$ de $n\times n$, encontrar un **rectángulo** (filas consecutivas × columnas consecutivas) de suma máxima. Aplicaciones citadas: bases de datos, procesamiento de imágenes y estimación de máxima verosimilitud.
+
+En la matriz de la diapositiva 22 el mejor rectángulo ocupa las **filas 2–7 y columnas 3–5**, con suma **13** (lo verificamos por fuerza bruta sobre los 784 rectángulos).
+
+**Fuerza bruta.** Hay $\Theta(n^4)$ rectángulos (dos filas y dos columnas). Sumar cada uno cuesta hasta $\Theta(n^2)$: $\Theta(n^6)$; con sumas acumuladas en 2D, $\Theta(n^4)$.
+
+**Idea de Bentley: reducir 2D a 1D.** *Supongamos* que conocemos la columna izquierda $j$ y la derecha $j'$. Entonces cada fila $i$ contribuye siempre el mismo bloque de columnas, y podemos colapsarla en un número:
+
+$$
+x_i=\sum_{k=j}^{j'}A_{ik}.
+$$
+
+Cualquier rectángulo con esas columnas es exactamente un bloque contiguo de filas, así que su suma es la de un **subarreglo** de $x$. ¡Es el problema de la sección anterior! Kadane lo resuelve en $O(n)$.
+
+**Ejemplo de la diapositiva 23** ($j=3$, $j'=5$):
+
+| fila $i$ | columnas 3, 4, 5 | $x_i$ | $OPT(i)$ de Kadane |
+|--:|:--:|--:|--:|
+| 1 | $0,\,-5,\,-2$ | −7 | −7 |
+| 2 | $-1,\,3,\,2$ | 4 | 4 *(reinicia)* |
+| 3 | $3,\,-5,\,-1$ | −3 | 1 |
+| 4 | $3,\,-1,\,4$ | 6 | 7 |
+| 5 | $2,\,0,\,3$ | 5 | 12 |
+| 6 | $-2,\,1,\,1$ | 0 | 12 |
+| 7 | $0,\,1,\,0$ | 1 | **13** |
+
+El máximo es $13$ con filas $2..7$: el rectángulo marcado en la diapositiva 22.
+
+**Algoritmo $O(n^3)$.**
+
+1. Precalcular sumas acumuladas por fila $S_{ij}=\sum_{k=1}^{j}A_{ik}$ (con $S_{i0}=0$) en $O(n^2)$.
+2. Para cada par de columnas $j\le j'$ (son $\Theta(n^2)$ pares):
+   - construir $x_i=S_{ij'}-S_{i,j-1}$ para todas las filas, en $O(n)$;
+   - correr Kadane sobre $x$, en $O(n)$.
+3. Devolver el mejor resultado.
+
+Total: $\Theta(n^2)$ pares $\times\,O(n)$ $=$ **$O(n^3)$**.
+
+> [!warning] Detalle de índices en la diapositiva
+> La lámina escribe $x_i=S_{ij'}-S_{ij}$ y «para cada $j<j'$». Con $S_{ij}=\sum_{k=1}^{j}A_{ik}$, esa resta suma las columnas $j+1..j'$, es decir, deja fuera la columna $j$. Es un corrimiento de índice: o se interpreta $j$ como la columna anterior al rectángulo, o se usa $S_{i,j-1}$ como aquí. Además hay que permitir $j=j'$ (rectángulos de una sola columna).
+
+**Problema abierto.** No se conoce un algoritmo en $O(n^{3-\varepsilon})$ para ninguna constante $\varepsilon>0$.
+
+En el interactivo de la sección 11 (pestaña *Bentley*), cambia $j$ y $j'$ para ver cómo se forma $x$, o pulsa «Probar los pares» para recorrer los 28 pares y confirmar que el máximo global es $13$.
+
+### Lo que comparten los tres problemas de esta clase
+
+| | Intervalos con pesos | Subarreglo máximo (Kadane) | Rectángulo máximo (Bentley) |
+|:--|:--|:--|:--|
+| Estado | mejor peso usando trabajos $1..j$ | mejor suma que **termina en** $i$ | se fija $(j,j')$ y se reduce a Kadane |
+| Elección | excluir $j$ / incluir $j$ y saltar a $p(j)$ | reiniciar / extender | — |
+| Respuesta | $OPT(n)$ | $\max_i OPT(i)$ | máximo sobre todos los pares |
+| Tiempo | $O(n\log n)$ | $O(n)$ | $O(n^3)$ |
+
+La lección: **definir bien el estado** es el paso creativo. En intervalos, «prefijo» bastaba; en subarreglos, la contigüidad obliga a anclar el extremo derecho.
+
+## 13. Guía para resolver un ejercicio similar
 
 1. **Escribe los intervalos y pesos.** Aclara si tocarse en un extremo cuenta como compatibilidad; aquí sí.
 2. **Ordena por fin** y renumera. Nunca uses la numeración original para calcular $p$ después de ordenar.
@@ -283,10 +490,12 @@ Es válido este orden porque **ambas dependencias son anteriores a $j$**: $j-1<j
 7. **Reconstruye desde $n$** y verifica dos cosas: que los trabajos recuperados son compatibles y que sus pesos suman $M[n]$.
 8. **Analiza por fases:** ordenación $O(n\log n)$, predecesores $O(n\log n)$, tabla $O(n)$, recuperación $O(n)$.
 
-**Autocomprobación.** En la figura de la diapositiva 9, ¿por qué $p(4)=1$ aunque $p(7)=3$? Porque $p$ depende del inicio de **cada** trabajo: el 4 empieza en 4 y solo el 1 termina a más tardar en 4; el 7 empieza en 6 y el último trabajo previo que termina a tiempo es el 3. ¿Por qué la respuesta del ejemplo numérico es $14$ y no $10+9$? Porque $M[4]=10$ representa una solución que puede solaparse con el trabajo 6; al incluir 6 solo se permite sumar $M[p(6)]=M[2]=5$.
+**Para problemas tipo subarreglo (Kadane).** Si la solución debe ser **contigua**, prueba como estado «mejor valor de una solución que termina exactamente en $i$»; la respuesta final será el máximo sobre todos los $i$, no el último valor. Si el problema es 2D, pregunta qué dimensión puedes fijar para reducirlo a uno 1D ya resuelto.
+
+**Autocomprobación.** En la figura de la diapositiva 9, ¿por qué $p(4)=1$ aunque $p(7)=3$? Porque $p$ depende del inicio de **cada** trabajo: el 4 empieza en 4 y solo el 1 termina a más tardar en 4; el 7 empieza en 6 y el último trabajo previo que termina a tiempo es el 3. ¿Por qué la respuesta del ejemplo numérico es $14$ y no $10+9$? Porque $M[4]=10$ representa una solución que puede solaparse con el trabajo 6; al incluir 6 solo se permite sumar $M[p(6)]=M[2]=5$. En Kadane, ¿por qué $OPT(5)=-14$ y no $-61$? Porque extender el bloque de suma $47$ deja $47-61=-14$, mayor que empezar en $-61$; lo que importa es que ese $-14$ ya es negativo y por eso en $i=6$ se reinicia.
 
 ## Referencia y continuación
 
-- Fuente de esta nota: [[06DynamicProgrammingI.pdf|Kevin Wayne, *Dynamic Programming I*, diapositivas 1–18]].
+- Fuente de esta nota: [[06DynamicProgrammingI.pdf|Kevin Wayne, *Dynamic Programming I*, diapositivas 1–23]]. Diapositivas extraídas en `Recursos/slides-06-pd/`.
 - Conexión con la clase anterior: [[2026-10-27 ADA - divide_y_veceras_1|divide y vencerás]] resuelve subproblemas independientes; aquí las ramas se superponen y usamos una tabla.
-- El resto del archivo presenta otras aplicaciones, pero quedan fuera del alcance de este apunte.
+- Siguiente clase: [[2026-11-10 ADA - Programacion dinamica II|mínimos cuadrados segmentados, mochila y cambio de monedas (diapositivas 24–41)]].

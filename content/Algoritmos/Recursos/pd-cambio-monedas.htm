@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cambio de monedas</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color-scheme:light dark;--bg:#f4f7fb;--card:#fff;--ink:#17253b;--muted:#485a73;--line:#cbd5e1;--blue:#245e9e;--soft:#e8f2ff;--gold:#fff1d0;--amber:#a36100;--red:#b23b2a;--redsoft:#fde8e4}
+@media(prefers-color-scheme:dark){:root{--bg:#121a28;--card:#1d293a;--ink:#e9f1fc;--muted:#c1cede;--line:#45566e;--blue:#8bbfff;--soft:#273d58;--gold:#5c4827;--amber:#ffd078;--red:#ff9c8a;--redsoft:#4a2a26}}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--ink)}
+main{max-width:960px;margin:auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+h1{font-size:1.3rem;margin:0 0 4px}p{line-height:1.5;margin:6px 0 12px;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+input[type=text],input[type=number]{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}input[type=text]{flex:1;min-width:220px}input[type=number]{width:100px}
+.button{font:inherit;border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--ink);padding:6px 10px;cursor:pointer}
+.button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin:12px 0}.card{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--soft)}.card strong{display:block;font-size:1.2rem;margin:4px 0}.card.opt{background:var(--gold)}
+.coins{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.coin{border-radius:999px;border:2px solid var(--blue);padding:3px 9px;font-weight:700;font-variant-numeric:tabular-nums;background:var(--card)}.card.opt .coin{border-color:var(--amber)}
+.strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:3px;margin:8px 0}.cell{border:1px solid var(--line);border-radius:6px;padding:3px 2px;text-align:center;font-variant-numeric:tabular-nums;font-size:.8rem;cursor:pointer;background:var(--card)}.cell b{display:block;font-size:.95rem}.cell.path{background:var(--redsoft);border-color:var(--red)}.cell.sel{outline:3px solid var(--blue)}.cell.inf{opacity:.5}
+.explainer{border-left:4px solid var(--amber);padding:8px 12px;background:var(--gold);line-height:1.55;margin:10px 0;border-radius:0 8px 8px 0}
+</style>
+</head>
+<body><main>
+<h1>Cambio con el mínimo número de monedas</h1>
+<p>OPT(v) = mínimo de monedas para formar <i>v</i>. Para cada <i>v</i> probamos <b>todas</b> las denominaciones como «última moneda» (elección múltiple) y reutilizamos OPT(v − d<sub>i</sub>).</p>
+<div class="row"><label for="den"><b>Denominaciones</b></label><input id="den" type="text" value="1, 10, 21, 34, 70, 100, 350, 1295, 1500"></div>
+<div class="row"><label for="V"><b>Objetivo V</b></label><input id="V" type="number" min="1" max="3000" value="140"><button class="button" id="go">Calcular</button><button class="button" id="ej1">Ejemplo diapositiva 40</button><button class="button" id="ej2">Sin moneda de 1: {4, 7}, V = 12</button></div>
+<div class="cards"><div class="card">Cajero voraz (siempre la mayor que quepa)<strong id="gn">—</strong><div class="coins" id="gc"></div></div><div class="card opt">Programación dinámica<strong id="dn">—</strong><div class="coins" id="dc"></div></div></div>
+<div class="explainer" id="exp"></div>
+<p><b>Tabla OPT(0..V).</b> Haz clic en una casilla para ver cómo se calculó. El camino rojo es la reconstrucción de OPT(V).</p>
+<div class="strip" id="strip"></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let d=[],V=0,O=[],last=[],sel=null;
+function solve(){
+ d=[...new Set($('den').value.split(/[,\s]+/).map(Number).filter(x=>Number.isInteger(x)&&x>0))].sort((a,b)=>a-b);
+ V=Math.max(1,Math.min(3000,parseInt($('V').value)||1));
+ O=[0];last=[0];for(let v=1;v<=V;v++){let b=Infinity,c=0;for(const x of d)if(x<=v&&O[v-x]+1<b){b=O[v-x]+1;c=x}O[v]=b;last[v]=c}
+ sel=V;render();
+}
+function coinsOf(v){const r=[];if(!isFinite(O[v]))return null;while(v>0){r.push(last[v]);v-=last[v]}return r}
+function greedy(){let v=V,r=[];for(let k=d.length-1;k>=0;k--)while(d[k]<=v){r.push(d[k]);v-=d[k]}return v===0?r:null}
+function chips(a){return a?a.map(x=>`<span class="coin">${x}</span>`).join(''):'<i>imposible</i>'}
+function render(){
+ const g=greedy(),p=coinsOf(V);
+ $('gn').textContent=g?g.length+' monedas':'no encuentra cambio';$('gc').innerHTML=chips(g);
+ $('dn').textContent=p?p.length+' monedas':'OPT(V) = ∞ (imposible)';$('dc').innerHTML=chips(p);
+ const path=new Set();if(p){let v=V;path.add(v);while(v>0){v-=last[v];path.add(v)}}
+ let s='';for(let v=0;v<=V;v++)s+=`<div class="cell ${path.has(v)?'path':''} ${v===sel?'sel':''} ${isFinite(O[v])?'':'inf'}" data-v="${v}">${v}<b>${isFinite(O[v])?O[v]:'∞'}</b></div>`;
+ $('strip').innerHTML=s;
+ $('strip').querySelectorAll('.cell').forEach(c=>c.onclick=()=>{sel=+c.dataset.v;render()});
+ const v=sel;let e;
+ if(v===0)e='OPT(0) = 0: el valor 0 se forma con cero monedas (caso base).';
+ else{const terms=d.map(x=>x>v?`d=${x}: no cabe`:`d=${x}: 1 + OPT(${v-x}) = ${isFinite(O[v-x])?1+O[v-x]:'∞'}`);e=`<b>OPT(${v})</b> = min sobre las denominaciones: ${terms.join(' · ')} ⇒ <b>${isFinite(O[v])?O[v]:'∞'}</b>`+(isFinite(O[v])?` (última moneda ${last[v]}).`:' (ninguna combinación funciona).')}
+ if(g&&p&&g.length>p.length&&v===V)e+=` El voraz usa ${g.length} monedas contra ${p.length}: elegir la mayor moneda que cabe (${g[0]}) deja un resto ${V-g[0]} que se forma mal.`;
+ if(!g&&p&&v===V)e+=' El voraz se atasca: tras tomar la mayor moneda, el resto no se puede formar, aunque sí existe solución.';
+ e+=` Trabajo: ${V} valores × ${d.length} denominaciones ⇒ O(nV).`;
+ $('exp').innerHTML=e;
+}
+$('go').onclick=solve;
+$('ej1').onclick=()=>{$('den').value='1, 10, 21, 34, 70, 100, 350, 1295, 1500';$('V').value=140;solve()};
+$('ej2').onclick=()=>{$('den').value='4, 7';$('V').value=12;solve()};
+solve();
+</script>
+</body></html>

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Percolación con Union-Find</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color: #18334a; background: #f7fbfd; }
+    * { box-sizing: border-box; }
+    body { max-width: 800px; margin: 0 auto; padding: 22px; }
+    h1 { font-size: 1.5rem; margin: 0 0 7px; }
+    p { line-height: 1.45; }
+    .controls { display: flex; flex-wrap: wrap; gap: 9px; margin: 16px 0; }
+    button { cursor: pointer; font: inherit; }
+    .controls button { border: 1px solid #467da2; border-radius: 8px; background: #fff; color: #174b70; padding: 8px 12px; }
+    .controls button:hover { background: #e7f3fa; }
+    .layout { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+    .grid { display: grid; grid-template-columns: repeat(5, 54px); gap: 5px; padding: 12px; background: #dce9ef; border-radius: 11px; }
+    .cell { width: 54px; height: 54px; border: 2px solid #a8beca; border-radius: 6px; background: #546b7b; color: #fff; font-weight: 700; }
+    .cell.open { background: #fff; color: #31516b; border-color: #75a3bd; }
+    .cell.full { background: #4ba3db; color: #fff; border-color: #2c79ad; }
+    .cell:focus-visible, .controls button:focus-visible { outline: 3px solid #e69c2d; outline-offset: 2px; }
+    .status { min-width: 220px; flex: 1; background: #fff; border: 1px solid #cfdee7; border-radius: 10px; padding: 14px; }
+    .status strong { color: #135f89; }
+    .yes { color: #116b43 !important; }
+    .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: .9rem; margin: 12px 0; }
+    .swatch { display: inline-block; width: 14px; height: 14px; vertical-align: middle; margin-right: 5px; border-radius: 2px; border: 1px solid #8ba6b6; }
+    .blocked { background: #546b7b; } .opened { background: #fff; } .connected { background: #4ba3db; }
+    .note { font-size: .92rem; color: #405a6b; }
+  </style>
+</head>
+<body>
+  <h1>Percolación: de casillas a componentes</h1>
+  <p>Abre casillas con un clic. Una casilla se une solo a sus vecinas abiertas de arriba, abajo, izquierda y derecha. El sistema percola cuando existe un camino azul de la fila superior a la inferior.</p>
+  <div class="controls">
+    <button id="step" type="button">Siguiente paso del ejemplo</button>
+    <button id="reset" type="button">Reiniciar</button>
+  </div>
+  <div class="layout">
+    <div>
+      <div class="grid" id="grid" aria-label="Cuadrícula de percolación de cinco por cinco"></div>
+      <div class="legend">
+        <span><i class="swatch blocked"></i>Bloqueada</span>
+        <span><i class="swatch opened"></i>Abierta</span>
+        <span><i class="swatch connected"></i>Conectada con arriba</span>
+      </div>
+    </div>
+    <div class="status" aria-live="polite">
+      <p><strong id="answer">Todavía no percola</strong></p>
+      <p id="count">0 de 25 casillas abiertas</p>
+      <p id="action">Empieza abriendo una casilla, o sigue el ejemplo.</p>
+    </div>
+  </div>
+  <p class="note">Dos nodos virtuales representan las filas superior e inferior. La consulta es <code>find(arriba) == find(abajo)</code>. El color azul se calcula por separado desde arriba para evitar el problema de <em>backwash</em>.</p>
+  <script>
+    const L = 5, N = L * L, TOP = N, BOTTOM = N + 1;
+    const grid = document.getElementById('grid');
+    const cells = [];
+    let parent, size, fullParent, fullSize, opened, count, exampleStep;
+    const example = [2, 7, 12, 17, 22];
+    function root(par, x) {
+      while (par[x] !== x) { par[x] = par[par[x]]; x = par[x]; }
+      return x;
+    }
+    function unite(par, sizes, a, b) {
+      a = root(par, a); b = root(par, b);
+      if (a === b) return;
+      if (sizes[a] < sizes[b]) [a, b] = [b, a];
+      par[b] = a; sizes[a] += sizes[b];
+    }
+    function join(a, b) {
+      unite(parent, size, a, b);
+      unite(fullParent, fullSize, a, b);
+    }
+    function draw() {
+      const percolates = root(parent, TOP) === root(parent, BOTTOM);
+      for (let i = 0; i < N; i++) {
+        const full = opened[i] && root(fullParent, i) === root(fullParent, TOP);
+        cells[i].className = 'cell' + (opened[i] ? ' open' : '') + (full ? ' full' : '');
+        cells[i].setAttribute('aria-label', `Fila ${Math.floor(i / L) + 1}, columna ${i % L + 1}: ` + (opened[i] ? full ? 'abierta y conectada con arriba' : 'abierta' : 'bloqueada'));
+        cells[i].disabled = opened[i];
+      }
+      document.getElementById('answer').textContent = percolates ? 'Sí, percola' : 'Todavía no percola';
+      document.getElementById('answer').className = percolates ? 'yes' : '';
+      document.getElementById('count').textContent = `${count} de ${N} casillas abiertas`;
+    }
+    function open(i) {
+      if (opened[i]) return;
+      opened[i] = true; count++;
+      const r = Math.floor(i / L), c = i % L;
+      if (r === 0) join(i, TOP);
+      if (r === L - 1) unite(parent, size, i, BOTTOM);
+      if (r > 0 && opened[i - L]) join(i, i - L);
+      if (r < L - 1 && opened[i + L]) join(i, i + L);
+      if (c > 0 && opened[i - 1]) join(i, i - 1);
+      if (c < L - 1 && opened[i + 1]) join(i, i + 1);
+      document.getElementById('action').textContent = `Abriste (${r + 1}, ${c + 1}). Se unió a sus vecinas abiertas.`;
+      draw();
+    }
+    function reset() {
+      parent = Array.from({length: N + 2}, (_, i) => i);
+      size = Array(N + 2).fill(1);
+      fullParent = Array.from({length: N + 1}, (_, i) => i);
+      fullSize = Array(N + 1).fill(1);
+      opened = Array(N).fill(false); count = 0; exampleStep = 0;
+      document.getElementById('action').textContent = 'Empieza abriendo una casilla, o sigue el ejemplo.';
+      draw();
+    }
+    for (let i = 0; i < N; i++) {
+      const button = document.createElement('button');
+      button.type = 'button'; button.textContent = i;
+      button.addEventListener('click', () => open(i));
+      grid.appendChild(button); cells.push(button);
+    }
+    document.getElementById('reset').addEventListener('click', reset);
+    document.getElementById('step').addEventListener('click', () => {
+      while (exampleStep < example.length && opened[example[exampleStep]]) exampleStep++;
+      if (exampleStep === example.length) {
+        document.getElementById('action').textContent = 'El ejemplo terminó: la columna central conecta arriba con abajo.';
+        return;
+      }
+      open(example[exampleStep++]);
+    });
+    reset();
+  </script>
+</body>
+</html>

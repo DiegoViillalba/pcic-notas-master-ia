@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Alineamiento: tabla y reconstrucción</title><style>
+:root{font-family:system-ui,-apple-system,sans-serif;color-scheme:light dark;--bg:#fff;--ink:#172e43;--muted:#4a6073;--line:#c6d1d9;--blue:#145ea8;--soft:#e7f1fc;--green:#0d6b4f;--greenbg:#dff3ea;--orange:#845000;--orangebg:#fff0ce;--red:#9d3237;--redbg:#fce7e8;--purple:#69409b;--purplebg:#f0e8fc}
+@media(prefers-color-scheme:dark){:root{--bg:#15202c;--ink:#edf3fa;--muted:#bbccdc;--line:#536579;--blue:#9ecaff;--soft:#223e5c;--green:#9cdec4;--greenbg:#184b3b;--orange:#ffdc9c;--orangebg:#503e1b;--red:#ffb0b7;--redbg:#532c36;--purple:#d5b7fc;--purplebg:#43335a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);padding:16px}main{max-width:900px;margin:auto}h1{font-size:1.22rem;line-height:1.3;margin:0 0 8px}p{line-height:1.55;margin:8px 0}label{font-size:.92rem;display:flex;flex-direction:column;gap:4px}input,select,button{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 10px;min-height:38px}input{max-width:100%;width:100%}button{cursor:pointer}button:hover{background:var(--soft)}button:disabled{opacity:.45;cursor:default}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--blue);outline-offset:2px}.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}.inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}.inputs label:first-child{grid-column:1/-1}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#position,#call{color:var(--muted);font-size:.9rem;overflow-wrap:anywhere}.scroll{overflow-x:auto}table{border-collapse:collapse;font-variant-numeric:tabular-nums;margin:12px 0;font-size:.95rem}th,td{padding:7px 10px;text-align:center;border:1px solid var(--line);min-width:35px}th{font-weight:600}td.current{outline:3px solid var(--blue);outline-offset:-3px;background:var(--soft);font-weight:700}.diag{background:var(--orangebg)}.above{background:var(--greenbg)}.left{background:var(--purplebg)}.path{background:var(--redbg)}.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.85rem;margin:10px 0}.legend span{padding:2px 5px}.explain{padding:10px 0;min-height:2.7em;line-height:1.5}pre{font-size:1.12rem;letter-spacing:.14em;line-height:1.75;margin:8px 0}#error{color:var(--red)}#error:empty{display:none}.candidate{padding:3px 8px;min-height:32px}.candidate[aria-pressed=true]{outline:2px solid var(--red)}#graph{width:100%;overflow:hidden}#graph svg{display:block;font-size:12px;color:var(--ink)}#graph text{fill:currentColor}#graph .edge{stroke:var(--line);stroke-width:1}#graph .node{fill:var(--muted)}#graph .cutband{fill:var(--orangebg)}#graph .part{fill:var(--soft);stroke:var(--blue);stroke-width:1;stroke-dasharray:4 3}#graph .route{fill:none;stroke:var(--blue);stroke-width:3;stroke-linejoin:round}#graph .choice{fill:var(--red);stroke:var(--bg);stroke-width:2}summary{cursor:pointer;color:var(--muted)}.small{font-size:.88rem;color:var(--muted)}
+@media(max-width:440px){body{padding:10px}th,td{padding:6px 7px}button{min-height:44px}.inputs{grid-template-columns:1fr}.inputs label:first-child{grid-column:auto}.fields{grid-template-columns:1fr 1fr}}
+</style></head><body><main><h1>Alineamiento: tabla y reconstrucción</h1><details><summary>Cambiar ejemplo o penalizaciones</summary><div class="inputs">
+<label>Ejemplo<select id="example"><option value="PALETTE,PALATE,2,1">PALETTE / PALATE · diapositivas 6 y 10</option><option value="CTACCG,TACATG,2,1">CTACCG / TACATG · diapositiva 7</option><option value="A,G,1,3">A / G · dos huecos mejor que sustituir</option><option value=",AC,2,1">ε / AC · caso base</option></select></label>
+<label>Cadena x<input id="x" value="PALETTE" maxlength="10" autocomplete="off" spellcheck="false"></label><label>Cadena y<input id="y" value="PALATE" maxlength="10" autocomplete="off" spellcheck="false"></label>
+<label>Hueco δ<input type="number" id="gap" value="2" min="1" max="9" step="1"></label><label>Sustitución α (iguales = 0)<input type="number" id="sub" value="1" min="0" max="9" step="1"></label></div>
+<button type="button" id="apply">Aplicar y reiniciar</button><p id="error" role="alert"></p></details>
+<p>Las filas consumen letras de x; las columnas, letras de y. Los bordes ya están inicializados. Coincidir cuesta 0.</p>
+<div class="toolbar"><button type="button" id="prev">Anterior</button><button type="button" id="next">Siguiente</button><button type="button" id="end">Completar</button><button type="button" id="trace">Reconstruir</button><button type="button" id="restart">Reiniciar</button></div>
+<p id="position"></p><div class="legend"><span class="diag">Diagonal: emparejar</span><span class="above">Arriba: hueco en y</span><span class="left">Izquierda: hueco en x</span><span class="path">Camino de retroceso</span></div>
+<div class="scroll"><table id="table" aria-label="Tabla de costos mínimos M[i,j]"></table></div>
+<div class="explain" id="detail" aria-live="polite"></div><div id="result" aria-live="polite"></div>
+</main><script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function matrix(x,y,d,a){
+ const M=Array.from({length:x.length+1},(_,i)=>Array.from({length:y.length+1},(_,j)=>i===0?j*d:j===0?i*d:0));
+ for(let i=1;i<=x.length;i++)for(let j=1;j<=y.length;j++)M[i][j]=Math.min(M[i-1][j-1]+(x[i-1]===y[j-1]?0:a),M[i-1][j]+d,M[i][j-1]+d);
+ return M;
+}
+function traceback(x,y,d,a,M=matrix(x,y,d,a)){
+ let i=x.length,j=y.length,A=[],B=[],path=[[i,j]];
+ while(i||j){
+  if(i&&j&&M[i][j]===M[i-1][j-1]+(x[i-1]===y[j-1]?0:a)){A.push(x[--i]);B.push(y[--j]);}
+  else if(i&&M[i][j]===M[i-1][j]+d){A.push(x[--i]);B.push('−');}
+  else{A.push('−');B.push(y[--j]);}
+  path.push([i,j]);
+ }
+ return {A:A.reverse().join(''),B:B.reverse().join(''),cost:M[x.length][y.length],path};
+}
+function column(x,y,d,a){
+ let prev=Array.from({length:x.length+1},(_,i)=>i*d);
+ for(const c of y){const cur=[prev[0]+d];for(let i=1;i<=x.length;i++)cur[i]=Math.min(prev[i-1]+(x[i-1]===c?0:a),cur[i-1]+d,prev[i]+d);prev=cur;}
+ return prev;
+}
+function readInputs(){
+ const x=$('x').value.trim().toUpperCase(),y=$('y').value.trim().toUpperCase(),d=Number($('gap').value),a=Number($('sub').value);
+ if(!/^[A-Z]{0,10}$/.test(x)||!/^[A-Z]{0,10}$/.test(y)||!Number.isInteger(d)||d<1||d>9||!Number.isInteger(a)||a<0||a>9){$('error').textContent='Usa hasta 10 letras A–Z por cadena; hueco entero de 1 a 9 y sustitución de 0 a 9. Se permite la cadena vacía.';return null;}
+ $('error').textContent='';return{x,y,d,a};
+}
+function bindInputs(reset){
+ $('apply').onclick=()=>{const p=readInputs();if(p)reset(p);};
+ $('example').onchange=()=>{const [x,y,d,a]=$('example').value.split(',');$('x').value=x;$('y').value=y;$('gap').value=d;$('sub').value=a;$('apply').click();};
+}
+function alignmentHTML(r){return '<div class="scroll"><pre aria-label="Alineamiento"><code>'+esc(r.A||'ε')+'\n'+esc(r.B||'ε')+'</code></pre></div>';}
+
+let p,k=0,M,tr=null,t=0;
+function reset(v){p=v;M=matrix(p.x,p.y,p.d,p.a);k=0;tr=null;t=0;render();}
+function render(){
+ const {x,y,d,a}=p,m=x.length,n=y.length,total=m*n,cur=k?{i:Math.floor((k-1)/n)+1,j:(k-1)%n+1}:null;
+ const shownPath=new Set(tr?tr.path.slice(0,t+1).map(v=>v.join(',')):[]);
+ let h='<thead><tr><th scope="col">x / y</th><th scope="col">ε</th>'+[...y].map(c=>'<th scope="col">'+c+'</th>').join('')+'</tr></thead><tbody>';
+ for(let i=0;i<=m;i++){
+  h+='<tr><th scope="row">'+(i?x[i-1]:'ε')+'</th>';
+  for(let j=0;j<=n;j++){
+   const visible=i===0||j===0||((i-1)*n+j<=k);let cls='';
+   if(tr&&shownPath.has(i+','+j))cls='path';
+   else if(cur&&!tr){if(i===cur.i&&j===cur.j)cls='current';else if(i===cur.i-1&&j===cur.j-1)cls='diag';else if(i===cur.i-1&&j===cur.j)cls='above';else if(i===cur.i&&j===cur.j-1)cls='left';}
+   h+='<td class="'+cls+'">'+(visible?M[i][j]:'·')+'</td>';
+  }h+='</tr>';
+ }$('table').innerHTML=h+'</tbody>';
+ $('position').textContent=tr?'Retroceso '+t+' de '+(tr.path.length-1):'Casillas calculadas: '+k+' / '+total;
+ if(tr){const [i,j]=tr.path[t];$('detail').textContent=t===tr.path.length-1?'Llegamos a (0,0). Alineamiento óptimo reconstruido; costo '+tr.cost+'.':'Estamos en ('+i+','+j+'). Retrocedemos por una arista que conserva la igualdad de Bellman.';
+  const partial=tr.A.length?{A:tr.A.slice(Math.max(0,tr.A.length-t)),B:tr.B.slice(Math.max(0,tr.B.length-t))}:{A:'',B:''};
+  $('result').innerHTML=t?alignmentHTML(partial):'';
+ }else if(cur){const {i,j}=cur,c=x[i-1]===y[j-1]?0:a;
+  $('detail').textContent='M['+i+','+j+'] = mín{ diagonal '+M[i-1][j-1]+' + '+c+', arriba '+M[i-1][j]+' + '+d+', izquierda '+M[i][j-1]+' + '+d+' } = '+M[i][j]+'.';
+  $('result').textContent=k===total?'Costo óptimo: '+M[m][n]+'. Ahora puedes reconstruir.':'';
+ }else{$('detail').textContent='Los bordes alinean un prefijo con ε: cada letra paga un hueco. Avanza para calcular el interior.';$('result').textContent=total===0?'Costo óptimo: '+M[m][n]+'.':'';}
+ $('prev').disabled=tr?t===0:k===0;$('next').disabled=tr?t===tr.path.length-1:k===total;$('trace').disabled=k!==total||!!tr;
+}
+$('next').onclick=()=>{if(tr)t++;else k++;render();};$('prev').onclick=()=>{if(tr)t--;else k--;render();};
+$('end').onclick=()=>{if(tr)t=tr.path.length-1;else k=p.x.length*p.y.length;render();};
+$('trace').onclick=()=>{tr=traceback(p.x,p.y,p.d,p.a,M);t=0;render();};$('restart').onclick=()=>reset(p);
+bindInputs(reset);reset(readInputs());
+window.simulation={matrix,column,traceback,getState:()=>({p,k,tr,t})};
+
+
+</script></body></html>

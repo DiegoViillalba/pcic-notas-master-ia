@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kadane y Bentley</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color-scheme:light dark;--bg:#f4f7fb;--card:#fff;--ink:#17253b;--muted:#485a73;--line:#cbd5e1;--blue:#245e9e;--soft:#e8f2ff;--gold:#fff1d0;--amber:#a36100;--red:#b23b2a;--redsoft:#fde8e4;--green:#1f7a4d;--greensoft:#e2f5ea}
+@media(prefers-color-scheme:dark){:root{--bg:#121a28;--card:#1d293a;--ink:#e9f1fc;--muted:#c1cede;--line:#45566e;--blue:#8bbfff;--soft:#273d58;--gold:#5c4827;--amber:#ffd078;--red:#ff9c8a;--redsoft:#4a2a26;--green:#7fdcaa;--greensoft:#1f3b2e}}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--ink)}
+main{max-width:980px;margin:auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+h1{font-size:1.3rem;margin:0 0 4px}h2{font-size:1.05rem;margin:18px 0 6px}p{line-height:1.5;margin:6px 0 12px;color:var(--muted)}
+.tabs{display:flex;gap:6px;margin:10px 0 14px;flex-wrap:wrap}.tab{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer}.tab[aria-selected=true]{background:var(--blue);color:var(--card);border-color:var(--blue)}
+.button{font:inherit;border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--ink);padding:6px 10px;cursor:pointer}.button:disabled{opacity:.45;cursor:default}
+.button:focus-visible,.tab:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+input[type=text]{font:inherit;flex:1;min-width:220px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;font-variant-numeric:tabular-nums;margin:6px 0}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;min-width:42px}
+th{background:var(--soft);font-weight:650}
+td.cur{outline:3px solid var(--blue);outline-offset:-3px}
+td.best{background:var(--gold);font-weight:700}
+td.inbest{background:var(--greensoft)}
+td.restart{color:var(--red);font-weight:700}
+td.dim{opacity:.35}
+td.sel{background:var(--redsoft)}
+td.rect{background:var(--greensoft);font-weight:700}
+.explainer{border-left:4px solid var(--amber);padding:8px 12px;background:var(--gold);line-height:1.5;margin:10px 0;border-radius:0 8px 8px 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0}.card{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--soft)}.card strong{display:block;font-size:1.15rem;margin-top:3px}
+.flex{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start}
+.hidden{display:none}
+small{color:var(--muted)}
+</style>
+</head>
+<body><main>
+<h1>Subarreglo y rectángulo de suma máxima</h1>
+<p>Kadane guarda en cada posición <b>la mejor suma de un subarreglo que termina exactamente ahí</b>. Bentley reduce el problema en 2D a muchas llamadas de Kadane.</p>
+<div class="tabs" role="tablist">
+<button class="tab" role="tab" aria-selected="true" data-tab="k">Kadane (1D)</button>
+<button class="tab" role="tab" aria-selected="false" data-tab="b">Bentley (2D)</button>
+</div>
+
+<section id="tab-k">
+<div class="row"><label for="arr"><b>Arreglo</b></label><input id="arr" type="text" value="12, 5, -1, 31, -61, 59, 26, -53, 58, 97, -93, -23, 84, -15, 6"><button class="button" id="cargar">Usar</button><button class="button" id="slide">Arreglo de la diapositiva 19</button></div>
+<div class="row"><button class="button" id="prev">◀ Paso</button><button class="button" id="next">Paso ▶</button><button class="button" id="fin">Ir al final</button><span id="paso"></span></div>
+<div class="scroll"><table id="ktab"></table></div>
+<div class="explainer" id="kexp"></div>
+<div class="cards"><div class="card">Mejor hasta ahora<strong id="kbest">—</strong></div><div class="card">Subarreglo<strong id="kseg">—</strong></div><div class="card">Trabajo realizado<strong id="kwork">—</strong><small>Kadane: 1 comparación por casilla. Fuerza bruta: Θ(n³); con sumas acumuladas: Θ(n²).</small></div></div>
+</section>
+
+<section id="tab-b" class="hidden">
+<p>Fija la columna izquierda <i>j</i> y la derecha <i>j′</i>. Cada fila se resume en <i>x<sub>i</sub></i> = suma de la fila entre esas columnas, y Kadane busca el mejor bloque de filas consecutivas.</p>
+<div class="row"><label for="cj">Columna izquierda j</label><select id="cj"></select><label for="cj2">Columna derecha j′</label><select id="cj2"></select><button class="button" id="todo">Probar los n(n+1)/2 pares</button></div>
+<div class="flex">
+<div class="scroll"><table id="mtab"></table></div>
+<div><table id="xtab"></table></div>
+</div>
+<div class="explainer" id="bexp"></div>
+</section>
+</main>
+<script>
+const SLIDE=[12,5,-1,31,-61,59,26,-53,58,97,-93,-23,84,-15,6];
+let x=SLIDE.slice(),step=0;
+const $=id=>document.getElementById(id);
+function kadane(a){const o=[],st=[];for(let i=0;i<a.length;i++){if(i===0||o[i-1]<=0){o.push(a[i]);st.push(i)}else{o.push(a[i]+o[i-1]);st.push(st[i-1])}}let b=0;for(let i=1;i<a.length;i++)if(o[i]>o[b])b=i;return{o,st,b}}
+function renderK(){
+ const n=x.length,{o,st}=kadane(x);
+ step=Math.max(1,Math.min(step,n));
+ let b=0;for(let i=1;i<step;i++)if(o[i]>o[b])b=i;
+ let h='<tr><th>i</th>'+x.map((_,i)=>`<th>${i+1}</th>`).join('')+'</tr>';
+ h+='<tr><th>x<sub>i</sub></th>'+x.map((v,i)=>{let c=[];if(i>=st[b]&&i<=b)c.push('inbest');if(i===step-1)c.push('cur');return`<td class="${c.join(' ')}">${v}</td>`}).join('')+'</tr>';
+ h+='<tr><th>OPT(i)</th>'+x.map((v,i)=>{if(i>=step)return'<td class="dim">?</td>';let c=[];if(i===b)c.push('best');if(i===step-1)c.push('cur');if(i>0&&st[i]===i)c.push('restart');return`<td class="${c.join(' ')}" title="${st[i]===i?'reinicia en i':'extiende'}">${o[i]}</td>`}).join('')+'</tr>';
+ $('ktab').innerHTML=h;
+ const i=step-1;
+ let e;
+ if(i===0)e=`<b>i = 1:</b> caso base, OPT(1) = x<sub>1</sub> = ${x[0]}.`;
+ else{const ext=x[i]+o[i-1];e=`<b>i = ${i+1}:</b> OPT(${i+1}) = max{ x<sub>${i+1}</sub>, x<sub>${i+1}</sub> + OPT(${i}) } = max{ ${x[i]}, ${x[i]} + (${o[i-1]}) } = max{ ${x[i]}, ${ext} } = <b>${o[i]}</b>. `+(o[i-1]<=0?`Como OPT(${i}) = ${o[i-1]} ≤ 0, arrastrar el pasado no ayuda: <span style="color:var(--red)"><b>se reinicia</b></span> el subarreglo en ${i+1}.`:`Como OPT(${i}) = ${o[i-1]} > 0, conviene <b>extender</b> el mejor subarreglo que terminaba en ${i}.`)}
+ $('kexp').innerHTML=e;
+ $('paso').textContent=`casilla ${step} de ${n}`;
+ $('kbest').textContent=o[b];
+ $('kseg').textContent=`posiciones ${st[b]+1}..${b+1}`;
+ $('kwork').textContent=`${step} de ${n} casillas`;
+ $('prev').disabled=step<=1;$('next').disabled=step>=n;
+}
+$('prev').onclick=()=>{step--;renderK()};$('next').onclick=()=>{step++;renderK()};$('fin').onclick=()=>{step=x.length;renderK()};
+$('cargar').onclick=()=>{const v=$('arr').value.split(/[,\s]+/).map(s=>s.replace('−','-')).filter(s=>s!=='').map(Number).filter(Number.isFinite);if(v.length){x=v;step=1;renderK()}};
+$('slide').onclick=()=>{$('arr').value=SLIDE.join(', ');x=SLIDE.slice();step=1;renderK()};
+step=1;renderK();
+
+const A=[[-2,5,0,-5,-2,2,-3],[4,-3,-1,3,2,1,-1],[-5,6,3,-5,-1,-4,-2],[-1,-1,3,-1,4,1,1],[3,-3,2,0,3,-3,-2],[-2,1,-2,1,1,3,-1],[2,-4,0,1,0,-3,-1]];
+const N=A.length;
+for(let j=0;j<N;j++){$('cj').add(new Option(j+1,j));$('cj2').add(new Option(j+1,j))}
+$('cj').value=2;$('cj2').value=4;
+let rect=null;
+function renderB(){
+ let j=+$('cj').value,j2=+$('cj2').value;
+ if(j2<j){j2=j;$('cj2').value=j}
+ const xs=A.map(r=>r.slice(j,j2+1).reduce((s,v)=>s+v,0));
+ const {o,st,b}=kadane(xs);
+ const r1=st[b],r2=b;
+ let h='<tr><th></th>'+A[0].map((_,c)=>`<th>${c+1}</th>`).join('')+'</tr>';
+ A.forEach((row,r)=>{h+=`<tr><th>${r+1}</th>`+row.map((v,c)=>{let cl='';if(c>=j&&c<=j2)cl=(r>=r1&&r<=r2)?'rect':'sel';return`<td class="${cl}">${v}</td>`}).join('')+'</tr>'});
+ $('mtab').innerHTML=h;
+ let t='<tr><th>i</th><th>x<sub>i</sub></th><th>OPT(i)</th></tr>';
+ xs.forEach((v,i)=>{t+=`<tr><th>${i+1}</th><td class="${i>=r1&&i<=r2?'inbest':''}">${v}</td><td class="${i===b?'best':''}">${o[i]}</td></tr>`});
+ $('xtab').innerHTML=t;
+ let msg=`Con columnas ${j+1}..${j2+1}: x = (${xs.join(', ')}). Kadane encuentra filas ${r1+1}..${r2+1} con suma <b>${o[b]}</b> en O(n) = ${N} pasos.`;
+ if(rect)msg+=`<br>Recorriendo los ${N*(N+1)/2} pares (j, j′) el máximo global es <b>${rect.s}</b>: filas ${rect.r1+1}..${rect.r2+1}, columnas ${rect.c1+1}..${rect.c2+1}. Total: O(n²) pares × O(n) = <b>O(n³)</b>.`;
+ $('bexp').innerHTML=msg;
+}
+$('cj').onchange=$('cj2').onchange=renderB;
+$('todo').onclick=()=>{let best=null;for(let a=0;a<N;a++)for(let c=a;c<N;c++){const xs=A.map(r=>r.slice(a,c+1).reduce((s,v)=>s+v,0));const k=kadane(xs);const s=k.o[k.b];if(!best||s>best.s)best={s,r1:k.st[k.b],r2:k.b,c1:a,c2:c}}rect=best;$('cj').value=best.c1;$('cj2').value=best.c2;renderB()};
+renderB();
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(u=>u.setAttribute('aria-selected',u===t));$('tab-k').classList.toggle('hidden',t.dataset.tab!=='k');$('tab-b').classList.toggle('hidden',t.dataset.tab!=='b')});
+</script>
+</body></html>

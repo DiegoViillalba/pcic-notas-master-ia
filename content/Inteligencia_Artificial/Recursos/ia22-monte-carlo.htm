@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Monte Carlo: del episodio al valor</title>
+<style>
+:root{color-scheme:light dark;--bg:var(--obsidian-bg,light-dark(#fbfcfa,#192127));--fg:var(--obsidian-text,light-dark(#24323c,#ecf0ec));--muted:var(--obsidian-text-muted,light-dark(#53636c,#bdc9cd));--line:var(--obsidian-border,light-dark(#c2cccb,#586a74));--soft:var(--obsidian-bg-2,light-dark(#edf2ed,#25333a));--accent:var(--obsidian-accent,light-dark(#246582,#92cfe5));font-family:var(--obsidian-font,system-ui,sans-serif)}
+*{box-sizing:border-box}body{margin:0;padding:18px;color:var(--fg);background:var(--bg)}main{max-width:920px;margin:auto}h1{font-size:1.25rem;margin:0 0 8px}h2{font-size:1.05rem;margin:20px 0 8px}p{line-height:1.5;margin:8px 0 12px}.muted{color:var(--muted)}.controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin:16px 0}label{display:grid;gap:5px;max-width:100%;min-width:0}button,input,select{font:inherit;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px;max-width:100%;min-height:40px}button{cursor:pointer}button:disabled{opacity:.5;cursor:default}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}input[type=range]{width:180px;padding:0}.timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0}.visit{padding:12px;background:var(--soft);min-width:94px;flex:1;text-align:center}.visit strong,.visit span{display:block}.visit span{margin-top:6px;font-size:.9rem}.calculation{border-block:1px solid var(--line);padding:12px 0;line-height:1.6;overflow-wrap:anywhere}.number{font-variant-numeric:tabular-nums}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 6px;overflow-wrap:anywhere}th{font-weight:600}.skip{opacity:.55}caption{text-align:left;margin:12px 0}.status{font-weight:600}@media(max-width:430px){body{padding:12px}.controls{gap:10px}.controls label{width:100%}.controls select{width:100%}th,td{padding:8px 3px;font-size:.9rem}.timeline{display:grid;grid-template-columns:1fr 1fr}}@media(pointer:coarse){button,input,select{min-height:44px}}
+</style>
+</head>
+<body><main id="mc-lab">
+<h1>Del episodio al promedio de retornos</h1>
+<p class="muted">Episodios didácticos compatibles con el ejemplo de Berkeley CS 188. La política permanece fija; no se aprende un modelo.</p>
+<div class="controls">
+<label for="dataset">Experiencias<select id="dataset"><option value="berkeley">B, C, D, A, E: cuatro episodios</option><option value="revisit">Un episodio con dos visitas a S</option></select></label>
+<label for="mode">Visitas usadas<select id="mode"><option value="first">Primera visita</option><option value="every">Todas las visitas</option></select></label>
+<label for="gamma">Descuento γ = <output id="gamma-value">1.00</output><input id="gamma" type="range" min="0" max="1" step="0.05" value="1"></label>
+</div>
+<div class="controls"><button id="next" type="button">Incorporar siguiente episodio</button><button id="reset" type="button">Volver al primer episodio</button></div>
+<p id="status" class="status" aria-live="polite"></p>
+<h2>Último episodio incorporado</h2>
+<div id="timeline" class="timeline" role="group" aria-label="Visitas del episodio, recompensas y retornos"></div>
+<p id="calculation" class="calculation number" aria-live="polite"></p>
+<table><caption>Promedios acumulados. N cuenta retornos usados y Σ G es su suma. X es terminal y su continuación vale cero.</caption><thead><tr><th scope="col">Estado</th><th scope="col" aria-label="Número de retornos usados">N</th><th scope="col" aria-label="Suma de retornos">Σ G</th><th scope="col" aria-label="Valor estimado">V</th></tr></thead><tbody id="values"></tbody></table>
+<p id="interpretation" class="muted"></p>
+</main>
+<script>
+(()=>{'use strict';
+const root=document.getElementById('mc-lab'),el=id=>root.querySelector('#'+id),fmt=x=>Number(x.toFixed(4)).toLocaleString('es-MX',{maximumFractionDigits:4});
+const data={berkeley:[{s:['B','C','D','X'],r:[-1,-1,10]},{s:['E','C','A','X'],r:[-1,-1,-10]},{s:['E','C','D','X'],r:[-1,-1,10]},{s:['B','C','D','X'],r:[-1,-1,10]}],revisit:[{s:['S','S','X'],r:[1,2]}]};
+let count=1;
+function returns(ep,g){let carry=0;const out=Array(ep.r.length);for(let t=ep.r.length-1;t>=0;t--){carry=ep.r[t]+g*carry;out[t]=carry;}return out;}
+function render(){const key=el('dataset').value,episodes=data[key],g=Number(el('gamma').value),first=el('mode').value==='first',all={};count=Math.min(count,episodes.length);el('gamma-value').textContent=g.toFixed(2);
+for(const ep of episodes.slice(0,count)){const seen=new Set(),ret=returns(ep,g);ep.r.forEach((r,t)=>{const s=ep.s[t],include=!first||!seen.has(s);seen.add(s);if(include){all[s]??=[];all[s].push(ret[t]);}});}
+const last=episodes[count-1],ret=returns(last,g),seen=new Set();el('timeline').replaceChildren();
+last.s.forEach((s,t)=>{const n=document.createElement('div');n.className='visit';if(t===last.r.length){n.innerHTML='<strong>X · terminal</strong><span>Continuación = 0</span>';}else{const skip=first&&seen.has(s);seen.add(s);if(skip)n.classList.add('skip');n.innerHTML=`<strong>${s} · t = ${t}</strong><span>R siguiente = ${last.r[t]}</span><span>G = ${fmt(ret[t])}</span><span>${skip?'No usada: revisita':'Retorno incorporado'}</span>`;}el('timeline').appendChild(n);});
+const terms=last.r.map((r,k)=>`${k===0?'':g+'^'+k+' × '}${r<0?'('+r+')':r}`).join(' + ');el('calculation').textContent=`G₀ = ${terms} = ${fmt(ret[0])}. Recurrencia hacia atrás: Gₜ = Rₜ₊₁ + γGₜ₊₁.`;
+el('values').innerHTML=Object.keys(all).sort().map(s=>{const values=all[s],sum=values.reduce((a,b)=>a+b,0);return `<tr><th scope="row">${s}</th><td class="number">${values.length}</td><td class="number">${fmt(sum)}</td><td class="number">${fmt(sum/values.length)}</td></tr>`;}).join('');
+el('status').textContent=`${count} de ${episodes.length} episodios incorporados · ${first?'primera visita':'todas las visitas'}.`;el('next').disabled=count===episodes.length;
+el('interpretation').textContent=key==='berkeley'?'B y E tienen el mismo sucesor y recompensa inmediata. Sus promedios pueden diferir por la suerte de las pocas trayectorias observadas.':'Las visitas a S tienen retornos distintos. Primera visita usa el de t = 0; todas las visitas usa ambos. No son dos episodios independientes.';
+}
+el('next').addEventListener('click',()=>{count++;render();});el('reset').addEventListener('click',()=>{count=1;render();});el('dataset').addEventListener('change',()=>{count=1;render();});el('mode').addEventListener('change',render);el('gamma').addEventListener('input',render);render();
+})();
+</script></body></html>

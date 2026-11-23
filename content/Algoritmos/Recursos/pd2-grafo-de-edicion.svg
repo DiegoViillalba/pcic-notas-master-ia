@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="330" viewBox="0 0 820 330" role="img" aria-labelledby="title desc">
+<title id="title">La tabla es un grafo de edición</title><desc id="desc">Desde un nodo anterior se avanza a la derecha pagando un hueco, hacia abajo pagando un hueco, o diagonalmente pagando la sustitución.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#365570"/></marker></defs>
+<rect width="100%" height="100%" fill="#f8fbff"/>
+<style>text{font-family:system-ui,sans-serif;fill:#16334c;font-size:17px}.small{font-size:14px}.heading{font-size:21px;font-weight:600}.edge{stroke:#365570;stroke-width:2;fill:none;marker-end:url(#arrow)}</style>
+
+<text x="28" y="34" class="heading">Un estado (i,j) = i letras de x y j letras de y consumidas</text>
+<path class="edge" d="M125 95 L340 95"/><path class="edge" d="M125 95 L125 245"/><path class="edge" d="M125 95 L340 245"/>
+<g fill="#e7f1fc" stroke="#365570"><circle cx="125" cy="95" r="10"/><circle cx="350" cy="95" r="10"/><circle cx="125" cy="255" r="10"/><circle cx="350" cy="255" r="10"/></g>
+<text x="34" y="76">(i−1,j−1)</text><text x="318" y="76">(i−1,j)</text><text x="26" y="292">(i,j−1)</text><text x="328" y="292">(i,j)</text>
+<text x="222" y="80">δ</text><text x="97" y="183">δ</text><text x="235" y="151">α(xᵢ,yⱼ)</text>
+<text x="440" y="107">→ Consume yⱼ: hueco en x.</text><text x="440" y="152">↓ Consume xᵢ: hueco en y.</text><text x="440" y="197">↘ Consume ambas: emparejamiento.</text><text x="440" y="252" class="small">Un camino completo equivale a un alineamiento.</text><text x="440" y="278" class="small">El costo de cada arista es el de su columna.</text></svg>

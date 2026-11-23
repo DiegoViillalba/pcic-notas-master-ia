@@ -52,15 +52,7 @@ Sea $T$ un árbol binario enraizado con $|\Sigma|$ hojas, cada una etiquetada co
 
 ### 1.1 Ejemplo de la clase
 
-```text
-              •
-          0 /   \ 1
-           •     •
-         0/ \1  0/ \1
-         a   c  b   •
-                  0/ \1
-                   e   d
-```
+![700](data:image/svg+xml;charset=utf-8,%3Csvg%20font-family%3D%22-apple-system-body%2C%20ui-sans-serif%2C%20-apple-system%2C%20system-ui%2C%20%26quot%3BSegoe%20UI%26quot%3B%2C%20Helvetica%2C%20%26quot%3BApple%20Color%20Emoji%26quot%3B%2C%20Arial%2C%20sans-serif%2C%20%26quot%3BSegoe%20UI%20Emoji%26quot%3B%2C%20%26quot%3BSegoe%20UI%20Symbol%26quot%3B%22%20font-weight%3D%22400%22%20data-d-component%3D%22svg%22%20fill%3D%22currentColor%22%20style%3D%22color%3Argb\(237%2C%20237%2C%20237\)%22%20viewBox%3D%220%200%20600%20350%22%20width%3D%22100%25%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20stroke%3D%22currentColor%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M300%2045%20L170%20125%20M300%2045%20L430%20125%20M170%20125%20L100%20220%20M170%20125%20L240%20220%20M430%20125%20L365%20220%20M430%20125%20L510%20220%20M510%20220%20L460%20310%20M510%20220%20L560%20310%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22%230f766e%22%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%2245%22%20r%3D%229%22%2F%3E%3Ccircle%20cx%3D%22170%22%20cy%3D%22125%22%20r%3D%229%22%2F%3E%3Ccircle%20cx%3D%22430%22%20cy%3D%22125%22%20r%3D%229%22%2F%3E%3Ccircle%20cx%3D%22510%22%20cy%3D%22220%22%20r%3D%229%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22currentColor%22%20font-size%3D%2219%22%20text-anchor%3D%22middle%22%3E%3Ctext%20x%3D%22220%22%20y%3D%2277%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22380%22%20y%3D%2277%22%3E1%3C%2Ftext%3E%3Ctext%20x%3D%22115%22%20y%3D%22163%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22222%22%20y%3D%22163%22%3E1%3C%2Ftext%3E%3Ctext%20x%3D%22375%22%20y%3D%22163%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22488%22%20y%3D%22163%22%3E1%3C%2Ftext%3E%3Ctext%20x%3D%22458%22%20y%3D%22262%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22552%22%20y%3D%22262%22%3E1%3C%2Ftext%3E%3C%2Fg%3E%3Cg%20fill%3D%22currentColor%22%20font-size%3D%2223%22%20font-weight%3D%22600%22%20text-anchor%3D%22middle%22%3E%3Ctext%20x%3D%22100%22%20y%3D%22242%22%3Ea%3C%2Ftext%3E%3Ctext%20x%3D%22240%22%20y%3D%22242%22%3Ec%3C%2Ftext%3E%3Ctext%20x%3D%22365%22%20y%3D%22242%22%3Eb%3C%2Ftext%3E%3Ctext%20x%3D%22460%22%20y%3D%22337%22%3Ee%3C%2Ftext%3E%3Ctext%20x%3D%22560%22%20y%3D%22337%22%3Ed%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fsvg%3E)
 
 | $\Sigma$ | $a$ | $b$ | $c$ | $d$ | $e$ |
 |---|---|---|---|---|---|
@@ -75,15 +67,7 @@ Sea $T$ un árbol binario enraizado con $|\Sigma|$ hojas, cada una etiquetada co
 
 El segundo árbol de las notas es
 
-```text
-              •
-          0 /   \ 1
-           •     •
-         0/    0/ \1
-         d     •    •
-             0/ \1 0/ \1
-             c   b a   e
-```
+![700](data:image/svg+xml;charset=utf-8,%3Csvg%20font-family%3D%22-apple-system-body%2C%20ui-sans-serif%2C%20-apple-system%2C%20system-ui%2C%20%26quot%3BSegoe%20UI%26quot%3B%2C%20Helvetica%2C%20%26quot%3BApple%20Color%20Emoji%26quot%3B%2C%20Arial%2C%20sans-serif%2C%20%26quot%3BSegoe%20UI%20Emoji%26quot%3B%2C%20%26quot%3BSegoe%20UI%20Symbol%26quot%3B%22%20font-weight%3D%22400%22%20data-d-component%3D%22svg%22%20fill%3D%22currentColor%22%20style%3D%22color%3Argb\(237%2C%20237%2C%20237\)%22%20viewBox%3D%220%200%20600%20350%22%20width%3D%22100%25%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20stroke%3D%22currentColor%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M300%2040%20L170%20125%20M300%2040%20L430%20125%20M170%20125%20L95%20220%20M430%20125%20L350%20220%20M430%20125%20L515%20220%20M350%20220%20L290%20310%20M350%20220%20L400%20310%20M515%20220%20L475%20310%20M515%20220%20L565%20310%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22%230f766e%22%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%2240%22%20r%3D%229%22%2F%3E%3Ccircle%20cx%3D%22170%22%20cy%3D%22125%22%20r%3D%229%22%2F%3E%3Ccircle%20cx%3D%22430%22%20cy%3D%22125%22%20r%3D%229%22%2F%3E%3Ccircle%20cx%3D%22350%22%20cy%3D%22220%22%20r%3D%229%22%2F%3E%3Ccircle%20cx%3D%22515%22%20cy%3D%22220%22%20r%3D%229%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22currentColor%22%20font-size%3D%2219%22%20text-anchor%3D%22middle%22%3E%3Ctext%20x%3D%22218%22%20y%3D%2275%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22385%22%20y%3D%2275%22%3E1%3C%2Ftext%3E%3Ctext%20x%3D%22116%22%20y%3D%22165%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22375%22%20y%3D%22165%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22490%22%20y%3D%22165%22%3E1%3C%2Ftext%3E%3Ctext%20x%3D%22298%22%20y%3D%22264%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22393%22%20y%3D%22264%22%3E1%3C%2Ftext%3E%3Ctext%20x%3D%22468%22%20y%3D%22264%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22558%22%20y%3D%22264%22%3E1%3C%2Ftext%3E%3C%2Fg%3E%3Cg%20fill%3D%22currentColor%22%20font-size%3D%2224%22%20font-weight%3D%22600%22%20text-anchor%3D%22middle%22%3E%3Ctext%20x%3D%2295%22%20y%3D%22244%22%3Ed%3C%2Ftext%3E%3Ctext%20x%3D%22290%22%20y%3D%22337%22%3Ec%3C%2Ftext%3E%3Ctext%20x%3D%22400%22%20y%3D%22337%22%3Eb%3C%2Ftext%3E%3Ctext%20x%3D%22475%22%20y%3D%22337%22%3Ea%3C%2Ftext%3E%3Ctext%20x%3D%22565%22%20y%3D%22337%22%3Ee%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fsvg%3E)
 
 | $\Sigma$ | $a$ | $b$ | $c$ | $d$ | $e$ |
 |---|---|---|---|---|---|
@@ -99,15 +83,7 @@ En sentido inverso, se construye $T$ **inductivamente leyendo los bits uno a uno
 
 Para $\gamma$ ($a=11$, $b=01$, $c=001$, $d=10$, $e=000$), en la raíz se separan $\{b,c,e\}$ (empiezan con `0`) de $\{a,d\}$ (empiezan con `1`). Del lado `0`: $\{c,e\}$ siguen con `0` y $b$ con `1`. Y así:
 
-```text
-                •
-           0 /     \ 1
-            •        •
-          0/ \1    0/ \1
-          •   b    d   a
-        0/ \1
-        e   c
-```
+![700](data:image/svg+xml;charset=utf-8,%3Csvg%20font-family%3D%22-apple-system-body%2C%20ui-sans-serif%2C%20-apple-system%2C%20system-ui%2C%20%26quot%3BSegoe%20UI%26quot%3B%2C%20Helvetica%2C%20%26quot%3BApple%20Color%20Emoji%26quot%3B%2C%20Arial%2C%20sans-serif%2C%20%26quot%3BSegoe%20UI%20Emoji%26quot%3B%2C%20%26quot%3BSegoe%20UI%20Symbol%26quot%3B%22%20font-weight%3D%22400%22%20data-d-component%3D%22svg%22%20fill%3D%22currentColor%22%20style%3D%22color%3Argb\(237%2C%20237%2C%20237\)%22%20viewBox%3D%220%200%20600%20360%22%20width%3D%22100%25%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20stroke%3D%22currentColor%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M300%2040%20L175%20125%20M300%2040%20L435%20125%20M175%20125%20L100%20225%20M175%20125%20L255%20225%20M435%20125%20L375%20225%20M435%20125%20L515%20225%20M100%20225%20L55%20320%20M100%20225%20L145%20320%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22%230f766e%22%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%2240%22%20r%3D%229%22%2F%3E%3Ccircle%20cx%3D%22175%22%20cy%3D%22125%22%20r%3D%229%22%2F%3E%3Ccircle%20cx%3D%22435%22%20cy%3D%22125%22%20r%3D%229%22%2F%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%22225%22%20r%3D%229%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22currentColor%22%20font-size%3D%2219%22%20text-anchor%3D%22middle%22%3E%3Ctext%20x%3D%22217%22%20y%3D%2277%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22385%22%20y%3D%2277%22%3E1%3C%2Ftext%3E%3Ctext%20x%3D%22115%22%20y%3D%22163%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22230%22%20y%3D%22163%22%3E1%3C%2Ftext%3E%3Ctext%20x%3D%22382%22%20y%3D%22163%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22490%22%20y%3D%22163%22%3E1%3C%2Ftext%3E%3Ctext%20x%3D%2261%22%20y%3D%22267%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22141%22%20y%3D%22267%22%3E1%3C%2Ftext%3E%3C%2Fg%3E%3Cg%20fill%3D%22currentColor%22%20font-size%3D%2224%22%20font-weight%3D%22600%22%20text-anchor%3D%22middle%22%3E%3Ctext%20x%3D%22255%22%20y%3D%22247%22%3Eb%3C%2Ftext%3E%3Ctext%20x%3D%22375%22%20y%3D%22247%22%3Ed%3C%2Ftext%3E%3Ctext%20x%3D%22515%22%20y%3D%22247%22%3Ea%3C%2Ftext%3E%3Ctext%20x%3D%2255%22%20y%3D%22344%22%3Ee%3C%2Ftext%3E%3Ctext%20x%3D%22145%22%20y%3D%22344%22%3Ec%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fsvg%3E)
 
 La propiedad de prefijos garantiza que ningún símbolo quede en un nodo interno: cada palabra termina en una hoja.
 
@@ -139,62 +115,242 @@ el mismo valor de la clase anterior, ahora leído como “frecuencia por profund
 
 ## 4. Lema 1: el árbol de un código óptimo es completo
 
-> [!important] Lema
-> El árbol binario correspondiente a un código óptimo es necesariamente **completo**: cada vértice interno tiene exactamente 2 hijos.
+**Lema.** El árbol binario de un código de prefijos óptimo puede elegirse **completo**, es decir, cada nodo interno tiene exactamente dos hijos.
 
-En inglés se dice *full binary tree*. No confundir con “árbol completo” en el sentido de heaps (todos los niveles llenos salvo el último).
+En inglés se denomina _full binary tree_. No debe confundirse con un árbol completo en el sentido de los _heaps_, donde todos los niveles están llenos excepto, posiblemente, el último.
 
-**Prueba (intercambio).** Supongamos que $T$ es óptimo y tiene un nodo $u$ con un único hijo $v$. Construimos $T'$ quitando $u$ y colgando $v$ en su lugar:
+### Intuición: ¿por qué un nodo con un solo hijo es ineficiente?
 
-- si $u$ era la raíz, $v$ pasa a ser la raíz;
-- si no, $v$ se vuelve hijo del padre de $u$.
+Recordemos que cada camino desde la raíz hasta una hoja representa una palabra código: recorrer una arista añade un bit (`0` o `1`). Por tanto, **la profundidad de una hoja determina la cantidad de bits necesarios para codificar su símbolo**.
 
-Cada hoja en el subárbol de $u$ sube un nivel y las demás no cambian. Como hay al menos una hoja bajo $u$ con frecuencia positiva,
+Si un nodo interno tiene un único hijo, estamos utilizando un bit adicional sin que exista una bifurcación que permita distinguir entre dos posibilidades. Podemos eliminar ese nodo y conectar directamente su hijo con el padre, acortando las palabras código de todas las hojas que descienden de él.
 
+**Ejemplo.** Consideremos el siguiente fragmento de un árbol:
+
+![700](data:image/svg+xml;charset=utf-8,%3Csvg%20font-family%3D%22-apple-system-body%2C%20ui-sans-serif%2C%20-apple-system%2C%20system-ui%2C%20%26quot%3BSegoe%20UI%26quot%3B%2C%20Helvetica%2C%20%26quot%3BApple%20Color%20Emoji%26quot%3B%2C%20Arial%2C%20sans-serif%2C%20%26quot%3BSegoe%20UI%20Emoji%26quot%3B%2C%20%26quot%3BSegoe%20UI%20Symbol%26quot%3B%22%20font-weight%3D%22400%22%20data-d-component%3D%22svg%22%20fill%3D%22currentColor%22%20style%3D%22color%3Argb\(237%2C%20237%2C%20237\)%22%20viewBox%3D%220%200%20480%20420%22%20width%3D%22100%25%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20stroke%3D%22%23ffffff%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M240%2052%20L150%20142%20M240%2052%20L335%20142%20M150%20142%20L150%20245%20M150%20245%20L150%20345%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22%23ffffff%22%20font-size%3D%2224%22%20text-anchor%3D%22middle%22%3E%3Ccircle%20cx%3D%22240%22%20cy%3D%2252%22%20r%3D%227%22%2F%3E%3Ctext%20x%3D%22187%22%20y%3D%2290%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22300%22%20y%3D%2290%22%3E1%3C%2Ftext%3E%3Ctext%20x%3D%22150%22%20y%3D%22164%22%3Eu%3C%2Ftext%3E%3Ctext%20x%3D%22335%22%20y%3D%22164%22%3Eb%3C%2Ftext%3E%3Ctext%20x%3D%22130%22%20y%3D%22203%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22150%22%20y%3D%22266%22%3Ev%3C%2Ftext%3E%3Ctext%20x%3D%22130%22%20y%3D%22310%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22150%22%20y%3D%22372%22%3Ed%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fsvg%3E)
+
+El símbolo $d$ tiene código `000`, mientras que $b$ tiene código `1`. Observemos que $u$ y $v$ tienen un único hijo, por lo que podemos eliminarlos sin introducir ambigüedades:
+
+![700](data:image/svg+xml;charset=utf-8,%3Csvg%20font-family%3D%22-apple-system-body%2C%20ui-sans-serif%2C%20-apple-system%2C%20system-ui%2C%20%26quot%3BSegoe%20UI%26quot%3B%2C%20Helvetica%2C%20%26quot%3BApple%20Color%20Emoji%26quot%3B%2C%20Arial%2C%20sans-serif%2C%20%26quot%3BSegoe%20UI%20Emoji%26quot%3B%2C%20%26quot%3BSegoe%20UI%20Symbol%26quot%3B%22%20font-weight%3D%22400%22%20data-d-component%3D%22svg%22%20fill%3D%22currentColor%22%20style%3D%22color%3Argb\(237%2C%20237%2C%20237\)%22%20viewBox%3D%220%200%20320%20210%22%20width%3D%22100%25%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20stroke%3D%22%23ffffff%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M160%2038%20L80%20142%20M160%2038%20L240%20142%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%22160%22%20cy%3D%2238%22%20r%3D%227%22%20fill%3D%22%23ffffff%22%2F%3E%3Cg%20fill%3D%22%23ffffff%22%20font-size%3D%2223%22%20text-anchor%3D%22middle%22%3E%3Ctext%20x%3D%22105%22%20y%3D%2284%22%3E0%3C%2Ftext%3E%3Ctext%20x%3D%22215%22%20y%3D%2284%22%3E1%3C%2Ftext%3E%3Ctext%20x%3D%2280%22%20y%3D%22173%22%3Ed%3C%2Ftext%3E%3Ctext%20x%3D%22240%22%20y%3D%22173%22%3Eb%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fsvg%3E)
+
+Ahora $d$ tiene código `0` y $b$ conserva `1`. Ambos códigos siguen siendo de prefijos, pero hemos reducido la longitud de $d$ de 3 a 1 bit.
+
+Si $f_d=0.18$, la contribución de $d$ al promedio de bits por símbolo cambia de:
+
+$$  
+0.18(3)=0.54  
+\quad\longrightarrow\quad  
+0.18(1)=0.18  
 $$
-\operatorname{PBS}(T')<\operatorname{PBS}(T),
+
+Por tanto, el promedio disminuye en $0.36$ bits por símbolo. **El código original no podía ser óptimo**, porque encontramos otro código válido que utiliza menos bits en promedio.
+
+### Demostración por contradicción
+
+Supongamos que $T$ es un árbol óptimo y que contiene un nodo interno $u$ con un único hijo $v$.
+
+Construimos un nuevo árbol $T'$ eliminando $u$ y conectando directamente $v$ con el padre de $u$. Si $u$ es la raíz, entonces $v$ se convierte en la nueva raíz.
+
+Sea $D(u)$ el conjunto de hojas descendientes de $u$. Al realizar esta transformación:
+
+- Las hojas de $D(u)$ disminuyen su profundidad en una unidad.
+    
+- Las demás hojas conservan su profundidad.
+    
+- El nuevo árbol sigue representando un código de prefijos válido.
+    
+
+Como la longitud de cada palabra código corresponde a la profundidad de su hoja, tenemos:
+
+$$  
+\begin{aligned}  
+\operatorname{PBS}(T')  
+&=\sum_{x\in\Sigma}f_x|\gamma_T(x)|  
+-\sum_{x\in D(u)}f_x\  
+&=\operatorname{PBS}(T)-\sum_{x\in D(u)}f_x.  
+\end{aligned}  
 $$
 
-lo cual contradice que $T$ sea óptimo. $\square$
+Si todas las frecuencias son positivas, entonces:
 
-En el ejemplo de $\gamma^{iv}$: contraer el nodo de un solo hijo cambia $d$ de `00` a `0` y baja el PBS en $f_d=.18$.
+$$  
+\sum_{x\in D(u)}f_x>0  
+$$
+
+y, en consecuencia:
+
+$$  
+\boxed{\operatorname{PBS}(T')<\operatorname{PBS}(T)}  
+$$
+
+Esto contradice nuestra hipótesis de que $T$ era óptimo. Por tanto, un árbol óptimo no puede contener nodos internos con un único hijo. $\square$
+
+### Aplicación al ejemplo de $\gamma^{iv}$
+
+En el árbol de $\gamma^{iv}$, el símbolo $d$ tiene código `00`, pero su padre posee un único hijo. Podemos contraer ese nodo y cambiar la codificación de $d$ a `0`, manteniendo las demás palabras código.
+
+Como $f_d=0.18$, el promedio disminuye en:
+
+$$  
+\Delta\operatorname{PBS}  
+=f_d(2-1)=0.18.  
+$$
+
+Por tanto, $\gamma^{iv}$ no es óptimo.
+
+**Conclusión:** En un código de prefijos óptimo no deben existir nodos internos con un solo hijo, porque representan bits innecesarios. Eliminar esos nodos conserva la propiedad de prefijos y reduce el promedio de bits por símbolo siempre que haya frecuencias positivas en el subárbol afectado.
+
+_Nota:_ Si se permiten símbolos con frecuencia cero, puede existir un código óptimo con nodos de un solo hijo cuya eliminación no mejore estrictamente el PBS. En ese caso, el lema garantiza que existe al menos un árbol óptimo completo, aunque no necesariamente que todos los árboles óptimos lo sean.
 
 ---
 
 ## 5. Lema 2: más profundo implica menos frecuente
 
-> [!important] Lema
-> Sea $T$ el árbol de un código óptimo y sean $x,y\in\Sigma$ tales que $\operatorname{depth}(x)<\operatorname{depth}(y)$. Entonces $f_x\ge f_y$.
+**Lema.** Sea $T$ el árbol de un código óptimo y sean $x,y\in\Sigma$ dos símbolos tales que:
 
-**Prueba (intercambio… de nuevo).** Por contradicción, supongamos $f_x<f_y$. Sea $T'$ el árbol que resulta de **intercambiar las etiquetas** $x$ y $y$. Separamos la parte que no cambia:
-
-$$
-\omega=\sum_{z\ne x,y}f_z\operatorname{depth}(z).
+$$  
+\operatorname{depth}(x)<\operatorname{depth}(y).  
 $$
 
-$$
-\operatorname{PBS}(T)=\omega+f_x\operatorname{depth}(x)+f_y\operatorname{depth}(y),
-$$
+Entonces necesariamente:
 
-$$
-\operatorname{PBS}(T')=\omega+f_x\operatorname{depth}(y)+f_y\operatorname{depth}(x).
+$$  
+\boxed{f_x\geq f_y}  
 $$
 
-Restando:
+Es decir, **un símbolo situado a menor profundidad no puede ser menos frecuente que otro situado a mayor profundidad**.
 
+### Intuición: ¿por qué los símbolos frecuentes deben estar más cerca de la raíz?
+
+Recordemos que la profundidad de una hoja determina la longitud de su palabra código. Por tanto, cada bit adicional que asignamos a un símbolo se paga tantas veces como este aparece en el texto.
+
+Si un símbolo es muy frecuente, conviene asignarle una palabra código corta, pues reducir su longitud produce un ahorro mayor que reducir la de un símbolo poco frecuente.
+
+**Ejemplo.** Consideremos dos símbolos:
+
+- $c$, con frecuencia $f_c=0.20$, situado a profundidad 3.
+    
+- $d$, con frecuencia $f_d=0.18$, situado a profundidad 2.
+    
+
+Como $c$ es más frecuente que $d$, resulta ineficiente que su codificación sea más larga. Podemos **intercambiar sus posiciones en el árbol** sin modificar su estructura ni las codificaciones de los demás símbolos.
+
+Antes del intercambio, las contribuciones de ambos símbolos al promedio de bits son:
+
+$$  
+0.20(3)+0.18(2)=0.96.  
 $$
-\begin{aligned}
-\operatorname{PBS}(T)-\operatorname{PBS}(T')
-&=\operatorname{depth}(x)(f_x-f_y)-\operatorname{depth}(y)(f_x-f_y)\\
-&=\underbrace{\big(\operatorname{depth}(x)-\operatorname{depth}(y)\big)}_{<0}\;\underbrace{\big(f_x-f_y\big)}_{<0}\;>\;0 .
-\end{aligned}
+
+Después de intercambiarlos:
+
+$$  
+0.20(2)+0.18(3)=0.94.  
 $$
 
-Así $\operatorname{PBS}(T')<\operatorname{PBS}(T)$, contradicción con la optimalidad de $T$. $\square$
+Por tanto, conseguimos un ahorro de:
 
-> [!example] El intercambio que mejoró $\gamma$
-> En el árbol de $\gamma$, $c$ está a profundidad 3 con $f_c=.20$ y $d$ a profundidad 2 con $f_d=.18$: viola el lema. Intercambiarlos ahorra $(3-2)(.20-.18)=.02$, y se obtiene exactamente $\operatorname{PBS}=2.23$, el valor de $\gamma'$.
+$$  
+\boxed{0.96-0.94=0.02\text{ bits/símbolo}}  
+$$
 
+El código original no podía ser óptimo, porque encontramos otro código de prefijos válido que utiliza menos bits en promedio.
+
+### Demostración por contradicción (intercambio)
+
+Supongamos que $T$ es un árbol óptimo y que existen dos símbolos $x,y$ tales que:
+
+$$  
+\operatorname{depth}(x)<\operatorname{depth}(y),  
+\qquad f_x<f_y.  
+$$
+
+Es decir, el símbolo $x$ está más cerca de la raíz, pero es menos frecuente que $y$.
+
+Construimos un nuevo árbol $T'$ **intercambiando únicamente las etiquetas de las hojas $x$ y $y$**, sin modificar la estructura del árbol. Como las hojas conservan sus posiciones, el nuevo código sigue siendo de prefijos.
+
+Definimos la contribución de todos los demás símbolos al promedio de bits como:
+
+$$  
+\omega=\sum_{z\neq x,y}f_z\operatorname{depth}(z).  
+$$
+
+Así, el promedio del árbol original es:
+
+$$  
+\operatorname{PBS}(T)=\omega+f_x\operatorname{depth}(x)+f_y\operatorname{depth}(y).  
+$$
+
+Mientras que, después del intercambio:
+
+$$  
+\operatorname{PBS}(T')=\omega+f_x\operatorname{depth}(y)+f_y\operatorname{depth}(x).  
+$$
+
+Restando ambas expresiones, los términos $\omega$ se cancelan:
+
+$$  
+\begin{aligned}  
+\operatorname{PBS}(T)-\operatorname{PBS}(T')  
+&=f_x\operatorname{depth}(x)+f_y\operatorname{depth}(y)\  
+&\quad-f_x\operatorname{depth}(y)-f_y\operatorname{depth}(x)\  
+&=(f_x-f_y)\big(\operatorname{depth}(x)-\operatorname{depth}(y)\big).  
+\end{aligned}  
+$$
+
+Por nuestra hipótesis:
+
+$$  
+\underbrace{(f_x-f_y)}_{<0}  
+\underbrace{\big(\operatorname{depth}(x)-\operatorname{depth}(y)\big)}_{<0}>0.  
+$$
+
+Por tanto:
+
+$$  
+\boxed{\operatorname{PBS}(T)-\operatorname{PBS}(T')>0}  
+$$
+
+Esto implica que:
+
+$$  
+\operatorname{PBS}(T')<\operatorname{PBS}(T).  
+$$
+
+Hemos construido un código válido con menor promedio de bits, lo cual **contradice la hipótesis de que $T$ era óptimo**. En consecuencia:
+
+$$  
+\boxed{\operatorname{depth}(x)<\operatorname{depth}(y)\implies f_x\geq f_y}  
+$$
+
+$\square$
+
+### Aplicación: el intercambio que mejoró $\gamma$
+
+En el árbol de $\gamma$, el símbolo $c$ está a profundidad 3 con frecuencia $f_c=0.20$, mientras que $d$ está a profundidad 2 con frecuencia $f_d=0.18$.
+
+Esto viola el lema, pues el símbolo más frecuente tiene una palabra código más larga.
+
+Al intercambiar sus etiquetas, el ahorro es:
+
+$$  
+\begin{aligned}  
+\Delta\operatorname{PBS}  
+&=(3-2)(0.20-0.18)\  
+&=\boxed{0.02\text{ bits/símbolo}}.  
+\end{aligned}  
+$$
+
+De esta manera, obtenemos el código $\gamma'$ con:
+
+$$  
+\boxed{\operatorname{PBS}(\gamma')=2.23}  
+$$
+
+**Conclusión:** En un árbol óptimo, los símbolos más frecuentes no pueden estar a mayor profundidad que símbolos estrictamente menos frecuentes. Si esto ocurre, podemos intercambiar sus etiquetas y disminuir el promedio de bits sin modificar la estructura del árbol.
+
+Este lema justifica una de las ideas fundamentales de Huffman: **reservar las palabras código más largas para los símbolos menos frecuentes**.
+
+**Observación:** El lema establece una condición necesaria de optimalidad, pero no suficiente. Un árbol que respeta el orden entre frecuencias y profundidades no es necesariamente óptimo; todavía debemos determinar cómo organizar sus ramas.
 ### 5.1 Consecuencia: si nos dieran la forma del árbol
 
 Kleinberg–Tardos destacan una lectura útil: si alguien nos diera la **forma** de un árbol óptimo $T^*$ sin etiquetas, sabríamos etiquetarlo: las hojas menos profundas reciben los símbolos más frecuentes, nivel por nivel. Dentro de un mismo nivel el orden **no importa**, porque todas esas hojas tienen el mismo multiplicador $\operatorname{depth}$.
@@ -203,21 +359,108 @@ El problema es que no conocemos la forma, y hay exponencialmente muchas. La clav
 
 ---
 
-## 6. Lema 3: los dos menos frecuentes pueden ser hermanos
+## 6. Lema 3: los dos símbolos menos frecuentes pueden ser hermanos
 
-> [!important] Lema
-> Existe un árbol $T^*$ de un código óptimo tal que los dos símbolos con frecuencias más pequeñas son **hermanos** en $T^*$.
+**Lema.** Sean $x,y\in\Sigma$ los dos símbolos de menor frecuencia. Entonces existe un árbol de codificación óptimo en el que $x$ y $y$ son **hojas hermanas situadas a máxima profundidad**, es decir, comparten el mismo padre.
 
-**Prueba.** Sea $T$ un árbol óptimo y sean $x,y$ los dos símbolos de menor frecuencia.
+### Intuición: ¿por qué los símbolos menos frecuentes pueden ser hermanos?
 
-1. Toma una hoja $v$ de **profundidad máxima**. Por el Lema 1, su padre tiene otro hijo $w$.
-2. $w$ también es hoja: si no lo fuera, tendría una hoja debajo con profundidad mayor que la de $v$, contradiciendo la elección de $v$.
-3. Por el Lema 2, las hojas de mayor profundidad llevan las frecuencias menores. Entonces $x$ y $y$ están en el nivel más profundo (o tienen la misma frecuencia que quienes ocupan esas hojas).
-4. Intercambia las etiquetas para que $x$ y $y$ ocupen $v$ y $w$. Los intercambios ocurren entre hojas del **mismo nivel** (o entre símbolos de igual frecuencia), así que el PBS no cambia.
+Recordemos los dos resultados anteriores:
 
-El árbol resultante $T^*$ cumple $\operatorname{PBS}(T^*)=\operatorname{PBS}(T)$, es óptimo y tiene a $x,y$ como hermanos. $\square$
+1. **Lema 1:** En un árbol óptimo, cada nodo interno tiene exactamente dos hijos.
+    
+2. **Lema 2:** Los símbolos menos frecuentes pueden colocarse a mayor profundidad sin aumentar el promedio de bits por símbolo.
+    
 
-En las notas: en $T$, $x$ y $y$ estaban en el último nivel pero separados ($x$ junto a $w$); intercambiar $y$ con $w$ los vuelve hermanos sin cambiar el PBS.
+Consideremos una hoja de máxima profundidad. Como el árbol es completo, su hermano también debe ser una hoja: si fuera un nodo interno, tendría descendientes todavía más profundos, contradiciendo que estamos en la profundidad máxima.
+
+Por tanto, **existe un par de hojas hermanas a máxima profundidad**. Podemos colocar allí los dos símbolos menos frecuentes, intercambiando sus etiquetas con las de las hojas originales. Por el Lema 2, estos intercambios no aumentan el costo, por lo que el árbol resultante sigue siendo óptimo.
+
+### Ejemplo: fusionar los símbolos menos frecuentes
+
+Supongamos un alfabeto $\Sigma={a,b,c,d,e}$ con las siguientes frecuencias:
+
+|Símbolo|Frecuencia|
+|---|---|
+|$a$|0.35|
+|$b$|0.25|
+|$c$|0.20|
+|$d$|0.12|
+|$e$|0.08|
+
+Los dos símbolos menos frecuentes son $d$ y $e$. El lema garantiza que podemos construir un árbol óptimo donde ambos sean hermanos.
+
+**La idea fundamental de Huffman consiste en fusionarlos temporalmente en un único símbolo artificial $z$:**
+
+$$  
+z=(d,e),\qquad f_z=f_d+f_e=0.12+0.08=0.20.  
+$$
+
+Así, reducimos el problema original de cinco símbolos a uno de cuatro:
+
+$$  
+{a,b,c,d,e}\longrightarrow{a,b,c,z}.  
+$$
+
+Una vez encontrado un árbol óptimo para el problema reducido, sustituimos la hoja $z$ por un nodo interno con dos hijos: $d$ y $e$.
+
+### ¿Por qué podemos resolver el problema reducido?
+
+Sea $T'$ el árbol del problema reducido y $T$ el árbol que obtenemos al expandir $z$ en sus dos hijos.
+
+Al realizar esta expansión, las profundidades de $d$ y $e$ son exactamente una unidad mayores que la profundidad original de $z$:
+
+$$  
+\operatorname{depth}_T(d)=\operatorname{depth}_{T'}(z)+1  
+$$
+
+$$  
+\operatorname{depth}_T(e)=\operatorname{depth}_{T'}(z)+1.  
+$$
+
+Las profundidades de los demás símbolos permanecen iguales. Por tanto, la contribución de $d$ y $e$ al promedio es:
+
+$$  
+\begin{aligned}  
+&f_d(\operatorname{depth}_{T'}(z)+1)  
++f_e(\operatorname{depth}_{T'}(z)+1)\  
+&=(f_d+f_e)\operatorname{depth}_{T'}(z)+f_d+f_e\  
+&=f_z\operatorname{depth}_{T'}(z)+f_d+f_e.  
+\end{aligned}  
+$$
+
+El primer término corresponde exactamente a la contribución de $z$ en el problema reducido. En consecuencia:
+
+$$  
+\boxed{\operatorname{PBS}(T)=\operatorname{PBS}(T')+f_d+f_e}  
+$$
+
+En nuestro ejemplo:
+
+$$  
+\operatorname{PBS}(T)=\operatorname{PBS}(T')+0.20.  
+$$
+
+Esto significa que **expandir el símbolo artificial incrementa el costo en una cantidad fija**, independiente de cómo se haya construido el resto del árbol.
+
+Por tanto, minimizar el costo del problema reducido también minimiza el costo del problema original entre los árboles donde $d$ y $e$ son hermanos. Como el lema garantiza que existe un árbol óptimo con esa propiedad, resolver óptimamente el problema reducido permite recuperar una solución óptima del problema original.
+
+### Conexión con el algoritmo greedy de Huffman
+
+Los tres lemas justifican la estrategia de Huffman:
+
+1. **Árbol completo:** Un código óptimo no necesita nodos internos con un único hijo.
+    
+2. **Frecuencia y profundidad:** Los símbolos menos frecuentes pueden situarse en las hojas más profundas.
+    
+3. **Propiedad de hermanos:** Los dos símbolos menos frecuentes pueden compartir un padre en algún árbol óptimo.
+    
+
+En consecuencia, podemos **fusionar los dos símbolos de menor frecuencia y resolver recursivamente un problema más pequeño**.
+
+Este procedimiento constituye la elección _greedy_ de Huffman: en cada iteración se seleccionan los dos símbolos de menor frecuencia y se reemplazan por un nodo cuya frecuencia es la suma de ambas.
+
+**Conclusión:** La elección greedy es segura porque existe una solución óptima que contiene a los dos símbolos menos frecuentes como hermanos. La fusión conserva la posibilidad de alcanzar el óptimo y reduce el tamaño del problema en una unidad. Esta es la propiedad que permite construir recursivamente un código de Huffman óptimo.
 
 ---
 

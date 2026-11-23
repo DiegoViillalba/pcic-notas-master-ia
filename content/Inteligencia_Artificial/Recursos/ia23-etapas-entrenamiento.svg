@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="365" viewBox="0 0 840 365" role="img" aria-labelledby="title desc">
+<title id="title">Etapas de aprendizaje de un modelo de lenguaje</title>
+<desc id="desc">Un corpus alimenta el preentrenamiento autosupervisado. El modelo puede ajustarse con demostraciones para seguir instrucciones y, opcionalmente, con recompensas aprendidas de preferencias humanas. También puede transferirse a otras tareas.</desc>
+<style>:root{color-scheme:light dark;--bg:#fafcfb;--fg:#243840;--muted:#50636d;--line:#7d999e;--soft:#e8f1f0;--accent:#217a78}@media(prefers-color-scheme:dark){:root{--bg:#192329;--fg:#eef3f1;--muted:#bdced2;--line:#91a9ae;--soft:#273c43;--accent:#85d3c8}}text{font:18px system-ui,sans-serif;fill:var(--fg)}.small{font-size:16px;fill:var(--muted)}.box{fill:var(--soft)}.arrow{stroke:var(--line);stroke-width:2;fill:none;marker-end:url(#a)}</style>
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="var(--line)"/></marker></defs>
+<rect width="840" height="365" rx="10" fill="var(--bg)"/>
+<text x="25" y="38" font-size="23">Aprender patrones → aprender tareas → orientar respuestas</text>
+<g text-anchor="middle">
+<rect class="box" x="25" y="87" width="240" height="130" rx="8"/><text x="145" y="120">Preentrenamiento</text><text x="145" y="148">Texto → siguiente token</text><text class="small" x="145" y="181">Etiqueta obtenida del texto</text><text class="small" x="145" y="204">Autosupervisión</text>
+<rect class="box" x="300" y="87" width="240" height="130" rx="8"/><text x="420" y="120">Ajuste con instrucciones</text><text x="420" y="148">Consulta → demostración</text><text class="small" x="420" y="181">Respuesta deseada</text><text class="small" x="420" y="204">Supervisión (SFT)</text>
+<rect class="box" x="575" y="87" width="240" height="130" rx="8"/><text x="695" y="120">RLHF opcional</text><text x="695" y="148">Preferencias → recompensa</text><text class="small" x="695" y="181">Mejorar una política</text><text class="small" x="695" y="204">Aprendizaje por refuerzo</text>
+</g>
+<path class="arrow" d="M266 152h29"/><path class="arrow" d="M541 152h29"/>
+<path class="arrow" d="M145 218v51h141"/>
+<text x="302" y="275">Transferencia a otra tarea</text><text x="302" y="303" class="small">Reutilizar representaciones; ajustar parte o todo el modelo.</text>
+<text x="25" y="345" class="small">Ruta ilustrativa: SFT y RLHF son objetivos distintos; no todas las aplicaciones usan ambos.</text>
+</svg>

@@ -1,0 +1,183 @@
+% ============================================================
+\newpage
+\section{Parte D — Simulacros resueltos}
+
+\subsection*{Simulacro D1}
+\addcontentsline{toc}{subsection}{Simulacro D1}
+
+\begin{solucion}{D1.1 · El auto no arranca}
+\textbf{(a)} $P(B)P(F)P(S\mid B,F)P(L\mid B)$: $1+1+4+2=\mathbf8$ parámetros (conjunta: 15).
+
+\textbf{(b)} $B\indep F$: \textbf{sí} ($B\to S\leftarrow F$ sin evidencia). $B\indep F\mid S$: \textbf{no} (colisionador observado).
+$L\indep F$: \textbf{sí} ($L\leftarrow B\to S\leftarrow F$ bloqueado en $S$). $L\indep F\mid S$: \textbf{no} ($S$ abre y $B$, bifurcación no observada, deja pasar).
+
+\textbf{(c)} Pesos $P(b)P(f)P(-s\mid b,f)$:
+\begin{center}\small
+\begin{tabular}{cc|l}
+$B$ & $F$ & $P(b,f,-s)$\\\hline
+$+b$ & $+f$ & $0.9(0.95)(0.01)=0.00855$\\
+$+b$ & $-f$ & $0.9(0.05)(1)=0.045$\\
+$-b$ & $+f$ & $0.1(0.95)(0.95)=0.09025$\\
+$-b$ & $-f$ & $0.1(0.05)(1)=0.005$
+\end{tabular}
+\end{center}
+$P(-s)=0.1488$. $P(-b\mid-s)=\frac{0.09025+0.005}{0.1488}=\mathbf{0.6401}$; \quad $P(-f\mid-s)=\frac{0.045+0.005}{0.1488}=\mathbf{0.3360}$.
+
+\textbf{(d)} Multiplicar cada fila por $P(+l\mid b)$ ($0.95$ si $+b$, $0.1$ si $-b$): $0.0081225$, $0.04275$, $0.009025$, $0.0005$; suma $0.0603975$.
+$P(-b\mid-s,+l)=\frac{0.009525}{0.0603975}=\mathbf{0.1577}$; \quad $P(-f\mid-s,+l)=\frac{0.04325}{0.0603975}=\mathbf{0.7161}$.
+Las luces encendidas indican batería buena; como el auto no arranca, la culpa pasa a la gasolina (razonamiento intercausal vía $S$).
+\end{solucion}
+
+\begin{solucion}{D1.2 · Aprender y muestrear}
+\textbf{(a)}
+\begin{center}\small
+\begin{tabular}{l|ccc}
+Fila & Conteo & MLE & Laplace\\\hline
+$P(+s\mid+b,+f)$ & 4/4 & 1 & 5/6 = 0.833\\
+$P(+s\mid+b,-f)$ & 0/1 & 0 & 1/3 = 0.333\\
+$P(+s\mid-b,+f)$ & 1/3 & 0.333 & 2/5 = 0.4\\
+$P(+s\mid-b,-f)$ & 0/0 & \textbf{indefinida} & 1/2\\
+$P(+l\mid+b)$ & 4/5 & 0.8 & 5/7 = 0.714\\
+$P(+l\mid-b)$ & 0/3 & 0 & 1/5 = 0.2
+\end{tabular}
+\end{center}
+
+\textbf{(b)} Peso $=P(-s\mid b,f)$: $(1,1)\to0.01$, $(0,1)\to0.95$, $(1,0)\to1$, $(1,1)\to0.01$, $(0,1)\to0.95$, $(1,1)\to0.01$.
+Suma $2.93$; con $+b$: $0.01+1+0.01+0.01=1.03$. $\hat P(+b\mid-s)=\mathbf{0.3515}$ frente a $1-0.6401=\mathbf{0.3599}$ exacto.
+
+\textbf{(c)} Solo se acepta una fracción $\approx P(-s)$, es decir 14.9\,\% de las muestras: para 100 aceptadas se necesitan $\approx100/0.1488\approx\mathbf{672}$.
+Además $L$ y $F$ se generarían sin usar la evidencia; con evidencia más rara el costo crece en proporción inversa a $P(\mathbf e)$.
+\end{solucion}
+
+\begin{solucion}{D1.3 · Inventario}
+\textbf{(a)} $s'=s+a-\min(s+a,d)$, $R=4\min(s+a,d)-a-0.5s'$:
+\begin{center}\small
+\begin{tabular}{cc|ll}
+$s$ & $a$ & Demanda 1 (0.5) & Demanda 0 (0.5)\\\hline
+0 & 0 & $s'=0$, $R=0$ & $s'=0$, $R=0$\\
+0 & 1 & $s'=0$, $R=3$ & $s'=1$, $R=-1.5$\\
+1 & 0 & $s'=0$, $R=4$ & $s'=1$, $R=-0.5$\\
+1 & 1 & $s'=1$, $R=2.5$ & $s'=2$, $R=-2$\\
+2 & 0 & $s'=1$, $R=3.5$ & $s'=2$, $R=-1$
+\end{tabular}
+\end{center}
+
+\textbf{(b)}
+\begin{center}\small
+\begin{tabular}{c|cc|cc|c|c}
+\toprule
+$k$ & $Q(0,0)$ & $Q(0,1)$ & $Q(1,0)$ & $Q(1,1)$ & $Q(2,0)$ & $V_k=(V_0,V_1,V_2)$\\\midrule
+1 & 0 & 0.75 & 1.75 & 0.25 & 1.25 & $(0.75,1.75,1.25)$\\
+2 & 0.6 & 1.75 & 2.75 & 1.45 & 2.45 & $(1.75,2.75,2.45)$\\
+3 & 1.4 & 2.55 & 3.55 & 2.33 & 3.33 & $(2.55,3.55,3.33)$\\\bottomrule
+\end{tabular}
+\end{center}
+Ej.\ $k=2$: $Q(0,1)=0.5(3+0.8\cdot0.75)+0.5(-1.5+0.8\cdot1.75)=1.8-0.05=1.75$. Voraz de $V_3$: pedir en 0, no pedir en 1.
+
+\textbf{(c)} $\pi$ (pedir si $s<2$): $V_0=0.75+0.4V_0+0.4V_1$, $V_1=0.25+0.4V_1+0.4V_2$, $V_2=1.25+0.4V_1+0.4V_2$ $\Rightarrow$ $V^\pi=(3.417,\,3.25,\,4.25)$.
+$\pi'$ (pedir solo en 0): $V_0=0.75+0.4V_0+0.4V_1$, $V_1=1.75+0.4V_0+0.4V_1$, $V_2=1.25+0.4V_1+0.4V_2$ $\Rightarrow$ $V_1-V_0=1$, $V^{\pi'}=(\mathbf{5.75},\mathbf{6.75},\mathbf{6.583})$.
+$\pi'$ domina en todos los estados. Mejora con $V^{\pi'}$: $Q(0,0)=4.6<Q(0,1)=5.75$; $Q(1,0)=6.75>Q(1,1)=5.583$: no cambia $\Rightarrow$ $\pi'$ \textbf{es óptima}.
+
+\textbf{(d)} Con $\gamma=0$ solo cuenta la recompensa inmediata ($V_1$ de (b)): pedir en 0 ($0.75>0$) y no en 1 ($1.75>0.25$). Aquí coincide con la óptima, pero en
+general un agente miope ignora el costo futuro del inventario.
+\end{solucion}
+
+\begin{solucion}{D1.4 · Q-learning tabular y aproximado}
+\textbf{(a)}
+\begin{center}\small
+\begin{tabular}{c|c|c}
+Transición & $y=r+0.8\max_{a'}Q(s',a')$ & Nuevo $Q=Q+0.25(y-Q)$\\\hline
+$(s_1,b,+1,s_2)$ & $1+0.8(4)=4.2$ & $Q(s_1,b)=2+0.25(2.2)=\mathbf{2.55}$\\
+$(s_2,a,-2,s_3)$ & $-2+0.8(3)=0.4$ & $Q(s_2,a)=4+0.25(-3.6)=\mathbf{3.1}$\\
+$(s_3,b,+5,T)$ & $5$ (terminal) & $Q(s_3,b)=3+0.25(2)=\mathbf{3.5}$\\
+$(s_1,a,0,s_3)$ & $0+0.8(3.5)=2.8$ & $Q(s_1,a)=1+0.25(1.8)=\mathbf{1.45}$
+\end{tabular}
+\end{center}
+\textbf{(b)} En $s_1$ la voraz es $b$ antes ($2>1$) y después ($2.55>1.45$): $\mu(b)=0.95$, $\mu(a)=0.05$.
+\textbf{(c)} $\hat Q(s,a)=0.5+3-2=1.5$; en $s'$: $0.5+1+0=1.5$ y $0.5+2-2=0.5$; $y=-1+0.8(1.5)=0.2$; $\delta=-1.3$;
+$\mathbf w'=(0.5,1,-2)+0.1(-1.3)(1,3,1)=(\mathbf{0.37},\mathbf{0.61},\mathbf{-2.13})$.
+\end{solucion}
+
+\subsection*{Simulacro D2}
+\addcontentsline{toc}{subsection}{Simulacro D2}
+
+\begin{solucion}{D2.1 · Lluvia, aspersor y tráfico}
+\textbf{(a)}
+$S\indep T$: \textbf{no} ($S\leftarrow N\to R\to T$ activo).
+$S\indep T\mid R$: \textbf{sí} (ese camino se bloquea en $R$; $S\to W\leftarrow R\to T$ se bloquea en $W$ no observado).
+$S\indep T\mid W$: \textbf{no} ($S\to W\leftarrow R\to T$: $W$ abre, $R$ no observado).
+$S\indep T\mid R,W$: \textbf{sí} ($R$ observado bloquea ambos caminos: es no colisionador en los dos).
+$N\indep W\mid R,S$: \textbf{sí} (padres de $W$ observados). $T\indep W\mid R$: \textbf{sí}.
+
+\textbf{(b)} Factores: $P(N)$, $P(R\mid N)$, $P(S\mid N)$, $P(+w\mid R,S)$; $T$ es hoja no observada y se descarta.
+Eliminar $N$: $f_1(R,S)=\sum_nP(n)P(R\mid n)P(S\mid n)$:
+\begin{center}\small
+\begin{tabular}{cc|l}
+$R$ & $S$ & $f_1$\\\hline
+$+r$ & $+s$ & $0.4(0.7)(0.2)+0.6(0.1)(0.6)=0.092$\\
+$+r$ & $-s$ & $0.4(0.7)(0.8)+0.6(0.1)(0.4)=0.248$\\
+$-r$ & $+s$ & $0.4(0.3)(0.2)+0.6(0.9)(0.6)=0.348$\\
+$-r$ & $-s$ & $0.4(0.3)(0.8)+0.6(0.9)(0.4)=0.312$
+\end{tabular}
+\end{center}
+Eliminar $S$: $f_2(+r)=0.092(0.95)+0.248(0.85)=0.2982$; $f_2(-r)=0.348(0.8)+0.312(0.05)=0.294$.
+$P(+r\mid+w)=0.2982/0.5922=\mathbf{0.5035}$.
+
+\textbf{(c)} Sin sumar $S$: $+r$: $0.092(0.95)=0.0874$; $-r$: $0.348(0.8)=0.2784$; $P(+r\mid+w,+s)=\mathbf{0.2389}$. Baja porque el aspersor explica el pasto
+mojado y, además, $+s$ sugiere cielo despejado ($N$), lo que hace menos probable la lluvia.
+\end{solucion}
+
+\begin{solucion}{D2.2 · Regresión, logística y métricas}
+\textbf{(a)} $X^\mathsf TX=\begin{pmatrix}4&12\\12&46\end{pmatrix}$, $X^\mathsf T\mathbf y=(20,77)$, $\det=40$;
+$\hat\theta=\frac1{40}(46\cdot20-12\cdot77,\ -12\cdot20+4\cdot77)=(\mathbf{-0.1},\mathbf{1.7})$.
+$\hat y=(1.6,3.3,6.7,8.4)$, residuos $(0.4,-0.3,-0.7,0.6)$, SSE $=\mathbf{1.1}$; $\hat y(6)=\mathbf{10.1}$.
+
+\textbf{(b)} Con $\theta=0$: $\pi_i=0.5$, $J=4\ln2=\mathbf{2.7726}$. $\boldsymbol\pi-\mathbf y=(-0.5,-0.5,0.5,0.5)$;
+$\nabla J=(0,\ 1(-0.5)+3(-0.5)+(-1)(0.5)+(-2)(0.5))=(0,\mathbf{-3.5})$; $\theta_1=(0,1.75)$.
+$\pi=(0.8520,0.9948,0.1480,0.0293)$; $J_1=\mathbf{0.3554}$. Los datos son separables: la pérdida puede acercarse a 0 haciendo $\theta_1\to\infty$; sin regularización
+$\theta$ crece indefinidamente (no hay mínimo finito).
+
+\textbf{(c)} Exactitud $170/200=\mathbf{0.85}$; precisión $30/40=\mathbf{0.75}$; recall $30/50=\mathbf{0.6}$; especificidad $140/150=\mathbf{0.933}$; $F_1=60/90=\mathbf{0.667}$.
+\end{solucion}
+
+\begin{solucion}{D2.3 · Agrupamiento}
+\textbf{(a)} Inicio $A,B$: asignación $C$: $d^2=(9,13)\to1$; $D,E,F\to2$ $\Rightarrow$ $\{A,C\}$, $\{B,D,E,F\}$; $\mu_1=(1.5,0)$, $\mu_2=(5.5,5.75)$, $J=74.25$.
+Siguiente: $B$: $(6.25,\,44.31)\to1$ $\Rightarrow$ $\{A,B,C\}$, $\{D,E,F\}$; $\mu_1=(1,0.667)$, $\mu_2=(7.333,7)$, $J=\mathbf{19.33}$; estable.
+Inicio $A,D$: converge en una iteración a la misma partición y $J$. Una mala inicialización cuesta iteraciones (y en otros datos puede dejar un óptimo local peor).
+
+\textbf{(b)} Manhattan: $AB=2$, $AC=3$, $BC=5$, $DE=1$, $DF=6$, $EF=5$, $CD=9$, $CE=10$, $BD=10$, $AD=12$, $AF=18$.
+\begin{center}\small
+\begin{tabular}{c|ll|ll}
+Paso & Simple & altura & Completo & altura\\\hline
+1 & $D+E$ & 1 & $D+E$ & 1\\
+2 & $A+B$ & 2 & $A+B$ & 2\\
+3 & $C+AB$ & $\min(3,5)=3$ & $C+AB$ & $\max(3,5)=5$\\
+4 & $F+DE$ & $\min(6,5)=5$ & $F+DE$ & $\max(6,5)=6$\\
+5 & $ABC+DEF$ & $9$ ($C$–$D$) & $ABC+DEF$ & $18$ ($A$–$F$)
+\end{tabular}
+\end{center}
+\textbf{(c)} Ambos: \textbf{2 grupos}; el mayor salto de altura está antes de la última unión (5 $\to$ 9 y 6 $\to$ 18).
+\end{solucion}
+
+\begin{solucion}{D2.4 · Red neuronal, atención y equidad}
+\textbf{(a)} Forward: $z_1=2-1+0=1$, $h=1$, $z_2=2-1=1$, $p=0.7311$, $\ell=-\ln(1-p)=\mathbf{1.3133}$.
+Backward: $\delta_2=p-y=0.7311$; $\partial\ell/\partial w_2=0.7311$, $\partial\ell/\partial b_2=0.7311$; $\delta_1=\delta_2w_2\cdot1=1.4621$;
+$\partial\ell/\partial\mathbf w_1=(2.9242,1.4621)$, $\partial\ell/\partial b_1=1.4621$.
+$\eta=0.5$: $\mathbf w_1=(-0.4621,-1.7311)$, $b_1=-0.7311$, $w_2=1.6345$, $b_2=-1.3655$.
+Nuevo: $z_1=-3.386$, $h=0$, $p=\sigma(-1.3655)=0.2033$, $\ell=\mathbf{0.2273}$.
+
+\textbf{(b)} Puntajes $\mathbf q^\mathsf T\mathbf k_j/\sqrt2=(2,2,3)/\sqrt2=(1.4142,1.4142,2.1213)$; pesos $(0.2483,0.2483,0.5035)$;
+salida $0.2483(1,0)+0.2483(0,1)+0.5035(2,2)=(\mathbf{1.2552},\mathbf{1.2552})$. Con máscara en la posición 2 solo cuentan $\mathbf k_1,\mathbf k_2$:
+pesos $(0.5,0.5)$ y salida $(0.5,0.5)$.
+
+\textbf{(c)}
+\begin{center}\small
+\begin{tabular}{c|ccccc}
+Grupo & Aprobación & TPR & FPR & PPV & Exactitud\\\hline
+H & 0.45 & 0.75 & 0.25 & 0.667 & 0.75\\
+M & 0.25 & 0.50 & 0.083 & 0.80 & 0.75
+\end{tabular}
+\end{center}
+Ambos grupos tienen la misma tasa base (0.4), así que las diferencias no se explican por ella: se violan paridad, igualdad de oportunidades
+(la mitad de las mujeres que pagarían son rechazadas) y \emph{equalized odds}, con exactitud idéntica.
+\end{solucion}

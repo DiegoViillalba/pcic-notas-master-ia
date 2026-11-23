@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="570" viewBox="0 0 840 570" role="img" aria-labelledby="title desc">
+<title id="title">Transformer causal con bloque pre-LayerNorm simplificado</title>
+<desc id="desc">Los tokens se convierten en embeddings con posición. Un bloque repetido aplica normalización, atención causal y suma residual; luego normalización, red por posición y otra suma residual. La proyección final y softmax predicen el siguiente token.</desc>
+<style>:root{color-scheme:light dark;--bg:#fafcfb;--fg:#243840;--muted:#50636d;--line:#7d999e;--soft:#e8f1f0;--accent:#217a78}@media(prefers-color-scheme:dark){:root{--bg:#192329;--fg:#eef3f1;--muted:#bdced2;--line:#91a9ae;--soft:#273c43;--accent:#85d3c8}}text{font:18px system-ui,sans-serif;fill:var(--fg)}.small{font-size:16px;fill:var(--muted)}.box{fill:var(--soft)}.arrow{stroke:var(--line);stroke-width:2;fill:none;marker-end:url(#a)}.skip{stroke:var(--accent);stroke-width:2;fill:none;marker-end:url(#a)}.sum{fill:var(--bg);stroke:var(--line);stroke-width:2}</style>
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="var(--line)"/></marker></defs>
+<rect width="840" height="570" rx="10" fill="var(--bg)"/>
+<text x="25" y="38" font-size="23">De tokens a una distribución del siguiente token</text>
+<text x="25" y="69" class="small">Solo decodificador · Variante pre-LN · Se omite dropout</text>
+<g text-anchor="middle">
+<rect class="box" x="30" y="112" width="220" height="65" rx="6"/><text x="140" y="139">Tokens del prefijo</text><text x="140" y="164">El perro persigue la</text>
+<rect class="box" x="30" y="217" width="220" height="64" rx="6"/><text x="140" y="244">Embeddings</text><text x="140" y="269">+ posición</text>
+<rect x="299" y="102" width="325" height="397" rx="8" fill="none" stroke="var(--line)" stroke-dasharray="5 5"/>
+<text x="461" y="132">Bloque × L</text>
+<rect class="box" x="348" y="151" width="204" height="37" rx="5"/><text x="450" y="177">LayerNorm</text>
+<rect class="box" x="348" y="212" width="204" height="52" rx="5"/><text x="450" y="235">Atención multi-cabeza</text><text x="450" y="256" class="small">Máscara causal</text>
+<circle class="sum" cx="450" cy="293" r="16"/><text x="450" y="299">+</text>
+<rect class="box" x="348" y="325" width="204" height="37" rx="5"/><text x="450" y="351">LayerNorm</text>
+<rect class="box" x="348" y="387" width="204" height="42" rx="5"/><text x="450" y="414">FFN por posición</text>
+<circle class="sum" cx="450" cy="463" r="16"/><text x="450" y="469">+</text>
+<rect class="box" x="660" y="344" width="152" height="70" rx="6"/><text x="736" y="373">Proyección</text><text x="736" y="399">al vocabulario</text>
+<rect class="box" x="660" y="448" width="152" height="49" rx="6"/><text x="736" y="479">Softmax</text>
+</g>
+<path class="arrow" d="M140 178v33"/>
+<path class="arrow" d="M251 248h38v-105h161v4"/>
+<path class="arrow" d="M450 189v18"/><path class="arrow" d="M450 265v8"/>
+<path class="arrow" d="M450 310v11"/><path class="arrow" d="M450 363v20"/>
+<path class="arrow" d="M450 430v12"/><path class="arrow" d="M467 463h174v-85h14"/>
+<path class="arrow" d="M736 415v27"/>
+<path class="skip" d="M327 143v150h102"/><path class="skip" d="M450 309H327v154h102"/>
+<text x="660" y="238" class="small">Posición i:</text><text x="660" y="265">solo tokens ≤ i</text><text x="660" y="297" class="small">Salida: predice i + 1</text>
+<text x="30" y="536" class="small">Atención: mezcla posiciones. FFN: transforma características. Residuales: suman rutas.</text>
+</svg>

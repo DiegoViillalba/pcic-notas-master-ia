@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="330" viewBox="0 0 820 330" role="img" aria-labelledby="title desc">
+<title id="title">Tres decisiones de la última columna</title><desc id="desc">Un alineamiento termina emparejando dos letras, dejando x sin pareja o dejando y sin pareja.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#365570"/></marker></defs>
+<rect width="100%" height="100%" fill="#f8fbff"/>
+<style>text{font-family:system-ui,sans-serif;fill:#16334c;font-size:17px}.small{font-size:14px}.heading{font-size:21px;font-weight:600}.edge{stroke:#365570;stroke-width:2;fill:none;marker-end:url(#arrow)}</style>
+
+<text x="28" y="34" class="heading">¿Cómo puede terminar un alineamiento?</text>
+<g transform="translate(28 64)"><rect width="240" height="152" rx="8" fill="#fff0ce"/><text x="16" y="29">1. Emparejar xᵢ con yⱼ</text><text x="80" y="73" style="font-family:monospace;font-size:28px">E</text><text x="80" y="112" style="font-family:monospace;font-size:28px">A</text><line x1="88" x2="88" y1="78" y2="89" stroke="#845000" stroke-width="2"/><text x="16" y="139" class="small">Costo α(E,A) + OPT(i−1,j−1)</text></g>
+<g transform="translate(290 64)"><rect width="240" height="152" rx="8" fill="#dff3ea"/><text x="16" y="29">2. Dejar xᵢ sin pareja</text><text x="80" y="73" style="font-family:monospace;font-size:28px">E</text><text x="80" y="112" style="font-family:monospace;font-size:28px">−</text><text x="16" y="139" class="small">Costo δ + OPT(i−1,j)</text></g>
+<g transform="translate(552 64)"><rect width="240" height="152" rx="8" fill="#f0e8fc"/><text x="16" y="29">3. Dejar yⱼ sin pareja</text><text x="80" y="73" style="font-family:monospace;font-size:28px">−</text><text x="80" y="112" style="font-family:monospace;font-size:28px">A</text><text x="16" y="139" class="small">Costo δ + OPT(i,j−1)</text></g>
+<text x="28" y="260">Tomamos el mínimo de las tres opciones.</text><text x="28" y="290" class="small">Cada opción consume una letra de x, una de y o ambas; nunca dos huecos.</text></svg>
