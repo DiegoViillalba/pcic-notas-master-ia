@@ -109,3 +109,39 @@ a.internal {
     display: none;
   }
 }
+
+// Fórmulas más chicas y con aire: KaTeX trae 1.21em por defecto, que en este
+// tema queda más grande que el texto y hace que las líneas con fórmulas inline
+// se amontonen/encimen. Bajamos el tamaño y damos más interlineado a los
+// párrafos, listas y celdas que contienen matemática.
+.katex {
+  font-size: 1.05em !important;
+}
+
+p:has(.katex),
+li:has(.katex),
+td:has(.katex),
+th:has(.katex) {
+  line-height: 1.75;
+}
+
+.katex-display {
+  margin: 0.9em 0;
+  padding: 0.2em 0;
+}
+
+// Etiquetas de las Properties: en pantallas angostas la celda se comprimía y
+// cada etiqueta se partía letra por letra en vertical. Que fluyan en varias
+// filas y que cada etiqueta se mantenga entera.
+.note-properties-tags {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  font-size: 0; // oculta las comas sueltas entre etiquetas
+
+  .tag-link {
+    font-size: 0.9rem;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+}
