@@ -9,7 +9,6 @@ aliases:
   - Aprendizaje por refuerzo II
   - Aprendizaje por refuerzo - 5 de noviembre
 referencias:
-  - "[[AI 22 Aprendizaje por refuerzo II.pdf]]"
   - https://inst.eecs.berkeley.edu/~cs188/textbook/rl/
   - https://inst.eecs.berkeley.edu/~cs188/fa26/projects/proj3/
   - https://rail.eecs.berkeley.edu/deeprlcourse/
@@ -28,25 +27,24 @@ tags:
 > [!summary] Pregunta central
 > Si nadie nos entrega las probabilidades del mundo ni las recompensas de cada decisión, ¿cómo aprendemos qué hacer y cómo aprovechamos lo aprendido en situaciones nuevas?
 
-**Jueves 5 de noviembre de 2026.** Continuación de [[2026-11-03 IA - Aprendizaje por refuerzo|la clase del 3 de noviembre: MDP, Bellman y políticas]]. Este apunte desarrolla las **22 diapositivas** de «Clase 22: aprendizaje por refuerzo II»; la fecha de creación del PDF también corresponde al 5 de noviembre. La numeración del archivo es distinta de la numeración de sesiones del plan.
+**Jueves 5 de noviembre de 2026.** Continuación de [[2026-11-03 IA - Aprendizaje por refuerzo|la clase del 3 de noviembre: MDP, Bellman y políticas]]. La nota es **autocontenida**: los ejemplos de las dos puertas, los episodios, las actualizaciones y las figuras se reproducen completos.
 
-**Cómo leerlo.** Primero construiremos la intuición con episodios y puertas; después obtendremos las reglas de actualización; finalmente pasaremos de memorizar valores a compartir parámetros. Las derivaciones, los números de los ejercicios y los laboratorios son elaboración didáctica. Los ejemplos adaptados de Berkeley y las ampliaciones que no se desarrollan en las diapositivas se identifican explícitamente.
+**Cómo leerlo.** Primero construiremos la intuición con episodios y puertas; después obtendremos las reglas de actualización; finalmente pasaremos de memorizar valores a compartir parámetros. Las derivaciones, los números de los ejercicios y los laboratorios son elaboración didáctica. Los ejemplos adaptados de Berkeley y las ampliaciones se identifican explícitamente.
 
-## Material de clase y recorrido
+## Recorrido
 
-![[AI 22 Aprendizaje por refuerzo II.pdf]]
 
-| Pregunta | Diapositivas | Sección |
-|---|---:|---|
-| ¿Qué cambia cuando no conocemos el modelo? | 1–5 | 1 |
-| ¿Cómo evalúo una política con episodios? | 6 | 2–3 |
-| ¿Por qué actuar siempre de forma voraz puede fallar? | 7–8 | 4 |
-| ¿Cómo alterno evaluación y mejora con muestras? | 9 | 5 |
-| ¿Puedo aprender una política distinta de la que sigo? | 10 | 6 |
-| ¿Cómo se obtiene y ejecuta Q-learning? | 11–13 | 7–9 |
-| ¿Qué hago si la tabla ya no cabe? | 14–16 | 10 |
-| ¿Cómo conecta esto con Atari y los métodos profundos? | 17–19 | 11–12 |
-| ¿Qué recursos y temas siguen? | 20–22 | 13 |
+| Pregunta | Sección |
+|---|---|
+| ¿Qué cambia cuando no conocemos el modelo? | 1 |
+| ¿Cómo evalúo una política con episodios? | 2–3 |
+| ¿Por qué actuar siempre de forma voraz puede fallar? | 4 |
+| ¿Cómo alterno evaluación y mejora con muestras? | 5 |
+| ¿Puedo aprender una política distinta de la que sigo? | 6 |
+| ¿Cómo se obtiene y ejecuta Q-learning? | 7–9 |
+| ¿Qué hago si la tabla ya no cabe? | 10 |
+| ¿Cómo conecta esto con Atari y los métodos profundos? | 11–12 |
+| ¿Qué recursos y temas siguen? | 13 |
 
 **Ruta sugerida:** calcular un retorno → promediar retornos → explorar → mejorar la política → sustituir una esperanza de Bellman por una muestra → compartir lo aprendido mediante características.
 
@@ -54,7 +52,7 @@ tags:
 
 ### 1.1 El problema sigue siendo un MDP
 
-*Diapositivas 3–5.* Seguimos teniendo estados $s$, acciones $a$, transiciones $T(s,a,s')$ y recompensas $R(s,a,s')$. Buscamos una política que maximice el retorno esperado. La diferencia es **qué información recibe el agente**: ahora $T$, $R$ o ambos son desconocidos.
+Seguimos teniendo estados $s$, acciones $a$, transiciones $T(s,a,s')$ y recompensas $R(s,a,s')$. Buscamos una política que maximice el retorno esperado. La diferencia es **qué información recibe el agente**: ahora $T$, $R$ o ambos son desconocidos.
 
 Mantendremos la convención temporal de la nota anterior:
 
@@ -75,11 +73,11 @@ V^\pi(s)=\mathbb E_\pi[G_t\mid S_t=s],\qquad
 Q^\pi(s,a)=\mathbb E_\pi[G_t\mid S_t=s,A_t=a].
 $$
 
-En $Q^\pi$ fijamos la primera acción y seguimos $\pi$ después. Escribiremos $V,Q$ para nuestras **estimaciones** y $V^\pi,Q^\pi,Q^*$ para los valores que intentamos estimar; las diapositivas usan también letras minúsculas $v,q$.
+En $Q^\pi$ fijamos la primera acción y seguimos $\pi$ después. Escribiremos $V,Q$ para nuestras **estimaciones** y $V^\pi,Q^\pi,Q^*$ para los valores que intentamos estimar; en la literatura también se usan letras minúsculas $v,q$.
 
 ### 1.2 Por qué la iteración de políticas necesita un reemplazo
 
-La diapositiva 4 recupera el ciclo de programación dinámica:
+Recordemos el ciclo de programación dinámica de la clase anterior:
 
 1. **Evaluar** una política $\pi$ mediante el modelo.
 2. **Mejorar** esa política comparando acciones.
@@ -91,6 +89,28 @@ $$
 V^\pi(s)=\sum_{s'}T(s,\pi(s),s')
 \left[R(s,\pi(s),s')+\gamma V^\pi(s')\right].
 $$
+
+El algoritmo completo de iteración de políticas con evaluación iterativa es:
+
+```text
+1. Inicializar V(s) y π(s) arbitrariamente para todo s
+2. Evaluación de política:
+   repetir:
+       Δ ← 0
+       para cada estado s:
+           v ← V(s)
+           V(s) ← Σ_{s',r} p(s',r | s, π(s)) [ r + γ V(s') ]
+           Δ ← máx(Δ, |v − V(s)|)
+   hasta que Δ < θ        (θ: umbral pequeño positivo; V(terminal)=0)
+3. Mejora de política:
+   política_estable ← verdadero
+   para cada estado s:
+       acción_vieja ← π(s)
+       π(s) ← argmax_a Σ_{s',r} p(s',r | s, a) [ r + γ V(s') ]
+       si acción_vieja ≠ π(s): política_estable ← falso
+   si política_estable: terminar y devolver V ≈ v*, π ≈ π*
+   si no: volver al paso 2
+```
 
 Sin $T$ y $R$ no podemos calcular esa suma directamente. Las experiencias pueden reemplazar la información que falta de dos maneras:
 
@@ -106,7 +126,7 @@ Por ejemplo, observar tres veces $s'$ en cuatro intentos de $(s,a)$ da $\widehat
 
 ## 2. Monte Carlo: aprender cuánto vale una política observando cómo termina
 
-*Diapositiva 6.* Imagina que sigues siempre la misma regla para atravesar un laberinto. Al terminar puedes preguntar: «desde aquella casilla, ¿cuánto premio acumulé?». Si repites suficientes episodios, el promedio de esas experiencias puede estimar lo que cabe esperar desde la casilla.
+Imagina que sigues siempre la misma regla para atravesar un laberinto. Al terminar puedes preguntar: «desde aquella casilla, ¿cuánto premio acumulé?». Si repites suficientes episodios, el promedio de esas experiencias puede estimar lo que cabe esperar desde la casilla.
 
 **Evaluación** significa que la política está fijada: de momento queremos saber cuánto vale, no decidir cómo cambiarla.
 
@@ -224,22 +244,22 @@ $$
 
 ### 4.1 El problema de confiar demasiado pronto
 
-*Diapositiva 7.* Abrimos la izquierda una vez y recibimos $0$. Después abrimos la derecha y recibimos $1$, $3$, $2$. Sus medias son
+Abrimos la izquierda una vez y recibimos $0$. Después abrimos la derecha y recibimos $1$, $3$, $2$. Sus medias son
 
 $$
 \widehat Q(\text{izquierda})=0,\qquad
 \widehat Q(\text{derecha})=\frac{1+3+2}{3}=2.
 $$
 
-Si elegimos siempre la mayor estimación, volveremos a la derecha. Pero **no sabemos cuál puerta tiene mayor recompensa esperada**: una observación de la izquierda no determina su distribución.
+Tras cada apertura de la derecha, la media corrida es $1$, luego $2$ y luego $2$. Si elegimos siempre la mayor estimación, volveremos a la derecha. Pero **no sabemos cuál puerta tiene mayor recompensa esperada**: una observación de la izquierda no determina su distribución.
 
-Aunque la diapositiva escribe $v(\text{left})$, aquí usaremos $Q(s,\text{izquierda})$: estamos comparando acciones desde una misma situación. Como cada intento termina tras una recompensa, este ejemplo es un **bandido de dos brazos**, un caso de decisión de un solo paso.
+Aunque en la literatura suele escribirse $v(\text{left})$, aquí usaremos $Q(s,\text{izquierda})$: estamos comparando acciones desde una misma situación. Como cada intento termina tras una recompensa, este ejemplo es un **bandido de dos brazos**, un caso de decisión de un solo paso.
 
-**Contraejemplo didáctico, no distribución revelada por el PDF:** la izquierda da $10$ con probabilidad $0.4$ y $0$ con $0.6$; la derecha da $1,2,3$ equiprobablemente. Entonces sus medias verdaderas son $4$ y $2$. La secuencia de la diapositiva es compatible con que la izquierda sea mejor. Explotar de inmediato puede atraparnos en una conclusión equivocada.
+**Contraejemplo didáctico** (las distribuciones reales no se conocen en el problema; esta es una elección ilustrativa): la izquierda da $10$ con probabilidad $0.4$ y $0$ con $0.6$; la derecha da $1,2,3$ equiprobablemente. Entonces sus medias verdaderas son $4$ y $2$. La secuencia observada ($0$ a la izquierda; $1,3,2$ a la derecha) es compatible con que la izquierda sea mejor. Explotar de inmediato puede atraparnos en una conclusión equivocada.
 
 ### 4.2 Construir la política $\varepsilon$-voraz
 
-*Diapositiva 8.* Combinamos dos decisiones:
+Combinamos dos decisiones:
 
 1. Con probabilidad $1-\varepsilon$, elegir una acción codiciosa según $Q$.
 2. Con probabilidad $\varepsilon$, elegir uniformemente entre **todas** las acciones legales.
@@ -279,7 +299,7 @@ Explorar puede reducir el premio inmediato para obtener información útil. La p
 
 <iframe src="ia22-puertas-exploracion.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
-**Idea central:** el laboratorio empieza con las cuatro observaciones de la diapositiva y añade las distribuciones didácticas anteriores. El agente recibe muestras; los valores verdaderos se muestran únicamente para que podamos evaluar el experimento.
+**Idea central:** el laboratorio empieza con las cuatro observaciones anteriores y añade las distribuciones didácticas anteriores. El agente recibe muestras; los valores verdaderos se muestran únicamente para que podamos evaluar el experimento.
 
 1. Con $\varepsilon=0$, ejecuta 200 intentos: la izquierda queda en una sola visita y estimación cero.
 2. Reinicia con $\varepsilon=0.2$. Observa si las visitas permiten corregir esa estimación.
@@ -287,13 +307,13 @@ Explorar puede reducir el premio inmediato para obtener información útil. La p
 
 ## 5. Control Monte Carlo: evaluar y mejorar con episodios
 
-*Diapositiva 9.* La evaluación de estados contesta cuánto vale seguir una regla. Para elegir acciones sin consultar $T$ y $R$, conviene aprender directamente los valores de **pares estado–acción**:
+La evaluación de estados contesta cuánto vale seguir una regla. Para elegir acciones sin consultar $T$ y $R$, conviene aprender directamente los valores de **pares estado–acción**:
 
 $$
 Q(s,a)\approx Q^\pi(s,a)=\mathbb E_\pi[G_t\mid S_t=s,A_t=a].
 $$
 
-Sustituimos el ciclo de la diapositiva 4 por uno basado en experiencia:
+Sustituimos ese ciclo por uno basado en experiencia:
 
 ```mermaid
 flowchart LR
@@ -322,15 +342,15 @@ La **primera visita de un par** puede ser distinta de la primera visita de su es
 
 ### 5.2 Por qué esto es control y qué no garantiza una ejecución corta
 
-Al cambiar $Q$, cambia la política que generará los episodios posteriores. Estamos evaluando y mejorando de forma intercalada, sin esperar a resolver exactamente cada política. Es una forma de **iteración generalizada de políticas**.
+Al cambiar $Q$, cambia la política que generará los episodios posteriores. Estamos evaluando y mejorando de forma intercalada, sin esperar a resolver exactamente cada política. Es una forma de **iteración generalizada de políticas**. Geométricamente, la estimación $Q$ se acerca a $Q^\pi$ de la política actual, la política se vuelve $\varepsilon$-voraz respecto de $Q$, y la sucesión de zigzags evaluación–mejora converge hacia el par $(Q^*,\pi^*)$.
 
 Como las políticas cambian, la media acumulada puede mezclar retornos de comportamientos anteriores: durante el aprendizaje no debemos afirmar que cada tabla intermedia es la evaluación exacta de la política actual.
 
-Con $\varepsilon>0$ fijo la política conserva exploración; no se convierte en una política determinista óptima sin restricciones. Para resultados asintóticos de control MC suelen imponerse condiciones como exploración infinita y comportamiento codicioso en el límite (**GLIE**), además de los supuestos episódicos y de estimación. Disminuir $\varepsilon$ demasiado rápido puede impedir la exploración necesaria. Esta precisión amplía el esquema de la diapositiva 9.
+Con $\varepsilon>0$ fijo la política conserva exploración; no se convierte en una política determinista óptima sin restricciones. Para resultados asintóticos de control MC suelen imponerse condiciones como exploración infinita y comportamiento codicioso en el límite (**GLIE**), además de los supuestos episódicos y de estimación. Disminuir $\varepsilon$ demasiado rápido puede impedir la exploración necesaria. Esta precisión amplía el esquema básico de control Monte Carlo.
 
 ## 6. Dos políticas: la que produce los datos y la que queremos aprender
 
-*Diapositiva 10.* Hasta ahora aprendíamos sobre el comportamiento que seguíamos. También podemos distinguir:
+Hasta ahora aprendíamos sobre el comportamiento que seguíamos. También podemos distinguir:
 
 | Política | Papel |
 |---|---|
@@ -348,11 +368,11 @@ Los retornos completos obtenidos siguiendo $\mu$ reflejan las decisiones futuras
 Q-learning construirá otro tipo de objetivo: usa la transición real observada, pero evalúa una **continuación codiciosa**. Puede hacerlo porque, dado $(s,a)$, la distribución de la siguiente recompensa y estado pertenece al entorno, no a la política que eligió $a$.
 
 > [!note] Reutilización y cobertura
-> Se puede aprovechar experiencia de políticas anteriores, humanos u otros agentes, como indica la diapositiva. Aun así, los datos deben corresponder al problema y cubrir las decisiones relevantes. Aprender fuera de política no permite descubrir una acción jamás observada sin supuestos adicionales; tampoco resuelve automáticamente los problemas de aprendizaje con un conjunto fijo de datos y aproximadores.
+> Se puede aprovechar experiencia de políticas anteriores, humanos u otros agentes, como se suele indicar. Aun así, los datos deben corresponder al problema y cubrir las decisiones relevantes. Aprender fuera de política no permite descubrir una acción jamás observada sin supuestos adicionales; tampoco resuelve automáticamente los problemas de aprendizaje con un conjunto fijo de datos y aproximadores.
 
 ## 7. De Bellman a Q-learning, paso a paso
 
-*Diapositivas 11–13.* Esta sección desarrolla la actualización que la presentación introduce directamente. TD(0) y SARSA se usan como **puentes explicativos**; no son un bloque nuevo impartido en el PDF.
+Esta sección desarrolla la actualización de Q-learning. TD(0) y SARSA se usan como **puentes explicativos**.
 
 ### 7.1 Primer puente: una muestra puede reemplazar un promedio
 
@@ -421,17 +441,17 @@ $$
 
 Para una tabla $Q_t$ fija al calcular el objetivo, la esperanza condicional de $y_t^Q$ es precisamente el respaldo de optimalidad aplicado a $Q_t$. Por eso la actualización puede verse como una aproximación estocástica a Bellman. El máximo está **dentro** de la esperanza: la mejor acción de continuación se elige tras observar el estado sucesor.
 
-### 7.4 Dos precisiones necesarias para leer las diapositivas
+### 7.4 Dos precisiones necesarias
 
-> [!warning] Diapositiva 11: la acción sucesora se elige en el sucesor
-> La línea que presenta $A'$ escribe $S_t$, pero el objetivo usa $Q(S_{t+1},A')$. La distribución correcta para esa acción es $A'\sim\pi(\cdot\mid S_{t+1})$. Una continuación bajo una política objetivo arbitraria no es todavía el Q-learning de control óptimo; las diapositivas 12–13 lo especializan a la política codiciosa.
+> [!warning] La acción sucesora se elige en el sucesor
+> Al escribir el objetivo con una acción sucesora $A'$, esta debe muestrearse en el estado sucesor: $A'\sim\pi(\cdot\mid S_{t+1})$, y el objetivo usa $Q(S_{t+1},A')$ (no $S_t$). Una continuación bajo una política objetivo arbitraria no es todavía el Q-learning de control óptimo; este se obtiene al especializar la política objetivo a la codiciosa.
 
-> [!warning] Diapositiva 12: máximo y argmáximo tienen tipos distintos
+> [!warning] Máximo y argmáximo tienen tipos distintos
 > La última igualdad debe contener $\max$, no $\arg\max$:
 > $$
 > Q\!\left(s',\operatorname*{arg\,max}_{a'}Q(s',a')\right)=\max_{a'}Q(s',a').
 > $$
-> Aquí elegimos una acción del conjunto de argmáximos. El argmáximo devuelve una **acción**; el máximo devuelve un **valor numérico**, que sí puede sumarse a una recompensa. La diapositiva 13 utiliza correctamente el máximo.
+> Aquí elegimos una acción del conjunto de argmáximos. El argmáximo devuelve una **acción**; el máximo devuelve un **valor numérico**, que sí puede sumarse a una recompensa.
 
 ### 7.5 Una actualización numérica completa
 
@@ -502,7 +522,7 @@ El laboratorio usa tasa constante y reinicios de práctica; sus trayectorias ilu
 
 ### 9.1 Pseudocódigo tabular
 
-*Diapositiva 13; versión desarrollada.*
+*Versión desarrollada.* 
 
 ```text
 Inicializar Q(s,a) con valores finitos para cada par legal
@@ -529,7 +549,7 @@ Extraer la política no requiere conocer $T$ ni $R$. Para evaluar el desempeño 
 
 ### 9.2 Qué supuestos acompañan al teorema
 
-La diapositiva afirma convergencia a $q^*$ «en el límite». Una formulación clásica suficiente para el caso descontado requiere:
+Se afirma que Q-learning converge a $q^*$ «en el límite». Una formulación clásica suficiente para el caso descontado requiere:
 
 - MDP estacionario con conjuntos finitos de estados y acciones, recompensas acotadas y $0\leq\gamma<1$.
 - Representación **tabular** y observaciones válidas de las transiciones del MDP.
@@ -560,7 +580,7 @@ Los últimos tres usan bootstrapping. En terminales se elimina la continuación.
 
 ### 10.1 Dos límites de la tabla
 
-*Diapositivas 14–16.* La presentación usa como órdenes de magnitud $10^{20}$ estados para backgammon y $10^{170}$ para Go; el control de un helicóptero introduce estados continuos. Su función es motivar la escala, no proporcionar conteos exactos universales.
+Como órdenes de magnitud se citan $10^{20}$ estados para backgammon y $10^{170}$ para Go; el control de un helicóptero introduce estados continuos. Su función es motivar la escala, no proporcionar conteos exactos universales.
 
 Una tabla de Q requiere una entrada por cada par: aproximadamente $|\mathcal S||\mathcal A|$ números si todas las acciones están disponibles. Esto plantea dos problemas distintos:
 
@@ -579,6 +599,8 @@ $$
 $$
 
 En control también podemos intentar aproximar $Q^*$. El objetivo concreto depende del algoritmo: la sola forma $\widehat Q(s,a;w)$ no indica qué política estamos evaluando.
+
+Hay tres arquitecturas habituales de aproximador con parámetros $w$: (a) entrada $s$ y salida un escalar $\widehat V(s;w)$; (b) entrada $(s,a)$ y salida un escalar $\widehat Q(s,a;w)$; (c) entrada $s$ y salida un vector con un valor $\widehat Q(s,a_1;w),\dots,\widehat Q(s,a_m;w)$, uno por acción. En las tres, la «caja» con parámetros $w$ generaliza de estados vistos a estados no vistos.
 
 Los mismos parámetros $w$ intervienen en muchos estados. Una actualización puede afectar situaciones no visitadas: eso es **generalización**. Que el efecto sea útil depende de la representación y de los datos.
 
@@ -612,7 +634,7 @@ A y B comparten predicción aunque el tablero sea distinto. También revela una 
 
 ### 10.4 Derivar una actualización de pesos
 
-**Ampliación de las diapositivas 15–16.** Construimos el objetivo Q-learning con los valores anteriores a la actualización:
+**Ampliación.** Construimos el objetivo Q-learning con los valores anteriores a la actualización:
 
 $$
 y=r+\gamma\max_{a'}\widehat Q(s',a';w),\qquad
@@ -660,9 +682,9 @@ Las predicciones pasan a $2.6,2.6,-2.7,-0.4$. B cambia sin haber sido entrenado;
 
 ## 11. De características a redes neuronales: qué añade DQN
 
-*Diapositiva 17 y complemento para la próxima clase.* El artículo mostrado es [Mnih y colaboradores, «Human-level control through deep reinforcement learning», Nature, 2015](https://deepmind-media.storage.googleapis.com/dqn/DQNNaturePaper.pdf). Sustituye una tabla de acciones por una red que aproxima sus valores usando observaciones visuales de juegos Atari.
+*Complemento para la próxima clase.* Un artículo clave es [Mnih y colaboradores, «Human-level control through deep reinforcement learning», Nature, 2015](https://deepmind-media.storage.googleapis.com/dqn/DQNNaturePaper.pdf). Sustituye una tabla de acciones por una red que aproxima sus valores usando observaciones visuales de juegos Atari.
 
-La idea de valor conserva su significado: una salida estima retorno esperado para una acción. Las salidas de una red Q **no tienen que ser probabilidades ni sumar uno**. Una arquitectura puede recibir $(s,a)$ y devolver un escalar, o recibir $s$ y devolver un valor por acción, como ilustra la diapositiva 16.
+La idea de valor conserva su significado: una salida estima retorno esperado para una acción. Las salidas de una red Q **no tienen que ser probabilidades ni sumar uno**. Una arquitectura puede recibir $(s,a)$ y devolver un escalar, o recibir $s$ y devolver un valor por acción.
 
 El problema no se resuelve únicamente sustituyendo $w^\top\phi$ por una red más grande. El objetivo depende de una estimación que cambia; además, las experiencias consecutivas están correlacionadas. DQN introduce dos mecanismos:
 
@@ -678,11 +700,17 @@ $$
 
 donde $d=1$ indica un terminal real y $\mathcal D$ es la memoria. No se deriva $y$ al actualizar la red principal.
 
-La lección de Berkeley [CS 185/285, «Q-Learning in Practice», pp. 3–7 y 30–36 del PDF](https://rail.eecs.berkeley.edu/deeprlcourse/static/slides/lec-8.pdf) explica estos mecanismos y por qué la garantía tabular **no se traslada automáticamente** a aproximadores. Combinar aproximación, bootstrapping y aprendizaje fuera de política puede ser inestable. Este bloque prepara redes profundas; el PDF de nuestra clase solo muestra el artículo y la motivación.
+La lección de Berkeley [CS 185/285, «Q-Learning in Practice», pp. 3–7 y 30–36 del PDF](https://rail.eecs.berkeley.edu/deeprlcourse/static/slides/lec-8.pdf) explica estos mecanismos y por qué la garantía tabular **no se traslada automáticamente** a aproximadores. Combinar aproximación, bootstrapping y aprendizaje fuera de política puede ser inestable. Este bloque prepara redes profundas; en clase solo se mencionó el artículo y la motivación.
 
 ## 12. Leer la taxonomía como varias preguntas independientes
 
-*Diapositivas 18–19.* La diapositiva 18 es una transición de cierre. La figura de la 19 reúne familias de métodos. Es más útil leerla mediante varios ejes que intentar memorizarla como un único árbol:
+Una figura habitual reúne las familias de métodos de aprendizaje por refuerzo. Su contenido es el siguiente:
+
+- **RL basado en modelo** (*Model-based RL*): proceso de decisión de Markov $P(s'|s,a)$; iteración de políticas $\pi_\theta(s,a)$ e iteración de valores $V(s)$; programación dinámica y optimalidad de Bellman; actor-crítico; dinámica no lineal $\dot{x}=f(x(t),u(t),t)\,dt$; control óptimo y HJB; MPC profundo; y una flecha «aprender un modelo» que lo conecta con RL profundo.
+- **RL libre de modelo** (*Model-free RL*), con dos ramas. *Libre de gradiente*: fuera de política (DQN, DDQN, Q-learning, $Q(s,a)$) y en política (TD(0), TD($\infty$) $\equiv$ MC, TD($\lambda$), SARSA). *Basada en gradiente*: red de política profunda y optimización por gradiente de la política, $\theta^{new}=\theta^{old}+\alpha\nabla_\theta R_\theta$.
+- **RL profundo** (*Deep RL*): la región que solapa ambos lados e incluye DQN/DDQN, MPC profundo y las redes de política.
+
+Es más útil leerla mediante varios ejes que intentar memorizarla como un único árbol:
 
 | Eje | Pregunta | Ejemplos |
 |---|---|---|
@@ -694,11 +722,11 @@ La lección de Berkeley [CS 185/285, «Q-Learning in Practice», pp. 3–7 y 30�
 
 **Profundo** describe el uso de redes profundas, no decide por sí solo los otros ejes. Puede haber modelos del entorno profundos, políticas profundas o valores profundos. Asimismo, «libre de modelo» no significa «sin gradientes»: el Q-learning aproximado puede actualizar pesos mediante semigradientes aunque no diferencie directamente el retorno de una política.
 
-Esta lectura por componentes conecta con [Berkeley CS 185/285, «Reinforcement Learning Basics», pp. 18 y 28–39 del PDF](https://rail.eecs.berkeley.edu/deeprlcourse/static/slides/lec-4.pdf): generar muestras, estimar y mejorar son partes que pueden combinarse de distintas maneras. Los algoritmos avanzados de la figura quedan como orientación, no como contenido ya desarrollado en clase.
+Esta lectura por componentes conecta con [Berkeley CS 185/285, «Reinforcement Learning Basics», pp. 18 y 28–39 del PDF](https://rail.eecs.berkeley.edu/deeprlcourse/static/slides/lec-4.pdf): generar muestras, estimar y mejorar son partes que pueden combinarse de distintas maneras. Los algoritmos avanzados quedan como orientación, no como contenido ya desarrollado en clase.
 
 ## 13. Herramientas de Berkeley para practicar lo que acabamos de derivar
 
-Las notas anteriores usan **CS 188** para la base de IA. La diapositiva 20 también enlaza el curso de refuerzo profundo de Berkeley, cuya página consultada se presenta como **CS 185/285**. Ambos sirven en niveles distintos.
+Las notas anteriores usan **CS 188** para la base de IA. También existe el curso de refuerzo profundo de Berkeley, **CS 185/285**. Ambos sirven en niveles distintos.
 
 ### 13.1 Gridworld, Crawler y Pacman: práctica progresiva
 
@@ -726,17 +754,17 @@ Fuentes oficiales consultadas el **16 de noviembre de 2026**:
 
 | Material | Uso en este apunte |
 |---|---|
-| Carlos Hernández, [[AI 22 Aprendizaje por refuerzo II.pdf|Clase 22: aprendizaje por refuerzo II]], 22 diapositivas | Material principal; orden de temas, puertas, control MC, Q-learning y escala |
+| Carlos Hernández, Inteligencia Artificial, aprendizaje por refuerzo II | Material de la clase; orden de temas, puertas, control MC, Q-learning y escala |
 | [CS 188, §5.2 — Model-Based Learning](https://inst.eecs.berkeley.edu/~cs188/textbook/rl/mbl.html) | Alternativa de aprender un modelo mediante conteos |
 | [CS 188, §5.3 — Model-Free Learning](https://inst.eecs.berkeley.edu/~cs188/textbook/rl/mfl.html) | Ejemplo de evaluación directa y puente hacia TD, Q y características |
 | [CS 188, §5.4 — Exploration and Exploitation](https://inst.eecs.berkeley.edu/~cs188/textbook/rl/eae.html) | Compromiso entre información y aprovechamiento |
 | [CS 188, Proyecto 3](https://inst.eecs.berkeley.edu/~cs188/fa26/projects/proj3/) | Herramientas y comandos de práctica anteriores |
-| [Berkeley CS 185/285 — Deep Reinforcement Learning](https://rail.eecs.berkeley.edu/deeprlcourse/) | Curso enlazado en la diapositiva 20; lecciones de fundamentos y Q en la práctica enlazadas arriba |
+| [Berkeley CS 185/285 — Deep Reinforcement Learning](https://rail.eecs.berkeley.edu/deeprlcourse/) | Curso complementario; lecciones de fundamentos y Q en la práctica enlazadas arriba |
 | [Watkins y Dayan, 1992](https://www.gatsby.ucl.ac.uk/~dayan/papers/cjch.pdf) | Condiciones de la garantía de Q-learning tabular |
-| [Mnih et al., 2015](https://deepmind-media.storage.googleapis.com/dqn/DQNNaturePaper.pdf) | Artículo mostrado en la diapositiva 17 y puente a DQN |
-| [Sutton y Barto, Reinforcement Learning: An Introduction, 2.ª edición](https://mitpress.mit.edu/9780262039246/reinforcement-learning/) | Referencia bibliográfica del tema, también mostrada en la diapositiva 20 |
+| [Mnih et al., 2015](https://deepmind-media.storage.googleapis.com/dqn/DQNNaturePaper.pdf) | Artículo de DQN y puente al aprendizaje profundo |
+| [Sutton y Barto, Reinforcement Learning: An Introduction, 2.ª edición](https://mitpress.mit.edu/9780262039246/reinforcement-learning/) | Referencia bibliográfica del tema |
 
-La diapositiva 20 menciona además cursos de UCL, Stanford y Waterloo; aquí concentramos las ampliaciones en Berkeley para mantener continuidad con el vault. La 21 enumera conceptos básicos, métodos tabulares y aproximados, exploración, refuerzo profundo y multiobjetivo: es un panorama, no el desarrollo de todos esos bloques. La 22 anuncia **redes neuronales profundas** para la siguiente sesión.
+Recursos generales de la materia: el libro *Reinforcement Learning: An Introduction* (Sutton y Barto) y cursos de otras instituciones: UCL (David Silver, [davidsilver.uk/teaching](https://www.davidsilver.uk/teaching/)), UC Berkeley ([rail.eecs.berkeley.edu/deeprlcourse](https://rail.eecs.berkeley.edu/deeprlcourse/)), Stanford ([CS 234](https://web.stanford.edu/class/cs234/)) y University of Waterloo ([CS 885, otoño 2021](https://cs.uwaterloo.ca/~ppoupart/teaching/cs885-fall21/)). Aquí concentramos las ampliaciones en Berkeley para mantener continuidad con el vault. Un panorama completo incluye conceptos básicos, métodos tabulares y aproximados, exploración, refuerzo profundo y multiobjetivo; esta nota no desarrolla todos esos bloques. La siguiente sesión trata **redes neuronales profundas**.
 
 ## 14. Autoevaluación: resolver antes de desplegar la solución
 

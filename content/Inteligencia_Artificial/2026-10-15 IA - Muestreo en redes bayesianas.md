@@ -11,7 +11,6 @@ conceptos:
   - "[[Verosimilitud con pesos]]"
   - "[[Muestreo de Gibbs]]"
 referencias:
-  - "[[AI 16 muestreo en redes bayesianas.pdf]]"
 tags:
   - clase
   - inteligencia-artificial
@@ -25,27 +24,28 @@ tags:
 > [!summary] Pregunta central
 > ¿Cómo aproximamos $P(Q\mid\mathbf e)$ cuando calcularla exactamente resulta costoso, y qué ocurre con las muestras cuando la evidencia es difícil de observar?
 
-Continuación de [[2026-10-13 IA - Inferencia en redes bayesianas|inferencia exacta por enumeración y eliminación de variables]]. En la sesión del **15 de octubre de 2026**, la presentación «Clase 16: muestreo en redes Bayesianas» repasa primero el costo de la eliminación y después compara cuatro métodos de muestreo. La numeración «16» pertenece al PDF; la fecha y el número de clase del índice siguen la planeación del curso.
+Continuación de [[2026-10-13 IA - Inferencia en redes bayesianas|inferencia exacta por enumeración y eliminación de variables]]. En la sesión del **15 de octubre de 2026**, se repasa primero el costo de la eliminación de variables y después se comparan cuatro métodos de muestreo. La nota es autocontenida: la red de ejemplo, sus CPT y los lotes de muestras se reproducen completos.
 
-**Ruta de lectura.** Primero distinguimos muestrear de consultar una probabilidad, luego usamos una misma red para seguir muestreo previo, rechazo, verosimilitud con pesos y Gibbs. Las cuentas adicionales están identificadas como desarrollos de las CPT de las diapositivas, no como resultados impresos en ellas.
+**Ruta de lectura.** Primero distinguimos muestrear de consultar una probabilidad, luego usamos una misma red para seguir muestreo previo, rechazo, verosimilitud con pesos y Gibbs. Las cuentas adicionales se desarrollan paso a paso a partir de las CPT de la red de ejemplo.
 
-![[AI 16 muestreo en redes bayesianas.pdf]]
 
-| Tema | Diapositivas | Sección |
-|---|---:|---|
-| Puente desde eliminación de variables | 2–6 | §1 |
-| Idea de muestreo y uniforme | 7–9 | §2 |
-| Muestreo previo y red de ejemplo | 10–11 | §§3–4 |
-| Rechazo | 12–14 | §5 |
-| Verosimilitud con pesos | 15–17 | §6 |
-| Gibbs y su distribución local | 18–20 | §7 |
-| Comparación, MCMC y siguiente tema | 21–23 | §§8–10 |
+| Tema | Sección |
+|---|---|
+| Puente desde eliminación de variables | §1 |
+| Idea de muestreo y uniforme | §2 |
+| Muestreo previo y red de ejemplo | §§3–4 |
+| Rechazo | §5 |
+| Verosimilitud con pesos | §6 |
+| Gibbs y su distribución local | §7 |
+| Comparación, MCMC y siguiente tema | §§8–10 |
 
 ## 1. Por qué pasamos de inferencia exacta a aproximada
 
 En eliminación de variables, multiplicamos factores y sumamos variables ocultas. Si un factor denso contiene $k$ variables de dominio $d$, puede tener $d^k$ entradas. El **orden de eliminación** determina qué factores intermedios aparecen: en la red $Z\to X_i\to Y_i$, eliminar primero las ramas $X_i$ produce resúmenes pequeños; eliminar $Z$ primero puede juntar todas las $X_i$ en una tabla exponencial. Este ejemplo se resolvió en [[2026-10-13 IA - Inferencia en redes bayesianas#12. El orden cambia el costo, aunque no cambie la respuesta|la clase anterior]].
 
-Un **poliárbol** es una red cuyo grafo subyacente no contiene ciclos no dirigidos; permite un orden eficiente para inferencia exacta, medido respecto al tamaño de sus CPT. La diapositiva 4 también recuerda que, en redes generales, la inferencia exacta puede ser difícil aun si las CPT originales son pequeñas. **Muestrear no cambia el modelo:** cambia el modo de calcular una respuesta, aceptando error estadístico a cambio de evitar ciertos cálculos exactos grandes.
+**Peor caso.** Una fórmula lógica en forma normal conjuntiva puede codificarse como red: las variables $X_1,\dots,X_7$ son raíces independientes con $P(X_i=0)=P(X_i=1)=0.5$; ocho nodos $Y_1,\dots,Y_8$ evalúan cada cláusula de tres literales (por ejemplo $Y_1=X_1\lor X_2\lor\neg X_3$ y $Y_8$ otra disyunción de tres literales sobre $X_5,X_6,X_7$); después una cascada de conjunciones los combina por pares: $Y_{1,2}=Y_1\land Y_2$, $Y_{3,4}$, $Y_{5,6}$, $Y_{7,8}$; luego $Y_{1,2,3,4}=Y_{1,2}\land Y_{3,4}$ y $Y_{5,6,7,8}=Y_{5,6}\land Y_{7,8}$; y finalmente $Z=Y_{1,2,3,4}\land Y_{5,6,7,8}$. Consultar $P(Z)$ equivale a decidir si la fórmula es satisfacible, de modo que en el peor caso la inferencia exacta es exponencial.
+
+Un **poliárbol** es una red cuyo grafo subyacente no contiene ciclos no dirigidos; permite un orden eficiente para inferencia exacta, medido respecto al tamaño de sus CPT. Recordemos también que, en redes generales, la inferencia exacta puede ser difícil aun si las CPT originales son pequeñas. **Muestrear no cambia el modelo:** cambia el modo de calcular una respuesta, aceptando error estadístico a cambio de evitar ciertos cálculos exactos grandes.
 
 > [!note] Exactitud y costo
 > Un estimador con pocas muestras puede ser rápido y poco preciso; para obtener más precisión suelen necesitarse más muestras. Tampoco es seguro que el muestreo sea siempre más rápido que una buena eliminación. La estructura de la red, la evidencia y la precisión requerida importan.
@@ -58,11 +58,11 @@ $$
 \widehat P(X=x)=\frac{1}{N}\sum_{i=1}^{N}\mathbf 1[x^{(i)}=x].
 $$
 
-La indicadora vale 1 cuando la muestra cumple el evento y 0 en otro caso. Por la ley de los grandes números, la frecuencia converge a la probabilidad del modelo al aumentar $N$. **Convergencia no significa que una corrida finita dé exactamente el valor verdadero.** En inferencia de una red conocida, las muestras aproximan probabilidades que las CPT ya definen; la diapositiva 7 menciona además el uso distinto de muestras para aprender distribuciones desconocidas.
+La indicadora vale 1 cuando la muestra cumple el evento y 0 en otro caso. Por la ley de los grandes números, la frecuencia converge a la probabilidad del modelo al aumentar $N$. **Convergencia no significa que una corrida finita dé exactamente el valor verdadero.** En inferencia de una red conocida, las muestras aproximan probabilidades que las CPT ya definen; las muestras sirven también, en otro contexto, para aprender distribuciones desconocidas.
 
 ### 2.1 De un uniforme a una variable discreta
 
-*Diapositiva 8.* Si $U\sim\operatorname{Uniforme}[0,1)$ y $P(C=\text{rojo})=0.6$, $P(C=\text{verde})=0.1$, $P(C=\text{azul})=0.3$, dividimos $[0,1)$ en intervalos de esas longitudes:
+Si $U\sim\operatorname{Uniforme}[0,1)$ y $P(C=\text{rojo})=0.6$, $P(C=\text{verde})=0.1$, $P(C=\text{azul})=0.3$, dividimos $[0,1)$ en intervalos de esas longitudes:
 
 | Valor devuelto | Intervalo de $U$ | Longitud |
 |---|---|---:|
@@ -74,11 +74,11 @@ Por ejemplo, $U=0.65$ devuelve verde. El mismo mecanismo sirve para cada fila de
 
 ## 3. Una red para todos los métodos
 
-*Diapositivas 10–11 y 16.* El ejemplo tiene $C$ = nublado, $S$ = aspersor, $R$ = lluvia y $W$ = pasto mojado:
+El ejemplo tiene $C$ = nublado, $S$ = aspersor, $R$ = lluvia y $W$ = pasto mojado:
 
 ![Red del muestreo: nublado, aspersor, lluvia y pasto](ia16-red-aspersor.svg)
 
-Usaremos $+x$ para «$X$ es verdadero» y $-x$ para «$X$ es falso». Las CPT de las diapositivas son:
+Usaremos $+x$ para «$X$ es verdadero» y $-x$ para «$X$ es falso». Las CPT son:
 
 | Parámetro | Valor | Parámetro | Valor |
 |---|---:|---|---:|
@@ -121,7 +121,7 @@ Estas cifras permiten juzgar si una estimación se acerca a la respuesta del **m
 
 ![Muestreo previo: sortear en orden topológico](ia16-muestreo-previo.svg)
 
-*Diapositivas 10–11.* Recorremos la red en **orden topológico**, de modo que los padres de cada nodo ya estén asignados:
+Recorremos la red en **orden topológico**, de modo que los padres de cada nodo ya estén asignados:
 
 ```text
 para cada muestra:
@@ -134,7 +134,17 @@ para cada muestra:
 
 El orden entre $S$ y $R$ puede intercambiarse. La probabilidad de generar un mundo concreto es justamente el producto de sus CPT; por tanto, las muestras siguen la conjunta $P(C,S,R,W)$. Para estimar $P(+w)$ basta contar cuántos mundos traen $+w$ y dividir entre $N$.
 
-**El pequeño lote de la diapositiva 11** contiene cinco mundos; cuatro tienen $+w$, así que da $\widehat P(+w)=4/5=0.8$, frente al valor exacto 0.65. Entre esos cuatro, tres tienen $+c$, de modo que el cociente observado $\widehat P(+c\mid+w)=3/4=0.75$. Esa diferencia es error de muestreo, no una nueva CPT. En el lote no hay ningún mundo con $-r,-w$, así que **no se puede estimar** $P(C\mid-r,-w)$ con él: el denominador empírico sería cero.
+**Un pequeño lote de ejemplo.** Supongamos que el muestreo previo produjo estos cinco mundos $(C,S,R,W)$:
+
+| Muestra | $C$ | $S$ | $R$ | $W$ |
+|---:|:-:|:-:|:-:|:-:|
+| 1 | $+c$ | $-s$ | $+r$ | $+w$ |
+| 2 | $+c$ | $+s$ | $+r$ | $+w$ |
+| 3 | $-c$ | $+s$ | $+r$ | $-w$ |
+| 4 | $+c$ | $-s$ | $+r$ | $+w$ |
+| 5 | $-c$ | $-s$ | $-r$ | $+w$ |
+
+Cuatro mundos (1, 2, 4 y 5) tienen $+w$, así que da $\widehat P(+w)=4/5=0.8$, frente al valor exacto 0.65. Entre esos cuatro, tres tienen $+c$, de modo que el cociente observado $\widehat P(+c\mid+w)=3/4=0.75$. Esa diferencia es error de muestreo, no una nueva CPT. En el lote no hay ningún mundo con $-r,-w$, así que **no se puede estimar** $P(C\mid-r,-w)$ con él: el denominador empírico sería cero.
 
 > [!important] Dos órdenes distintos
 > El orden topológico permite **generar** una muestra porque conocemos los padres antes de sortear el hijo. El orden de **eliminación de variables** de la clase anterior busca mantener pequeñas las tablas de inferencia exacta. No son el mismo problema.
@@ -143,7 +153,7 @@ El orden entre $S$ y $R$ puede intercambiarse. La probabilidad de generar un mun
 
 ![Evidencia +w: consulta P(C | +w)](ia16-rechazo-pesos.svg)
 
-*Diapositivas 12–14.* Para estimar $P(Q\mid\mathbf e)$, generamos mundos completos por muestreo previo y contamos únicamente los que cumplen la evidencia. Para $P(C\mid+w)$:
+Para estimar $P(Q\mid\mathbf e)$, generamos mundos completos por muestreo previo y contamos únicamente los que cumplen la evidencia. Para $P(C\mid+w)$:
 
 ```text
 aceptados = 0; positivos = 0
@@ -163,7 +173,7 @@ El costo aparece cuando la evidencia es rara. La fracción aceptada se aproxima 
 
 ![Evidencia +w: consulta P(C | +w)](ia16-rechazo-pesos.svg)
 
-*Diapositivas 15–17.* Ahora asignamos directamente el valor observado a cada variable de evidencia. Sorteamos solo las demás en orden topológico. Cada muestra recibe un peso inicial 1; por cada nodo observado $E_i=e_i$, multiplicamos por la probabilidad local de observar ese valor dados **los padres que quedaron en esa muestra**:
+Ahora asignamos directamente el valor observado a cada variable de evidencia. Sorteamos solo las demás en orden topológico. Cada muestra recibe un peso inicial 1; por cada nodo observado $E_i=e_i$, multiplicamos por la probabilidad local de observar ese valor dados **los padres que quedaron en esa muestra**:
 
 $$
 w(\mathbf z,\mathbf e)=\prod_{E_i\in\mathcal E}P(e_i\mid\operatorname{pa}(E_i)).
@@ -175,7 +185,7 @@ $$
 \widehat P(+c\mid+w)=\frac{\sum_{i=1}^{N}w_i\mathbf 1[c^{(i)}=+c]}{\sum_{i=1}^{N}w_i},\quad\text{si }\sum_iw_i>0.
 $$
 
-**Ejemplo de la diapositiva 16.** Si salen $+c,+s,+r$ y fijamos $+w$, el peso es $0.99$. En la diapositiva se fija **también** $+s$: para evidencia $+s,+w$, esa misma asignación recibe $w=0.1\times0.99=0.099$. El $0.1$ procede de $P(+s\mid+c)$; no es la probabilidad de muestrear $+c$.
+**Ejemplo.** Si salen $+c,+s,+r$ y fijamos $+w$, el peso es $0.99$. Si se fija **también** $+s$ como evidencia (evidencia $+s,+w$), esa misma asignación recibe $w=0.1\times0.99=0.099$. El $0.1$ procede de $P(+s\mid+c)$; no es la probabilidad de muestrear $+c$.
 
 ### Por qué la corrección funciona
 
@@ -194,9 +204,9 @@ S_{\mathrm{LW}}(\mathbf z\mid\mathbf e)w(\mathbf z,\mathbf e)
 =P(\mathbf z,\mathbf e).
 $$
 
-Los cocientes de sumas ponderadas se acercan así a la posterior. Esta es la igualdad que aparece abreviada en la diapositiva 17. No afirma que las muestras **sin peso** sigan la posterior.
+Los cocientes de sumas ponderadas se acercan así a la posterior. Esta es la igualdad que justifica el estimador. No afirma que las muestras **sin peso** sigan la posterior.
 
-**Límite práctico:** fijar una observación influye en sus descendientes al sortearlos, pero no modifica directamente el sorteo de sus ancestros. Si la evidencia favorece muy fuertemente unos pocos ancestros, muchas muestras obtendrán pesos diminutos. Como diagnóstico, el tamaño efectivo aproximado es $N_{\mathrm{ef}}=(\sum_iw_i)^2/\sum_iw_i^2$; puede ser mucho menor que $N$. Esta fórmula es una ampliación de estudio, no aparece en la presentación.
+**Límite práctico:** fijar una observación influye en sus descendientes al sortearlos, pero no modifica directamente el sorteo de sus ancestros. Si la evidencia favorece muy fuertemente unos pocos ancestros, muchas muestras obtendrán pesos diminutos. Como diagnóstico, el tamaño efectivo aproximado es $N_{\mathrm{ef}}=(\sum_iw_i)^2/\sum_iw_i^2$; puede ser mucho menor que $N$. Esta fórmula es una ampliación de estudio, no forma parte del procedimiento básico.
 
 ### Explorar las estimaciones
 
@@ -206,13 +216,24 @@ El explorador usa exactamente las CPT de §3. Permite comparar cómo cambia la e
 
 ## 7. Gibbs: actualizar un mundo en vez de comenzar de cero
 
-*Diapositivas 18–20.* Gibbs es un método de **cadena de Markov Monte Carlo** (MCMC). Fijamos permanentemente la evidencia, inicializamos los demás nodos con cualquier asignación válida y repetimos:
+Gibbs es un método de **cadena de Markov Monte Carlo** (MCMC). Fijamos permanentemente la evidencia, inicializamos los demás nodos con cualquier asignación válida y repetimos:
 
 1. Elegir una variable **no observada** $X$.
 2. Volver a sortear $X$ según $P(X\mid\text{valores actuales de las demás variables})$.
 3. Mantener los demás valores, avanzar y contar estados de la cadena después de un período de calentamiento.
 
-Para $P(S\mid+r)$, la diapositiva 19 fija $R=+r$ e inicia $C,S,W$; luego actualiza sucesivamente uno de esos nodos. La evidencia permanece fija en cada estado. **Las muestras consecutivas están correlacionadas**: no son nuevos mundos independientes como en muestreo previo.
+Para $P(S\mid+r)$, se fija $R=+r$ y se inicializan $C,S,W$; luego actualiza sucesivamente uno de esos nodos. La evidencia permanece fija en cada estado. **Las muestras consecutivas están correlacionadas**: no son nuevos mundos independientes como en muestreo previo.
+
+**Traza para $P(S\mid+r)$.** Se fija $R=+r$ y se inicializan al azar los demás nodos, por ejemplo $C=+c,\ S=-s,\ W=-w$. Una secuencia de estados posible:
+
+| Paso | Variable re-muestreada | Se muestrea de | Estado resultante $(C,S,R,W)$ |
+|---:|---|---|---|
+| 0 | (inicio) | — | $(+c,-s,+r,-w)$ |
+| 1 | $S$ | $P(S\mid+c,-w,+r)$ | $(+c,+s,+r,-w)$ |
+| 2 | $C$ | $P(C\mid+s,-w,+r)$ | $(+c,+s,+r,-w)$ |
+| 3 | $W$ | $P(W\mid+s,+c,+r)$ | $(+c,+s,+r,-w)$ |
+
+Los valores concretos sorteados dependen del azar; aquí un re-muestreo puede devolver el mismo valor que ya tenía el nodo. Así se continúa durante muchas iteraciones.
 
 ### 7.1 Solo hace falta la manta de Markov
 
@@ -224,7 +245,7 @@ $$
 P(X=x\mid\text{resto})\propto P(x\mid\operatorname{pa}(X))\prod_{Y\in\operatorname{hijos}(X)}P(y\mid\operatorname{pa}(Y)).
 $$
 
-Padres, hijos y otros padres de los hijos forman la **manta de Markov**. En la diapositiva 20 se actualiza $S$ dado $+c,+r,-w$:
+Padres, hijos y otros padres de los hijos forman la **manta de Markov**. Por ejemplo, para actualizar $S$ dado $+c,+r,-w$:
 
 $$
 P(S=s\mid+c,+r,-w)\propto P(s\mid+c)P(-w\mid s,+r).
@@ -240,7 +261,7 @@ El factor $P(+c)P(+r\mid+c)$ aparece en ambos casos y se cancela. Esto muestra p
 
 ### 7.2 Qué significa «en el límite»
 
-Si la cadena puede recorrer los estados relevantes y mezcla adecuadamente, la frecuencia de estados se acerca a la posterior $P(Q\mid\mathbf e)$. **No hay garantía de que unas pocas iteraciones basten.** Se suele descartar un calentamiento inicial y vigilar la autocorrelación o comparar corridas. Con CPT deterministas puede haber estados entre los que la cadena no transite; en ese caso la afirmación de convergencia requiere cuidado. Estas precisiones completan la frase breve de las diapositivas 18 y 22.
+Si la cadena puede recorrer los estados relevantes y mezcla adecuadamente, la frecuencia de estados se acerca a la posterior $P(Q\mid\mathbf e)$. **No hay garantía de que unas pocas iteraciones basten.** Se suele descartar un calentamiento inicial y vigilar la autocorrelación o comparar corridas. Con CPT deterministas puede haber estados entre los que la cadena no transite; en ese caso la afirmación de convergencia requiere cuidado. Estas precisiones completan la idea básica de que la cadena converge a la posterior.
 
 ## 8. Elegir y comparar los cuatro métodos
 
@@ -292,9 +313,9 @@ En rechazo, 1,000 intentos no produjeron ningún mundo compatible con la evidenc
 
 ## 10. Alcance y siguiente clase
 
-**Fuente principal:** [[AI 16 muestreo en redes bayesianas.pdf|AI 16 — Muestreo en redes bayesianas]], 23 diapositivas. El PDF contiene las CPT, los cuatro procedimientos y la derivación local de Gibbs. Las probabilidades exactas $0.65$, $0.574615$ y $1/91$, la discusión de muestras efectivas y las advertencias de convergencia son desarrollos hechos aquí a partir de ese material. El recurso interactivo reproduce el modelo con un generador pseudoaleatorio local y no consulta datos externos.
+**Alcance.** Las probabilidades exactas $0.65$, $0.574615$ y $1/91$, la discusión de muestras efectivas y las advertencias de convergencia se desarrollan en esta nota a partir de las CPT de la red. El recurso interactivo reproduce el modelo con un generador pseudoaleatorio local y no consulta datos externos.
 
-La última diapositiva anuncia **aprender la estructura de una red a partir de datos**. Es un problema distinto de esta clase: aquí la estructura y las CPT estaban dadas y queríamos responder consultas. Aprender estructura pregunta qué flechas y dependencias sostienen los datos.
+El siguiente tema es **aprender la estructura de una red a partir de datos**. Es un problema distinto de esta clase: aquí la estructura y las CPT estaban dadas y queríamos responder consultas. Aprender estructura pregunta qué flechas y dependencias sostienen los datos.
 
 ## Resumen después de clase
 

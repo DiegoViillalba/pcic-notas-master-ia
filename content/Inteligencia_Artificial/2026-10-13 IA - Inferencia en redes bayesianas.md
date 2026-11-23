@@ -10,7 +10,6 @@ conceptos:
   - "[[Factor probabilístico]]"
   - "[[Eliminación de variables]]"
 referencias:
-  - "[[AI 15 Inferencia en redes bayesianas.pdf]]"
   - "[[Artificial_inteliigence-A_modern_approach.pdf]]"
   - "https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/elimination.html"
   - "https://inst.eecs.berkeley.edu/~cs188/sp25/assets/lectures/cs188-sp25-lec15.pdf"
@@ -27,30 +26,29 @@ tags:
 > [!summary] Pregunta central
 > Si una red bayesiana describe cómo se relacionan varias variables, ¿cómo calculamos la probabilidad de algo que no observamos usando lo que sí sabemos, y cómo evitamos repetir cálculos innecesarios?
 
-Continuación de [[2026-10-06 IA - Redes bayesianas|Redes bayesianas: independencia y d-separación]]. En esa nota aprendimos **qué distribución representa la red** y **qué independencias garantiza su grafo**. Ahora construiremos un procedimiento para responder consultas numéricas. La fecha **13 de octubre de 2026** corresponde a la sesión indicada; el PDF se titula «Clase 15: inferencia en redes Bayesianas», una numeración distinta de la planeación del curso.
+Continuación de [[2026-10-06 IA - Redes bayesianas|Redes bayesianas: independencia y d-separación]]. En esa nota aprendimos **qué distribución representa la red** y **qué independencias garantiza su grafo**. Ahora construiremos un procedimiento para responder consultas numéricas. La nota corresponde a la sesión del **13 de octubre de 2026**. Es autocontenida: las tablas y los grafos de cada ejemplo se reproducen completos.
 
 **Cómo estudiar este apunte.** Sigue el orden de las secciones: primero una tabla pequeña, después una cadena de tres variables y finalmente la red de alarma. Antes de mirar cada resultado, intenta anticipar qué debemos fijar, qué debemos sumar y qué debemos conservar. Las ecuaciones generales aparecen después de los ejemplos que les dan significado.
 
-![[AI 15 Inferencia en redes bayesianas.pdf]]
 
-## Ruta incremental y relación con el PDF
+## Ruta incremental
 
-| Etapa | Pregunta que aprenderemos a responder | Diapositivas | Secciones |
-|---|---|---|---|
-| Recuperar lo anterior | ¿Qué información aporta la estructura? | 3–7 | §1 |
-| Formular una consulta | ¿Cuál es la incógnita y qué está observado? | 8–9 | §2 |
-| Condicionar una tabla | ¿Por qué seleccionamos y después normalizamos? | 11–14 | §§3–4 |
-| Enumerar | ¿Por qué sumamos las variables ocultas? | 9–10, 15 | §§5–6 |
-| Operar con factores | ¿Qué significa unir y eliminar? | 16–21 | §7 |
-| Eliminar paso a paso | ¿Cómo obtenemos el mismo resultado con tablas menores? | 22–28 | §§8–10 |
-| Elegir el orden | ¿Cuándo aparecen factores enormes? | 29–31 | §§11–12 |
-| Consolidar | ¿Puedo explicar el procedimiento sin memorizarlo? | Síntesis; 32 como puente | §§13–15 |
+| Etapa | Pregunta que aprenderemos a responder | Secciones |
+|---|---|---|
+| Recuperar lo anterior | ¿Qué información aporta la estructura? | §1 |
+| Formular una consulta | ¿Cuál es la incógnita y qué está observado? | §2 |
+| Condicionar una tabla | ¿Por qué seleccionamos y después normalizamos? | §§3–4 |
+| Enumerar | ¿Por qué sumamos las variables ocultas? | §§5–6 |
+| Operar con factores | ¿Qué significa unir y eliminar? | §7 |
+| Eliminar paso a paso | ¿Cómo obtenemos el mismo resultado con tablas menores? | §§8–10 |
+| Elegir el orden | ¿Cuándo aparecen factores enormes? | §§11–12 |
+| Consolidar | ¿Puedo explicar el procedimiento sin memorizarlo? | §§13–15 |
 
-**Procedencia.** Las tablas de temperatura, estaciones y la cadena $R\to T\to L$ se transcriben del PDF. Las cuentas y explicaciones se desarrollan aquí. La red de alarma usa la estructura del PDF y las CPT ya verificadas en la clase anterior y en AIMA, figura 13.2. Las ampliaciones sobre enumeración recursiva, complejidad y variables irrelevantes se identifican como apoyo de AIMA, 4.ª edición global, §13.3, pp. 445–452; no son transcripciones literales de las diapositivas.
+**Procedencia.** Las tablas de temperatura, estaciones y la cadena $R\to T\to L$ son los ejemplos de la clase; las cuentas y explicaciones se desarrollan aquí. La red de alarma usa las CPT verificadas en la clase anterior y en AIMA, figura 13.2. Las ampliaciones sobre enumeración recursiva, complejidad y variables irrelevantes se identifican como apoyo de AIMA, 4.ª edición global, §13.3, pp. 445–452.
 
 ## 1. Recuperar la idea necesaria: la red ya contiene la conjunta
 
-*Diapositivas 3–7; repaso de la sesión anterior.* Una red bayesiana es un DAG junto con distribuciones locales. La distribución conjunta se recupera multiplicando una distribución por nodo:
+*Repaso de la sesión anterior.* Una red bayesiana es un DAG junto con distribuciones locales. La distribución conjunta se recupera multiplicando una distribución por nodo:
 
 $$
 P(x_1,\ldots,x_n)=\prod_{i=1}^{n}P(x_i\mid\operatorname{pa}(X_i)).
@@ -75,13 +73,13 @@ La d-separación responde una pregunta estructural: «¿se garantiza que una var
 | $R\to T$, $R\to D$, $T\to S\leftarrow D$ | $T\perp D\mid R$ | Garantizada: se bloquea la causa común y el colisionador sigue cerrado. |
 | La misma red | $T\perp D\mid R,S$ | No garantizada: observar $S$ abre el camino inferior. |
 
-El ejemplo 2, con $L\to R\to T\leftarrow B$, muestra además que observar $T$ abre el colisionador, pero observar también $R$ bloquea ese camino: se garantiza $L\perp B\mid T,R$. Las soluciones completas de los tres ejemplos están en [[2026-10-06 IA - Redes bayesianas#8. Los tres ejemplos de las diapositivas, resueltos paso a paso|§8 de la clase anterior]].
+El ejemplo 2, con $L\to R\to T\leftarrow B$, muestra además que observar $T$ abre el colisionador, pero observar también $R$ bloquea ese camino: se garantiza $L\perp B\mid T,R$. Las soluciones completas de los tres ejemplos están en [[2026-10-06 IA - Redes bayesianas#8. Los tres ejemplos de d-separación, resueltos paso a paso|§8 de la clase anterior]].
 
 **Qué conservamos de este repaso:** las independencias justifican la factorización compacta. Un camino activo retira una garantía de independencia; por sí solo no proporciona una probabilidad ni demuestra dependencia para todas las CPT posibles.
 
 ## 2. Formular la pregunta antes de calcular
 
-*Diapositivas 8–9.* En una consulta $P(Q\mid\mathbf e)$ distinguimos tres papeles:
+En una consulta $P(Q\mid\mathbf e)$ distinguimos tres papeles:
 
 | Papel | Qué representa | Qué haremos con él |
 |---|---|---|
@@ -104,11 +102,11 @@ $$
 
 en el orden $(b,\neg b)$. La consulta $\arg\max_b P(B=b\mid j,m)$ devuelve un valor: aquí, «no robo».
 
-Si $Q$ es un subconjunto de variables, maximizar $P(Q\mid\mathbf e)$ es una consulta **MAP**. Si se busca la asignación más probable de **todas** las variables no observadas, hablamos de **MPE**. La diapositiva 8 usa «explicación más probable» en sentido amplio; este apunte desarrolla el cálculo de distribuciones posteriores, que requiere sumar las ocultas. No sustituimos esas sumas por máximos.
+Si $Q$ es un subconjunto de variables, maximizar $P(Q\mid\mathbf e)$ es una consulta **MAP**. Si se busca la asignación más probable de **todas** las variables no observadas, hablamos de **MPE**. En clase se usó «explicación más probable» en sentido amplio; este apunte desarrolla el cálculo de distribuciones posteriores, que requiere sumar las ocultas. No sustituimos esas sumas por máximos.
 
 ## 3. Primer peldaño: condicionar es seleccionar y normalizar
 
-*Diapositivas 11–13.* Empecemos sin grafo. Tenemos la conjunta de temperatura $T$ y tiempo $W$:
+Empecemos sin grafo. Tenemos la conjunta de temperatura $T$ y tiempo $W$:
 
 | $T$ | $W$ | $P(T,W)$ |
 |---|---|---:|
@@ -116,6 +114,8 @@ Si $Q$ es un subconjunto de variables, maximizar $P(Q\mid\mathbf e)$ es una cons
 | Calor | Lluvia | 0.1 |
 | Frío | Sol | 0.2 |
 | Frío | Lluvia | 0.3 |
+
+Antes de calcular, conviene ver las dos condicionales de $W$ dada la temperatura. Para calor, las masas $0.4$ y $0.1$ suman $0.5$, así que $P(W\mid T=\text{calor})=\langle0.8,0.2\rangle$ (sol, lluvia). Para frío se obtiene $P(W\mid T=\text{frío})=\langle0.4,0.6\rangle$. Cada una es una distribución sobre $W$ con $T$ fijo.
 
 Queremos $P(W\mid T=\text{frío})$.
 
@@ -135,7 +135,9 @@ $$
 
 La selección $\langle0.2,0.3\rangle$ todavía expresa masas respecto del universo original. La normalización expresa las proporciones **dentro del conjunto compatible con la observación**.
 
-### Resolver el quiz de la diapositiva 13
+### Ejercicio: condicionar una conjunta de dos variables
+
+**Enunciado.** Dada la siguiente conjunta de $X$ e $Y$, calcula $P(X\mid Y=-y)$.
 
 La conjunta es:
 
@@ -156,7 +158,7 @@ $$
 
 ## 4. Segundo peldaño: sumar lo desconocido antes de normalizar
 
-*Diapositiva 14.* Añadimos una variable: estación $S$. Los valores de la tabla son:
+Añadimos una variable: estación $S$. Los valores de la tabla son:
 
 | $S$ | $T$ | $W$ | $P(S,T,W)$ |
 |---|---|---|---:|
@@ -203,7 +205,7 @@ $$
 
 ## 5. La regla general ya tiene significado
 
-*Diapositivas 9–10.* Llamemos $w(q)$ al peso de los mundos donde la consulta vale $q$ y se cumple la evidencia:
+Llamemos $w(q)$ al peso de los mundos donde la consulta vale $q$ y se cumple la evidencia:
 
 $$
 \boxed{w(q)=P(q,\mathbf e)=\sum_{\mathbf h}P(q,\mathbf e,\mathbf h).}
@@ -240,7 +242,7 @@ Sin evidencia, $Z=1$. Si la consulta contiene varias variables, $q$ recorre toda
 
 ![Cadena R → T → L: consulta P(L)](ia15-cadena-consulta-l.svg)
 
-*Datos de las diapositivas 18–22.* Usaremos $R\to T\to L$. Podemos recordar $R$ como lluvia, $T$ como tráfico y $L$ como llegar tarde; esos nombres son una interpretación didáctica. Los números son los del PDF:
+Usaremos la cadena $R\to T\to L$. Podemos recordar $R$ como lluvia, $T$ como tráfico y $L$ como llegar tarde; esos nombres son una interpretación didáctica. Sus tablas son:
 
 $$
 P(r)=0.1,\qquad P(\neg r)=0.9.
@@ -292,12 +294,12 @@ El producto $P(r)P(t\mid r)=0.08$ aparece para $l$ y para $\neg l$. Lo mismo ocu
 
 **Pregunta que motiva el siguiente método:** ¿podemos resumir $R$ en una tabla sobre $T$ y usar ese resumen para ambos valores de $L$?
 
-> [!note] Precisión sobre la diapositiva 15
+> [!note] Precisión: enumerar no exige almacenar la conjunta
 > Construir la conjunta completa y luego sumar es una implementación sencilla de enumeración. **Enumerar no exige almacenarla completa**: el algoritmo recursivo de AIMA, §13.3.1, recorre asignaciones y acumula sus pesos con espacio lineal. El problema general sigue siendo el número exponencial de combinaciones y la repetición de subcálculos.
 
 ## 7. Factores: tablas sobre las que podemos operar
 
-*Diapositivas 17–21; AIMA, pp. 448–450.* Un [[Factor probabilístico|factor]] es una función no negativa sobre un conjunto de variables. Su **alcance** o *scope* es el conjunto de variables que indexan su tabla.
+*AIMA, pp. 448–450.* Un [[Factor probabilístico|factor]] es una función no negativa sobre un conjunto de variables. Su **alcance** o *scope* es el conjunto de variables que indexan su tabla.
 
 Al comenzar, usamos las CPT como factores. Por ejemplo, $f(R,T)=P(T\mid R)$ tiene alcance $\{R,T\}$. Aunque la notación tenga una barra, necesitamos ambos valores para buscar una entrada.
 
@@ -352,7 +354,7 @@ El factor resultante conserva la probabilidad total de cada valor de $T$, sin co
 
 ![Cadena R → T → L: consulta P(L)](ia15-cadena-consulta-l.svg)
 
-*Diapositivas 22 y 25.* Queremos otra vez $P(L)$. Ahora usaremos el orden $R,T$.
+Queremos otra vez $P(L)$. Ahora usaremos el orden $R,T$.
 
 ### Paso 1: escribir los factores iniciales
 
@@ -413,6 +415,13 @@ Sacamos $P(L\mid T)$ de la suma sobre $R$ porque **no depende de $R$**. Usamos l
 | Formar la conjunta completa | $R,T,L$ | 8 |
 | Eliminar $R$ y después $T$ | $R,T$ o $T,L$ | 4 |
 
+Las dos expresiones para $P(L)$ y el orden de sus operaciones son:
+
+| Método | Expresión | Secuencia de operaciones |
+|---|---|---|
+| Enumeración | $\sum_t\sum_r P(L\mid t)P(r)P(t\mid r)$ | unir en $r$, unir en $t$, eliminar $r$, eliminar $t$ |
+| Eliminación de variables | $\sum_t P(L\mid t)\sum_r P(r)P(t\mid r)$ | unir en $r$, eliminar $r$, unir en $t$, eliminar $t$ |
+
 La comparación se refiere a formar tablas explícitas. La enumeración recursiva puede evitar almacenar las ocho filas y sigue recorriendo sus combinaciones.
 
 ### Laboratorio: seguir las tablas que se transforman
@@ -425,7 +434,7 @@ Empieza en **Cadena: $P(L)$** y avanza por los pasos. Compara **Enumeración** c
 
 ![Cadena R → T → L: consulta P(L | r)](ia15-cadena-evidencia-r.svg)
 
-*Diapositiva 23.* Ahora sabemos que llueve. Consulta $L$, evidencia $R=r$, oculta $T$.
+Ahora sabemos que llueve. Consulta $L$, evidencia $R=r$, oculta $T$.
 
 ### Paso 1: restringir antes de operar
 
@@ -469,7 +478,7 @@ Podríamos cancelar desde el principio el escalar positivo $P(r)$, común a todo
 
 ## 10. Convergencia: resolver la red de alarma con ambos métodos
 
-*Diapositivas 10 y 26–28; CPT de la clase anterior y AIMA.* La estructura es:
+*CPT de la clase anterior y AIMA.* La estructura es:
 
 ![Alarma: consulta P(B | j, m)](ia15-alarma-consulta.svg)
 
@@ -613,7 +622,7 @@ En el laboratorio de §8, selecciona **Alarma: $P(B\mid j,m)$** y compara los ó
 
 ## 11. Convertir los ejemplos en un algoritmo
 
-*Diapositiva 24.* Para calcular $P(Q\mid\mathbf e)$:
+Para calcular $P(Q\mid\mathbf e)$:
 
 ```text
 F ← factores locales de la red restringidos a la evidencia
@@ -652,7 +661,7 @@ Podemos quitar esa rama antes de calcular. Repitiendo el argumento con hojas que
 
 ![Causa común con ramas: Z → Xᵢ → Yᵢ](ia15-poliarbol-ramas.svg)
 
-*Diapositiva 29.* Consideremos una causa común $Z$ con ramas $Z\to X_i\to Y_i$, para $i=1,\ldots,n$. Todas las $Y_i=y_i$ están observadas y queremos $P(X_n\mid y_1,\ldots,y_n)$.
+Consideremos una causa común $Z$ con ramas $Z\to X_i\to Y_i$, para $i=1,\ldots,n$. Todas las $Y_i=y_i$ están observadas y queremos $P(X_n\mid y_1,\ldots,y_n)$.
 
 Después de restringir la evidencia, tenemos:
 
@@ -695,13 +704,13 @@ El producto previo depende de $Z,X_1,\ldots,X_n$: $n+1$ variables. El resultado 
 | Ramas primero | $2^2=4$ entradas | $2$ entradas |
 | $Z$ primero | $2^{n+1}$ entradas | $2^n$ entradas |
 
-Para $n=6$, son **4 frente a 128 entradas** en el mayor producto. Después de sumar una variable, la comparación es **2 frente a 64**. Especificar cuál tabla estamos contando evita confundir ambas cifras; esta distinción también aparece en las [diapositivas de Berkeley, 2025, pp. 35–36 del PDF](https://inst.eecs.berkeley.edu/~cs188/sp25/assets/lectures/cs188-sp25-lec15.pdf).
+Para $n=6$, son **4 frente a 128 entradas** en el mayor producto. Después de sumar una variable, la comparación es **2 frente a 64**. Especificar cuál tabla estamos contando evita confundir ambas cifras; esta distinción también aparece en el material de la [Lecture 15 de Berkeley, 2025](https://inst.eecs.berkeley.edu/~cs188/sp25/assets/lectures/cs188-sp25-lec15.pdf).
 
 ### Explorador del orden y los alcances
 
 <iframe src="ia15-orden-eliminacion.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
-Compara ambos órdenes con seis ramas y avanza una eliminación a la vez. El explorador muestra qué factores entran, qué variables debe reunir el producto y cuántas entradas requiere. Al aumentar las ramas, el orden que elimina $Z$ primero crece exponencialmente; el otro mantiene productos de cuatro entradas. El recurso estudia **alcances y tamaños**, sin inventar probabilidades para la diapositiva 29.
+Compara ambos órdenes con seis ramas y avanza una eliminación a la vez. El explorador muestra qué factores entran, qué variables debe reunir el producto y cuántas entradas requiere. Al aumentar las ramas, el orden que elimina $Z$ primero crece exponencialmente; el otro mantiene productos de cuatro entradas. El recurso estudia **alcances y tamaños**, sin inventar probabilidades para esta estructura.
 
 ### Qué orienta la elección en otras redes
 
@@ -711,11 +720,11 @@ Una heurística práctica es preferir la siguiente eliminación que produzca una
 
 ## 13. Los límites: exactitud, dificultad y poliárboles
 
-*Diapositivas 8, 16 y 30–32; ampliación AIMA, §13.3.3.* Enumeración y eliminación son métodos **exactos**: calculan la posterior del modelo, salvo el redondeo de una implementación numérica. Exacto no significa que el modelo describa perfectamente la realidad; depende de sus supuestos y CPT.
+*Ampliación AIMA, §13.3.3.* Enumeración y eliminación son métodos **exactos**: calculan la posterior del modelo, salvo el redondeo de una implementación numérica. Exacto no significa que el modelo describa perfectamente la realidad; depende de sus supuestos y CPT.
 
 ### Por qué no existe una promesa de rapidez para cualquier red
 
-La diapositiva 30 codifica una fórmula lógica en una red. Las variables proposicionales son raíces booleanas independientes con probabilidad $1/2$; otros nodos evalúan cláusulas OR y combinaciones AND mediante CPT deterministas.
+Una fórmula lógica puede codificarse en una red. Las variables proposicionales son raíces booleanas independientes con probabilidad $1/2$; otros nodos evalúan cláusulas OR y combinaciones AND mediante CPT deterministas.
 
 1. Cada asignación de las $n$ raíces pesa $2^{-n}$.
 2. El nodo final $Z$ vale verdadero exactamente en las asignaciones que satisfacen la fórmula.
@@ -724,8 +733,72 @@ La diapositiva 30 codifica una fórmula lógica en una red. Las variables propos
 
 Las operaciones AND pueden organizarse en una cascada de nodos pequeños, de modo que el modelo no requiera desde el inicio una CPT con todas las cláusulas como padres. La dificultad puede surgir en los factores intermedios, aun cuando las CPT iniciales sean pequeñas.
 
+**Ejemplo concreto con siete variables y ocho cláusulas.** La fórmula es:
+
+$$
+(x_1\lor x_2\lor\neg x_3)\land(\neg x_1\lor x_3\lor\neg x_4)\land(x_2\lor\neg x_2\lor x_4)\land(\neg x_3\lor\neg x_4\lor\neg x_5)\land(x_2\lor x_5\lor x_7)\land(x_4\lor x_5\lor x_6)\land(\neg x_5\lor x_6\lor\neg x_7)\land(\neg x_5\lor\neg x_6\lor x_7).
+$$
+
+La red tiene raíces $X_1,\ldots,X_7$ con $P(X_i=0)=P(X_i=1)=0.5$. Cada cláusula es un nodo $Y_k$ cuyos padres son las variables que aparecen en ella y cuyo valor es el OR de sus literales:
+
+| Nodo | Definición | Padres |
+|---|---|---|
+| $Y_1$ | $X_1\lor X_2\lor\neg X_3$ | $X_1,X_2,X_3$ |
+| $Y_2$ | $\neg X_1\lor X_3\lor\neg X_4$ | $X_1,X_3,X_4$ |
+| $Y_3$ | $X_2\lor\neg X_2\lor X_4$ | $X_2,X_4$ |
+| $Y_4$ | $\neg X_3\lor\neg X_4\lor\neg X_5$ | $X_3,X_4,X_5$ |
+| $Y_5$ | $X_2\lor X_5\lor X_7$ | $X_2,X_5,X_7$ |
+| $Y_6$ | $X_4\lor X_5\lor X_6$ | $X_4,X_5,X_6$ |
+| $Y_7$ | $\neg X_5\lor X_6\lor\neg X_7$ | $X_5,X_6,X_7$ |
+| $Y_8$ | $\neg X_5\lor\neg X_6\lor X_7$ | $X_5,X_6,X_7$ |
+
+Las cláusulas se combinan con una cascada de AND por parejas:
+
+```mermaid
+flowchart TD
+  X1((X1)) --> Y1
+  X2((X2)) --> Y1
+  X3((X3)) --> Y1
+  X1 --> Y2
+  X3 --> Y2
+  X4((X4)) --> Y2
+  X2 --> Y3
+  X4 --> Y3
+  X3 --> Y4
+  X4 --> Y4
+  X5((X5)) --> Y4
+  X2 --> Y5
+  X5 --> Y5
+  X7((X7)) --> Y5
+  X4 --> Y6
+  X5 --> Y6
+  X6((X6)) --> Y6
+  X5 --> Y7
+  X6 --> Y7
+  X7 --> Y7
+  X5 --> Y8
+  X6 --> Y8
+  X7 --> Y8
+  Y1 --> Y12["Y1,2 = Y1 AND Y2"]
+  Y2 --> Y12
+  Y3 --> Y34["Y3,4 = Y3 AND Y4"]
+  Y4 --> Y34
+  Y5 --> Y56["Y5,6 = Y5 AND Y6"]
+  Y6 --> Y56
+  Y7 --> Y78["Y7,8 = Y7 AND Y8"]
+  Y8 --> Y78
+  Y12 --> Y1234["Y1,2,3,4"]
+  Y34 --> Y1234
+  Y56 --> Y5678["Y5,6,7,8"]
+  Y78 --> Y5678
+  Y1234 --> Z((Z))
+  Y5678 --> Z
+```
+
+Cada nodo AND tiene dos padres, de modo que ninguna CPT es grande. Aun así, calcular $P(Z)$ exige tratar la interacción entre las siete variables a través de los factores intermedios.
+
 > [!warning] Precisión de complejidad
-> La diapositiva 16 dice «NP-completo», pero calcular una probabilidad exacta es una tarea numérica. La conclusión segura para el problema general es **NP-difícil**; AIMA, pp. 451–452, explica además su dificultad de conteo, **#P-difícil**. Las versiones de decisión requieren una formulación precisa antes de asignarles una clase. El método de eliminación no elimina esa dificultad general.
+> A veces se dice que la inferencia exacta es «NP-completa», pero calcular una probabilidad exacta es una tarea numérica. La conclusión segura para el problema general es **NP-difícil**; AIMA, pp. 451–452, explica además su dificultad de conteo, **#P-difícil**. Las versiones de decisión requieren una formulación precisa antes de asignarles una clase. El método de eliminación no elimina esa dificultad general.
 
 ### Poliárboles: estructura que sí permite un orden eficiente
 
@@ -819,13 +892,12 @@ En §12 con $n=8$, ¿cuántas entradas tiene el producto que construimos para el
 
 ## Referencias y alcance
 
-- **Material principal:** [[AI 15 Inferencia en redes bayesianas.pdf|AI 15 — Inferencia en redes bayesianas]], 32 diapositivas. Los números de página coinciden con los de diapositiva.
 - **Continuidad:** [[2026-10-06 IA - Redes bayesianas]], especialmente factorizar la conjunta, d-separación y CPT de alarma.
 - **AIMA, 4.ª edición global:** [[Artificial_inteliigence-A_modern_approach.pdf|Russell y Norvig, Artificial Intelligence: A Modern Approach]], §13.3.1, pp. 445–447; §13.3.2, pp. 448–451; §13.3.3, pp. 451–452. MAP y MPE: notas bibliográficas, p. 475.
 - **Apoyo para las operaciones:** [Berkeley CS 188, §6.6 — Exact Inference in Bayes Nets](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/elimination.html).
-- **Apoyo para el tamaño de factores:** [Berkeley CS 188, primavera 2025, Lecture 15](https://inst.eecs.berkeley.edu/~cs188/sp25/assets/lectures/cs188-sp25-lec15.pdf), pp. 35–36 del PDF.
+- **Apoyo para el tamaño de factores:** [Berkeley CS 188, primavera 2025, Lecture 15](https://inst.eecs.berkeley.edu/~cs188/sp25/assets/lectures/cs188-sp25-lec15.pdf), pp. 35–36 del documento.
 
-Los nombres lluvia, tráfico y llegar tarde en la cadena son ayudas didácticas; sus CPT sí provienen del material. Los laboratorios son recreaciones locales de los cálculos, sin dependencias externas. Este apunte no presupone ejercicios adicionales o comentarios orales que no estén documentados en el PDF.
+Los nombres lluvia, tráfico y llegar tarde en la cadena son ayudas didácticas; sus CPT son las del ejemplo. Los laboratorios son recreaciones locales de los cálculos, sin dependencias externas. Todos los ejercicios y cálculos de esta nota se resuelven completos en el texto.
 
 ## Resumen después de clase
 

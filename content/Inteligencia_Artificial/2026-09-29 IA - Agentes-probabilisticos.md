@@ -15,7 +15,6 @@ conceptos:
   - Red bayesiana
   - D-separación
 referencias:
-  - "[[AI 13 introducción agentes probabilísticos.pdf|Presentación de la clase 13]]"
   - "https://inst.eecs.berkeley.edu/~cs188/textbook/"
 tags:
   - clase
@@ -31,9 +30,8 @@ tags:
 > [!summary] Pregunta central
 > ¿Cómo representa un agente lo que desconoce, actualiza sus creencias cuando observa evidencia y aprovecha la estructura del problema para evitar una tabla exponencial de posibilidades?
 
-Esta nota desarrolla las **32 diapositivas** de la presentación. Las definiciones y los ejemplos de temperatura, clima y alarma proceden de ese material. Las derivaciones detalladas, ejercicios y visualizaciones amplían la explicación; los complementos de Berkeley se identifican con enlaces a las secciones correspondientes de **CS 188**. La inferencia por enumeración y las tripletas adicionales sirven de apoyo y preparación: la presentación anuncia que la inferencia continuará en la siguiente sesión.
+Esta nota es **autocontenida**: reúne las definiciones, las tablas, las figuras y los cálculos necesarios para seguir cada ejemplo sin material externo. Los ejemplos de temperatura, clima y alarma se desarrollan completos, con sus tablas numéricas y sus grafos dibujados. Los complementos de Berkeley se identifican con enlaces a las secciones correspondientes de **CS 188**. La inferencia por enumeración y las tripletas adicionales sirven de apoyo y preparación: la inferencia continúa en la siguiente sesión.
 
-![[AI 13 introducción agentes probabilísticos.pdf]]
 
 ## Ruta de estudio incremental
 
@@ -45,7 +43,7 @@ Esta nota desarrolla las **32 diapositivas** de la presentación. Las definicion
 
 ## 1. De dónde venimos y por qué aparece la incertidumbre
 
-*Diapositivas 1–6.* La sesión abre con dudas de la tarea 3 y comentarios sobre el avance del curso; la presentación no registra cuáles fueron esas dudas ni sus respuestas. Después plantea la transición de búsqueda, juegos y agentes lógicos hacia incertidumbre y aprendizaje.
+La sesión abre con dudas de la tarea 3 y comentarios sobre el avance del curso; el contenido de esas dudas y sus respuestas no forma parte de esta nota. Después se plantea la transición de búsqueda, juegos y agentes lógicos hacia incertidumbre y aprendizaje.
 
 | Tema anterior | Qué representábamos | Qué agregamos ahora |
 |---|---|---|
@@ -67,7 +65,7 @@ La incertidumbre puede aparecer porque:
 - las acciones tienen resultados variables: salir a la misma hora no garantiza el mismo tiempo de viaje;
 - el modelo omite variables: tráfico, accidentes, obras o cambios de ruta.
 
-Un proceso determinista también puede ser incierto **para quien desconoce sus entradas**. La frase de la diapositiva 5 sobre la falta de certeza es una motivación, no una afirmación de que todo proceso sea necesariamente aleatorio.
+Un proceso determinista también puede ser incierto **para quien desconoce sus entradas**. La idea de que la falta de certeza proviene de la falta de información es una motivación, no una afirmación de que todo proceso sea necesariamente aleatorio.
 
 ### Paso 2: pasar de demostrar a estimar
 
@@ -89,11 +87,11 @@ $$
 
 **Ejemplo didáctico:** llevar paraguas cuesta 1 unidad de incomodidad; no llevarlo cuesta 10 si llueve y 0 si no llueve. Si $p=P(R=\mathrm{true}\mid e)$, los costos esperados son $1$ y $10p$. Conviene llevarlo cuando $p>0.1$; si $p=0.1$, ambas acciones empatan. La probabilidad informa la decisión, pero el umbral depende del costo.
 
-Este puente sigue la idea de maximizar utilidad esperada en [CS 188, §7.1 Utilities](https://inst.eecs.berkeley.edu/~cs188/textbook/vpis/utilities.html). No es un nuevo desarrollo de teoría de utilidad dentro de esta presentación.
+Este puente sigue la idea de maximizar utilidad esperada en [CS 188, §7.1 Utilities](https://inst.eecs.berkeley.edu/~cs188/textbook/vpis/utilities.html). No es un nuevo desarrollo de teoría de utilidad dentro de esta nota.
 
 ## 2. Variables aleatorias, dominios y resultados
 
-*Diapositiva 7.* Una **variable aleatoria** representa un aspecto del mundo cuyo valor puede ser desconocido. Formalmente es una función:
+Una **variable aleatoria** representa un aspecto del mundo cuyo valor puede ser desconocido. Formalmente es una función:
 
 $$
 X:\Omega\longrightarrow E,
@@ -107,7 +105,7 @@ donde $\Omega$ contiene los resultados elementales del experimento y $E$ es el e
 | $T$ | ¿La temperatura es fría o cálida? | $\{\mathrm{cold},\mathrm{hot}\}$ |
 | $D$ | ¿Cuánto tardamos en llegar a la UNAM? | $[0,\infty)$, por ejemplo en minutos |
 
-La presentación utiliza $T$ para **temperatura**; en el ejemplo posterior $P(T,R,U)$ se utilizará para **tráfico**. Son ejemplos distintos y se indicará el significado en cada caso.
+En esta nota $T$ representa la **temperatura**; en el ejemplo posterior $P(T,R,U)$ se utilizará para **tráfico**. Son ejemplos distintos y se indicará el significado en cada caso.
 
 ### Notación que debemos distinguir
 
@@ -124,7 +122,7 @@ Se puede abreviar $P(W=\mathrm{rain})$ como $P(\mathrm{rain})$ cuando queda clar
 
 ## 3. Una distribución asigna masa a las alternativas
 
-*Diapositiva 8.* Para una variable discreta:
+Para una variable discreta:
 
 $$
 P(X=x)\geq 0,\qquad \sum_{x\in\mathrm{Dom}(X)}P(X=x)=1.
@@ -132,7 +130,7 @@ $$
 
 La primera condición impide probabilidades negativas; la segunda exige repartir toda la masa entre las alternativas del dominio. De ambas se deduce $P(X=x)\leq1$.
 
-Las tablas de la diapositiva son:
+Las tablas son:
 
 | Temperatura $T$ | $P(T)$ |
 |---|---:|
@@ -148,12 +146,12 @@ Las tablas de la diapositiva son:
 
 En este modelo, $0.6+0.1+0.3+0=1$. Un cero excluye ese resultado **del modelo**; no constituye una prueba universal de imposibilidad física.
 
-> [!warning] Las diapositivas cambian de ejemplo
-> En las diapositivas 9–10 el dominio de $W$ se reduce a $\{\mathrm{sun},\mathrm{rain}\}$ y la probabilidad marginal de lluvia será **0.4**. Esa conjunta es otro modelo: no debe mezclarse con la tabla anterior, donde la lluvia tiene probabilidad **0.1**.
+> [!warning] El ejemplo cambia más adelante
+> En las secciones 4 y 5 el dominio de $W$ se reduce a $\{\mathrm{sun},\mathrm{rain}\}$ y la probabilidad marginal de lluvia será **0.4**. Esa conjunta es otro modelo: no debe mezclarse con la tabla anterior, donde la lluvia tiene probabilidad **0.1**.
 
 ## 4. Distribución conjunta: una fila por mundo posible
 
-*Diapositiva 9.* Una distribución conjunta especifica la probabilidad de **cada asignación completa** de un conjunto de variables:
+Una distribución conjunta especifica la probabilidad de **cada asignación completa** de un conjunto de variables:
 
 $$
 P(X_1=x_1,\ldots,X_n=x_n)\equiv P(x_1,\ldots,x_n).
@@ -161,7 +159,7 @@ $$
 
 La coma representa conjunción de eventos. $P(T=\mathrm{hot},W=\mathrm{sun})$ es la probabilidad de que ocurran ambos a la vez.
 
-La conjunta que se usa en las diapositivas 9–11 es:
+La conjunta que se usa en las secciones 4 a 6 es:
 
 | $T$ | $W$ | $P(T,W)$ |
 |---|---|---:|
@@ -199,7 +197,7 @@ Agregar una variable booleana **duplica** el número de filas. Esta dificultad m
 
 ## 5. Marginalizar: sumar lo que no preguntamos
 
-*Diapositiva 10.* Si solo queremos conocer $T$, agrupamos las filas que comparten su valor y sumamos sobre todos los valores de $W$:
+Si solo queremos conocer $T$, agrupamos las filas que comparten su valor y sumamos sobre todos los valores de $W$:
 
 $$
 P(T=t)=\sum_wP(T=t,W=w).
@@ -227,7 +225,7 @@ $$
 
 ## 6. Condicionar: restringir por evidencia y normalizar
 
-*Complemento necesario para las diapositivas 14–16.* Marginalizar significa que no sabemos o no nos interesa el valor de una variable. Condicionar significa que **sí conocemos un valor observado**.
+*Complemento necesario para las secciones siguientes.* Marginalizar significa que no sabemos o no nos interesa el valor de una variable. Condicionar significa que **sí conocemos un valor observado**.
 
 Para $P(W=w)>0$:
 
@@ -270,7 +268,7 @@ $$
 En Bayes, $P(x)$ es la creencia previa, $P(y\mid x)$ la verosimilitud de la evidencia bajo la hipótesis, $P(y)$ la masa de esa evidencia y $P(x\mid y)$ la creencia posterior. La verosimilitud, considerada como función de $x$ con $y$ fijo, no tiene por qué sumar 1 sobre las hipótesis.
 
 > [!note] Conexión con Berkeley
-> [CS 188, §6.1 Probability Rundown](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/probability.html) reúne estas operaciones y la notación de independencia. Su función en esta nota es conectar las tablas de la presentación con las expresiones condicionales posteriores. Una consulta puede combinar selección de evidencia, sumas sobre variables ocultas y normalización; si la evidencia tiene probabilidad cero, el cociente condicional no está definido.
+> [CS 188, §6.1 Probability Rundown](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/probability.html) reúne estas operaciones y la notación de independencia. Su función en esta nota es conectar las tablas de este ejemplo con las expresiones condicionales posteriores. Una consulta puede combinar selección de evidencia, sumas sobre variables ocultas y normalización; si la evidencia tiene probabilidad cero, el cociente condicional no está definido.
 
 ### Construcción paso a paso con áreas: de la conjunta a la marginal y la condicional
 
@@ -339,17 +337,17 @@ $$
 
 <iframe src="probabilidad-conjunta-marginal-condicional.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
-**Cómo estudiarla:** selecciona la consulta $T$ y evidencia $W=\mathrm{rain}$; recorre los pasos para ver $0.1$ y $0.3$ convertirse en $0.25$ y $0.75$. Quita la evidencia para recuperar la marginal. El control de dependencia interpola entre las dos tablas de la diapositiva 14 manteniendo sus marginales.
+**Cómo estudiarla:** selecciona la consulta $T$ y evidencia $W=\mathrm{rain}$; recorre los pasos para ver $0.1$ y $0.3$ convertirse en $0.25$ y $0.75$. Quita la evidencia para recuperar la marginal. El control de dependencia interpola entre las dos tablas de la sección 8 manteniendo sus marginales.
 
 **Si no carga:** marginalizar suma todas las filas compatibles con el valor consultado; condicionar selecciona las filas compatibles con la evidencia y divide sus pesos entre la masa total seleccionada. En este ejemplo, $P(\mathrm{cold})=0.5$ pero $P(\mathrm{cold}\mid\mathrm{rain})=0.75$.
 
 ## 7. Un modelo probabilístico es una simplificación consultable
 
-*Diapositivas 11–12.* En esta clase, un modelo probabilístico consiste en variables, dominios y una distribución conjunta sobre sus asignaciones.
+En esta clase, un modelo probabilístico consiste en variables, dominios y una distribución conjunta sobre sus asignaciones.
 
 No contiene necesariamente todas las variables del mundo ni todas sus interacciones. La elección depende de las preguntas que pretendemos responder. Un modelo de trayectos que incluya lluvia y tráfico puede ser útil aunque omita el color de cada automóvil.
 
-Conviene separar tres tareas, retomando la diapositiva 19:
+Conviene separar tres tareas, retomando la idea de la sección 12:
 
 | Tarea | Pregunta |
 |---|---|
@@ -361,7 +359,7 @@ El aprendizaje, al que apunta la transición inicial, podrá estimar probabilida
 
 ## 8. Independencia: cuándo una variable no aporta información sobre otra
 
-*Diapositivas 14 y 21.* $X$ e $Y$ son independientes, $X\perp Y$, si:
+$X$ e $Y$ son independientes, $X\perp Y$, si:
 
 $$
 \forall x,y:\quad P(x,y)=P(x)P(y).
@@ -375,9 +373,9 @@ $$
 
 La condición debe cumplirse **para todas las asignaciones**, no solamente para una fila. La independencia es una propiedad de la distribución.
 
-### Comparar las dos tablas de la presentación
+### Comparar dos tablas con las mismas marginales
 
-La diapositiva 14 mantiene las marginales $P(T)=(0.5,0.5)$ y $P(W)=(0.6,0.4)$, pero compara dos conjuntas:
+Ambas tablas mantienen las marginales $P(T)=(0.5,0.5)$ y $P(W)=(0.6,0.4)$, pero son dos conjuntas distintas:
 
 | $T$ | $W$ | $P_1(T,W)$: dependiente | $P_2(T,W)$: independiente |
 |---|---|---:|---:|
@@ -398,7 +396,7 @@ Una sola desigualdad basta para refutar independencia. Para $P_2$, cada fila es 
 
 ## 9. Independencia condicional: qué información deja de ser necesaria
 
-*Diapositivas 15 y 21.* Escribimos $X\perp Y\mid Z$ cuando, para cada valor $z$ con $P(z)>0$:
+Escribimos $X\perp Y\mid Z$ cuando, para cada valor $z$ con $P(z)>0$:
 
 $$
 P(x,y\mid z)=P(x\mid z)P(y\mid z).
@@ -436,7 +434,7 @@ Tampoco la independencia marginal implica siempre independencia condicional: obs
 
 ## 10. Regla de la cadena: primero exactitud, después simplificación
 
-*Diapositivas 16 y 23.* La regla del producto aplicada repetidamente da:
+La regla del producto aplicada repetidamente da:
 
 $$
 P(x_1,\ldots,x_n)=\prod_{i=1}^{n}P(x_i\mid x_1,\ldots,x_{i-1}),
@@ -477,7 +475,7 @@ Para variables booleanas, una conjunta general necesita 7 parámetros libres. Es
 
 ## 11. Por qué una conjunta completa es difícil de almacenar y aprender
 
-*Diapositiva 17.* La explosión de filas afecta dos aspectos:
+La explosión de filas afecta dos aspectos:
 
 1. **Representar:** hay que guardar una probabilidad por cada asignación.
 2. **Estimar:** hacen falta datos suficientes para distinguir muchas combinaciones; algunas aparecerán pocas veces o nunca.
@@ -488,7 +486,7 @@ Si cada variable interactúa directamente con pocas otras, podemos estimar y alm
 
 ## 12. Redes bayesianas: grafo más tablas locales
 
-*Diapositivas 18–20 y 24–25.* Una red bayesiana discreta tiene dos componentes:
+Una red bayesiana discreta tiene dos componentes:
 
 1. Un **grafo dirigido acíclico**, o DAG, con un nodo por variable.
 2. Una distribución $P(X_i\mid\mathrm{Pa}(X_i))$ para cada nodo, representada por una **tabla de probabilidad condicional** o CPT.
@@ -503,7 +501,7 @@ $\mathrm{Pa}(X_i)$ es el conjunto de padres: los nodos con flechas que entran en
 - El grafo expresa supuestos de independencia condicional; no almacena los números.
 - Un DAG admite un orden topológico: los padres aparecen antes que sus hijos.
 
-La analogía con CSP de la diapositiva 24 es útil: ambos usan grafos para expresar relaciones locales. En un CSP una restricción permite o prohíbe combinaciones; aquí una CPT asigna probabilidades a los valores del hijo para cada configuración de padres.
+La analogía con CSP es útil: ambos usan grafos para expresar relaciones locales. En un CSP una restricción permite o prohíbe combinaciones; aquí una CPT asigna probabilidades a los valores del hijo para cada configuración de padres.
 
 ### Una CPT debe normalizar por configuración de padres
 
@@ -518,11 +516,11 @@ $$
 > [!note] Flechas y causalidad
 > [CS 188, §6.3 Bayesian Network Representation](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/representation.html) presenta el DAG y las CPT como una representación de la conjunta. Una interpretación causal es posible con supuestos adicionales; el grafo probabilístico por sí solo no demuestra causalidad. Observar $Y=y$ tampoco equivale automáticamente a intervenir y fijar $Y$.
 
-La referencia de la diapositiva 25 a un proceso «causal» con ruido debe leerse con esa salvedad. Las flechas tampoco obligan a que haya dependencia numérica: una CPT puede ignorar efectivamente un padre.
+Cuando se describe la red como un proceso «causal» con ruido, debe leerse con esa salvedad. Las flechas tampoco obligan a que haya dependencia numérica: una CPT puede ignorar efectivamente un padre.
 
 ## 13. De la regla de la cadena a la semántica de la red
 
-*Diapositivas 26–27.* Tomemos un orden topológico $X_1,\ldots,X_n$.
+Tomemos un orden topológico $X_1,\ldots,X_n$.
 
 **Paso 1.** Expandimos usando la regla de la cadena:
 
@@ -558,7 +556,7 @@ Como complemento de [CS 188, §6.4 Structure of Bayes Nets](https://inst.eecs.be
 
 ## 14. Ejemplo completo: robo, terremoto, alarma y llamadas
 
-*Diapositiva 13, retomada después de construir las definiciones.* Las cinco variables booleanas son:
+Las cinco variables booleanas son:
 
 | Variable | Significado |
 |---|---|
@@ -574,7 +572,7 @@ Como complemento de [CS 188, §6.4 Structure of Bayes Nets](https://inst.eecs.be
 
 El modelo admite falsas alarmas, fallas de detección y llamadas aun cuando no suena la alarma.
 
-### 14.1 Las tablas de la presentación
+### 14.1 Las tablas de probabilidad
 
 Las raíces tienen $P(+b)=0.001$ y $P(+e)=0.002$. Sus complementos son $P(-b)=0.999$ y $P(-e)=0.998$.
 
@@ -695,13 +693,13 @@ La probabilidad sube de **0.1 %** a aproximadamente **28.42 %**. Las llamadas ap
 
 **Cómo estudiarla:** observa primero las CPT. Después fija $J=+$ y $M=+$, consulta $B$ y revisa las filas compatibles y sus pesos. Selecciona una fila para ver el producto que construye ese mundo. Prueba luego observar $A=+$ y agregar $E=+$: el terremoto ofrece una explicación alternativa de la alarma.
 
-**Si no carga:** la conjunta se calcula multiplicando $P(B)P(E)P(A\mid B,E)P(J\mid A)P(M\mid A)$. Para consultar una variable se suman las filas compatibles con la evidencia y se normaliza. Ambas llamadas producen $P(+b\mid+j,+m)\approx0.28417$ bajo las tablas de la presentación.
+**Si no carga:** la conjunta se calcula multiplicando $P(B)P(E)P(A\mid B,E)P(J\mid A)P(M\mid A)$. Para consultar una variable se suman las filas compatibles con la evidencia y se normaliza. Ambas llamadas producen $P(+b\mid+j,+m)\approx0.28417$ bajo las tablas anteriores.
 
-## 15. Otros escenarios de la presentación: fuego y caries
+## 15. Otros escenarios: fuego y caries
 
 ### 15.1 Fuego, humo y alarma
 
-*Diapositiva 22.* La imagen muestra fuego, humo y un detector; no fija un DAG ni una CPT. Una **propuesta de modelado** es:
+Imaginemos una habitación con fuego, humo y un detector. La descripción del escenario no fija un DAG ni una CPT. Una **propuesta de modelado** es:
 
 ![Fuego, humo y alarma: dos modelos posibles](ia29-fuego-humo-alarma.svg)
 
@@ -719,7 +717,7 @@ Un modelo alternativo con $F\to H$ y $F\to A$ supone $H\perp A\mid F$. No son el
 
 ### 15.2 Caries, dolor y detección
 
-*Diapositiva 24.* Aquí sí se muestra el grafo:
+Un escenario con grafo explícito es el de un paciente dental:
 
 ![Caries: una causa común, dos observaciones](ia29-red-caries.svg)
 
@@ -731,11 +729,11 @@ $$
 P(C,T,K)=P(C)P(T\mid C)P(K\mid C),
 $$
 
-y el supuesto es $T\perp K\mid C$. Sin observar $C$, un dolor puede informar sobre caries y, por esa vía, sobre la detección. **Dos hijos de una causa común pueden estar relacionados aunque no tengan una flecha entre ellos.** La presentación no proporciona probabilidades para este ejemplo.
+y el supuesto es $T\perp K\mid C$. Sin observar $C$, un dolor puede informar sobre caries y, por esa vía, sobre la detección. **Dos hijos de una causa común pueden estar relacionados aunque no tengan una flecha entre ellos.** Este ejemplo no incluye probabilidades numéricas: solo ilustra la estructura.
 
 ## 16. Supuestos directos y consecuencias adicionales: cadena de cuatro nodos
 
-*Diapositiva 28.* El grafo es:
+El grafo es:
 
 ![Cadena de cuatro nodos: observar bloquea el camino](ia29-cadena-cuatro-nodos.svg)
 
@@ -768,7 +766,7 @@ La expresión final no depende de $x$. También $X\perp\{Z,W\}\mid Y$ y $Y\perp 
 
 ## 17. Cadena de tres nodos: conexión indirecta y bloqueo por evidencia
 
-*Diapositivas 29 y 31.* Consideremos $X\to Y\to Z$: presión baja → lluvia → tráfico.
+Consideremos $X\to Y\to Z$: presión baja → lluvia → tráfico.
 
 ![Presión → lluvia → tráfico](ia29-cadena-presion-lluvia-trafico.svg)
 
@@ -805,14 +803,14 @@ P(z\mid x,y)
 \end{aligned}
 $$
 
-Una vez conocida la lluvia, la presión baja ya no añade información sobre tráfico **en este modelo**. Esta es la cancelación que desarrolla la diapositiva 31.
+Una vez conocida la lluvia, la presión baja ya no añade información sobre tráfico **en este modelo**. Esta es la cancelación característica de las cadenas.
 
-> [!note] Dos factorizaciones en la diapositiva 31
-> Bajo el dibujo aparece $P(y)P(x\mid y)P(z\mid y)$, mientras que la demostración usa $P(x)P(y\mid x)P(z\mid y)$. Ambas son iguales porque $P(x)P(y\mid x)=P(y)P(x\mid y)$. La segunda sigue las flechas de la cadena; la primera también puede representarse con la bifurcación $X\leftarrow Y\to Z$. Comparten la independencia $X\perp Z\mid Y$, pero esa equivalencia probabilística no identifica la dirección causal del mundo.
+> [!note] Dos factorizaciones equivalentes
+> Para tres variables conectadas por $Y$ puede escribirse $P(y)P(x\mid y)P(z\mid y)$, mientras que la demostración anterior usa $P(x)P(y\mid x)P(z\mid y)$. Ambas son iguales porque $P(x)P(y\mid x)=P(y)P(x\mid y)$. La segunda sigue las flechas de la cadena; la primera también puede representarse con la bifurcación $X\leftarrow Y\to Z$. Comparten la independencia $X\perp Z\mid Y$, pero esa equivalencia probabilística no identifica la dirección causal del mundo.
 
 ## 18. D-separación: leer independencia mediante caminos
 
-*Diapositiva 30 y complemento para la 31.* La presentación propone estudiar tripletas, componerlas en casos mayores y obtener un criterio gráfico. [CS 188, §6.5 D-Separation](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/d-separation.html) desarrolla ese criterio: si la evidencia bloquea todos los caminos entre dos nodos, su independencia condicional está garantizada para cualquier distribución que factorice según el DAG. Si queda un camino activo, la estructura no garantiza independencia; los valores de las tablas todavía pueden producirla en casos particulares.
+Para decidir independencias en grafos grandes se estudian tripletas, se componen en casos mayores y se obtiene un criterio gráfico. [CS 188, §6.5 D-Separation](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/d-separation.html) desarrolla ese criterio: si la evidencia bloquea todos los caminos entre dos nodos, su independencia condicional está garantizada para cualquier distribución que factorice según el DAG. Si queda un camino activo, la estructura no garantiza independencia; los valores de las tablas todavía pueden producirla en casos particulares.
 
 ### 18.1 Las tres tripletas
 
@@ -830,7 +828,7 @@ En la cadena y la causa común, $X\perp Z\mid Y$. En el colisionador de tres nod
 
 **Ejemplo propio de efecto común:** dos fallas independientes $X$ y $Z$ hacen que un indicador se encienda cuando ocurre al menos una: $Y=X\lor Z$. Si el indicador está encendido y descubrimos que $X=0$, necesariamente $Z=1$. Si sabemos que $X=1$, $Z$ ya no es necesario para explicar el indicador. Condicionar cambió la relación entre las causas.
 
-En la red de alarma, $B\to A\leftarrow E$ tiene esta estructura. Con las CPT de la presentación:
+En la red de alarma, $B\to A\leftarrow E$ tiene esta estructura. Con las CPT de la red de alarma:
 
 $$
 P(+b\mid+a)\approx0.37355,
@@ -863,13 +861,13 @@ Un nodo puede ser colisionador en un camino y no serlo en otro: importa la orien
 
 <iframe src="independencia-d-separacion-interactiva.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
-**Cómo estudiarla:** en la cadena, compara los extremos sin evidencia y luego observa el nodo central. Cambia a efecto común y repite: observar el centro activa el camino. En el ejemplo con descendiente, observa solo $D$ para activar el colisionador. Los valores numéricos son ejemplos didácticos, no CPT adicionales de la presentación.
+**Cómo estudiarla:** en la cadena, compara los extremos sin evidencia y luego observa el nodo central. Cambia a efecto común y repite: observar el centro activa el camino. En el ejemplo con descendiente, observa solo $D$ para activar el colisionador. Los valores numéricos son ejemplos didácticos, no CPT adicionales de la red de alarma.
 
 **Si no carga:** observar el centro bloquea cadenas y causas comunes; observar un efecto común o alguno de sus descendientes puede activar un camino. La independencia se garantiza únicamente cuando todos los caminos entre los extremos quedan bloqueados.
 
 ## 19. Qué queda para la siguiente clase
 
-*Diapositiva 32.* La presentación anuncia cómo resolver consultas y realizar inferencia. La continuación se encuentra en [[2026-10-06 IA - Redes bayesianas|Redes bayesianas del 6 de octubre]].
+Queda por resolver cómo contestar consultas y realizar inferencia de forma eficiente. La continuación se encuentra en [[2026-10-06 IA - Redes bayesianas|Redes bayesianas del 6 de octubre]].
 
 Ya podemos construir y leer un modelo; después interesará evitar repetir cálculos al responder muchas consultas. El ejemplo de enumeración de esta nota muestra el procedimiento básico, pero no desarrolla eliminación de variables ni muestreo.
 
@@ -902,7 +900,7 @@ Ya podemos construir y leer un modelo; después interesará evitar repetir cálc
 ### Ejercicios con solución
 
 1. **Conjunta de temperatura y clima:** calcula $P(\mathrm{hot}\mid\mathrm{sun})$. **Solución:** $0.4/(0.4+0.2)=2/3$.
-2. **Independencia:** ¿las marginales $(0.5,0.5)$ y $(0.6,0.4)$ bastan para identificar la conjunta? **Solución:** no; las dos tablas de la diapositiva 14 tienen esas marginales y distinta dependencia.
+2. **Independencia:** ¿las marginales $(0.5,0.5)$ y $(0.6,0.4)$ bastan para identificar la conjunta? **Solución:** no; las dos tablas de la sección 8 tienen esas marginales y distinta dependencia.
 3. **Tamaño:** ¿cuántas filas tiene una conjunta de diez variables con tres valores cada una? **Solución:** $3^{10}=59\,049$, con $59\,048$ parámetros libres sin otras restricciones.
 4. **Alarma:** calcula $P(+a)$ sumando sobre las raíces. **Solución:** $0.001(0.002)(0.95)+0.001(0.998)(0.94)+0.999(0.002)(0.29)+0.999(0.998)(0.001)=0.002516442$.
 5. **Alarma:** ¿$J$ y $M$ son independientes dado $A$? **Solución:** sí bajo el DAG; $P(j,m\mid a)=P(j\mid a)P(m\mid a)$. Sin observar $A$, esa independencia no está garantizada.
@@ -920,41 +918,11 @@ Ya podemos construir y leer un modelo; después interesará evitar repetir cálc
 - [ ] Identifico consulta, evidencia y variables ocultas.
 - [ ] Explico por qué observar una cadena y observar un colisionador tienen efectos distintos.
 
-## Correspondencia con toda la presentación
-
-| Diapositivas | Contenido | Desarrollo en esta nota |
-|---|---|---|
-| 1–3 | Comentarios, portada y agenda | Introducción y §1; no se inventan respuestas de tarea |
-| 4–6 | Transición e incertidumbre | §1 |
-| 7 | Variables y dominios | §2 |
-| 8 | Distribuciones individuales | §3 |
-| 9 | Conjuntas y tamaño | §4 |
-| 10 | Marginales | §5; apoyo condicional en §6 |
-| 11–12 | Modelo, simplificación y consultas | §7 |
-| 13 | Red de alarma, grafo y todas las CPT | §14 |
-| 14 | Independencia y comparación de tablas | §8 |
-| 15 | Independencia condicional | §9 |
-| 16 | Regla de la cadena y simplificación | §10 |
-| 17 | Dificultad de representar y aprender | §11 |
-| 18–20 | Redes, tareas y semántica | §7 y §12 |
-| 21 | Independencia como propiedad de la distribución | §8–9 |
-| 22 | Fuego, humo y alarma | §15.1 |
-| 23 | Repetición de cadena e independencia | §10 |
-| 24 | Nodos, aristas y ejemplo de caries | §12 y §15.2 |
-| 25 | DAG y tablas condicionales | §12 |
-| 26 | Factorización y capacidad de representación | §13 |
-| 27 | Supuestos locales y adicionales | §13 |
-| 28 | Cadena de cuatro nodos | §16 |
-| 29 | Independencia: prueba y contraejemplo | §17 |
-| 30 | Introducción a d-separación | §18 |
-| 31 | Cadena presión–lluvia–tráfico y demostración | §17 |
-| 32 | Continuación con inferencia | §19 |
 
 ## Referencias y alcance
 
-- **Material de clase:** [[AI 13 introducción agentes probabilísticos.pdf|AI 13: introducción a agentes probabilísticos]], 32 diapositivas. La portada dice «Clase 13»; la fecha de esta nota sigue el registro del vault.
 - **Berkeley CS 188:** [textbook](https://inst.eecs.berkeley.edu/~cs188/textbook/), §§[6.1](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/probability.html), [6.2](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/inference.html), [6.3](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/representation.html), [6.4](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/structure.html) y [6.5](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/d-separation.html). El vínculo con decisiones se apoya en [§7.1](https://inst.eecs.berkeley.edu/~cs188/textbook/vpis/utilities.html). Consultado el 6 de octubre de 2026.
-- Las visualizaciones usan las tablas de la presentación para temperatura/clima y alarma. Sus controles exploran el modelo; el interpolador de dependencia y los modelos numéricos de tripletas son construcciones didácticas.
+- Las visualizaciones usan las tablas de temperatura/clima y de alarma desarrolladas en la nota. Sus controles exploran el modelo; el interpolador de dependencia y los modelos numéricos de tripletas son construcciones didácticas.
 - El texto de CS 188 se publica con licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Estas explicaciones son una elaboración de estudio, con atribución a los materiales señalados.
 
 ## Resumen después de clase

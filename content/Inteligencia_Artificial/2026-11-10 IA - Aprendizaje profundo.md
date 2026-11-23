@@ -10,7 +10,6 @@ aliases:
   - Redes neuronales profundas y transformers
   - Inteligencia artificial - 10 de noviembre
 referencias:
-  - "[[AI 23 Aprendizaje profundo.pdf]]"
   - https://arxiv.org/abs/1706.03762
   - https://arxiv.org/abs/2203.02155
 tags:
@@ -25,44 +24,49 @@ tags:
 
 # Aprendizaje profundo: de aprender representaciones a generar lenguaje
 
-**Martes 10 de noviembre de 2026.** Apunte basado en las **39 diapositivas** de «Clase 23: aprendizaje profundo». El plan de la materia llama a esta sesión «Redes neuronales»; el PDF amplía el tema a modelos de lenguaje. Su fecha de creación también corresponde al 10 de noviembre.
+**Martes 10 de noviembre de 2026.** Apunte **autocontenido** sobre aprendizaje profundo: cada figura se describe y se redibuja, y cada cálculo se desarrolla completo. El plan de la materia llama a esta sesión «Redes neuronales»; el tema se amplía a modelos de lenguaje.
 
 > [!summary] La idea que conecta toda la clase
 > Una red profunda transforma sus entradas mediante varias etapas aprendidas. La retropropagación calcula cómo cambiar cada parámetro para reducir un error. En un modelo de lenguaje, estas transformaciones convierten tokens en representaciones contextuales y, finalmente, en probabilidades para el siguiente token.
 
-**Cómo estudiar el apunte.** Lee primero la parte I, que construye la intuición sin depender de las ecuaciones. Después recorre la parte II para formalizar cada mecanismo. Las derivaciones, los ejemplos numéricos y los recursos interactivos son **complementos didácticos**, no transcripciones de resultados experimentales de las diapositivas. Los laboratorios funcionan sin conexión y están incrustados junto al concepto correspondiente.
+**Cómo estudiar el apunte.** Lee primero la parte I, que construye la intuición sin depender de las ecuaciones. Después recorre la parte II para formalizar cada mecanismo. Las derivaciones, los ejemplos numéricos y los recursos interactivos son **complementos didácticos**, no resultados experimentales. Los laboratorios funcionan sin conexión y están incrustados junto al concepto correspondiente.
 
-| Recorrido del PDF | Diapositivas | Dónde se desarrolla |
-|---|---:|---|
-| Softmax, profundidad y ReLU | 3–8 | 1 y 5–6 |
-| Grafos computacionales, forward y backward | 9–12 | 2 y 7–8 |
-| Evaluación, sesgo y varianza | 13–14 | 3 y 9 |
-| Tokens, embeddings y autorregresión | 15–26 | 4 y 10–11 |
-| Autoatención y transformer | 27–32 | 4 y 12–13 |
-| Autosupervisión, transferencia, ajuste y RLHF | 33–38 | 4 y 14 |
-| Presentación y cierre | 1–2, 39 | Contexto de la sesión |
+| Recorrido | Dónde se desarrolla |
+|---|---|
+| Softmax, profundidad y ReLU | 1 y 5–6 |
+| Grafos computacionales, forward y backward | 2 y 7–8 |
+| Evaluación, sesgo y varianza | 3 y 9 |
+| Tokens, embeddings y autorregresión | 4 y 10–11 |
+| Autoatención y transformer | 4 y 12–13 |
+| Autosupervisión, transferencia, ajuste y RLHF | 4 y 14 |
 
 ## Parte I. Construir la intuición
 
 ## 1. Profundidad: aprender a describir antes de decidir
 
-*Diapositivas 3–8.* Imagina que queremos reconocer un objeto en una imagen. Una decisión directa a partir de todos los píxeles puede ser difícil. Podemos construir representaciones intermedias: combinaciones locales de píxeles, patrones, partes y, finalmente, evidencia para una clase. **Cada etapa vuelve a expresar la información de una forma útil para la siguiente.**
+Imagina que queremos reconocer un objeto en una imagen. Una decisión directa a partir de todos los píxeles puede ser difícil. Podemos construir representaciones intermedias: combinaciones locales de píxeles, patrones, partes y, finalmente, evidencia para una clase. **Cada etapa vuelve a expresar la información de una forma útil para la siguiente.**
 
 ![Profundidad: transformar la representación antes de decidir](ia23-representaciones.svg)
 
-En una red profunda no tenemos que escribir manualmente todos esos detectores: el entrenamiento ajusta las transformaciones. La jerarquía de bordes, formas y objetos de la diapositiva 8 es una **intuición ilustrativa**; una capa real no tiene obligatoriamente una interpretación humana tan limpia.
+**Ejemplo de cadena de etapas para clasificar imágenes.** Cuatro bloques consecutivos: detección de líneas y esquinas (Linear + ReLU), detección de formas (Linear + ReLU), detección de objetos (Linear + ReLU) y detección de clase (Linear + Softmax); a la salida se compara con el objetivo mediante una pérdida. La entrada son los datos y el objetivo es la etiqueta. Una red profunda general es simplemente una cadena más larga de pares Linear–nodo no lineal (cuatro en el esquema típico) seguida de la pérdida.
+
+**Dos modelos de referencia previos.** (a) Regresión logística multinomial: Linear → Softmax → entropía cruzada, con tres grupos de puntos (rojo, verde y azul) separados por tres fronteras lineales que se encuentran en un punto. (b) Red de dos capas: Linear → Sigmoide → Linear → Softmax → entropía cruzada, aplicada a cuatro grupos de puntos en configuración tipo XOR: azules en las esquinas superior izquierda (cerca de $(-5,5)$) e inferior derecha (cerca de $(5,-5)$) y rojos en la superior derecha $(5,5)$ e inferior izquierda $(-5,-5)$; ninguna recta los separa, pero la capa oculta sí lo permite.
+
+En una red profunda no tenemos que escribir manualmente todos esos detectores: el entrenamiento ajusta las transformaciones. La jerarquía de bordes, formas y objetos es una **intuición ilustrativa**; una capa real no tiene obligatoriamente una interpretación humana tan limpia.
 
 Una capa realiza una combinación ponderada de sus entradas y aplica una activación. La combinación decide qué información reunir; la activación permite respuestas no lineales. Si solo encadenáramos transformaciones afines, muchas capas se podrían reducir a una sola. Tener más operaciones no bastaría para aumentar ese tipo de capacidad expresiva.
 
+**Propiedades de ReLU y softplus.** $f_{\mathrm{relu}}(x)=\max(0,x)$ y $f_{\mathrm{sp}}(x)=\log(1+e^x)$. La gráfica de ReLU es cero para $x<0$ y la recta $y=x$ para $x>0$ (alcanza 10 en $x=10$); softplus la suaviza cerca de cero. ReLU es de las más usadas, sus derivadas no desaparecen en la región positiva, algunas neuronas pueden «morir» y técnicamente no es diferenciable en 0.
+
 **ReLU como compuerta.** Deja pasar una entrada positiva y convierte una negativa en cero. En su región positiva no comprime progresivamente la señal como una sigmoide saturada. Sin embargo, una unidad que permanezca en la región negativa puede dejar de recibir gradiente por esa ruta: es la intuición de una neurona «muerta».
 
-**Profundidad y anchura.** La profundidad cuenta etapas sucesivas; la anchura, unidades o características dentro de una etapa. No hay un número universal de capas que garantice buen aprendizaje. La comparación histórica de la diapositiva 5 es contexto, no una regla que prohíba redes profundas antes de cierta fecha. Una red con capas ocultas no lineales suele producir un problema de optimización no convexo.
+**Profundidad y anchura.** La profundidad cuenta etapas sucesivas; la anchura, unidades o características dentro de una etapa. No hay un número universal de capas que garantice buen aprendizaje. Hace unas dos décadas se solía añadir solo una capa sobre el modelo de regresión logística, con el foco puesto en optimización convexa y con pocos datos. Esa comparación histórica entre redes poco profundas y profundas es contexto, no una regla que prohíba redes profundas antes de cierta fecha. Una red con capas ocultas no lineales suele producir un problema de optimización no convexo.
 
 **Conexión previa:** [[2026-10-27 IA - Aprendizaje supervisado y clasificacion|clasificación, XOR y redes neuronales]]. La capa oculta cambia la representación para que una decisión antes difícil se vuelva más sencilla.
 
 ## 2. Aprender: predecir, medir el error y repartir responsabilidades
 
-*Diapositivas 9–12.* Entrenar una red tiene tres acciones distintas:
+Entrenar una red tiene tres acciones distintas:
 
 1. **Forward:** pasar la entrada por las operaciones hasta obtener una predicción y una pérdida.
 2. **Backward o retropropagación:** recorrer las dependencias en sentido inverso para saber cuánto influye cada parámetro en la pérdida.
@@ -74,11 +78,13 @@ La pérdida es un número que resume qué tan mala fue una predicción según el
 
 El grafo computacional registra operaciones y dependencias. Si una variable alimenta dos caminos que llegan a la pérdida, su influencia total reúne las contribuciones de ambos. No se «manda hacia atrás la respuesta correcta»: se propaga sensibilidad de la pérdida mediante la regla de la cadena.
 
-La diapositiva 11 habla de composición secuencial, recursiva y en red. La misma idea se aplica a cadenas, bifurcaciones y parámetros compartidos. Una recurrencia se puede desplegar en el tiempo para formar el grafo que se diferencia.
+Cada módulo de la red necesita tres funciones: **forward** (calcula $f(\mathbf x)$), **backward** (recibe el gradiente de la salida y devuelve el de la entrada) y su **derivada**, el Jacobiano $J_{\mathbf x}f(\mathbf x)$. Gráficamente, un nodo tiene una flecha de entrada y una de salida en el pase hacia adelante y las mismas con sentido contrario en el pase hacia atrás. En el grafo computacional, nodos de datos y de parámetros (varias entradas por cada operación) alimentan una cadena de operaciones que se bifurca y vuelve a unirse hasta una única pérdida. Para una capa $f$ con entrada $\mathbf x$ y parámetros $\theta$, el backward produce la derivada de la pérdida respecto de la salida de la capa, respecto de sus parámetros ($dL/d\theta$) y respecto de su entrada.
+
+La composición de funciones puede ser secuencial, recursiva o en red. La misma idea se aplica a cadenas, bifurcaciones y parámetros compartidos. Una recurrencia se puede desplegar en el tiempo para formar el grafo que se diferencia.
 
 ## 3. Una pérdida baja no basta: evaluar fuera del entrenamiento
 
-*Diapositivas 13–14.* Memorizar los ejemplos observados no garantiza acertar en ejemplos nuevos. Distinguimos tres conjuntos:
+Memorizar los ejemplos observados no garantiza acertar en ejemplos nuevos. Distinguimos tres conjuntos:
 
 | Conjunto | Para qué se usa |
 |---|---|
@@ -88,25 +94,35 @@ La diapositiva 11 habla de composición secuencial, recursiva y en red. La misma
 
 **Subajuste:** el modelo o el entrenamiento no capturan la estructura relevante. **Sobreajuste:** el modelo se adapta a particularidades del conjunto de entrenamiento que no se sostienen en datos nuevos. Más capacidad puede reducir el error de entrenamiento y aumentar la sensibilidad a qué muestras se usaron.
 
-La curva en U de la diapositiva 14 ilustra un compromiso clásico entre sesgo y varianza; no es una ley universal que deba aparecer en toda red profunda. Una brecha grande entre entrenamiento y validación es una señal para investigar, no un diagnóstico suficiente por sí sola.
+La curva en U del error de validación frente a la complejidad ilustra un compromiso clásico entre sesgo y varianza; no es una ley universal que deba aparecer en toda red profunda. Una brecha grande entre entrenamiento y validación es una señal para investigar, no un diagnóstico suficiente por sí sola.
 
 En clasificación, acertar mucho tampoco cuenta toda la historia: si casi todos los ejemplos son negativos, predecir siempre «negativo» puede dar una exactitud alta y detectar cero positivos. Necesitamos distinguir falsos positivos y falsos negativos; los formalizamos en la sección 9.
 
+El diagnóstico de sesgo y varianza se suele ilustrar con dos gráficas. En la primera, el error de predicción (eje vertical, de 0 a 1.2) frente a la complejidad del modelo (grados de libertad, de 0 a 35): decenas de curvas azules de entrenamiento descienden de forma continua y su promedio llega cerca de 0.1, mientras que las curvas rojas de prueba descienden primero, alcanzan un mínimo cercano a 0.45–0.5 hacia 10–15 grados de libertad y luego suben. A la izquierda hay alto sesgo y baja varianza; a la derecha, bajo sesgo y alta varianza. En la segunda gráfica, flexibilidad (baja a alta) frente a interpretabilidad (baja a alta): de más interpretables y menos flexibles a menos interpretables y más flexibles aparecen selección de subconjuntos y lasso, mínimos cuadrados, modelos aditivos generalizados y árboles, bagging y boosting, máquinas de vectores de soporte y, por último, aprendizaje profundo.
+
 ## 4. Del texto a la predicción del siguiente token
 
-*Diapositivas 15–38.* El salto a los modelos de lenguaje mantiene el esquema de clasificación: hay una entrada, una representación aprendida y una distribución sobre posibles salidas. La clase que se predice es ahora un **token del vocabulario**.
+El salto a los modelos de lenguaje mantiene el esquema de clasificación: hay una entrada, una representación aprendida y una distribución sobre posibles salidas. La clase que se predice es ahora un **token del vocabulario**.
 
 ### 4.1 Tokens y embeddings
 
-Un token puede ser una palabra, un fragmento, un signo o una secuencia de bytes, según el tokenizador. El texto se transforma en identificadores discretos. Sus números identifican elementos del vocabulario: no expresan semejanza ni orden semántico.
+Un token puede ser una palabra, un fragmento, un signo o una secuencia de bytes, según el tokenizador. Como ejemplo con un tokenizador de la familia GPT-3.5/GPT-4, el texto en inglés «Many words map to one token, but some don't: indivisible.» más «Unicode characters like emojis may be split into many tokens containing the underlying bytes:» (seguido de varios símbolos de bytes), más «Sequences of characters commonly found next to each other may be grouped together: 1234567890» (252 caracteres) se convierte en **57 tokens**: la mayoría de las palabras comunes (con su espacio previo) son un token, las palabras raras como «indivisible» se parten en fragmentos, los símbolos de bytes del emoji se dividen en varios tokens y los dígitos de «1234567890» se agrupan en trozos. Su lista de identificadores es:
+
+`[8607, 4339, 2472, 311, 832, 4037, 11, 719, 1063, 1541, 956, 25, 3687, 23936, 382, 35020, 5885, 1093, 100166, 1253, 387, 6859, 1139, 1690, 11460, 8649, 279, 16940, 5943, 25, 11410, 97, 248, 9468, 237, 122, 271, 1542, 45045, 315, 5885, 17037, 1766, 1828, 311, 1855, 1023, 1253, 387, 41141, 3871, 25, 220, 4513, 10961, 16474, 15]`
+
+Nótese que una misma palabra con el mismo espacio previo repite el identificador (por ejemplo 311, 5885, 1253 y 387 aparecen más de una vez) y que un emoji puede ocupar varios identificadores. El texto se transforma en identificadores discretos. Sus números identifican elementos del vocabulario: no expresan semejanza ni orden semántico.
+
+**Flujo completo del ejemplo.** Entrada «The», « dog», « chased», « the» → tokenizar → identificadores one-hot $[791]$, $[5679]$, $[62920]$, $[279]$ → *embed* → un vector por token → la red *predice* un vector de salida → *un-embed* → identificador $[5041]$ → *un-tokenize* → « ball».
 
 Un **embedding** sustituye cada identificador por un vector aprendido. La tabla inicial asocia el mismo vector al mismo token; las capas siguientes generan representaciones que dependen del contexto. Así, las representaciones de «banco» pueden diferir entre una conversación sobre dinero y una sobre sentarse.
+
+Dos figuras ilustran esto. En un mapa bidimensional de embeddings, las palabras de transporte y lugares (train, bus, car, college, school, work) quedan juntas en la zona superior derecha; las preposiciones (on, in, with) cerca de ellas; los verbos de movimiento (walk, swim, run, go) en el centro; y los pronombres y funcionales (I, we, they, the, by, to) en la zona inferior izquierda. En un mapa de calor de vectores de características (valores de 0 a 1), las filas de «sea» y «ocean» tienen patrones casi iguales, igual que «football» y «soccer», y «I» y «we», mientras que las de grupos distintos difieren. La analogía clásica de Mikolov et al. (2013) es $\text{king}-\text{man}+\text{woman}\approx\text{queen}$: restar «man» a «king» da un vector de «realeza», que sumado a «woman» llega cerca de «queen».
 
 Los dibujos en dos dimensiones son proyecciones de un espacio de mayor dimensión. Cercanía y analogías como «rey − hombre + mujer ≈ reina» ilustran relaciones que pueden aparecer; no son identidades exactas ni garantizan que cada coordenada tenga un significado interpretable.
 
 ### 4.2 Autorregresión: completar y volver a completar
 
-Para continuar «El perro persigue la», el modelo asigna probabilidades a los posibles siguientes tokens. Un procedimiento de decodificación elige uno, por ejemplo «pelota», lo añade al contexto y repite. El modelo no necesita producir una oración completa en una sola decisión.
+Para continuar «El perro persigue la», el modelo asigna probabilidades a los posibles siguientes tokens. Un procedimiento de decodificación elige uno, por ejemplo «pelota», lo añade al contexto y repite. El modelo no necesita producir una oración completa en una sola decisión. Esquemáticamente, la misma red se aplica en cuatro pasos sucesivos: con «The» (y relleno) predice «dog»; con «The dog» predice «chased»; con «The dog chased» predice «the»; con «The dog chased the» predice «ball»; en cada paso la salida se concatena al contexto y se vuelve a alimentar.
 
 En generación ordinaria se reutilizan los parámetros aprendidos. **Agregar un token al contexto no equivale a volver a entrenar la red.** En entrenamiento, el texto observado proporciona muchos pares «prefijo → siguiente token».
 
@@ -114,21 +130,25 @@ En generación ordinaria se reutilizan los parámetros aprendidos. **Agregar un 
 
 Una posición construye una consulta: qué información busca. Otras posiciones aportan claves para estimar compatibilidad y valores con información que mezclar. Los pesos de atención determinan cuánto contribuye cada valor a la representación resultante.
 
-En «El perro mordió el hueso porque estaba hambriento», el contexto puede ayudar a relacionar «hambriento» con «perro». Es una motivación lingüística, no una garantía de que una cabeza concreta aprenda exactamente esa regla. Varias cabezas permiten mezclas distintas; sus funciones no se asignan manualmente.
+En «The dog chewed the bone because it was hungry», el contexto puede ayudar a relacionar «it» con «dog» (la atención de «it» se concentra sobre «dog» y, en menor grado, sobre «chewed» y «hungry»). Si la oración termina en «delicious», la atención de «it» se desplaza hacia «bone». En la versión en español, «El perro mordió el hueso porque estaba hambriento», «hambriento» se relaciona con «perro». Es una motivación lingüística, no una garantía de que una cabeza concreta aprenda exactamente esa regla. Varias cabezas permiten mezclas distintas; sus funciones no se asignan manualmente. Por ejemplo, una cabeza puede atender a la palabra previa y otra a referencias de pronombres.
+
+Una figura típica de autoatención con seis entradas $x_1,\ldots,x_6$ muestra que la última posición ($x_6$) no condiciona por igual en todas las anteriores: con peso uniforme todas las flechas son iguales; con atención, solo algunas posiciones (por ejemplo $x_2$, $x_3$ y $x_5$) pesan más. En el esquema de una cabeza, cada entrada $x_i$ pasa por tres perceptrones multicapa que producen $k_i$, $q_i$ y $v_i$; los puntajes $s_i$ se forman con productos punto de consultas y claves; «normalizar y softmax» produce los pesos $a_i$; y la suma ponderada de los valores da la salida $x'$. La versión de varias cabezas replica ese bloque con parámetros propios, concatena las salidas $z_1,z_2,z_3$ y las pasa por un MLP.
 
 ### 4.4 Transformer y etapas de aprendizaje
 
-El transformer combina atención, redes por posición, normalización y conexiones residuales. Un modelo causal impide que cada posición vea tokens futuros al predecir el siguiente. La sección 13 muestra un bloque simplificado y hace explícita esa restricción.
+El transformer combina atención, redes por posición, normalización y conexiones residuales. Un bloque transformer apila, de entrada a salida: normalización (LayerNorm), atención multicabeza, otra normalización y un MLP; el modelo completo repite $N$ bloques entre las etapas Tokenizar → Embed (entrada «The dog chased the») y Un-embed → Un-tokenize (salida «ball»). Un modelo causal impide que cada posición vea tokens futuros al predecir el siguiente. La sección 13 muestra un bloque simplificado y hace explícita esa restricción.
 
 ![Etapas de aprendizaje de un modelo de lenguaje](ia23-etapas-entrenamiento.svg)
 
-**Autosupervisión:** las etiquetas se obtienen de los propios datos, por ejemplo ocultando qué token viene después. **Transferencia:** reutilizar lo aprendido para otra tarea. **Ajuste supervisado con instrucciones:** aprender de pares de consulta y respuesta deseada. **RLHF:** una etapa adicional posible que utiliza retroalimentación humana para orientar el comportamiento mediante una señal de recompensa. El ajuste con instrucciones y RLHF son procesos distinguibles; la diapositiva 37 los presenta juntos.
+Como ilustración de transferencia, un mismo modelo preentrenado procesa un texto y puede responder a la tarea 1 (predecir la siguiente palabra) o a la tarea 2 (predecir el sentimiento) cambiando solo el cabezal final. Otro ejemplo de autosupervisión en imágenes: se oculta un recuadro de una fachada (aparece en blanco) y la red lo rellena con contenido plausible a partir del contexto.
+
+**Autosupervisión:** las etiquetas se obtienen de los propios datos, por ejemplo ocultando qué token viene después. **Transferencia:** reutilizar lo aprendido para otra tarea. **Ajuste supervisado con instrucciones:** aprender de pares de consulta y respuesta deseada. **RLHF:** una etapa adicional posible que utiliza retroalimentación humana para orientar el comportamiento mediante una señal de recompensa. El ajuste con instrucciones y RLHF son procesos distinguibles, aunque a menudo se presentan juntos.
 
 ## Parte II. Formalización matemática
 
 ## 5. Una red profunda como composición
 
-*Diapositivas 4–6 y 9–12; notación y derivación complementarias.* Para una observación usamos vectores columna. Sea $d_0$ la dimensión de entrada y $d_l$ la anchura de la capa $l$:
+*Notación y derivación complementarias.* Para una observación usamos vectores columna. Sea $d_0$ la dimensión de entrada y $d_l$ la anchura de la capa $l$:
 
 $$
 \mathbf a^{(0)}=\mathbf x\in\mathbb R^{d_0},\qquad
@@ -152,7 +172,7 @@ La composición sigue siendo afín. Con activaciones no lineales podemos constru
 
 ### 5.1 ReLU y softplus
 
-La diapositiva 7 muestra ambas:
+Estas son las dos activaciones más comunes:
 
 $$
 \operatorname{ReLU}(z)=\max(0,z),\qquad
@@ -171,7 +191,7 @@ ReLU evita la saturación en la región positiva, pero **no garantiza** que el g
 
 ## 6. Softmax y entropía cruzada: de puntajes a una pérdida
 
-*Diapositiva 3.* Para $K$ clases excluyentes, la última capa genera puntajes o *logits* $\mathbf z\in\mathbb R^K$:
+Para $K$ clases excluyentes, la última capa genera puntajes o *logits* $\mathbf z\in\mathbb R^K$:
 
 $$
 p_k=\operatorname{softmax}(\mathbf z)_k
@@ -212,7 +232,7 @@ Para $n$ ejemplos, un objetivo usual es $J(\theta)=\frac1n\sum_i\ell_i(\theta)+\
 
 ## 7. Retropropagación: aplicar la regla de la cadena eficientemente
 
-*Diapositivas 9–12; derivación complementaria.* En una composición escalar $u=f(v)$, el gradiente que llega a $v$ es:
+*Derivación complementaria.* En una composición escalar $u=f(v)$, el gradiente que llega a $v$ es:
 
 $$
 \frac{\partial\ell}{\partial v}
@@ -264,7 +284,7 @@ Todos los gradientes de un paso se calculan con los mismos parámetros anteriore
 
 ## 8. Un ejemplo completo: forward, backward y una actualización
 
-**Ejemplo didáctico escalar con salida binaria**, elegido para poder revisar todas las cuentas. No es el experimento de una diapositiva. Usamos una unidad oculta ReLU y una sigmoide de salida:
+**Ejemplo didáctico escalar con salida binaria**, elegido para poder revisar todas las cuentas. Usamos una unidad oculta ReLU y una sigmoide de salida:
 
 $$
 z_1=w_1x+b_1,\quad h=\operatorname{ReLU}(z_1),\quad
@@ -321,7 +341,7 @@ El nuevo forward da $p'\approx0.3976647$ y $\ell'\approx0.9221461$. La pérdida 
 
 ## 9. Evaluación: matriz de confusión, sesgo y varianza
 
-*Diapositivas 13–14.* Fijemos cuál clase llamamos positiva:
+Fijemos cuál clase llamamos positiva:
 
 | Real / Predicha | Negativa | Positiva |
 |---|---:|---:|
@@ -342,6 +362,8 @@ $$
 
 «Precisión» traduce aquí *precision*, no *accuracy*. La tasa de falsos positivos es $FP/(TN+FP)$ y la de falsos negativos es $FN/(TP+FN)$. Si un denominador es cero, hay que explicitar la convención usada para reportar esa métrica.
 
+La matriz de confusión tiene como filas la clase real (0, 1) y como columnas la predicha (0, 1): $TN$ y $TP$ son los aciertos (diagonal), $FP$ es el error tipo I y $FN$ el error tipo II. A su lado se leen: especificidad $=TN/(TN+FP)$ (fila real 0), recall o sensibilidad $=TP/(TP+FN)$ (fila real 1), precisión $=TP/(TP+FP)$ (columna predicha 1) y tasa negativa (valor predictivo negativo) $=TN/(FN+TN)$ (columna predicha 0).
+
 **Ejemplo:** $TP=8$, $FP=2$, $FN=4$, $TN=86$. Exactitud $=94\%$, precisión $=80\%$, recall $\approx66.7\%$, especificidad $\approx97.7\%$ y $F_1\approx72.7\%$. Una exactitud alta convive con perder un tercio de los positivos. Cambiar el umbral puede cambiar estos valores sin volver a entrenar la red.
 
 ### 9.1 Una formalización del compromiso sesgo-varianza
@@ -359,7 +381,7 @@ El sesgo mide error sistemático del predictor promedio; la varianza, cuánto ca
 
 ## 10. Embeddings: de identificadores a vectores
 
-*Diapositivas 18–24; notación complementaria.* Sea $V$ el tamaño del vocabulario y $d$ la dimensión del embedding. Para el identificador $t_i$, definimos una tabla aprendida $E\in\mathbb R^{V\times d}$:
+*Notación complementaria.* Sea $V$ el tamaño del vocabulario y $d$ la dimensión del embedding. Para el identificador $t_i$, definimos una tabla aprendida $E\in\mathbb R^{V\times d}$:
 
 $$
 \mathbf e_i=E_{t_i,:},\qquad
@@ -379,7 +401,7 @@ Es una medida geométrica, no una probabilidad de que dos palabras signifiquen l
 
 ## 11. Autorregresión y objetivo autosupervisado
 
-*Diapositivas 25–26 y 33–36.* La regla de la cadena de la probabilidad permite factorizar una secuencia:
+La regla de la cadena de la probabilidad permite factorizar una secuencia:
 
 $$
 \boxed{p_\theta(t_1,\ldots,t_T)=\prod_{i=1}^T p_\theta(t_i\mid t_{<i}).}
@@ -407,7 +429,7 @@ Podemos elegir el máximo de la distribución (*greedy*) o muestrear. Con temper
 
 ## 12. Autoatención: consultas, claves, valores y máscara causal
 
-*Diapositivas 27–30; ecuaciones complementarias.* Con $H\in\mathbb R^{T\times d}$ y una cabeza:
+*Ecuaciones complementarias.* Con $H\in\mathbb R^{T\times d}$ y una cabeza:
 
 $$
 Q=HW_Q,\qquad K=HW_K,\qquad V_{\!a}=HW_V,
@@ -453,7 +475,7 @@ Con $v_1=(1,0)$ y $v_2=(0,1)$, la salida es $o\approx(0.6698,0.3302)$. Aunque $k
 
 ## 13. Un bloque transformer causal
 
-*Diapositivas 31–32.* Este esquema didáctico muestra una variante **pre-LayerNorm** de un modelo solo decodificador. Omite dropout. Es coherente con el orden de normalización de la figura de la diapositiva 31; no intenta representar todas las variantes de transformer.
+Este esquema didáctico muestra una variante **pre-LayerNorm** de un modelo solo decodificador. Omite dropout. No intenta representar todas las variantes de transformer.
 
 ![Transformer causal con bloque pre-LayerNorm simplificado](ia23-transformer-causal.svg)
 
@@ -475,18 +497,18 @@ Las sumas residuales conservan un camino directo para la información y el gradi
 
 ## 14. Preentrenamiento, transferencia, instrucciones y RLHF
 
-*Diapositivas 33–38.* Son decisiones sobre datos y objetivos de aprendizaje, no nombres de capas:
+Son decisiones sobre datos y objetivos de aprendizaje, no nombres de capas:
 
 | Etapa | Señal de aprendizaje | Qué se ajusta |
 |---|---|---|
-| Preentrenamiento autosupervisado | Objetivos derivados de datos, como siguiente token | Representaciones y parámetros del modelo |
+| Preentrenamiento autosupervisado | Objetivos derivados de datos, como predecir la siguiente palabra, la palabra faltante o si dos imágenes están relacionadas | Representaciones y parámetros del modelo |
 | Transferencia a otra tarea | Etiquetas u objetivos de la nueva tarea | Una cabeza nueva, parte del modelo o todo el modelo |
 | Ajuste supervisado con instrucciones, SFT | Consulta y respuesta deseada | Probabilidad de respuestas de demostración |
 | RLHF, cuando se usa | Recompensa relacionada con preferencias humanas | Política generadora de respuestas |
 
 Para SFT, una pérdida usual suma entropías cruzadas sobre los tokens de la respuesta $y$, condicionados por la consulta $x$ y la respuesta previa. Puede enmascararse la consulta para que solo los tokens de respuesta contribuyan a la pérdida.
 
-**RLHF como MDP**, siguiendo la simplificación de la diapositiva 38:
+**RLHF como MDP**, en una formulación simplificada:
 
 $$
 s_t=(\text{consulta},t_1,\ldots,t_{t-1}),\qquad
@@ -497,9 +519,9 @@ $$
 
 La transición concatena un token; un objetivo idealizado es $\max_\theta\mathbb E_{\pi_\theta}[\sum_t\gamma^tr_t]$. La recompensa puede llegar al final de la respuesta; no hace falta una calificación humana para cada token generado.
 
-La diapositiva usa calificaciones $+1/-1$ como simplificación. En el procedimiento de InstructGPT se distinguen demostraciones supervisadas, comparaciones de respuestas para entrenar un modelo de recompensa y optimización posterior de la política. **SFT no requiere por sí mismo aprendizaje por refuerzo.** [Ouyang et al., *Training language models to follow instructions with human feedback*](https://arxiv.org/abs/2203.02155).
+Una simplificación común usa calificaciones $+1/-1$ (los humanos califican la respuesta con $+1$ o $-1$). En el procedimiento de InstructGPT se distinguen demostraciones supervisadas, comparaciones de respuestas para entrenar un modelo de recompensa y optimización posterior de la política. **SFT no requiere por sí mismo aprendizaje por refuerzo.** [Ouyang et al., *Training language models to follow instructions with human feedback*](https://arxiv.org/abs/2203.02155).
 
-El dato de población de la UNAM de la diapositiva 37 sirve como ejemplo de formato de respuesta; no lo tomamos como una cifra vigente ni como contenido factual que deba memorizarse.
+Ejemplo de las dos tareas con la consulta «¿Cuál es la población de la UNAM?». Tarea 1 (predecir la siguiente palabra): una continuación posible es «Esa pregunta siempre me ha fascinado», plausible como texto pero inútil. Tarea 2 (generar texto útil): «Son 356,530 según Wikipedia». El ajuste se hace con ejemplos útiles de conversaciones humanas. Este ejemplo de consulta y respuesta sirve para ilustrar el formato de las respuestas; no debe tomarse como una cifra vigente ni como contenido factual que deba memorizarse.
 
 **Conexión previa:** [[2026-11-05 IA - Aprendizaje por refuerzo II|políticas, recompensas y aproximación de funciones]]. En lenguaje, la política elige tokens y la red comparte parámetros entre muchísimos prefijos.
 
@@ -555,7 +577,6 @@ El dato de población de la UNAM de la diapositiva 37 sirve como ejemplo de form
 
 ## Material y fuentes
 
-- **Fuente principal:** [[AI 23 Aprendizaje profundo.pdf|presentación de la clase, 39 diapositivas]]. Las referencias numéricas del apunte corresponden a páginas del PDF.
 - **Ampliación de atención y arquitectura:** Vaswani et al. (2017), [*Attention Is All You Need*](https://arxiv.org/abs/1706.03762). Se distingue su arquitectura original del bloque causal pre-LN ilustrado aquí.
 - **Ampliación de SFT y RLHF:** Ouyang et al. (2022), [*Training language models to follow instructions with human feedback*](https://arxiv.org/abs/2203.02155).
 - Los cuatro diagramas y las tres animaciones son elaboraciones para este apunte. Los números de los laboratorios son ejemplos controlados, no mediciones de modelos comerciales.

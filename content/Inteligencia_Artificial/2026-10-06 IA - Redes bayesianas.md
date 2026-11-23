@@ -16,7 +16,6 @@ conceptos:
   - Explicación alternativa
   - Manto de Markov
 referencias:
-  - "[[AI 14 Redes Bayesianas independencia.pdf]]"
   - "[[Artificial_inteliigence-A_modern_approach.pdf]]"
   - "https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/d-separation.html"
   - "https://ocw.mit.edu/courses/6-034-artificial-intelligence-fall-2010/resources/readings/"
@@ -35,27 +34,26 @@ tags:
 
 Continuación de [[2026-09-29 IA - Agentes-probabilisticos|la introducción a agentes probabilísticos]]. El eje de esta clase es **leer las independencias que garantiza una estructura de red bayesiana**. Las probabilidades numéricas ayudan a entender las reglas; la inferencia general queda como puente hacia la siguiente sesión.
 
-La presentación se titula «Clase 16: redes Bayesianas independencia», aunque el archivo se llama «AI 14». Se conserva la fecha del apunte existente, **6 de octubre**; el índice distingue la planeación del curso del material desarrollado.
+Esta nota es autocontenida: cada grafo se dibuja y cada tabla de probabilidad se reproduce completa, de modo que los ejemplos pueden seguirse sin consultar otro material.
 
-![[AI 14 Redes Bayesianas independencia.pdf]]
 
-## Ruta de estudio y relación con las diapositivas
+## Ruta de estudio
 
-| Paso | Idea que debemos dominar | Diapositivas | Sección |
-|---|---|---|---|
-| 1 | Qué representa una red y cómo recupera la conjunta | 6–9, 12–15 | §§1–2 |
-| 2 | Independencia marginal, condicional y supuestos locales | 10–11, 16–18 | §§3–4 |
-| 3 | Cadena, causa común y efecto común | 19–22 | §§5–6 |
-| 4 | Caminos activos y d-separación | 23–26 | §7 |
-| 5 | Resolver los tres ejemplos completos | 27–29 | §8 |
-| 6 | Comprender las restricciones de la topología | 30–31 | §10 |
-| Ampliación | Ejemplo del MIT y conexión con AIMA | Complemento | §§9 y 11 |
+| Paso | Idea que debemos dominar | Sección |
+|---|---|---|
+| 1 | Qué representa una red y cómo recupera la conjunta | §§1–2 |
+| 2 | Independencia marginal, condicional y supuestos locales | §§3–4 |
+| 3 | Cadena, causa común y efecto común | §§5–6 |
+| 4 | Caminos activos y d-separación | §7 |
+| 5 | Resolver los tres ejemplos completos | §8 |
+| 6 | Comprender las restricciones de la topología | §10 |
+| Ampliación | Ejemplo del MIT y conexión con AIMA | §§9 y 11 |
 
 **Fuentes de apoyo.** AIMA significa *Artificial Intelligence: A Modern Approach*, de Russell y Norvig: utilizamos la 4.ª edición global que ya está en el vault, §§13.1–13.2.1. Berkeley CS 188 organiza los patrones y las consultas gráficas; MIT 6.034 aporta el ejemplo de causas alternativas de un ladrido. Las derivaciones, números didácticos y diagramas recreados se identifican en cada sección.
 
 ## 1. Una red bayesiana es un grafo más distribuciones locales
 
-*Diapositivas 7–9 y 13–15.* Una **red bayesiana** contiene:
+Una **red bayesiana** contiene:
 
 1. Un grafo dirigido acíclico, o **DAG**, con un nodo por variable aleatoria.
 2. El dominio de cada variable.
@@ -90,7 +88,7 @@ Esta descripción coincide con [Berkeley CS 188, §6.3](https://inst.eecs.berkel
 
 ### Ejemplo 1: lluvia, tráfico y paraguas
 
-*Diapositiva 12; desarrollo numérico didáctico.* $R$: llueve; $T$: hay tráfico; $U$: una persona lleva paraguas. Suponemos que, una vez conocida la lluvia, saber si hay tráfico no aporta información adicional sobre el paraguas.
+*Desarrollo numérico didáctico.* $R$: llueve; $T$: hay tráfico; $U$: una persona lleva paraguas. Suponemos que, una vez conocida la lluvia, saber si hay tráfico no aporta información adicional sobre el paraguas.
 
 ![Una independencia reduce la tabla](ia14-lluvia-trafico-paraguas.svg)
 
@@ -122,7 +120,7 @@ Este producto corresponde a **una asignación completa**, «llueve, hay tráfico
 
 ## 2. La red de alarma: construir una probabilidad desde cinco tablas
 
-*Diapositiva 6; AIMA, figura 13.2.* Usamos $B$: robo, $E$: terremoto, $A$: alarma, $J$: John llama y $M$: Mary llama. Todas son booleanas. Una letra minúscula, como $b$, abrevia el evento $B=\mathrm{true}$; $\neg b$ significa $B=\mathrm{false}$.
+*AIMA, figura 13.2.* Usamos $B$: robo, $E$: terremoto, $A$: alarma, $J$: John llama y $M$: Mary llama. Todas son booleanas. Una letra minúscula, como $b$, abrevia el evento $B=\mathrm{true}$; $\neg b$ significa $B=\mathrm{false}$.
 
 ![Alarma: cinco variables, cinco factores](ia14-red-alarma.svg)
 
@@ -134,7 +132,7 @@ $$
 P(B,E,A,J,M)=P(B)P(E)P(A\mid B,E)P(J\mid A)P(M\mid A).
 $$
 
-### Paso 2: leer las CPT de la diapositiva
+### Paso 2: leer las CPT de la red
 
 $$
 P(b)=0.001,\qquad P(e)=0.002.
@@ -209,11 +207,11 @@ La probabilidad previa era 0.1 % y la posterior es aproximadamente 28.42 %. Las 
 
 <iframe src="red-bayesiana-alarma-interactiva.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
-Selecciona **«Ambos llaman»** y compara los dos pesos con el cálculo anterior. Después elige **«Suena la alarma»** y **«Alarma y terremoto»**: obtendrás $P(b\mid a)\approx0.373551$ y $P(b\mid a,e)\approx0.003268$. Conocer un terremoto ofrece otra explicación para la alarma y reduce la creencia en robo. Aunque el recurso se creó para el apunte anterior, sus CPT coinciden con la diapositiva 6 de esta clase.
+Selecciona **«Ambos llaman»** y compara los dos pesos con el cálculo anterior. Después elige **«Suena la alarma»** y **«Alarma y terremoto»**: obtendrás $P(b\mid a)\approx0.373551$ y $P(b\mid a,e)\approx0.003268$. Conocer un terremoto ofrece otra explicación para la alarma y reduce la creencia en robo. Aunque el recurso se creó para el apunte anterior, sus CPT coinciden con las de la red de alarma de esta clase.
 
 ## 3. Independencia marginal y condicional: dos preguntas distintas
 
-*Diapositivas 10–11.* Para variables discretas:
+Para variables discretas:
 
 $$
 X\perp Y\quad\Longleftrightarrow\quad P(x,y)=P(x)P(y)\quad\text{para todo }x,y.
@@ -236,7 +234,7 @@ La expresión se refiere a **todos los valores posibles de $Z$**, no solamente a
 
 ### Fuego, humo y alarma: primero decidir qué modelo estamos suponiendo
 
-La diapositiva 11 plantea el escenario sin fijar una única estructura. Dos modelos razonables son:
+El escenario no fija una única estructura. Dos modelos razonables son:
 
 ![Fuego, humo y alarma: dos modelos posibles](ia29-fuego-humo-alarma.svg)
 
@@ -247,7 +245,7 @@ En ambos modelos puede haber asociación entre los extremos sin evidencia, pero 
 
 ## 4. Independencias locales y conexiones indirectas
 
-*Diapositivas 16–18; AIMA, §13.2.1.* La **propiedad de Markov local** establece que cada variable es independiente de sus otros no descendientes dados sus padres:
+*AIMA, §13.2.1.* La **propiedad de Markov local** establece que cada variable es independiente de sus otros no descendientes dados sus padres:
 
 $$
 X_i\perp\bigl(\operatorname{NoDesc}(X_i)\setminus\operatorname{Pa}(X_i)\bigr)\mid\operatorname{Pa}(X_i).
@@ -255,7 +253,7 @@ $$
 
 Un descendiente es un nodo al que podemos llegar siguiendo flechas desde $X_i$. Aquí «otros no descendientes» excluye también al propio nodo. La afirmación se hace sobre el conjunto completo, no únicamente sobre cada variable por separado.
 
-### Ejemplo 2: la cadena de cuatro nodos de la diapositiva 17
+### Ejemplo 2: la cadena de cuatro nodos
 
 ![Padres y conexiones indirectas](ia14-cadena-cuatro.svg)
 
@@ -279,11 +277,11 @@ $$
 
 ## 5. Dos patrones que se bloquean al observar el nodo central
 
-*Diapositivas 19–21.* Cada camino largo se estudia mediante tripletas consecutivas. Primero entendemos dos casos donde el nodo central **no recibe las dos puntas de flecha del camino**.
+Cada camino largo se estudia mediante tripletas consecutivas. Primero entendemos dos casos donde el nodo central **no recibe las dos puntas de flecha del camino**.
 
 ### 5.1 Cadena: $X\rightarrow Y\rightarrow Z$
 
-En el ejemplo de la diapositiva 20, $X$ es baja presión, $Y$ lluvia y $Z$ tráfico.
+En este ejemplo, $X$ es baja presión, $Y$ lluvia y $Z$ tráfico.
 
 ![Cadena: observar el medio bloquea](ia14-cadena-presion.svg)
 
@@ -325,7 +323,7 @@ Como son diferentes, en esta distribución $X$ y $Z$ son dependientes. Pero, si 
 
 ### 5.2 Causa común o bifurcación: $X\leftarrow Y\rightarrow Z$
 
-En la diapositiva 21, $Y$ es la proximidad de una entrega, $X$ un foro activo y $Z$ un laboratorio lleno.
+En este otro ejemplo, $Y$ es la proximidad de una entrega, $X$ un foro activo y $Z$ un laboratorio lleno.
 
 ![Causa común: observar el origen bloquea](ia14-causa-comun.svg)
 
@@ -372,13 +370,13 @@ Al conocer la entrega, ese aporte informativo desaparece: $P(z\mid x,y)=P(z\mid 
 
 ## 6. Efecto común: observar puede abrir un camino
 
-*Diapositiva 22.* El tercer patrón invierte la regla anterior:
+El tercer patrón invierte la regla anterior:
 
 $$
 R\rightarrow T\leftarrow B.
 $$
 
-$R$ es lluvia, $B$ un partido y $T$ tráfico. El nodo $T$ es un **colisionador** porque recibe las dos puntas de flecha **en este camino**. Añadimos el reporte $T'$ para anticipar la diapositiva 27.
+$R$ es lluvia, $B$ un partido y $T$ tráfico. El nodo $T$ es un **colisionador** porque recibe las dos puntas de flecha **en este camino**. Añadimos el reporte $T'$ para anticipar el ejemplo 1 de la sección 8.
 
 ![Efecto común y evidencia descendiente](ia14-efecto-comun.svg)
 
@@ -447,7 +445,7 @@ Esto retira la garantía de independencia incluso si una CPT particular hace que
 
 ## 7. D-separación: combinar las reglas sin perder caminos
 
-*Diapositivas 23–26.* Dadas variables $X,Y$ y un conjunto de evidencia $\mathcal E$, buscamos si la estructura obliga a que $X\perp Y\mid\mathcal E$. Suponemos que los extremos consultados no pertenecen a la evidencia.
+Dadas variables $X,Y$ y un conjunto de evidencia $\mathcal E$, buscamos si la estructura obliga a que $X\perp Y\mid\mathcal E$. Suponemos que los extremos consultados no pertenecen a la evidencia.
 
 Un **camino** se obtiene recorriendo aristas sin exigir seguir su dirección, pero **conservando las puntas de flecha** para clasificar cada tripleta. Por ejemplo, en $L\rightarrow R\rightarrow T\leftarrow B$, podemos recorrer de $L$ a $B$ aunque la última arista apunte desde $B$.
 
@@ -473,8 +471,8 @@ En la última fila, **observar un descendiente de $Y$ también activa la triplet
 
 Una arista directa no tiene nodos internos que podamos bloquear mediante evidencia en otros nodos. Dos componentes desconectados no tienen caminos que revisar y están d-separados sin evidencia.
 
-> [!warning] Dos precisiones sobre las diapositivas
-> En la diapositiva 24, el «intento 1» contiene una inversión en la frase sobre nodos conectados; es un intento provisional y no debe memorizarse como regla. Además, sombrear y quitar todos los nodos observados falla ante colisionadores: observarlos puede abrir caminos. En la diapositiva 26, la conclusión rigurosa cuando hay un camino activo es **«independencia no garantizada por el grafo»**; afirmar dependencia de una distribución concreta requiere revisar sus CPT o construir un contraejemplo.
+> [!warning] Dos precisiones sobre la regla de caminos
+> Una primera regla intuitiva —«sombrear y quitar todos los nodos observados»— falla ante colisionadores: observarlos puede abrir caminos, no cerrarlos. Por eso no debe memorizarse como regla. Además, la conclusión rigurosa cuando hay un camino activo es **«independencia no garantizada por el grafo»**; afirmar dependencia de una distribución concreta requiere revisar sus CPT o construir un contraejemplo.
 
 ### Explorador: de una tripleta a los tres ejemplos de clase
 
@@ -484,11 +482,11 @@ Recorre primero cadena, causa común y efecto común. Después selecciona los ej
 
 La secuencia por tripletas se apoya en [Berkeley CS 188, §6.5](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/d-separation.html). Enumerar todos los caminos sirve para practicar en estos grafos pequeños; para redes grandes existen procedimientos más eficientes.
 
-## 8. Los tres ejemplos de las diapositivas, resueltos paso a paso
+## 8. Los tres ejemplos de d-separación, resueltos paso a paso
 
 ### 8.1 Ejemplo 1: un colisionador y su descendiente
 
-*Diapositiva 27.* La red es $R\rightarrow T\leftarrow B$, $T\rightarrow T'$. **$T'$ es otra variable**, por ejemplo un reporte posterior de tráfico; no es la negación de $T$.
+La red es $R\rightarrow T\leftarrow B$, $T\rightarrow T'$. **$T'$ es otra variable**, por ejemplo un reporte posterior de tráfico; no es la negación de $T$.
 
 ![Efecto común y evidencia descendiente](ia14-efecto-comun.svg)
 
@@ -504,7 +502,7 @@ Para $R\perp T'\mid T$, el camino relevante cambia a $R\rightarrow T\rightarrow 
 
 ### 8.2 Ejemplo 2: abrir un colisionador no elimina otros bloqueos
 
-*Diapositiva 28.* Las aristas son $L\rightarrow R$, $R\rightarrow D$, $R\rightarrow T$, $B\rightarrow T$ y $T\rightarrow T'$.
+Las aristas son $L\rightarrow R$, $R\rightarrow D$, $R\rightarrow T$, $B\rightarrow T$ y $T\rightarrow T'$.
 
 ![Ejemplo 2: abrir y volver a bloquear](ia14-ejemplo2.svg)
 
@@ -536,7 +534,7 @@ La rama $R\rightarrow D$ no genera un segundo camino simple hacia $B$. No debemo
 
 ### 8.3 Ejemplo 3: dos caminos y evidencia que cambia la respuesta
 
-*Diapositiva 29.* $R$: lluvia; $T$: tráfico; $D$: goteo del techo; $S$: tristeza. La conjunta es:
+$R$: lluvia; $T$: tráfico; $D$: goteo del techo; $S$: tristeza. La conjunta es:
 
 $$
 P(r,t,d,s)=P(r)P(t\mid r)P(d\mid r)P(s\mid t,d).
@@ -628,7 +626,7 @@ Como $0.5\ne0.743243$, el mapache y el ladrón **son dependientes dado el ladrid
 
 ## 10. Lo que la topología garantiza y lo que los parámetros agregan
 
-*Diapositivas 18 y 30–31.* Debemos distinguir dos afirmaciones:
+Debemos distinguir dos afirmaciones:
 
 $$
 X\text{ e }Y\text{ d-separados por }\mathcal E\quad\Longrightarrow\quad X\perp Y\mid\mathcal E
@@ -672,7 +670,7 @@ Agregar una arista que preserve la aciclicidad permite representar al menos las 
 
 ## 11. Ampliación AIMA: manto de Markov y otra forma de verificar d-separación
 
-Estos dos resultados proceden de AIMA, §13.2.1, pp. 436–438. Amplían las diapositivas sin ser requisitos para resolver sus tres ejemplos.
+Estos dos resultados proceden de AIMA, §13.2.1, pp. 436–438. Amplían la explicación sin ser requisitos para resolver los tres ejemplos anteriores.
 
 ### 11.1 Manto de Markov
 
@@ -770,13 +768,12 @@ Antes de desplegar cada solución, escribe extremos, evidencia y todos los camin
 | «Observar falso equivale a no observar» | Tanto verdadero como falso son valores conocidos y cuentan como evidencia. |
 | «Las CPT cambian cuando observo» | La evidencia actualiza la distribución posterior; las CPT del modelo permanecen. |
 
-## Avisos incluidos en el material
+## Avisos de la sesión
 
-Las diapositivas 1–4 contienen comentarios sobre el examen y el proyecto. La propuesta debe identificar equipo, problema, hipótesis, datos o simulador y metodología, con un máximo de dos páginas y seis integrantes. El esquema de pitch incluye propósito, problema, mercado, solución, producto y componente de IA, competencia, modelo de negocio, equipo y finanzas. Se registran como información de la presentación; no se indican fechas adicionales de entrega. La diapositiva 32 anuncia **inferencia** como siguiente tema.
+Al inicio de la sesión se dieron comentarios sobre el examen y el proyecto. La propuesta debe identificar equipo, problema, hipótesis, datos o simulador y metodología, con un máximo de dos páginas y seis integrantes. El esquema de pitch incluye propósito, problema, mercado, solución, producto y componente de IA, competencia, modelo de negocio, equipo y finanzas. No se indicaron fechas adicionales de entrega. El siguiente tema es **inferencia**.
 
 ## Referencias y continuación
 
-- **Material principal:** [[AI 14 Redes Bayesianas independencia.pdf|AI 14 — Redes bayesianas: independencia]], especialmente diapositivas 6–31.
 - **AIMA:** Russell y Norvig, [[Artificial_inteliigence-A_modern_approach.pdf|Artificial Intelligence: A Modern Approach]], 4.ª edición global, §§13.1–13.2.1; §13.3.1 para el puente de enumeración. [Índice oficial de la edición global](https://aima.cs.berkeley.edu/global-index.html). En la 3.ª edición, el tema corresponde al capítulo 14.
 - **Berkeley CS 188:** [§6.3 Representación](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/representation.html), [§6.4 Estructura](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/structure.html) y [§6.5 D-separación](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/d-separation.html). Para continuar: [§6.6 Inferencia exacta](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/elimination.html).
 - **MIT 6.034, Patrick Winston:** [Probabilistic Inference Notes](https://ocw.mit.edu/courses/6-034-artificial-intelligence-fall-2010/3e6200ca84af05d95712045abedce9e9_MIT6_034F10_bayes.pdf), pp. 1–2 para los conteos del perro y pp. 4–5 para factorización; [Lecture 22: Probabilistic Inference II](https://ocw.mit.edu/courses/6-034-artificial-intelligence-fall-2010/resources/lecture-22-probabilistic-inference-ii/) para continuar con modelos e inferencia.

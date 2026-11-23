@@ -8,7 +8,6 @@ estado: procesada
 aliases:
   - Aprendizaje por refuerzo - 3 de noviembre
 referencias:
-  - "[[AI 21 Aprendizaje por refuerzo.pdf]]"
   - https://inst.eecs.berkeley.edu/~cs188/textbook/mdp/
   - https://inst.eecs.berkeley.edu/~cs188/textbook/rl/
 tags:
@@ -25,24 +24,23 @@ tags:
 > [!summary] Pregunta central
 > ¿Cómo elegimos una acción cuando cambia tanto la recompensa inmediata como los estados y las oportunidades que tendremos después?
 
-**Fecha del apunte: martes 3 de noviembre de 2026.** Se construye a partir de las **24 diapositivas** de «Clase 21: aprendizaje por refuerzo». La numeración de la presentación y la de sesiones del plan son distintas. Continúa en [[2026-11-05 IA - Aprendizaje por refuerzo II|la clase del 5 de noviembre: Monte Carlo, exploración, Q-learning y aproximación]].
+**Fecha del apunte: martes 3 de noviembre de 2026.** La nota es **autocontenida**: el ejemplo del automóvil (estados, acciones, transiciones y recompensas), sus grafos y todas las iteraciones numéricas se reproducen completos. Continúa en [[2026-11-05 IA - Aprendizaje por refuerzo II|la clase del 5 de noviembre: Monte Carlo, exploración, Q-learning y aproximación]].
 
-**Alcance.** El material de clase desarrolla procesos de decisión de Markov (MDP), políticas, descuento, valores, Bellman, evaluación y mejora. Las derivaciones, ejercicios, SVG y laboratorios de esta nota son elaboración didáctica. Las conexiones con **Berkeley CS 188**, el curso que ya venimos usando, se enlazan donde ayudan. La sección de aprendizaje por muestras y Q-learning es un **complemento preparatorio**: la última diapositiva anuncia «RL 2».
+**Alcance.** La nota desarrolla procesos de decisión de Markov (MDP), políticas, descuento, valores, Bellman, evaluación y mejora, con derivaciones, ejercicios, figuras SVG y laboratorios interactivos. Las conexiones con **Berkeley CS 188**, el curso que ya venimos usando, se enlazan donde ayudan. La sección de aprendizaje por muestras y Q-learning es un **complemento preparatorio** para la siguiente clase («RL 2»).
 
-## Material de clase y ruta de estudio
+## Ruta de estudio
 
-![[AI 21 Aprendizaje por refuerzo.pdf]]
 
-| Pregunta | Diapositivas | Secciones de esta nota |
-|---|---:|---|
-| ¿Qué significa aprender mediante recompensas? | 1–3 | 1 |
-| ¿Cómo describo el mundo y mi comportamiento? | 4–8 | 2–3 |
-| ¿Cómo comparo recompensas presentes y futuras? | 9–11 | 4 |
-| ¿Qué significan V, Q y la política óptima? | 12–16 | 5–6 |
-| ¿Cómo calculo el valor de una política? | 17–19 | 7 |
-| ¿Cuándo existen valores óptimos y convergen las iteraciones? | 20–21 | 8–9 |
-| ¿Cómo uso los valores para mejorar lo que hago? | 22–23 | 10 |
-| ¿Qué sigue si no conozco el modelo? | 24 | 11, complemento Berkeley |
+| Pregunta | Secciones de esta nota |
+|---|---|
+| ¿Qué significa aprender mediante recompensas? | 1 |
+| ¿Cómo describo el mundo y mi comportamiento? | 2–3 |
+| ¿Cómo comparo recompensas presentes y futuras? | 4 |
+| ¿Qué significan V, Q y la política óptima? | 5–6 |
+| ¿Cómo calculo el valor de una política? | 7 |
+| ¿Cuándo existen valores óptimos y convergen las iteraciones? | 8–9 |
+| ¿Cómo uso los valores para mejorar lo que hago? | 10 |
+| ¿Qué sigue si no conozco el modelo? | 11, complemento Berkeley |
 
 Recorrido recomendado: entender el automóvil → experimentar con el descuento → hacer un respaldo de Bellman a mano → evaluar una política fija → mejorarla → distinguir planificación de aprendizaje.
 
@@ -69,7 +67,7 @@ La recompensa evalúa una transición. La **política** determina cómo actuar. 
 
 ### 2.1 El estado debe resumir lo necesario para decidir
 
-**Intuición.** Si conocemos la temperatura actual del motor y la acción que aplicaremos, el modelo de clase no necesita reconstruir toda la historia del automóvil para predecir su próximo estado.
+**Intuición.** Si conocemos la temperatura actual del motor y la acción que aplicaremos, el modelo no necesita reconstruir toda la historia del automóvil para predecir su próximo estado.
 
 La **propiedad de Markov** exige que, dado el estado y la acción presentes, la historia no aporte información adicional sobre el siguiente estado y recompensa:
 
@@ -97,15 +95,15 @@ $$
 | $\gamma$ | Descuento | En el caso principal, $0\leq\gamma<1$ |
 | $\rho_0$ | Distribución inicial | Un estado inicial fijo es un caso particular |
 
-Si las recompensas son aleatorias, $R(s,a,s')=\mathbb E[R_{t+1}\mid s,a,s']$. La distribución conjunta $p(s',r\mid s,a)$ de la diapositiva 18 es una formulación más general; al tomar expectativas recuperamos la notación de la tabla.
+Si las recompensas son aleatorias, $R(s,a,s')=\mathbb E[R_{t+1}\mid s,a,s']$. La distribución conjunta $p(s',r\mid s,a)$ es una formulación más general; al tomar expectativas recuperamos la notación de la tabla.
 
-**MDP y RL.** Un MDP describe el problema de decisión. Si nos dan $T$ y $R$, podemos **planificar**. Si desconocemos el modelo y debemos aprender mediante interacción, estamos en **aprendizaje por refuerzo**. La presentación introduce RL estudiando primero su modelo matemático.
+**MDP y RL.** Un MDP describe el problema de decisión. Si nos dan $T$ y $R$, podemos **planificar**. Si desconocemos el modelo y debemos aprender mediante interacción, estamos en **aprendizaje por refuerzo**. Introducimos RL estudiando primero su modelo matemático.
 
 Berkeley desarrolla esta formulación y la propiedad de Markov en [CS 188, §4.1](https://inst.eecs.berkeley.edu/~cs188/textbook/mdp/markov-decision-processes.html).
 
 ## 3. Ejemplo conductor: el automóvil
 
-*Diapositivas 6–8; reconstrucción del grafo original.* Escribamos $C=$ Cool, $W=$ Warm y $O=$ Overheated. Las acciones son Slow y Fast. Usaremos $C$ como estado inicial para los ejemplos, aunque calcularemos valores para ambos estados no terminales.
+*Grafo del modelo.* Escribamos $C=$ Cool, $W=$ Warm y $O=$ Overheated. Las acciones son Slow y Fast. Usaremos $C$ como estado inicial para los ejemplos, aunque calcularemos valores para ambos estados no terminales.
 
 ![Modelo completo del automóvil](ia21-mdp-auto.svg)
 
@@ -119,6 +117,36 @@ Berkeley desarrolla esta formulación y la propiedad de Markov en [CS 188, §4.1
 | $W$ | Fast | $O$ | $1$ | $-10$ |
 
 $O$ es terminal: su valor de continuación es cero. La penalización $-10$ se cobra **al entrar** en él. Si lo representamos como absorbente para completar una matriz, añadimos una transición ficticia $O\to O$ de recompensa cero; no repetimos la penalización.
+
+### 3.0 El árbol de decisión del automóvil
+
+Si desplegamos el modelo desde $C$ en forma de árbol (cuadrados: estados; círculos: acción elegida, es decir, nodos de azar), cada acción abre las ramas de la tabla. Hasta profundidad dos:
+
+```mermaid
+graph TD
+  C0["C"] -->|Slow| a1(("C,Slow"))
+  C0 -->|Fast| a2(("C,Fast"))
+  a1 -->|"1.0 / +1"| C1["C"]
+  a2 -->|"0.5 / +2"| C2["C"]
+  a2 -->|"0.5 / +2"| W2["W"]
+  C1 -->|Slow| b1(("C,Slow"))
+  C1 -->|Fast| b2(("C,Fast"))
+  C2 -->|Slow| b3(("C,Slow"))
+  C2 -->|Fast| b4(("C,Fast"))
+  W2 -->|Slow| b5(("W,Slow"))
+  W2 -->|Fast| b6(("W,Fast"))
+  b1 --> r1["C"]
+  b2 --> r2["C"]
+  b2 --> r3["W"]
+  b3 --> r4["C"]
+  b4 --> r5["C"]
+  b4 --> r6["W"]
+  b5 --> r7["C"]
+  b5 --> r8["W"]
+  b6 -->|"1.0 / -10"| r9["O"]
+```
+
+Los tres estados de profundidad uno ($C$ tras Slow, $C$ y $W$ tras Fast) vuelven a ofrecer Slow y Fast, y así sucesivamente: el mismo estado aparece repetido en muchas ramas. Esa repetición es la que la programación dinámica evita guardando un solo valor por estado. La única hoja terminal de este árbol es $O$, alcanzada con Fast desde $W$.
 
 ### 3.1 Una política es una regla contingente
 
@@ -142,7 +170,7 @@ Una tabla de política explícita puede ejecutarse como un agente de reflejo: ob
 
 ### 4.1 De premios aislados a una suma temporal
 
-La diapositiva 9 compara $[1,2,2]$ con $[2,3,4]$: con suma sin descuento ganan $9$ frente a $5$. Al comparar $[0,0,1]$ con $[1,0,0]$, ambas suman uno, pero un descuento positivo menor que uno favorece recibirlo antes.
+Comparemos las secuencias de recompensas $[1,2,2]$ y $[2,3,4]$: con suma sin descuento, la segunda gana $9$ frente a $5$. Al comparar $[0,0,1]$ con $[1,0,0]$, ambas suman uno, pero un descuento positivo menor que uno favorece recibirlo antes.
 
 ![Descomposición del retorno](ia21-descuento.svg)
 
@@ -191,7 +219,7 @@ Hay otras opciones: fijar un horizonte finito o formular un problema episódico 
 
 ## 5. V, Q y política: tres preguntas diferentes
 
-*Diapositivas 12–13 y 16.* Para una política fija $\pi$:
+Para una política fija $\pi$:
 
 $$
 V^\pi(s)=\mathbb E_\pi[G_t\mid S_t=s],
@@ -246,7 +274,7 @@ $$
 r(s,a)=\sum_{s'}T(s,a,s')R(s,a,s'),
 $$
 
-y obtenemos la expresión de las diapositivas 17 y 19:
+y obtenemos la expresión de evaluación de una política:
 
 $$
 V^\pi(s)=\sum_a\pi(a\mid s)\left[r(s,a)+\gamma\sum_{s'}T(s,a,s')V^\pi(s')\right].
@@ -274,7 +302,7 @@ La conexión con [[2026-09-08 IA - Incertidumbre y Expectimax|expectimax]] es di
 
 ## 7. Evaluar una política: «¿qué pasa si sigo esta regla?»
 
-*Diapositivas 17–19.* Fijamos
+Fijamos
 
 $$
 \pi(C)=\text{Fast},\qquad\pi(W)=\text{Slow},\qquad V^\pi(O)=0.
@@ -337,10 +365,10 @@ $$
 | 3 | 4.565 | 3.565 | 5 | 4 |
 | Límite | 15.5 | 14.5 | $+\infty$ | $+\infty$ |
 
-> [!warning] Qué muestran realmente los números de la diapositiva 19
+> [!warning] Qué muestran realmente los números con $\gamma=1$
 > $V_1=(2,1,0)$ y $V_2=(3.5,2.5,0)$ son correctos con $\gamma=1$ y actualización sincrónica. Representan retornos de uno y dos pasos; **no** valores de una política infinita ya convergida. Para $k\geq1$, $V_k(C)=1.5k+0.5$ y $V_k(W)=1.5k-0.5$. Las ecuaciones estacionarias con $\gamma=1$ no tienen una solución finita para esta política.
 
-La diapositiva 18 muestra una evaluación que actualiza valores **en el mismo vector**. Es una variante válida bajo condiciones apropiadas, pero sus valores intermedios pueden diferir. Para reproducir la diapositiva 19 y conservar la interpretación de horizonte $k$, aquí usamos dos vectores.
+Existe una variante de la evaluación que actualiza valores **en el mismo vector**. Es válida bajo condiciones apropiadas, pero sus valores intermedios pueden diferir. Para conservar la interpretación de horizonte $k$, aquí usamos dos vectores.
 
 ## 8. Encontrar valores óptimos: iteración de valores
 
@@ -410,12 +438,12 @@ Si solo disponemos de $V(s)$, elegir una acción todavía requiere el modelo. Si
 
 1. Con $\gamma=0.9$ y maximización, verifica $V_1=(2,1,0)$ y $V_2=(3.35,2.35,0)$.
 2. Cambia a evaluación y elige Slow en ambos estados: el límite debe ser $(10,10,0)$.
-3. Selecciona Fast en Cool y Slow en Warm con $\gamma=1$: reproduce la diapositiva 19 y observa que los valores siguen aumentando. El laboratorio permite barridos finitos, pero no declara convergencia.
+3. Selecciona Fast en Cool y Slow en Warm con $\gamma=1$: reproduce la tabla anterior y observa que los valores siguen aumentando. El laboratorio permite barridos finitos, pero no declara convergencia.
 4. Regresa a $0.9$ y ejecuta más barridos: el resultado debe acercarse a $(15.5,14.5,0)$.
 
 ## 9. Por qué converge: los errores futuros se atenúan
 
-*Diapositiva 21, con desarrollo matemático.* Definamos el operador
+*Con desarrollo matemático.* Definamos el operador
 
 $$
 (BV)(s)=\max_a\sum_{s'}T(s,a,s')\left[R(s,a,s')+\gamma V(s')\right].
@@ -449,7 +477,7 @@ $$
 \|V_k-V^*\|_\infty\leq\gamma^k\|V_0-V^*\|_\infty.
 $$
 
-La misma idea funciona para el operador de una política fija. Esta demostración precisa el bosquejo de convergencia de clase. Con $\gamma=1$, el argumento deja de contraer y no basta para demostrar convergencia.
+La misma idea funciona para el operador de una política fija. Esta demostración formaliza la idea intuitiva de que dos árboles de profundidad $k$ y $k+1$ difieren solo en su última capa, descontada por $\gamma^k$. Con $\gamma=1$, el argumento deja de contraer y no basta para demostrar convergencia.
 
 ### 9.1 Pasar de «cambió poco» a una cota de error
 
@@ -477,7 +505,7 @@ Si todas las trayectorias terminan en a lo sumo $M$ pasos y la frontera terminal
 
 ## 10. Mejorar políticas: «¿puedo actuar mejor con lo que ya sé?»
 
-*Diapositivas 20, 22–23.* Definimos dominancia por
+Definimos dominancia por
 
 $$
 \pi\succeq\pi'\quad\Longleftrightarrow\quad V^\pi(s)\geq V^{\pi'}(s)\quad\text{para todo }s.
@@ -485,7 +513,7 @@ $$
 
 Dos políticas pueden ser incomparables si una gana en unos estados y pierde en otros. Además, políticas distintas pueden tener idéntico valor: formalmente, esta relación es un **preorden** sobre políticas, y se convierte en orden parcial al identificar políticas con el mismo vector de valor.
 
-En un MDP con estados y acciones finitos, recompensas acotadas y descuento $\gamma<1$, existe una política óptima **determinista y estacionaria** que maximiza el valor para todos los estados. Las afirmaciones de las diapositivas 16 y 20 deben leerse dentro de estos supuestos. En horizonte finito puede hacer falta depender del tiempo; en problemas generales o con restricciones adicionales no se trasladan automáticamente.
+En un MDP con estados y acciones finitos, recompensas acotadas y descuento $\gamma<1$, existe una política óptima **determinista y estacionaria** que maximiza el valor para todos los estados. Esta afirmación debe leerse dentro de estos supuestos. En horizonte finito puede hacer falta depender del tiempo; en problemas generales o con restricciones adicionales no se trasladan automáticamente.
 
 ### 10.1 La mejora se hace con Q de la política actual
 
@@ -563,7 +591,7 @@ Con transiciones densas, un barrido de valores cuesta $O(|\mathcal S|^2|\mathcal
 
 ## 11. Complemento Berkeley: del modelo conocido a aprender de muestras
 
-**Esta sección prepara la continuación; no se atribuye a las 24 diapositivas.** Hasta aquí conocemos las probabilidades y recompensas del automóvil. El problema de RL aparece cuando el agente necesita aprender sin recibir esas tablas. Berkeley hace esta separación explícita en [§5.1](https://inst.eecs.berkeley.edu/~cs188/textbook/rl/rl.html).
+**Esta sección prepara la continuación.** Hasta aquí conocemos las probabilidades y recompensas del automóvil. El problema de RL aparece cuando el agente necesita aprender sin recibir esas tablas. Berkeley hace esta separación explícita en [§5.1](https://inst.eecs.berkeley.edu/~cs188/textbook/rl/rl.html).
 
 ![Del modelo a las muestras](ia21-planificacion-aprendizaje.svg)
 
@@ -652,7 +680,7 @@ Con $V(C)=4$, $V(W)=2$, $V(O)=0$ y $\gamma=0.5$, calcula los cuatro valores de a
 
 ### D. Detectar un supuesto roto
 
-¿Qué impide aplicar la garantía de contracción al ejemplo de la diapositiva 19?
+¿Qué impide aplicar la garantía de contracción al ejemplo del automóvil con $\gamma=1$ y la política Fast–Slow?
 
 > [!answer]- Solución
 > Usa $\gamma=1$, y la política Fast–Slow no termina. No hay factor de contracción menor que uno ni retorno total finito. Los respaldos siguen siendo válidos para horizontes finitos.
@@ -666,7 +694,7 @@ En Q-learning, con $Q(s,a)=3$, $r=1$, $\max_{a'}Q(s',a')=4$, $\gamma=0.9$ y $\al
 
 ## 14. Fuentes y cómo continuar
 
-**Material principal:** Carlos Hernández, [[AI 21 Aprendizaje por refuerzo.pdf|Clase 21: aprendizaje por refuerzo]], 24 diapositivas. El grafo del automóvil y las iteraciones de $\gamma=1$ se verificaron visualmente en las diapositivas 6 y 17–19. Las precisiones sobre terminación, empates y alcance de las garantías se explicitan en esta nota.
+**Material de la clase:** Carlos Hernández, Inteligencia Artificial, aprendizaje por refuerzo. Las precisiones sobre terminación, empates y alcance de las garantías se explicitan en esta nota.
 
 **UC Berkeley, CS 188 — Introduction to Artificial Intelligence**, fuentes oficiales consultadas el **16 de noviembre de 2026**:
 

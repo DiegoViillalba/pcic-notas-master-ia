@@ -7,7 +7,6 @@ profesor: Carlos Hernández
 estado: procesada
 conceptos: []
 referencias:
-  - "[[AI 18 Aprendizaje máquina.pdf]]"
 tags:
   - clase
   - inteligencia-artificial
@@ -20,21 +19,20 @@ tags:
 > [!summary] Pregunta central
 > Hasta ahora usamos modelos para razonar y decidir. ¿Cómo aprendemos un modelo a partir de ejemplos y comprobamos que predice bien en datos nuevos?
 
-La sesión del **22 de octubre de 2026** sigue la presentación «Clase 18: introducción a aprendizaje máquina». El 18 es el número de la presentación, mientras que el [[Indice|plan de curso]] asigna el 22 a esta fecha. Continúa la pregunta de [[2026-10-20 IA - Aprendizaje de redes bayesianas|la clase anterior]]: allí aprendimos parámetros y estructura de una red bayesiana; aquí abordamos el marco general y empezamos con regresión.
+La sesión del **22 de octubre de 2026** corresponde a la clase 22 del [[Indice|plan de curso]]. La nota es autocontenida: cada concepto, fórmula y ejemplo se desarrolla completo. Continúa la pregunta de [[2026-10-20 IA - Aprendizaje de redes bayesianas|la clase anterior]]: allí aprendimos parámetros y estructura de una red bayesiana; aquí abordamos el marco general y empezamos con regresión.
 
-![[AI 18 Aprendizaje máquina.pdf]]
 
-| Tema | Diapositivas |
-|---|---:|
-| Definición, tipos y proceso | 3–14 |
-| Regresión lineal y mínimos cuadrados | 15–20 |
-| Regresión polinomial y complejidad | 21–24 |
-| Incertidumbre y procesos gaussianos | 25–27 |
-| Ejercicio de demanda de energía | 28 |
+| Tema |
+|---|
+| Definición, tipos y proceso |
+| Regresión lineal y mínimos cuadrados |
+| Regresión polinomial y complejidad |
+| Incertidumbre y procesos gaussianos |
+| Ejercicio de demanda de energía |
 
 ## 1. Qué significa aprender
 
-La definición de Tom Mitchell (diapositiva 5) identifica **tarea $T$**, **medida de desempeño $P$** y **experiencia $E$**: se aprende cuando el desempeño en $T$, medido con $P$, mejora gracias a $E$. Para predecir demanda eléctrica, $T$ podría ser estimar el consumo de un edificio, $P$ el error en casos no vistos y $E$ las mediciones previas de clima, ocupación y consumo.
+La definición de Tom Mitchell identifica **tarea $T$**, **medida de desempeño $P$** y **experiencia $E$**: se aprende cuando el desempeño en $T$, medido con $P$, mejora gracias a $E$. Para predecir demanda eléctrica, $T$ podría ser estimar el consumo de un edificio, $P$ el error en casos no vistos y $E$ las mediciones previas de clima, ocupación y consumo.
 
 | Tipo | Datos disponibles | Objetivo típico |
 |---|---|---|
@@ -42,17 +40,24 @@ La definición de Tom Mitchell (diapositiva 5) identifica **tarea $T$**, **medid
 | **No supervisado** | Entradas sin etiqueta objetivo | Descubrir grupos o estructura |
 | **Por refuerzo** | Interacción, acciones y recompensas | Aprender una política que maximice recompensa acumulada |
 
-Las diapositivas 7–8 anticipan regresión lineal y polinomial, regresión logística, redes neuronales, $k$-means y Q-learning. Son temas del curso, no métodos desarrollados todos en esta sesión.
+Los temas que vienen en el curso incluyen regresión lineal y polinomial, regresión logística, redes neuronales, $k$-means y Q-learning. Son temas del curso, no métodos desarrollados todos en esta sesión.
 
 ### Representación, optimización y evaluación
 
-Un método de aprendizaje requiere decidir **qué forma puede tener el modelo** (representación), **cómo elegir sus parámetros** (optimización) y **cómo medir su calidad** (evaluación). La diapositiva 10 enumera representaciones numéricas (regresión, redes neuronales), simbólicas (árboles y reglas), basadas en instancias (vecinos cercanos) y probabilísticas (Bayes ingenuo, redes bayesianas).
+Un método de aprendizaje requiere decidir **qué forma puede tener el modelo** (representación), **cómo elegir sus parámetros** (optimización) y **cómo medir su calidad** (evaluación). Las representaciones habituales son:
 
-En la práctica (diapositiva 11) también se define el problema, se reúnen y limpian datos, se interpretan resultados y se integra el modelo en una aplicación. La presentación menciona **CRISP-DM** como ejemplo de proceso. Para medir generalización sin optimismo, los casos de evaluación deben quedar fuera del ajuste y de la selección del modelo.
+| Familia | Ejemplos |
+|---|---|
+| Funciones numéricas | regresión lineal, redes neuronales, máquinas de vectores de soporte |
+| Funciones simbólicas | árboles de decisión, reglas de lógica proposicional, reglas de lógica de primer orden |
+| Basadas en instancias | vecinos más cercanos, razonamiento basado en casos |
+| Modelos probabilísticos | Bayes ingenuo, redes bayesianas, modelos ocultos de Markov, gramáticas libres de contexto probabilísticas, redes de Markov |
+
+En la práctica también se define el problema, se reúnen y limpian datos, se interpretan resultados y se integra el modelo en una aplicación. **CRISP-DM** (Cross Industry Standard Process for Data Mining) es un ejemplo conocido de ese proceso: un ciclo con las fases comprensión del negocio, comprensión de los datos, preparación de datos, modelado, evaluación y despliegue, con los datos en el centro. Para medir generalización sin optimismo, los casos de evaluación deben quedar fuera del ajuste y de la selección del modelo.
 
 ## 2. Entradas, salidas y objetivo supervisado
 
-Un ejemplo etiquetado es $(\mathbf{x}_i,y_i)$. La entrada $\mathbf{x}_i$ contiene **características** o predictores; $y_i$ es la **respuesta** (diapositivas 12 y 17). Las características pueden ser cuantitativas (velocidad), cualitativas (tipo de edificio) u ordinales (ocupación baja, media, alta). Las cualitativas necesitan una codificación adecuada antes de entrar en un modelo lineal.
+Un ejemplo etiquetado es $(\mathbf{x}_i,y_i)$. La entrada $\mathbf{x}_i$ contiene **características** o predictores; $y_i$ es la **respuesta**. Las características pueden ser cuantitativas (velocidad), cualitativas (tipo de edificio) u ordinales (ocupación baja, media, alta). Las cualitativas necesitan una codificación adecuada antes de entrar en un modelo lineal.
 
 - **Clasificación:** la salida es una clase, como *setosa*, *versicolor* o *virginica*, o uno de los dígitos $0,\ldots,9$. Escribir una clase como número no la convierte en una magnitud continua.
 - **Regresión:** la salida es una cantidad numérica, como concentración de glucosa o demanda de energía.
@@ -67,9 +72,9 @@ $$
 \mathbf{x}_i^{\mathsf T}=(1,x_{i1},\ldots,x_{i,d-1}),\qquad \hat y_i=\mathbf{x}_i^{\mathsf T}\boldsymbol\theta,\qquad \hat{\mathbf y}=X\boldsymbol\theta.
 $$
 
-Aquí «lineal» significa **lineal en los parámetros $\boldsymbol\theta$**. La diapositiva 19 escribe «$x_{i1}=\theta_1$» para el sesgo; debe ser **$x_{i1}=1$**, con $\theta_1$ como coeficiente de esa columna (o $\theta_0$ si numeramos desde cero).
+Aquí «lineal» significa **lineal en los parámetros $\boldsymbol\theta$**. Para el sesgo, la primera columna de la matriz de diseño debe ser **$x_{i1}=1$** (no $x_{i1}=\theta_1$), con $\theta_1$ como coeficiente de esa columna (o $\theta_0$ si numeramos desde cero).
 
-La función de costo de las diapositivas 18–20 suma errores al cuadrado:
+La función de costo suma errores al cuadrado:
 
 $$
 J(\boldsymbol\theta)=\sum_{i=1}^{n}(y_i-\hat y_i)^2=\lVert\mathbf y-X\boldsymbol\theta\rVert_2^2.
@@ -91,7 +96,7 @@ $$
 \boxed{\hat{\boldsymbol\theta}=(X^{\mathsf T}X)^{-1}X^{\mathsf T}\mathbf y.}
 $$
 
-Si las columnas son dependientes, la inversa no existe; puede usarse la pseudoinversa o regularización. Para cálculo numérico suele ser mejor resolver con QR o SVD que formar explícitamente la inversa. **Aclaración:** la línea intermedia del gradiente en la diapositiva 20 omite el factor 2 del término cuadrático; la derivada anterior corresponde al $J$ definido allí, sin factor $1/2$.
+Si las columnas son dependientes, la inversa no existe; puede usarse la pseudoinversa o regularización. El costo $J$ como función de dos parámetros $(\theta_1,\theta_2)$ es una superficie convexa en forma de cuenco con un único mínimo, por lo que el punto estacionario es el mínimo global. Para cálculo numérico suele ser mejor resolver con QR o SVD que formar explícitamente la inversa. Si el costo se definiera con un factor $1/2$, el 2 del gradiente desaparecería, pero la solución sería la misma.
 
 ## 4. Regresión polinomial y generalización
 
@@ -101,15 +106,15 @@ $$
 \hat y(\mathbf x)=\boldsymbol\phi(\mathbf x)^{\mathsf T}\boldsymbol\theta.
 $$
 
-Para una entrada escalar, $\boldsymbol\phi(x)=(1,x,x^2)$ permite una parábola. Con dos variables, $(1,x_1,x_2,x_1^2,x_2^2)$ añade curvatura separada; $x_1x_2$ añadiría interacción. La diapositiva 21 llama «núcleos» a estas transformaciones, pero **añadir características explícitas** no es lo mismo que aplicar el *kernel trick* de métodos duales.
+Para una entrada escalar, $\boldsymbol\phi(x)=(1,x,x^2)$ permite una parábola. Con dos variables, $(1,x_1,x_2,x_1^2,x_2^2)$ añade curvatura separada; $x_1x_2$ añadiría interacción. A estas transformaciones se les suele llamar informalmente «núcleos», pero **añadir características explícitas** no es lo mismo que aplicar el *kernel trick* de métodos duales.
 
-Las diapositivas 22–24 comparan datos generados por una relación cuadrática con modelos de distinta complejidad:
+Con dos variables, $\boldsymbol\phi=(1,x_1,x_2)$ ajusta un plano; $(1,x_1,x_2,x_1^2,x_2^2)$ ajusta una superficie curva (un domo). Comparemos datos generados por $y_i=\theta_0+x_i\theta_1+x_i^2\theta_2+\mathcal N(0,\sigma^2)$ con modelos de distinta complejidad. Las curvas de aprendizaje grafican el error cuadrático medio (mse) contra el tamaño del conjunto de entrenamiento (de 0 a 200); la línea horizontal en mse $\approx4$ es el **error mínimo posible** $\epsilon$, fijado por el ruido:
 
 | Modelo | Qué sucede | Errores de entrenamiento y prueba |
 |---|---|---|
-| Grado 2, acorde con los datos | Captura la tendencia sin seguir cada fluctuación del ruido | Ambos se acercan al nivel impuesto por el ruido |
-| Demasiado simple | **Subajuste**: no representa la curvatura | Ambos permanecen altos |
-| Grado 25 | **Sobreajuste**: puede seguir el ruido | Entrenamiento bajo y prueba mayor, sobre todo con pocos datos |
+| Grado 2, acorde con los datos | Captura la tendencia sin seguir cada fluctuación del ruido | Ambos se acercan al nivel impuesto por el ruido (mse $\approx4$); con pocos ejemplos el de entrenamiento queda por debajo (cerca de 1.5) y el de prueba algo por encima (cerca de 5) |
+| Demasiado simple | **Subajuste**: no representa la curvatura | Ambos permanecen altos y cercanos entre sí, en mse $\approx14$–18, muy por encima de 4 aunque crezca el conjunto |
+| Grado 25 | **Sobreajuste**: puede seguir el ruido | Entrenamiento bajo (de casi 0 a unos 3); prueba enorme con pocos datos (fuera de escala por encima de 22 hasta unos 30 ejemplos, cerca de 12 con 50, unos 5 con 100) que baja hacia 4–5 con 200 ejemplos |
 
 La curva de prueba del modelo complejo baja al añadir ejemplos, pero más datos no garantizan corregir cualquier sobreajuste. La evaluación debe hacerse con casos separados y representativos del uso real.
 
@@ -121,7 +126,7 @@ El recurso muestra una relación cuadrática con ruido. Cambia el grado y el nú
 
 ## 5. Incertidumbre: procesos gaussianos
 
-Una predicción puntual $\hat y$ no dice cuánto desconocemos en otras entradas. Las diapositivas 25–27 presentan los **procesos gaussianos (GP)** como distribuciones sobre funciones: para cualquier conjunto finito de entradas, sus valores tienen una distribución normal multivariada. Una media $\mu(x)$ y una covarianza $\kappa(x,x')$ describen el modelo.
+Una predicción puntual $\hat y$ no dice cuánto desconocemos en otras entradas. Los **procesos gaussianos (GP)** son distribuciones sobre funciones: para cualquier conjunto finito de entradas, sus valores tienen una distribución normal multivariada. Una media $\mu(x)$ y una covarianza $\kappa(x,x')$ describen el modelo.
 
 Para entradas observadas $X$, nuevas entradas $X_*$ y valores latentes $\mathbf f$:
 
@@ -135,13 +140,13 @@ $$
 \boxed{\boldsymbol\mu_{*\mid D}=\boldsymbol\mu_*+K_*^{\mathsf T}K^{-1}(\mathbf f-\boldsymbol\mu),\qquad \Sigma_{*\mid D}=K_{**}-K_*^{\mathsf T}K^{-1}K_*.}
 $$
 
-La diapositiva propone $\kappa(x,x')=\sigma_f^2\exp\!\bigl(-\lVert x-x'\rVert^2/(2\ell^2)\bigr)$: $\sigma_f$ controla la amplitud y $\ell$ la escala de variación. **Si observamos $\mathbf y=\mathbf f+\boldsymbol\epsilon$ con ruido gaussiano de varianza $\sigma_n^2$**, se reemplaza $K^{-1}$ por $(K+\sigma_n^2I)^{-1}$ y $\mathbf f$ por $\mathbf y$ en la fórmula de la media; en la covarianza se reemplaza la misma inversa. Para predecir una observación nueva se suma $\sigma_n^2I$ a la covarianza latente. Esto distingue incertidumbre de la función y ruido de medición.
+Un núcleo común es $\kappa(x,x')=\sigma_f^2\exp\!\bigl(-\lVert x-x'\rVert^2/(2\ell^2)\bigr)$: $\sigma_f$ controla la amplitud y $\ell$ la escala de variación. **Si observamos $\mathbf y=\mathbf f+\boldsymbol\epsilon$ con ruido gaussiano de varianza $\sigma_n^2$**, se reemplaza $K^{-1}$ por $(K+\sigma_n^2I)^{-1}$ y $\mathbf f$ por $\mathbf y$ en la fórmula de la media; en la covarianza se reemplaza la misma inversa. Para predecir una observación nueva se suma $\sigma_n^2I$ a la covarianza latente. Esto distingue incertidumbre de la función y ruido de medición.
 
-La media expresa la predicción y la varianza indica dónde el modelo es menos seguro. En el **aprendizaje activo** de la diapositiva 27 se eligen nuevas mediciones en zonas informativas, por ejemplo de alta incertidumbre, para reducirla.
+La media expresa la predicción y la varianza indica dónde el modelo es menos seguro. Gráficamente, a partir de unos pocos puntos de datos hay muchas funciones plausibles; la banda sombreada de incertidumbre es estrecha cerca de los datos y se ensancha lejos de ellos. En el **aprendizaje activo** se eligen nuevas mediciones en zonas informativas, por ejemplo de alta incertidumbre, para reducirla.
 
 ## 6. Ejercicio: demanda de energía
 
-*Diapositiva 28.* Se predice requerimiento de energía $y$ a partir de velocidad del viento $v$ y personas en el edificio $p$.
+Se predice requerimiento de energía $y$ a partir de velocidad del viento $v$ y personas en el edificio $p$.
 
 | $v$ | $p$ | $y$ |
 |---:|---:|---:|
