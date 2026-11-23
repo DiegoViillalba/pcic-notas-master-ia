@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Probabilidad como área: conjunta, marginal y condicional</title>
+<style>
+:root{color-scheme:light dark;--bg:#f8f7f3;--ink:#192a32;--muted:#52626a;--surface:#fff;--line:#ced7da;--hot:#d9803f;--cold:#2e8aa3;--sun:#e0b93f;--rain:#5f84b8;--tot:#9aa9b0;--acc:#186b80}
+@media(prefers-color-scheme:dark){:root{--bg:#151e24;--ink:#e7eff2;--muted:#b5c4cb;--surface:#202d35;--line:#43545e;--hot:#e09a62;--cold:#5cb5cc;--sun:#d9b43a;--rain:#7f9fce;--tot:#5d7079;--acc:#68becb}}
+*{box-sizing:border-box}
+body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+main{max-width:900px;margin:auto}
+h1{font-size:1.3rem;margin:0 0 2px}
+.muted{color:var(--muted);font-size:.86rem}
+button{font:inherit;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 14px;cursor:pointer}
+button[aria-pressed=true]{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+button:disabled{opacity:.4;cursor:default}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.nav{display:flex;gap:8px;align-items:center;margin:12px 0}
+.nav input{flex:1;accent-color:var(--acc)}
+.grid{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:24px;align-items:start}
+svg{width:100%;height:auto;display:block;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+svg text{font:600 14px system-ui,sans-serif;fill:#0d1a20;pointer-events:none;text-anchor:middle}
+svg text.sm{font-weight:400;font-size:11px}
+svg rect.cell{stroke:var(--bg);stroke-width:2}
+.hot{fill:var(--hot)}.cold{fill:var(--cold)}.sun{fill:var(--sun)}.rain{fill:var(--rain)}.tot{fill:var(--tot)}
+h2{font-size:1.05rem;margin:0 0 6px}
+.box{border-left:4px solid var(--acc);padding:6px 12px;background:var(--surface);margin-bottom:10px}
+.eq{font-family:ui-monospace,Menlo,monospace;font-size:.88rem;white-space:pre-wrap;margin:8px 0}
+table{border-collapse:separate;border-spacing:3px;font-variant-numeric:tabular-nums;text-align:center;font-size:.92rem}
+td,th{padding:6px 10px;border-radius:5px}
+th{font-weight:600;color:var(--muted)}
+td{background:var(--surface);border:1px solid var(--line);transition:opacity .3s,background .3s}
+td.on{background:color-mix(in srgb,var(--acc) 22%,var(--surface));border-color:var(--acc);font-weight:700}
+td.off{opacity:.25}
+td.m{border-style:dashed;background:transparent}
+td.mh{border:2px solid var(--acc);font-weight:700;background:transparent}
+.pre{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body><main id="pa">
+<h1>Probabilidad = área</h1>
+<p class="muted">Un cuadrado de área 1 contiene todos los mundos posibles. Cada concepto es un movimiento geométrico sobre él.</p>
+
+<div class="nav">
+ <button type="button" id="prev">◀ Anterior</button>
+ <input type="range" id="sl" min="1" max="7" value="1" aria-label="Paso">
+ <button type="button" id="next">Siguiente ▶</button>
+</div>
+
+<div class="grid">
+ <svg id="sv" viewBox="0 0 360 360" role="img" aria-label="Cuadrado unitario dividido según la distribución conjunta"></svg>
+ <div>
+  <div class="box"><h2 id="ttl"></h2><div id="txt" aria-live="polite"></div></div>
+  <div class="eq" id="eq"></div>
+  <table id="tb" aria-label="Tabla conjunta"></table>
+  <div class="pre"><span class="muted">Modelo:</span>
+   <button type="button" data-p="clase" aria-pressed="true">Tabla de la clase</button>
+   <button type="button" data-p="ind" aria-pressed="false">T y W independientes</button>
+  </div>
+ </div>
+</div>
+<p class="muted">Datos de AI 13, diapositivas 9–10 y 14. Sin recursos externos.</p>
+</main>
+<script>
+(()=>{
+const root=document.getElementById('pa'),$=id=>root.querySelector('#'+id),N=360;
+const presets={clase:{hs:.4,hr:.1,cs:.2,cr:.3},ind:{hs:.3,hr:.2,cs:.3,cr:.2}};
+const f=n=>String(+n.toFixed(4)),pc=n=>f(n);
+const S={step:1,preset:'clase'};
+const ids=['tot','cS','cR','hs','cs','hr','cr'];
+const cls={tot:'tot',cS:'sun',cR:'rain'};
+const NS='http://www.w3.org/2000/svg';
+const els={},txt={},cur={};
+ids.forEach(id=>{const r=document.createElementNS(NS,'rect');r.setAttribute('class','cell '+(cls[id]||''));$('sv').appendChild(r);els[id]=r;
+ const t=document.createElementNS(NS,'text');$('sv').appendChild(t);txt[id]=t;cur[id]={x:0,y:0,w:N,h:N,o:0};});
+
+function model(){const p=presets[S.preset],pS=p.hs+p.cs,pR=p.hr+p.cr,pH=p.hs+p.hr,pC=p.cs+p.cr;return{...p,pS,pR,pH,pC};}
+function J(m){return{hs:{x:0,y:0,w:m.pS*N,h:m.hs/m.pS*N},cs:{x:0,y:m.hs/m.pS*N,w:m.pS*N,h:m.cs/m.pS*N},
+ hr:{x:m.pS*N,y:0,w:m.pR*N,h:m.hr/m.pR*N},cr:{x:m.pS*N,y:m.hr/m.pR*N,w:m.pR*N,h:m.cr/m.pR*N}};}
+function R(m){return{hs:{x:0,y:0,w:m.hs/m.pH*N,h:m.pH*N},hr:{x:m.hs/m.pH*N,y:0,w:m.hr/m.pH*N,h:m.pH*N},
+ cs:{x:0,y:m.pH*N,w:m.cs/m.pC*N,h:m.pC*N},cr:{x:m.cs/m.pC*N,y:m.pH*N,w:m.cr/m.pC*N,h:m.pC*N}};}
+const hide={x:0,y:0,w:N,h:N,o:0};
+function target(m){
+ const s=S.step,j=J(m),r=R(m),T={};
+ ids.forEach(id=>T[id]={...(cur[id]),o:0});
+ const cells=(lay,o)=>['hs','cs','hr','cr'].forEach(id=>T[id]={...lay[id],o:o?o[id]:1});
+ const lab={};
+ if(s===1){T.tot={x:0,y:0,w:N,h:N,o:1};lab.tot='1';
+  cells(j,{hs:0,cs:0,hr:0,cr:0});}
+ if(s===2){T.cS={x:0,y:0,w:m.pS*N,h:N,o:1};T.cR={x:m.pS*N,y:0,w:m.pR*N,h:N,o:1};lab.cS='sun  '+pc(m.pS);lab.cR='rain  '+pc(m.pR);
+  cells(j,{hs:0,cs:0,hr:0,cr:0});}
+ if(s===3){cells(j);['hs','cs','hr','cr'].forEach(i=>lab[i]=pc(m[i]));}
+ if(s===4){cells(r);['hs','cs','hr','cr'].forEach(i=>lab[i]=pc(m[i]));}
+ if(s===5){cells(j);['hs','cs','hr','cr'].forEach(i=>lab[i]=pc(m[i]));}
+ if(s===6){cells(j,{hs:.12,cs:.12,hr:1,cr:1});lab.hr=pc(m.hr);lab.cr=pc(m.cr);lab.hs=pc(m.hs);lab.cs=pc(m.cs);}
+ if(s===7){const h1=m.hr/m.pR*N,h2=m.cr/m.pR*N;
+  T.hs={...j.hs,o:0};T.cs={...j.cs,o:0};T.hr={x:0,y:0,w:N,h:h1,o:1};T.cr={x:0,y:h1,w:N,h:h2,o:1};
+  lab.hr=pc(m.hr/m.pR);lab.cr=pc(m.cr/m.pR);}
+ return{T,lab};
+}
+// color class per step
+function colors(){const s=S.step;
+ const byT=s===3||s===4||s>=6,byW=s===5;
+ ['hs','cs','hr','cr'].forEach(id=>{const t=id[0]==='h'?'hot':'cold',w=id[1]==='s'?'sun':'rain';
+  els[id].setAttribute('class','cell '+(byW?w:t));});}
+let raf=null;
+function tween(tg){
+ const from=JSON.parse(JSON.stringify(cur)),t0=performance.now(),D=window.matchMedia('(prefers-reduced-motion:reduce)').matches?1:550;
+ cancelAnimationFrame(raf);
+ const tick=now=>{let k=Math.min(1,(now-t0)/D);k=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+  ids.forEach(id=>{const a=from[id],b=tg.T[id],c=cur[id];
+   ['x','y','w','h','o'].forEach(p=>c[p]=a[p]+(b[p]-a[p])*k);
+   const e=els[id];e.setAttribute('x',c.x);e.setAttribute('y',c.y);e.setAttribute('width',Math.max(0,c.w));e.setAttribute('height',Math.max(0,c.h));e.setAttribute('opacity',c.o);
+   const t=txt[id];t.setAttribute('x',c.x+c.w/2);t.setAttribute('y',c.y+c.h/2+5);t.setAttribute('opacity',Math.max(0,(c.o-.3)/.7)*(c.w>34&&c.h>20?1:0));});
+  if(k<1)raf=requestAnimationFrame(tick);};
+ raf=requestAnimationFrame(tick);
+}
+function captions(m){
+ const s=S.step,{hs,hr,cs,cr,pS,pR,pH,pC}=m;
+ const C={
+ 1:['1 · Todos los mundos posibles','El cuadrado completo representa <b>toda</b> la incertidumbre del agente. Su área vale <b>1</b>. Cada región que dibujemos tendrá un área igual a su probabilidad.','Área total = 1'],
+ 2:['2 · Cortar por una variable: W','Un corte vertical reparte el cuadrado en «sun» y «rain». El <b>ancho</b> de cada franja es la probabilidad de ese clima. (Este ancho ya es una marginal; lo reconoceremos en el paso 5.)',`ancho(sun) = ${pc(pS)}\nancho(rain) = ${pc(pR)}`],
+ 3:['3 · Probabilidad conjunta P(T,W)','Cortamos cada columna por temperatura. Cada celda es un mundo completo (T y W a la vez) y su <b>área = ancho × alto</b>: la probabilidad de la columna por la fracción que ocupa T dentro de ella. Las cuatro áreas suman 1.',`P(hot,sun) = P(sun)·P(hot|sun)\n${pc(hs)} = ${pc(pS)} × ${pc(hs/pS)}\nsuma de áreas = ${pc(hs+hr+cs+cr)}`],
+ 4:['4 · Marginalizar W (olvidar el clima)','Mismas cuatro piezas, mismas áreas, <b>reagrupadas por temperatura</b>. Ya no distinguimos sun de rain: la banda «hot» es la suma de sus piezas. No se pierde área y no hay que reescalar.',`P(hot)  = ${pc(hs)} + ${pc(hr)} = ${pc(pH)}\nP(cold) = ${pc(cs)} + ${pc(cr)} = ${pc(pC)}\nΣ = 1`],
+ 5:['5 · Marginalizar T (olvidar la temperatura)','Ahora agrupamos por clima: la columna «sun» es la suma de sus dos celdas. Es el mismo movimiento (sumar), en la otra dirección. Las <b>marginales son los anchos</b> (o alturas) de las franjas.',`P(sun)  = ${pc(hs)} + ${pc(cs)} = ${pc(pS)}\nP(rain) = ${pc(hr)} + ${pc(cr)} = ${pc(pR)}\nΣ = 1`],
+ 6:['6 · Condicionar: observo W = rain','La evidencia elimina los mundos incompatibles: la franja «sun» queda fuera. Lo que sobrevive tiene área <b>'+pc(pR)+'</b>, no 1: todavía <b>no</b> es una distribución. Esa área es exactamente P(rain).',`pesos: ${pc(hr)} (hot), ${pc(cr)} (cold)\nsuma = P(rain) = ${pc(pR)} < 1`],
+ 7:['7 · Renormalizar: la franja se estira a área 1','Dividir entre P(rain) equivale a <b>ampliar</b> la franja que sobrevivió hasta ocupar todo el cuadrado. Las alturas no cambian de proporción: ahora son P(T | rain).',`P(hot|rain)  = ${pc(hr)}/${pc(pR)} = ${pc(hr/pR)}\nP(cold|rain) = ${pc(cr)}/${pc(pR)} = ${pc(cr/pR)}\n`+(S.preset==='ind'?'Con T y W independientes la altura NO cambia respecto a P(T): condicionar no aporta información.':'Compara con P(cold)=0.5: la evidencia sí movió la creencia (T y W dependen).')]};
+ return C[s];
+}
+function table(m){
+ const s=S.step,v=(id)=>{if(s===7&&id[1]==='r')return pc(m[id]/m.pR);return pc(m[id]);};
+ const cl=id=>{if(s<3)return'off';if(s===6||s===7)return id[1]==='r'?'on':'off';return'';};
+ const mgT=(i)=>s===4?'mh':'m',mgW=(i)=>s===5?'mh':'m';
+ $('tb').innerHTML=`<tr><th></th><th>sun</th><th>rain</th><th>P(T)</th></tr>
+ <tr><th>hot</th><td class="${cl('hs')}">${v('hs')}</td><td class="${cl('hr')}">${v('hr')}</td><td class="${s<4?'off ':''}${mgT()}">${pc(m.pH)}</td></tr>
+ <tr><th>cold</th><td class="${cl('cs')}">${v('cs')}</td><td class="${cl('cr')}">${v('cr')}</td><td class="${s<4?'off ':''}${mgT()}">${pc(m.pC)}</td></tr>
+ <tr><th>P(W)</th><td class="${s<5&&s!==2?'off ':''}${mgW()}">${pc(m.pS)}</td><td class="${s<5&&s!==2?'off ':''}${mgW()}">${pc(m.pR)}</td><td class="m">1</td></tr>`;
+}
+function render(){
+ const m=model(),tg=target(m),c=captions(m);
+ colors();$('ttl').innerHTML=c[0];$('txt').innerHTML=c[1];$('eq').textContent=c[2];
+ ids.forEach(id=>{txt[id].textContent=tg.lab[id]||'';});
+ table(m);tween(tg);
+ $('sl').value=S.step;$('prev').disabled=S.step===1;$('next').disabled=S.step===7;
+ root.querySelectorAll('[data-p]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.p===S.preset)));
+}
+$('prev').onclick=()=>{S.step=Math.max(1,S.step-1);render();};
+$('next').onclick=()=>{S.step=Math.min(7,S.step+1);render();};
+$('sl').oninput=e=>{S.step=+e.target.value;render();};
+root.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{S.preset=b.dataset.p;render();});
+render();
+})();
+</script></body></html>

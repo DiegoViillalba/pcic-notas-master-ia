@@ -244,6 +244,61 @@ En Bayes, $P(x)$ es la creencia previa, $P(y\mid x)$ la verosimilitud de la evid
 > [!note] Conexión con Berkeley
 > [CS 188, §6.1 Probability Rundown](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/probability.html) reúne estas operaciones y la notación de independencia. Su función en esta nota es conectar las tablas de la presentación con las expresiones condicionales posteriores. Una consulta puede combinar selección de evidencia, sumas sobre variables ocultas y normalización; si la evidencia tiene probabilidad cero, el cociente condicional no está definido.
 
+### Construcción paso a paso con áreas: de la conjunta a la marginal y la condicional
+
+**Idea guía:** un cuadrado de **área 1** contiene todos los mundos posibles; la probabilidad de un evento es el **área** de su región. Con esa imagen, conjunta, marginalización y condicionamiento son tres movimientos distintos sobre la *misma* tabla.
+
+<iframe src="probabilidad-areas-paso-a-paso.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
+
+*Recórrela con el control deslizante (pasos 1–7). Cada paso de abajo corresponde al mismo paso de la visualización.*
+
+**Si no carga:** la tabla de partida es
+
+| | sun | rain | $P(T)$ |
+|---|---:|---:|---:|
+| **hot** | 0.4 | 0.1 | 0.5 |
+| **cold** | 0.2 | 0.3 | 0.5 |
+| $P(W)$ | 0.6 | 0.4 | 1 |
+
+**Paso 1 · Todo el espacio.** El cuadrado completo es la incertidumbre total del agente: área $=1$.
+
+**Paso 2 · Cortar por una variable.** Un corte vertical por $W$ da dos franjas cuyos **anchos** son $0.6$ (sun) y $0.4$ (rain).
+
+**Paso 3 · Distribución conjunta $P(T,W)$.** Cortamos cada columna por $T$. Cada celda es un **mundo completo** y su área es *ancho × alto*:
+
+$$P(\mathrm{hot},\mathrm{sun})=\underbrace{P(\mathrm{sun})}_{\text{ancho}}\cdot\underbrace{P(\mathrm{hot}\mid\mathrm{sun})}_{\text{alto}}=0.6\cdot\tfrac23=0.4.$$
+
+Las cuatro áreas suman 1. *Ya aparece, sin decirlo, la regla del producto $P(t,w)=P(w)P(t\mid w)$: la condicional es la proporción de alto dentro de una columna.*
+
+**Paso 4 · Marginalizar $W$ (olvidar el clima).** Se **reagrupan las mismas piezas por temperatura**. Las áreas no cambian; solo dejamos de distinguir sun de rain:
+
+$$P(\mathrm{hot})=0.4+0.1=0.5,\qquad P(\mathrm{cold})=0.2+0.3=0.5.$$
+
+**Paso 5 · Marginalizar $T$.** Mismo movimiento en la otra dirección: se agrupa por columna.
+
+$$P(\mathrm{sun})=0.4+0.2=0.6,\qquad P(\mathrm{rain})=0.1+0.3=0.4.$$
+
+Las marginales son los **márgenes de la tabla**, y geométricamente los anchos (o alturas) de las franjas. Marginalizar nunca descarta área: por eso el resultado ya suma 1.
+
+**Paso 6 · Condicionar: observo $W=\mathrm{rain}$.** La evidencia **elimina los mundos incompatibles**: la franja *sun* sale del cuadro. Lo que sobrevive tiene área $0.4$, que es exactamente $P(\mathrm{rain})$. Todavía **no es una distribución**, porque no suma 1.
+
+**Paso 7 · Renormalizar.** Dividir entre $P(\mathrm{rain})$ equivale a **ampliar** la franja hasta ocupar todo el cuadrado. Las proporciones no cambian; las alturas son ahora $P(T\mid\mathrm{rain})$:
+
+$$P(\mathrm{hot}\mid\mathrm{rain})=\frac{0.1}{0.4}=0.25,\qquad P(\mathrm{cold}\mid\mathrm{rain})=\frac{0.3}{0.4}=0.75.$$
+
+#### Resumen: dos movimientos distintos
+
+| | Marginalizar (pasos 4–5) | Condicionar (pasos 6–7) |
+|---|---|---|
+| Geometría | **Reagrupar** las piezas; el área total sigue siendo 1 | **Descartar** piezas y **ampliar** lo que queda |
+| Qué sabe el agente | No conoce (o ignora) la otra variable | **Observó** la otra variable |
+| Fórmula | $P(t)=\sum_w P(t,w)$ | $P(t\mid w)=\dfrac{P(t,w)}{P(w)}$ |
+| ¿Normalizar? | No | Sí: lo que sobrevive suma $P(w)<1$ |
+| Con la tabla | $P(\mathrm{cold})=0.5$ | $P(\mathrm{cold}\mid\mathrm{rain})=0.75$ |
+
+> [!tip] Independencia, geométricamente
+> Si $T$ y $W$ son independientes, **todas las columnas se cortan a la misma altura**: la línea que separa hot de cold queda horizontal de lado a lado. Entonces ampliar la franja *rain* no cambia nada: $P(T\mid W)=P(T)$. Activa «T y W independientes» en la visualización y compara el paso 7.
+
 ### Visualización · Conjunta, marginal y condicional
 
 <iframe src="probabilidad-conjunta-marginal-condicional.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
