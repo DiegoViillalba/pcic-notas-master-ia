@@ -40,7 +40,9 @@ En aprendizaje supervisado observamos pares $(\mathbf{x}_i,y_i)$. En la clase an
 
 Para dos características $\mathbf{x}=(x_1,x_2)^\mathsf T$, una función de decisión afín es
 
-$$z(\mathbf{x})=w_1x_1+w_2x_2+b=\mathbf{w}^{\mathsf T}\mathbf{x}+b.$$
+$$
+z(\mathbf{x})=w_1x_1+w_2x_2+b=\mathbf{w}^{\mathsf T}\mathbf{x}+b.
+$$
 
 La **frontera de decisión** es el conjunto $z(\mathbf{x})=0$: una recta en dos dimensiones y un hiperplano en más dimensiones. La regla $\hat y=1$ si $z\geq0$, y $\hat y=0$ si $z<0$, separa los dos semiespacios. La diapositiva 5 escribe el sesgo como $w_3$; $b$ representa la misma constante. Cambiar los pesos gira la frontera; cambiar $b$ la desplaza. Una sola recta solo puede resolver patrones *linealmente separables*.
 
@@ -54,17 +56,23 @@ Mueve los coeficientes y alterna entre datos separables y el patrón XOR. En el 
 
 La **sigmoide** transforma el puntaje $z\in\mathbb R$ en un valor entre 0 y 1:
 
-$$\sigma(z)=\frac{1}{1+e^{-z}},\qquad \pi_i=P(y_i=1\mid\mathbf{x}_i,\boldsymbol\theta)=\sigma(\mathbf{x}_i^\mathsf T\boldsymbol\theta).$$
+$$
+\sigma(z)=\frac{1}{1+e^{-z}},\qquad \pi_i=P(y_i=1\mid\mathbf{x}_i,\boldsymbol\theta)=\sigma(\mathbf{x}_i^\mathsf T\boldsymbol\theta).
+$$
 
 Incluimos una primera componente $1$ en $\mathbf{x}_i$ para incorporar el sesgo en $\boldsymbol\theta$. Como $\sigma(0)=1/2$, el umbral de probabilidad $1/2$ corresponde exactamente a $\mathbf{x}^\mathsf T\boldsymbol\theta=0$ (diapositiva 7). Si $z$ es grande y positivo, $\pi$ se acerca a 1; si es grande y negativo, se acerca a 0. El **logit** es la transformación inversa, $\log(\pi/(1-\pi))=z$; no es otro nombre de la sigmoide.
 
 Suponiendo ejemplos condicionalmente independientes, cada etiqueta sigue una Bernoulli:
 
-$$P(\mathbf y\mid X,\boldsymbol\theta)=\prod_{i=1}^{n}\pi_i^{y_i}(1-\pi_i)^{1-y_i},\qquad y_i\in\{0,1\}.$$
+$$
+P(\mathbf y\mid X,\boldsymbol\theta)=\prod_{i=1}^{n}\pi_i^{y_i}(1-\pi_i)^{1-y_i},\qquad y_i\in\{0,1\}.
+$$
 
 Maximizar esta verosimilitud equivale a minimizar la **entropía cruzada binaria** o log-verosimilitud negativa:
 
-$$\boxed{J(\boldsymbol\theta)=-\sum_{i=1}^{n}\left[y_i\log\pi_i+(1-y_i)\log(1-\pi_i)\right].}$$
+$$
+\boxed{J(\boldsymbol\theta)=-\sum_{i=1}^{n}\left[y_i\log\pi_i+(1-y_i)\log(1-\pi_i)\right].}
+$$
 
 Si se divide entre $n$, cambia la escala de la pérdida y del gradiente, pero no su minimizador. Para un ejemplo con $y=1$, la pérdida es $-\log\pi$; si el modelo asigna una probabilidad pequeña a la clase correcta, paga una penalización grande. En la diapositiva 8 aparece $\pi=1+e^{-x\theta}$: falta el recíproco. La definición correcta es $\pi=1/(1+e^{-x\theta})$.
 
@@ -83,7 +91,9 @@ Para cualquier vector $\mathbf v$, $\mathbf v^\mathsf T\nabla^2J\mathbf v=\sum_i
 
 Para minimizar $J$, partimos de $\boldsymbol\theta_0$ y actualizamos en dirección descendente:
 
-$$\boxed{\boldsymbol\theta_{k+1}=\boldsymbol\theta_k-\alpha_k\nabla J(\boldsymbol\theta_k)},\qquad \alpha_k>0.$$
+$$
+\boxed{\boldsymbol\theta_{k+1}=\boldsymbol\theta_k-\alpha_k\nabla J(\boldsymbol\theta_k)},\qquad \alpha_k>0.
+$$
 
 Esto es el caso $\mathbf p_k=-\nabla J(\boldsymbol\theta_k)$ de la regla general $\boldsymbol\theta_{k+1}=\boldsymbol\theta_k+\alpha_k\mathbf p_k$. Para un gradiente no nulo, $\mathbf p_k^\mathsf T\nabla J=-\|\nabla J\|^2<0$; por ello es una dirección de descenso **local**. Un paso demasiado grande todavía puede aumentar la pérdida. La búsqueda lineal elige $\alpha_k$ sobre esa dirección; también puede fijarse o adaptarse. Se repite hasta cumplir una condición de paro, como cambio pequeño de pérdida, norma pequeña del gradiente o un límite de iteraciones. La diapositiva 12 invierte verbalmente la condición al decir «mientras condición_de_paro»; el ciclo continúa **mientras no** se cumpla.
 
@@ -106,7 +116,9 @@ La capa oculta crea nuevas características; la salida convierte el puntaje fina
 
 Para dos clases se usa la pérdida binaria de la sección 2. Calcular $\log\sigma(z)$ y $\log(1-\sigma(z))$ de forma ingenua puede causar problemas numéricos cuando $|z|$ es grande. Una forma estable que trabaja directamente con el puntaje es
 
-$$\ell(z,y)=\max(z,0)-yz+\log\bigl(1+e^{-|z|}\bigr).$$
+$$
+\ell(z,y)=\max(z,0)-yz+\log\bigl(1+e^{-|z|}\bigr).
+$$
 
 Por tanto, la afirmación de la diapositiva 18 sobre inestabilidad se refiere al **cálculo ingenuo**, no a la entropía cruzada como objetivo matemático.
 
@@ -114,7 +126,9 @@ Por tanto, la afirmación de la diapositiva 18 sobre inestabilidad se refiere al
 
 Si hay $K$ clases mutuamente excluyentes, una capa produce puntajes $z_1,\ldots,z_K$ y **softmax** los normaliza:
 
-$$p_j=\frac{e^{z_j}}{\sum_{k=1}^{K}e^{z_k}},\qquad \sum_{j=1}^{K}p_j=1.$$
+$$
+p_j=\frac{e^{z_j}}{\sum_{k=1}^{K}e^{z_k}},\qquad \sum_{j=1}^{K}p_j=1.
+$$
 
 Con una etiqueta *one-hot* $\mathbf t$, la pérdida es $-\sum_jt_j\log p_j=-\log p_{\text{clase correcta}}$. La sigmoide binaria es equivalente a un softmax de dos puntajes en cuanto a la probabilidad de una clase. Para calcular softmax de forma estable, se resta $m=\max_kz_k$ a todos los puntajes: $p_j=e^{z_j-m}/\sum_ke^{z_k-m}$. La combinación softmax con entropía cruzada simplifica el gradiente con respecto a los puntajes a $\mathbf p-\mathbf t$.
 

@@ -73,7 +73,9 @@ Un proceso determinista también puede ser incierto **para quien desconoce sus e
 
 En lógica preguntamos si $KB\models\alpha$. En probabilidad preguntamos cuánto apoyo tiene una hipótesis dada la información disponible:
 
-$$P(\alpha\mid e).$$
+$$
+P(\alpha\mid e).
+$$
 
 Aquí $e$ es la **evidencia observada**. Por ejemplo, una llamada del vecino es evidencia de una alarma, pero no prueba por sí sola que haya ocurrido un robo.
 
@@ -81,7 +83,9 @@ Aquí $e$ es la **evidencia observada**. Por ejemplo, una llamada del vecino es 
 
 El modelo probabilístico estima resultados; para elegir una acción también hacen falta preferencias o costos. Como puente con Expectimax:
 
-$$a^*\in\arg\max_a\sum_s P(s\mid e,a)U(a,s).$$
+$$
+a^*\in\arg\max_a\sum_s P(s\mid e,a)U(a,s).
+$$
 
 **Ejemplo didáctico:** llevar paraguas cuesta 1 unidad de incomodidad; no llevarlo cuesta 10 si llueve y 0 si no llueve. Si $p=P(R=\mathrm{true}\mid e)$, los costos esperados son $1$ y $10p$. Conviene llevarlo cuando $p>0.1$; si $p=0.1$, ambas acciones empatan. La probabilidad informa la decisión, pero el umbral depende del costo.
 
@@ -91,7 +95,9 @@ Este puente sigue la idea de maximizar utilidad esperada en [CS 188, §7.1 Utili
 
 *Diapositiva 7.* Una **variable aleatoria** representa un aspecto del mundo cuyo valor puede ser desconocido. Formalmente es una función:
 
-$$X:\Omega\longrightarrow E,$$
+$$
+X:\Omega\longrightarrow E,
+$$
 
 donde $\Omega$ contiene los resultados elementales del experimento y $E$ es el espacio de valores de la variable. Para cada $\omega\in\Omega$, la función devuelve un valor $X(\omega)$.
 
@@ -120,7 +126,9 @@ Se puede abreviar $P(W=\mathrm{rain})$ como $P(\mathrm{rain})$ cuando queda clar
 
 *Diapositiva 8.* Para una variable discreta:
 
-$$P(X=x)\geq 0,\qquad \sum_{x\in\mathrm{Dom}(X)}P(X=x)=1.$$
+$$
+P(X=x)\geq 0,\qquad \sum_{x\in\mathrm{Dom}(X)}P(X=x)=1.
+$$
 
 La primera condición impide probabilidades negativas; la segunda exige repartir toda la masa entre las alternativas del dominio. De ambas se deduce $P(X=x)\leq1$.
 
@@ -147,7 +155,9 @@ En este modelo, $0.6+0.1+0.3+0=1$. Un cero excluye ese resultado **del modelo**;
 
 *Diapositiva 9.* Una distribución conjunta especifica la probabilidad de **cada asignación completa** de un conjunto de variables:
 
-$$P(X_1=x_1,\ldots,X_n=x_n)\equiv P(x_1,\ldots,x_n).$$
+$$
+P(X_1=x_1,\ldots,X_n=x_n)\equiv P(x_1,\ldots,x_n).
+$$
 
 La coma representa conjunción de eventos. $P(T=\mathrm{hot},W=\mathrm{sun})$ es la probabilidad de que ocurran ambos a la vez.
 
@@ -169,7 +179,9 @@ La conjunta que se usa en las diapositivas 9–11 es:
 
 Para cualquier conjunta discreta:
 
-$$\sum_{x_1}\cdots\sum_{x_n}P(x_1,\ldots,x_n)=1.$$
+$$
+\sum_{x_1}\cdots\sum_{x_n}P(x_1,\ldots,x_n)=1.
+$$
 
 ### ¿Cuánto ocupa la tabla?
 
@@ -189,7 +201,9 @@ Agregar una variable booleana **duplica** el número de filas. Esta dificultad m
 
 *Diapositiva 10.* Si solo queremos conocer $T$, agrupamos las filas que comparten su valor y sumamos sobre todos los valores de $W$:
 
-$$P(T=t)=\sum_wP(T=t,W=w).$$
+$$
+P(T=t)=\sum_wP(T=t,W=w).
+$$
 
 Aplicándolo a la tabla:
 
@@ -217,7 +231,9 @@ $$
 
 Para $P(W=w)>0$:
 
-$$P(T=t\mid W=w)=\frac{P(T=t,W=w)}{P(W=w)}.$$
+$$
+P(T=t\mid W=w)=\frac{P(T=t,W=w)}{P(W=w)}.
+$$
 
 ### Ejemplo: temperatura dado que llueve
 
@@ -235,15 +251,21 @@ Ahora ambas probabilidades suman 1. En cambio, $0.1$ y $0.3$ eran probabilidades
 
 ### La dirección de la condición importa
 
-$$P(\mathrm{rain}\mid\mathrm{cold})=\frac{0.3}{0.5}=0.6,$$
+$$
+P(\mathrm{rain}\mid\mathrm{cold})=\frac{0.3}{0.5}=0.6,
+$$
 
 mientras que $P(\mathrm{cold}\mid\mathrm{rain})=0.75$. Los numeradores coinciden, pero los denominadores describen poblaciones distintas.
 
 La regla del producto y la regla de Bayes se obtienen de la definición:
 
-$$P(x,y)=P(x\mid y)P(y)=P(y\mid x)P(x),$$
+$$
+P(x,y)=P(x\mid y)P(y)=P(y\mid x)P(x),
+$$
 
-$$P(x\mid y)=\frac{P(y\mid x)P(x)}{P(y)}.$$
+$$
+P(x\mid y)=\frac{P(y\mid x)P(x)}{P(y)}.
+$$
 
 En Bayes, $P(x)$ es la creencia previa, $P(y\mid x)$ la verosimilitud de la evidencia bajo la hipótesis, $P(y)$ la masa de esa evidencia y $P(x\mid y)$ la creencia posterior. La verosimilitud, considerada como función de $x$ con $y$ fijo, no tiene por qué sumar 1 sobre las hipótesis.
 
@@ -272,17 +294,23 @@ En Bayes, $P(x)$ es la creencia previa, $P(y\mid x)$ la verosimilitud de la evid
 
 **Paso 3 · Distribución conjunta $P(T,W)$.** Cortamos cada columna por $T$. Cada celda es un **mundo completo** y su área es *ancho × alto*:
 
-$$P(\mathrm{hot},\mathrm{sun})=\underbrace{P(\mathrm{sun})}_{\text{ancho}}\cdot\underbrace{P(\mathrm{hot}\mid\mathrm{sun})}_{\text{alto}}=0.6\cdot\tfrac23=0.4.$$
+$$
+P(\mathrm{hot},\mathrm{sun})=\underbrace{P(\mathrm{sun})}_{\text{ancho}}\cdot\underbrace{P(\mathrm{hot}\mid\mathrm{sun})}_{\text{alto}}=0.6\cdot\tfrac23=0.4.
+$$
 
 Las cuatro áreas suman 1. *Ya aparece, sin decirlo, la regla del producto $P(t,w)=P(w)P(t\mid w)$: la condicional es la proporción de alto dentro de una columna.*
 
 **Paso 4 · Marginalizar $W$ (olvidar el clima).** Se **reagrupan las mismas piezas por temperatura**. Las áreas no cambian; solo dejamos de distinguir sun de rain:
 
-$$P(\mathrm{hot})=0.4+0.1=0.5,\qquad P(\mathrm{cold})=0.2+0.3=0.5.$$
+$$
+P(\mathrm{hot})=0.4+0.1=0.5,\qquad P(\mathrm{cold})=0.2+0.3=0.5.
+$$
 
 **Paso 5 · Marginalizar $T$.** Mismo movimiento en la otra dirección: se agrupa por columna.
 
-$$P(\mathrm{sun})=0.4+0.2=0.6,\qquad P(\mathrm{rain})=0.1+0.3=0.4.$$
+$$
+P(\mathrm{sun})=0.4+0.2=0.6,\qquad P(\mathrm{rain})=0.1+0.3=0.4.
+$$
 
 Las marginales son los **márgenes de la tabla**, y geométricamente los anchos (o alturas) de las franjas. Marginalizar nunca descarta área: por eso el resultado ya suma 1.
 
@@ -290,7 +318,9 @@ Las marginales son los **márgenes de la tabla**, y geométricamente los anchos 
 
 **Paso 7 · Renormalizar.** Dividir entre $P(\mathrm{rain})$ equivale a **ampliar** la franja hasta ocupar todo el cuadrado. Las proporciones no cambian; las alturas son ahora $P(T\mid\mathrm{rain})$:
 
-$$P(\mathrm{hot}\mid\mathrm{rain})=\frac{0.1}{0.4}=0.25,\qquad P(\mathrm{cold}\mid\mathrm{rain})=\frac{0.3}{0.4}=0.75.$$
+$$
+P(\mathrm{hot}\mid\mathrm{rain})=\frac{0.1}{0.4}=0.25,\qquad P(\mathrm{cold}\mid\mathrm{rain})=\frac{0.3}{0.4}=0.75.
+$$
 
 #### Resumen: dos movimientos distintos
 
@@ -333,11 +363,15 @@ El aprendizaje, al que apunta la transición inicial, podrá estimar probabilida
 
 *Diapositivas 14 y 21.* $X$ e $Y$ son independientes, $X\perp Y$, si:
 
-$$\forall x,y:\quad P(x,y)=P(x)P(y).$$
+$$
+\forall x,y:\quad P(x,y)=P(x)P(y).
+$$
 
 Para valores $y$ con $P(y)>0$, esto equivale a:
 
-$$P(x\mid y)=P(x).$$
+$$
+P(x\mid y)=P(x).
+$$
 
 La condición debe cumplirse **para todas las asignaciones**, no solamente para una fila. La independencia es una propiedad de la distribución.
 
@@ -354,7 +388,9 @@ La diapositiva 14 mantiene las marginales $P(T)=(0.5,0.5)$ y $P(W)=(0.6,0.4)$, p
 
 Para $P_1$:
 
-$$P_1(\mathrm{hot},\mathrm{sun})=0.4\ne0.5(0.6)=0.3.$$
+$$
+P_1(\mathrm{hot},\mathrm{sun})=0.4\ne0.5(0.6)=0.3.
+$$
 
 Una sola desigualdad basta para refutar independencia. Para $P_2$, cada fila es el producto de sus marginales, así que $T\perp W$.
 
@@ -364,11 +400,15 @@ Una sola desigualdad basta para refutar independencia. Para $P_2$, cada fila es 
 
 *Diapositivas 15 y 21.* Escribimos $X\perp Y\mid Z$ cuando, para cada valor $z$ con $P(z)>0$:
 
-$$P(x,y\mid z)=P(x\mid z)P(y\mid z).$$
+$$
+P(x,y\mid z)=P(x\mid z)P(y\mid z).
+$$
 
 En los casos donde las condiciones tienen probabilidad positiva, equivale a:
 
-$$P(x\mid y,z)=P(x\mid z).$$
+$$
+P(x\mid y,z)=P(x\mid z).
+$$
 
 Una vez que sabemos $z$, conocer además $y$ no modifica la distribución de $X$.
 
@@ -376,7 +416,9 @@ Una vez que sabemos $z$, conocer además $y$ no modifica la distribución de $X$
 
 En este ejemplo tomamos $R=$ lluvia, $T=$ tráfico y $U=$ uso de paraguas. Podemos **suponer**:
 
-$$T\perp U\mid R.$$
+$$
+T\perp U\mid R.
+$$
 
 ![[ia29-lluvia-trafico-paraguas.svg]]
 
@@ -386,7 +428,9 @@ La lluvia influye en ambos, pero una vez conocida la lluvia, el paraguas no aña
 
 Sin observar $R$, ver paraguas puede informar sobre lluvia y, por esa vía, sobre tráfico. Por ello:
 
-$$T\perp U\mid R\quad\text{no implica}\quad T\perp U.$$
+$$
+T\perp U\mid R\quad\text{no implica}\quad T\perp U.
+$$
 
 Tampoco la independencia marginal implica siempre independencia condicional: observar un efecto común puede relacionar dos causas. Volveremos a ello al introducir d-separación.
 
@@ -394,7 +438,9 @@ Tampoco la independencia marginal implica siempre independencia condicional: obs
 
 *Diapositivas 16 y 23.* La regla del producto aplicada repetidamente da:
 
-$$P(x_1,\ldots,x_n)=\prod_{i=1}^{n}P(x_i\mid x_1,\ldots,x_{i-1}),$$
+$$
+P(x_1,\ldots,x_n)=\prod_{i=1}^{n}P(x_i\mid x_1,\ldots,x_{i-1}),
+$$
 
 donde el primer factor es $P(x_1)$. Se usan condicionales definidos en los eventos de probabilidad positiva; las ramas de masa cero no contribuyen a la conjunta.
 
@@ -415,11 +461,15 @@ Esta igualdad no requiere $T\perp U\mid R$. Cambiar el orden de las variables ca
 
 Si $U\perp T\mid R$, entonces:
 
-$$P(u\mid r,t)=P(u\mid r).$$
+$$
+P(u\mid r,t)=P(u\mid r).
+$$
 
 ### Paso 3: sustituir y obtener tablas menores
 
-$$\boxed{P(t,r,u)=P(r)P(t\mid r)P(u\mid r).}$$
+$$
+\boxed{P(t,r,u)=P(r)P(t\mid r)P(u\mid r).}
+$$
 
 Para variables booleanas, una conjunta general necesita 7 parámetros libres. Esta factorización requiere 1 para $R$, 2 para $T\mid R$ y 2 para $U\mid R$: **5**. El ahorro proviene del supuesto de independencia condicional, no de escribir la misma tabla con otros símbolos.
 
@@ -457,7 +507,9 @@ La analogía con CSP de la diapositiva 24 es útil: ambos usan grafos para expre
 
 Si $X$ es booleano:
 
-$$P(X=\mathrm{true}\mid p)+P(X=\mathrm{false}\mid p)=1$$
+$$
+P(X=\mathrm{true}\mid p)+P(X=\mathrm{false}\mid p)=1
+$$
 
 **para cada** configuración $p$ de sus padres. La suma de toda la columna de probabilidades a través de configuraciones distintas no tiene por qué ser 1.
 
@@ -472,15 +524,21 @@ La referencia de la diapositiva 25 a un proceso «causal» con ruido debe leerse
 
 **Paso 1.** Expandimos usando la regla de la cadena:
 
-$$P(x_1,\ldots,x_n)=\prod_iP(x_i\mid x_1,\ldots,x_{i-1}).$$
+$$
+P(x_1,\ldots,x_n)=\prod_iP(x_i\mid x_1,\ldots,x_{i-1}).
+$$
 
 **Paso 2.** La red supone que los padres hacen innecesaria la información adicional de las variables anteriores:
 
-$$P(x_i\mid x_1,\ldots,x_{i-1})=P(x_i\mid\mathrm{pa}(X_i)).$$
+$$
+P(x_i\mid x_1,\ldots,x_{i-1})=P(x_i\mid\mathrm{pa}(X_i)).
+$$
 
 **Paso 3.** Sustituimos en cada factor:
 
-$$\boxed{P(x_1,\ldots,x_n)=\prod_iP(x_i\mid\mathrm{pa}(X_i)).}$$
+$$
+\boxed{P(x_1,\ldots,x_n)=\prod_iP(x_i\mid\mathrm{pa}(X_i)).}
+$$
 
 $\mathrm{Pa}(X_i)$ denota el conjunto de variables; $\mathrm{pa}(X_i)$, sus valores en la asignación particular.
 
@@ -536,11 +594,15 @@ Por ejemplo, $P(+a\mid-b,-e)=0.001$ es una falsa alarma bajo ausencia de ambas c
 
 Primero, la regla de la cadena en el orden $B,E,A,J,M$:
 
-$$P(b,e,a,j,m)=P(b)P(e\mid b)P(a\mid b,e)P(j\mid b,e,a)P(m\mid b,e,a,j).$$
+$$
+P(b,e,a,j,m)=P(b)P(e\mid b)P(a\mid b,e)P(j\mid b,e,a)P(m\mid b,e,a,j).
+$$
 
 Después, los supuestos de la red permiten simplificar:
 
-$$\boxed{P(b,e,a,j,m)=P(b)P(e)P(a\mid b,e)P(j\mid a)P(m\mid a).}$$
+$$
+\boxed{P(b,e,a,j,m)=P(b)P(e)P(a\mid b,e)P(j\mid a)P(m\mid a).}
+$$
 
 Esto supone $B\perp E$, $J\perp\{B,E\}\mid A$ y $M\perp\{B,E,J\}\mid A$.
 
@@ -583,29 +645,43 @@ Para $P(B\mid+j,+m)$:
 
 Primero calculamos dos pesos, uno por valor de $B$:
 
-$$w_b=P(b)\sum_eP(e)\sum_aP(a\mid b,e)P(+j\mid a)P(+m\mid a).$$
+$$
+w_b=P(b)\sum_eP(e)\sum_aP(a\mid b,e)P(+j\mid a)P(+m\mid a).
+$$
 
 Con robo, la probabilidad de alarma tras sumar sobre terremoto es:
 
-$$P(+a\mid+b)=0.002(0.95)+0.998(0.94)=0.94002.$$
+$$
+P(+a\mid+b)=0.002(0.95)+0.998(0.94)=0.94002.
+$$
 
 Si suena la alarma, ambas llamadas tienen probabilidad $0.9(0.7)=0.63$; si no suena, $0.05(0.01)=0.0005$. Entonces:
 
-$$w_{+b}=0.001\,[0.94002(0.63)+0.05998(0.0005)]=0.00059224259.$$
+$$
+w_{+b}=0.001\,[0.94002(0.63)+0.05998(0.0005)]=0.00059224259.
+$$
 
 Sin robo:
 
-$$P(+a\mid-b)=0.002(0.29)+0.998(0.001)=0.001578,$$
+$$
+P(+a\mid-b)=0.002(0.29)+0.998(0.001)=0.001578,
+$$
 
-$$w_{-b}=0.999\,[0.001578(0.63)+0.998422(0.0005)]=0.001491857649.$$
+$$
+w_{-b}=0.999\,[0.001578(0.63)+0.998422(0.0005)]=0.001491857649.
+$$
 
 La masa de la evidencia es la suma de ambos pesos:
 
-$$P(+j,+m)=w_{+b}+w_{-b}=0.002084100239.$$
+$$
+P(+j,+m)=w_{+b}+w_{-b}=0.002084100239.
+$$
 
 Normalizamos:
 
-$$\boxed{P(+b\mid+j,+m)=\frac{0.00059224259}{0.002084100239}\approx0.28417.}$$
+$$
+\boxed{P(+b\mid+j,+m)=\frac{0.00059224259}{0.002084100239}\approx0.28417.}
+$$
 
 La probabilidad sube de **0.1 %** a aproximadamente **28.42 %**. Las llamadas aportan información, pero no certeza; las falsas alarmas y llamadas sin alarma siguen siendo explicaciones posibles.
 
@@ -629,7 +705,9 @@ La probabilidad sube de **0.1 %** a aproximadamente **28.42 %**. Las llamadas ap
 
 Esta propuesta expresa que el detector responde al humo y supone:
 
-$$A\perp F\mid H,\qquad P(F,H,A)=P(F)P(H\mid F)P(A\mid H).$$
+$$
+A\perp F\mid H,\qquad P(F,H,A)=P(F)P(H\mid F)P(A\mid H).
+$$
 
 **Interpretación:** si ya sabemos cuánto humo hay, saber además que hay fuego no modifica la probabilidad de alarma en este modelo. Si la alarma también utiliza un sensor de calor, esa suposición podría ser incorrecta y convendría incluir una relación adicional o una variable de calor.
 
@@ -645,7 +723,9 @@ Un modelo alternativo con $F\to H$ y $F\to A$ supone $H\perp A\mid F$. No son el
 
 La factorización es:
 
-$$P(C,T,K)=P(C)P(T\mid C)P(K\mid C),$$
+$$
+P(C,T,K)=P(C)P(T\mid C)P(K\mid C),
+$$
 
 y el supuesto es $T\perp K\mid C$. Sin observar $C$, un dolor puede informar sobre caries y, por esa vía, sobre la detección. **Dos hijos de una causa común pueden estar relacionados aunque no tengan una flecha entre ellos.** La presentación no proporciona probabilidades para este ejemplo.
 
@@ -659,11 +739,15 @@ y el supuesto es $T\perp K\mid C$. Sin observar $C$, un dolor puede informar sob
 
 La regla de la cadena completa da:
 
-$$P(x,y,z,w)=P(x)P(y\mid x)P(z\mid x,y)P(w\mid x,y,z).$$
+$$
+P(x,y,z,w)=P(x)P(y\mid x)P(z\mid x,y)P(w\mid x,y,z).
+$$
 
 El grafo introduce los supuestos locales $Z\perp X\mid Y$ y $W\perp\{X,Y\}\mid Z$, por lo que:
 
-$$P(x,y,z,w)=P(x)P(y\mid x)P(z\mid y)P(w\mid z).$$
+$$
+P(x,y,z,w)=P(x)P(y\mid x)P(z\mid y)P(w\mid z).
+$$
 
 Además se puede obtener $X\perp W\mid Y$. En efecto:
 
@@ -692,7 +776,9 @@ La expresión final no depende de $x$. También $X\perp\{Z,W\}\mid Y$ y $Y\perp 
 
 **Contraejemplo construido:** tomamos booleanos con $P(X=1)=0.5$, $Y=X$ y $Z=Y$. La distribución factoriza según la cadena, pero:
 
-$$P(X=1,Z=1)=0.5\ne0.5(0.5)=0.25.$$
+$$
+P(X=1,Z=1)=0.5\ne0.5(0.5)=0.25.
+$$
 
 Un contraejemplo basta para mostrar que la independencia no está garantizada. Esto no demuestra que toda parametrización del grafo tenga dependencia.
 
@@ -700,7 +786,9 @@ Un contraejemplo basta para mostrar que la independencia no está garantizada. E
 
 **Sí.** La factorización de la cadena es:
 
-$$P(x,y,z)=P(x)P(y\mid x)P(z\mid y).$$
+$$
+P(x,y,z)=P(x)P(y\mid x)P(z\mid y).
+$$
 
 Para $P(x,y)>0$:
 
@@ -740,9 +828,13 @@ En la cadena y la causa común, $X\perp Z\mid Y$. En el colisionador de tres nod
 
 En la red de alarma, $B\to A\leftarrow E$ tiene esta estructura. Con las CPT de la presentación:
 
-$$P(+b\mid+a)\approx0.37355,$$
+$$
+P(+b\mid+a)\approx0.37355,
+$$
 
-$$P(+b\mid+a,+e)\approx0.00327.$$
+$$
+P(+b\mid+a,+e)\approx0.00327.
+$$
 
 El terremoto ofrece una explicación alternativa de la alarma. Este efecto se conoce como **explicación alternativa** o *explaining away*; no es una ley de que toda observación de un colisionador siempre reduzca cualquier probabilidad.
 

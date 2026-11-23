@@ -54,7 +54,9 @@ Un **poliárbol** es una red cuyo grafo subyacente no contiene ciclos no dirigid
 
 Una **muestra** es un resultado aleatorio generado según una distribución. Si repetimos el proceso $N$ veces, la frecuencia de un evento estima su probabilidad. Para muestras independientes de $P(X)$:
 
-$$\widehat P(X=x)=\frac{1}{N}\sum_{i=1}^{N}\mathbf 1[x^{(i)}=x].$$
+$$
+\widehat P(X=x)=\frac{1}{N}\sum_{i=1}^{N}\mathbf 1[x^{(i)}=x].
+$$
 
 La indicadora vale 1 cuando la muestra cumple el evento y 0 en otro caso. Por la ley de los grandes números, la frecuencia converge a la probabilidad del modelo al aumentar $N$. **Convergencia no significa que una corrida finita dé exactamente el valor verdadero.** En inferencia de una red conocida, las muestras aproximan probabilidades que las CPT ya definen; la diapositiva 7 menciona además el uso distinto de muestras para aprender distribuciones desconocidas.
 
@@ -99,17 +101,25 @@ Usaremos $+x$ para «$X$ es verdadero» y $-x$ para «$X$ es falso». Las CPT de
 
 Cada probabilidad complementaria se obtiene restando de 1. La conjunta se factoriza así:
 
-$$P(c,s,r,w)=P(c)P(s\mid c)P(r\mid c)P(w\mid s,r).$$
+$$
+P(c,s,r,w)=P(c)P(s\mid c)P(r\mid c)P(w\mid s,r).
+$$
 
 **Valor de referencia calculado exactamente a partir de esas CPT.** Por ejemplo,
 
-$$P(+w\mid+c)=0.1(0.8)(0.99)+0.1(0.2)(0.90)+0.9(0.8)(0.90)+0.9(0.2)(0.01)=0.747,$$
+$$
+P(+w\mid+c)=0.1(0.8)(0.99)+0.1(0.2)(0.90)+0.9(0.8)(0.90)+0.9(0.2)(0.01)=0.747,
+$$
 
-$$P(+w\mid-c)=0.5(0.2)(0.99)+0.5(0.8)(0.90)+0.5(0.2)(0.90)+0.5(0.8)(0.01)=0.553.$$
+$$
+P(+w\mid-c)=0.5(0.2)(0.99)+0.5(0.8)(0.90)+0.5(0.2)(0.90)+0.5(0.8)(0.01)=0.553.
+$$
 
 Como $P(+c)=P(-c)=0.5$, resulta $P(+w)=0.5(0.747)+0.5(0.553)=0.65$. Por Bayes:
 
-$$\boxed{P(+c\mid+w)=\frac{P(+c,+w)}{P(+w)}=\frac{0.3735}{0.65}\approx0.574615.}$$
+$$
+\boxed{P(+c\mid+w)=\frac{P(+c,+w)}{P(+w)}=\frac{0.3735}{0.65}\approx0.574615.}
+$$
 
 Estas cifras permiten juzgar si una estimación se acerca a la respuesta del **modelo**. No garantizan que las CPT describan perfectamente el clima real.
 
@@ -155,11 +165,15 @@ El costo aparece cuando la evidencia es rara. La fracción aceptada se aproxima 
 
 *Diapositivas 15–17.* Ahora asignamos directamente el valor observado a cada variable de evidencia. Sorteamos solo las demás en orden topológico. Cada muestra recibe un peso inicial 1; por cada nodo observado $E_i=e_i$, multiplicamos por la probabilidad local de observar ese valor dados **los padres que quedaron en esa muestra**:
 
-$$w(\mathbf z,\mathbf e)=\prod_{E_i\in\mathcal E}P(e_i\mid\operatorname{pa}(E_i)).$$
+$$
+w(\mathbf z,\mathbf e)=\prod_{E_i\in\mathcal E}P(e_i\mid\operatorname{pa}(E_i)).
+$$
 
 Para $P(C\mid+w)$, sorteamos $C,S,R$, fijamos $W=+w$ y damos peso $P(+w\mid S,R)$. Acumulamos pesos, no cantidades de filas:
 
-$$\widehat P(+c\mid+w)=\frac{\sum_{i=1}^{N}w_i\mathbf 1[c^{(i)}=+c]}{\sum_{i=1}^{N}w_i},\quad\text{si }\sum_iw_i>0.$$
+$$
+\widehat P(+c\mid+w)=\frac{\sum_{i=1}^{N}w_i\mathbf 1[c^{(i)}=+c]}{\sum_{i=1}^{N}w_i},\quad\text{si }\sum_iw_i>0.
+$$
 
 **Ejemplo de la diapositiva 16.** Si salen $+c,+s,+r$ y fijamos $+w$, el peso es $0.99$. En la diapositiva se fija **también** $+s$: para evidencia $+s,+w$, esa misma asignación recibe $w=0.1\times0.99=0.099$. El $0.1$ procede de $P(+s\mid+c)$; no es la probabilidad de muestrear $+c$.
 
@@ -167,7 +181,9 @@ $$\widehat P(+c\mid+w)=\frac{\sum_{i=1}^{N}w_i\mathbf 1[c^{(i)}=+c]}{\sum_{i=1}^
 
 Llamemos $\mathbf z$ a las variables no observadas. La probabilidad con la que este procedimiento sortea $\mathbf z$ es
 
-$$S_{\mathrm{LW}}(\mathbf z\mid\mathbf e)=\prod_{Z_i\notin\mathcal E}P(z_i\mid\operatorname{pa}(Z_i)).$$
+$$
+S_{\mathrm{LW}}(\mathbf z\mid\mathbf e)=\prod_{Z_i\notin\mathcal E}P(z_i\mid\operatorname{pa}(Z_i)).
+$$
 
 Al multiplicarla por el peso recuperamos la conjunta:
 
@@ -202,15 +218,21 @@ Para $P(S\mid+r)$, la diapositiva 19 fija $R=+r$ e inicia $C,S,W$; luego actuali
 
 Para actualizar $X$, los factores que no mencionan $X$ son iguales para todos sus valores y se cancelan al normalizar. Basta usar su CPT y las CPT de sus hijos:
 
-$$P(X=x\mid\text{resto})\propto P(x\mid\operatorname{pa}(X))\prod_{Y\in\operatorname{hijos}(X)}P(y\mid\operatorname{pa}(Y)).$$
+$$
+P(X=x\mid\text{resto})\propto P(x\mid\operatorname{pa}(X))\prod_{Y\in\operatorname{hijos}(X)}P(y\mid\operatorname{pa}(Y)).
+$$
 
 Padres, hijos y otros padres de los hijos forman la **manta de Markov**. En la diapositiva 20 se actualiza $S$ dado $+c,+r,-w$:
 
-$$P(S=s\mid+c,+r,-w)\propto P(s\mid+c)P(-w\mid s,+r).$$
+$$
+P(S=s\mid+c,+r,-w)\propto P(s\mid+c)P(-w\mid s,+r).
+$$
 
 Para $+s$, el peso local es $0.1(0.01)=0.001$; para $-s$, $0.9(0.10)=0.09$. Al normalizar:
 
-$$\boxed{P(+s\mid+c,+r,-w)=\frac{0.001}{0.001+0.09}=\frac{1}{91}\approx0.010989.}$$
+$$
+\boxed{P(+s\mid+c,+r,-w)=\frac{0.001}{0.001+0.09}=\frac{1}{91}\approx0.010989.}
+$$
 
 El factor $P(+c)P(+r\mid+c)$ aparece en ambos casos y se cancela. Esto muestra por qué no necesitamos enumerar toda la red para una actualización local.
 

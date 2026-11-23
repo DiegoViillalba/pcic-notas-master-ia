@@ -17,7 +17,9 @@ tags: [concepto, algoritmos, grafos, estructuras-discretas]
 
 Un **grafo** es una estructura matemática formada por un conjunto de **vértices** (o nodos) y un conjunto de **aristas** que conectan pares de vértices. Se escribe
 
-$$G=(V,E),$$
+$$
+G=(V,E),
+$$
 
 donde $V$ es el conjunto de vértices y $E$ el conjunto de aristas.
 

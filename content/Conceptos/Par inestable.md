@@ -12,7 +12,9 @@ En $M$, un hospital $h$ y una estudiante $s$ no emparejados forman un par inesta
 
 ## Formulación
 
-$$s\succ_h M(h)\ \land\ h\succ_s M(s).$$
+$$
+s\succ_h M(h)\ \land\ h\succ_s M(s).
+$$
 
 ## Intuición
 

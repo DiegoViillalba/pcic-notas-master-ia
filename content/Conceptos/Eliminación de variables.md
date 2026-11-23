@@ -28,7 +28,9 @@ La propiedad distributiva permite dejar fuera de una suma lo que no depende de s
 
 Si $\mathcal F_V$ contiene todos los factores actuales que mencionan $V$:
 
-$$h(S\setminus\{V\})=\sum_V\prod_{f\in\mathcal F_V}f,\qquad S=\bigcup_{f\in\mathcal F_V}\operatorname{scope}(f).$$
+$$
+h(S\setminus\{V\})=\sum_V\prod_{f\in\mathcal F_V}f,\qquad S=\bigcup_{f\in\mathcal F_V}\operatorname{scope}(f).
+$$
 
 Se retira $\mathcal F_V$ de la lista y se agrega $h$. Los demás factores esperan.
 

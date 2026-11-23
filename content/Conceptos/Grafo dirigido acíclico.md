@@ -43,7 +43,9 @@ Los DAGs son el modelo matemático universal para representar **dependencias y p
 1. Supongamos que $G$ es un DAG pero **todo** nodo tiene al menos una arista de entrada ($\text{in-degree}(v) \ge 1$ para todo $v \in V$).
 2. Elijamos un nodo inicial cualquiera $v_1$. Como tiene aristas entrantes, podemos retroceder a lo largo de una arista entrante $(v_2, v_1)$ hacia un nodo predecesor $v_2$.
 3. Como $v_2$ también tiene al menos una arista entrante, retrocedemos hacia $v_3$, y así sucesivamente:
-   $$v_k \to \dots \to v_3 \to v_2 \to v_1$$
+   $$
+   v_k \to \dots \to v_3 \to v_2 \to v_1
+   $$
 4. Dado que el conjunto de vértices $V$ es finito ($|V| = n$), por el principio del palomar, tras dar a lo más $n$ pasos hacia atrás nos veremos forzados a visitar por segunda vez algún nodo ya visitado $w$.
 5. La subsecuencia de aristas recorrida entre la primera y la segunda visita al nodo $w$ forma un **ciclo dirigido**, lo cual contradice la hipótesis de que $G$ es un DAG.
 6. Por contradicción, debe existir al menos un nodo sin aristas de entrada.

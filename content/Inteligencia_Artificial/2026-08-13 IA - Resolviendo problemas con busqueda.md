@@ -111,14 +111,20 @@ Un **problema de búsqueda** está formado por:
 - **Espacio de estados (_state space_):** conjunto de todos los estados posibles del mundo.
 - **Acciones:** conjunto de acciones disponibles para el agente en cada estado    
 - **Modelo de transición (_transition model_):** determina cuál será el nuevo estado después de ejecutar una acción desde el estado actual.
-	 $$T(s,a)=s'$$
+	 $$
+	 T(s,a)=s'
+	 $$
 - **Costo de acción (_action cost_):** costo asociado a pasar de un estado a otro mediante una acción.
-	$$ c(s,a,s') $$
+	$$
+	c(s,a,s')
+	$$
 - **Estado inicial (_start state_):** estado en el que comienza el agente.
     
 - **Prueba de objetivo (_goal test_):** función que determina si un estado dado es un estado objetivo.
     
-    $$ GoalTest(s)= \begin{cases} \text{True}, & \text{si }s\text{ es objetivo}\\ \text{False}, & \text{en otro caso} \end{cases} $$
+    $$
+    GoalTest(s)= \begin{cases} \text{True}, & \text{si }s\text{ es objetivo}\\ \text{False}, & \text{en otro caso} \end{cases}
+    $$
 
 ---
 
@@ -126,7 +132,9 @@ Un **problema de búsqueda** está formado por:
 
 El proceso general consiste en:
 
-$$ \text{Estado inicial} \rightarrow \text{Explorar estados} \rightarrow \text{Aplicar acciones} \rightarrow \text{Generar nuevos estados} \rightarrow \text{Estado objetivo} $$
+$$
+\text{Estado inicial} \rightarrow \text{Explorar estados} \rightarrow \text{Aplicar acciones} \rightarrow \text{Generar nuevos estados} \rightarrow \text{Estado objetivo}
+$$
 
 1. Se comienza en el **estado inicial**.
 2. Se consideran las acciones disponibles.
@@ -136,11 +144,15 @@ $$ \text{Estado inicial} \rightarrow \text{Explorar estados} \rightarrow \text{A
 
 El camino encontrado desde el estado inicial hasta el objetivo se denomina normalmente:
 
-$$ \boxed{\text{plan}} $$
+$$
+\boxed{\text{plan}}
+$$
 
 La secuencia puede escribirse como:
 
-$$ s_0 \xrightarrow{a_1} s_1 \xrightarrow{a_2} s_2 \rightarrow\cdots\rightarrow s_g $$
+$$
+s_0 \xrightarrow{a_1} s_1 \xrightarrow{a_2} s_2 \rightarrow\cdots\rightarrow s_g
+$$
 
 donde \(s_g\) es un estado objetivo.
 
@@ -173,13 +185,17 @@ Es importante distinguir dos conceptos.
 
 Contiene **toda la información existente acerca de la situación actual**.
 
-$$ \boxed{\text{World State}=\text{representación completa del mundo}} $$
+$$
+\boxed{\text{World State}=\text{representación completa del mundo}}
+$$
 
 ### Estado de búsqueda (_search state_)
 
 Contiene solamente la información necesaria para resolver el problema de planificación.
 
-$$ \boxed{\text{Search State}=\text{información relevante para la búsqueda}} $$
+$$
+\boxed{\text{Search State}=\text{información relevante para la búsqueda}}
+$$
 
 La razón principal para eliminar información innecesaria es ahorrar:
 
@@ -189,7 +205,9 @@ La razón principal para eliminar información innecesaria es ahorrar:
 
 Por tanto:
 
-$$ \text{Search State}\subseteq\text{información del World State} $$
+$$
+\text{Search State}\subseteq\text{información del World State}
+$$
 
 conceptualmente.
 
@@ -215,13 +233,17 @@ Además, existen **power pellets** o píldoras de poder. Cuando Pacman come una:
 
 Un **estado completo del mundo** podría contener información como:
 
-$$ s= ( \text{posición de Pacman}, \text{posición de fantasmas}, \text{comida restante}, \text{power pellets}, \text{estado de fantasmas}, \text{puntaje}, \ldots ) $$
+$$
+s= ( \text{posición de Pacman}, \text{posición de fantasmas}, \text{comida restante}, \text{power pellets}, \text{estado de fantasmas}, \text{puntaje}, \ldots )
+$$
 
 Pero dependiendo del problema que queramos resolver, nuestro **estado de búsqueda** podría ser mucho más sencillo.
 
 Por ejemplo, si únicamente queremos encontrar un camino hasta una posición determinada:
 
-$$ \boxed{s=(x,y)} $$
+$$
+\boxed{s=(x,y)}
+$$
 
 podría ser suficiente.
 
@@ -229,7 +251,9 @@ Es decir, aunque el mundo contiene muchísima información, el algoritmo de bús
 
 ### Idea central
 
-$$ \boxed{ \text{Problema de búsqueda} = \text{Estados} + \text{Acciones} + \text{Transiciones} + \text{Costos} + \text{Inicio} + \text{Objetivo} } $$
+$$
+\boxed{ \text{Problema de búsqueda} = \text{Estados} + \text{Acciones} + \text{Transiciones} + \text{Costos} + \text{Inicio} + \text{Objetivo} }
+$$
 
 y una **estrategia de búsqueda** determina el orden en el que exploramos ese espacio hasta encontrar un **plan**.
 

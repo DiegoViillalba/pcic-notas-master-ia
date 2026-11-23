@@ -16,7 +16,9 @@ tags: [concepto, inteligencia-artificial, busqueda, costos]
 
 Estrategia no informada que extrae de una cola de prioridad el nodo con menor costo acumulado
 
-$$g(n)=\sum_{a\in\operatorname{camino}(n)}c(a).$$
+$$
+g(n)=\sum_{a\in\operatorname{camino}(n)}c(a).
+$$
 
 ## Propiedades
 

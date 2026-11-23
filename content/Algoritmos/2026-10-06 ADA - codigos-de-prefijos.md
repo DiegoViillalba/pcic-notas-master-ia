@@ -320,7 +320,9 @@ Es **mejor que el código de longitud fija**, que siempre usa $3$ bits por símb
 
 > [!important] Problema
 > Dado un alfabeto $\Sigma$ y sus frecuencias $f$, obtener un **código de prefijos** $\gamma$ tal que
-> $$\operatorname{PBS}(\gamma)=\sum_{x\in\Sigma}f_x|\gamma(x)|$$
+> $$
+> \operatorname{PBS}(\gamma)=\sum_{x\in\Sigma}f_x|\gamma(x)|
+> $$
 > sea el mínimo posible.
 
 El código $\gamma$ no es óptimo. Basta con otro código de prefijos:

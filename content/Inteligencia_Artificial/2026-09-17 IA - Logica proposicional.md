@@ -44,7 +44,9 @@ Si interpretamos la tercera como una regla categórica («si está mojado, está
 
 Tomemos $R=$ «llueve», $M=$ «el suelo está mojado» y $S=$ «el suelo está resbaloso». Entonces:
 
-$$KB=\{R,\;R\to M,\;M\to S\}. $$
+$$
+KB=\{R,\;R\to M,\;M\to S\}.
+$$
 
 ```mermaid
 flowchart LR
@@ -72,7 +74,9 @@ Para consultar $f$, basta comparar dos posibilidades:
 
 **Por qué funciona la primera prueba:** si no hay ningún mundo donde $KB$ sea verdadera y $f$ falsa, todos los mundos de $KB$ satisfacen $f$. Esta es la equivalencia de **refutación**:
 
-$$KB\models f\quad\Longleftrightarrow\quad KB\land\neg f\text{ es insatisfactible}. $$
+$$
+KB\models f\quad\Longleftrightarrow\quad KB\land\neg f\text{ es insatisfactible}.
+$$
 
 `Tell(f)` usa la misma distinción: si $KB\models f$, no aprende nada nuevo; si $KB\models\neg f$, añadir $f$ introduce una contradicción; si ninguna se cumple, elimina algunos mundos posibles y aprende algo. **Cuidado:** si $KB$ ya es insatisfactible, tanto $KB\models f$ como $KB\models\neg f$ son verdaderas por vacuidad. Por eso el cuadro de tres respuestas supone una base consistente.
 
@@ -88,7 +92,9 @@ En el laboratorio de la clase previa puedes alternar valores y observar qué mun
 
 Una **regla de inferencia** es un patrón sintáctico que permite escribir una conclusión a partir de premisas. No requiere enumerar modelos cada vez que se usa:
 
-$$\frac{p,\quad p\to q}{q}\qquad\text{(modus ponens)}. $$
+$$
+\frac{p,\quad p\to q}{q}\qquad\text{(modus ponens)}.
+$$
 
 En $\{R,R\to M,M\to S\}$, primero sustituimos $p:=R,q:=M$ y obtenemos $M$. Luego sustituimos $p:=M,q:=S$ y obtenemos $S$. Escribimos $KB\vdash S$ para decir «$S$ es **derivable** con las reglas del sistema»; $KB\models S$ significa «$S$ es verdadera en **todos los modelos** de $KB$».
 
@@ -144,11 +150,15 @@ Un algoritmo bien implementado mantiene un contador de premisas aún no satisfec
 
 Supón que sabemos $L\vee N$ («llueve o nieva») y $\neg N\vee T$ («si nieva, hay tráfico»). No podemos aplicar modus ponens directamente a $L\vee N$, porque no sabemos que $N$ sea verdadera. Sin embargo, podemos concluir $L\vee T$:
 
-$$\frac{L\vee N,\qquad\neg N\vee T}{L\vee T}. $$
+$$
+\frac{L\vee N,\qquad\neg N\vee T}{L\vee T}.
+$$
 
 La intuición es por casos. Si $N$ es falsa, la primera cláusula exige $L$. Si $N$ es verdadera, la segunda exige $T$. En ambos casos se cumple $L\vee T$. La regla general es:
 
-$$\frac{C\vee P,\qquad D\vee\neg P}{C\vee D}. $$
+$$
+\frac{C\vee P,\qquad D\vee\neg P}{C\vee D}.
+$$
 
 $P$ y $\neg P$ se llaman **literales complementarios**; $C\vee D$ es el **resolvente**. Si $C$ y $D$ no contienen ningún literal, la conclusión es la **cláusula vacía** $\square$, que no puede ser verdadera en ningún modelo.
 
@@ -180,7 +190,9 @@ Selecciona dos cláusulas con literales complementarios y el átomo que cancelar
 
 Resolución opera sobre cláusulas, de modo que expresamos la fórmula como una **conjunción de disyunciones de literales**:
 
-$$\underbrace{(P\vee\neg Q)}_{\text{cláusula 1}}\land\underbrace{(R\vee S\vee\neg P)}_{\text{cláusula 2}}. $$
+$$
+\underbrace{(P\vee\neg Q)}_{\text{cláusula 1}}\land\underbrace{(R\vee S\vee\neg P)}_{\text{cláusula 2}}.
+$$
 
 Esta es la forma normal conjuntiva (FNC; *CNF* en inglés). Toda fórmula proposicional puede transformarse en una FNC **lógicamente equivalente** usando estas identidades:
 
@@ -204,11 +216,15 @@ $$
 
 El resultado **ya es una cláusula** y, por tanto, una FNC de una sola cláusula. Aquí no hace falta distribuir. Si en cambio la intención era $(U\to N)\to X$, el resultado sería distinto:
 
-$$ (U\to N)\to X\equiv\neg(\neg U\vee N)\vee X\equiv(U\land\neg N)\vee X\equiv(U\vee X)\land(\neg N\vee X). $$
+$$
+(U\to N)\to X\equiv\neg(\neg U\vee N)\vee X\equiv(U\land\neg N)\vee X\equiv(U\vee X)\land(\neg N\vee X).
+$$
 
 Este par de resultados muestra por qué **los paréntesis importan**. Para ver de verdad el paso distributivo, toma $P\to(Q\land R)$:
 
-$$P\to(Q\land R)\equiv\neg P\vee(Q\land R)\equiv(\neg P\vee Q)\land(\neg P\vee R). $$
+$$
+P\to(Q\land R)\equiv\neg P\vee(Q\land R)\equiv(\neg P\vee Q)\land(\neg P\vee R).
+$$
 
 > [!warning] Límite práctico
 > Distribuir repetidamente puede hacer crecer mucho la fórmula. En resolución por refutación se puede usar una transformación de Tseitin con variables auxiliares para obtener tamaño lineal, pero esa transformación preserva **satisfacibilidad**, no necesariamente equivalencia sobre un vocabulario ampliado sin proyectar las auxiliares. Las diapositivas usan las equivalencias directas.

@@ -108,7 +108,9 @@ Durante la ejecución de DFS sobre un grafo dirigido $G = (V, E)$, cada vértice
   - $u.f$: Tiempo de **finalización** (*finishing time*), cuando $u$ pasa de gris a negro.
 
 Para todo vértice $u$, los intervalos de descubrimiento y finalización están bien ordenados:
-$$1 \le u.d < u.f \le 2n$$
+$$
+1 \le u.d < u.f \le 2n
+$$
 
 ### 2.2 Pseudocódigo formal
 
@@ -158,11 +160,15 @@ def DFS_Visit(G, u, tiempo, L):
 
 Como cada nodo $u$ se inserta al frente de $L$ en el instante exacto en que pasa a negro y se fija su tiempo $u.f$, la lista resultante:
 
-$$L = [v_1, v_2, \dots, v_n]$$
+$$
+L = [v_1, v_2, \dots, v_n]
+$$
 
 cumple estrictamente que los tiempos de finalización decrecen de izquierda a derecha:
 
-$$v_1.f > v_2.f > \dots > v_n.f$$
+$$
+v_1.f > v_2.f > \dots > v_n.f
+$$
 
 *(Anotación literal del pizarrón, Fotografía 1).*
 
@@ -181,7 +187,9 @@ Para demostrar que $L$ es un orden topológico, debemos verificar que para **tod
 
 Dado que los vértices se ordenan en $L$ en orden decreciente de sus tiempos de finalización, la condición de precedencia $u \prec_L v$ equivale exactamente a demostrar que:
 
-$$u.f > v.f \quad \forall (u, v) \in E$$
+$$
+u.f > v.f \quad \forall (u, v) \in E
+$$
 
 Consideremos el momento exacto en que el algoritmo `DFS_Visit` ejecutado sobre $u$ procesa la arista dirigida $(u, v)$.
 En ese instante:
@@ -210,10 +218,14 @@ En ese instante:
 - Si $v$ es gris cuando se explora la arista $(u, v)$, significa que $v$ ya fue descubierto pero su llamada `DFS_Visit(v)` aún no concluye.
 - Por la naturaleza de la pila de llamadas recursivas de DFS, $v$ es un **ancestro** de $u$ en el árbol DFS actual.
 - En consecuencia, ya existe un camino dirigido desde $v$ hasta $u$ en el árbol DFS:
-  $$v \rightsquigarrow u$$
+  $$
+  v \rightsquigarrow u
+  $$
 - Al examinar la arista $(u, v)$, esta arista apunta de un descendiente a un ancestro, por lo que es una **arista hacia atrás** (*back edge*).
 - La concatenación del camino de árbol $v \rightsquigarrow u$ con la arista $(u, v)$ forma un **ciclo dirigido simple**:
-  $$v \rightsquigarrow u \to v$$
+  $$
+  v \rightsquigarrow u \to v
+  $$
 - **Contradicción:** Por hipótesis del lema, $G$ es un DAG (no contiene ciclos dirigidos).
 - **Conclusión del Caso 1:** Este caso **no puede ocurrir** durante la ejecución de TopoSort sobre un DAG. Si este caso llegara a presentarse, certificaría de inmediato que el grafo no es un DAG.
 
@@ -230,9 +242,13 @@ En ese instante:
   2. El nodo $v$ se pinta de negro.
   3. El control retorna a $u$.
 - Dado que a $u$ todavía le resta terminar de examinar sus demás aristas salientes antes de concluir su propia llamada:
-  $$u.d < v.d < v.f < u.f$$
+  $$
+  u.d < v.d < v.f < u.f
+  $$
 - Por lo tanto, se cumple estrictamente:
-  $$u.f > v.f$$
+  $$
+  u.f > v.f
+  $$
 
 ---
 
@@ -240,11 +256,17 @@ En ese instante:
 
 - Si $v$ es negro, significa que la exploración de $v$ ya concluyó en su totalidad en una etapa anterior del recorrido (ya sea en una rama previa del árbol DFS actual o en un árbol DFS disjunto explorado anteriormente).
 - Por lo tanto, el tiempo de finalización $v.f$ ya fue calculado y fijado en el pasado:
-  $$v.f < \text{tiempo actual}$$
+  $$
+  v.f < \text{tiempo actual}
+  $$
 - Por otro lado, como $u$ sigue siendo gris en este instante, su tiempo de finalización $u.f$ todavía no se ha fijado; se le asignará un valor del reloj estrictamente en el futuro:
-  $$u.f > \text{tiempo actual}$$
+  $$
+  u.f > \text{tiempo actual}
+  $$
 - Comparando ambas cotas temporales:
-  $$v.f < \text{tiempo actual} < u.f \implies u.f > v.f$$
+  $$
+  v.f < \text{tiempo actual} < u.f \implies u.f > v.f
+  $$
 
 ---
 
@@ -269,7 +291,9 @@ Concluimos que la lista $L$ es un ordenamiento topológico válido de $G$. $\bla
 
 > [!important] Componente Fuertemente Conexa (SCC)
 > En un grafo dirigido $G = (V, E)$, una **componente fuertemente conexa** (*Strongly Connected Component* o SCC) es un subconjunto **maximal** de vértices $C \subseteq V$ tales que para todo par de nodos $u, v \in C$, $u$ y $v$ son **mutuamente alcanzables**:
-> $$u \rightsquigarrow v \quad \text{y} \quad v \rightsquigarrow u$$
+> $$
+> u \rightsquigarrow v \quad \text{y} \quad v \rightsquigarrow u
+> $$
 
 **La condición de maximalidad:**
 Decir que $C$ es *maximal* significa que no existe ningún superconjunto estricto $C' \supset C$ tal que todos los nodos de $C'$ sigan siendo mutuamente alcanzables entre sí. Si añadimos cualquier nodo externo $w \notin C$, se rompe la propiedad de alcanzabilidad mutua con al menos un nodo de $C$.
@@ -282,7 +306,9 @@ La relación de alcanzabilidad mutua ($u \sim v \iff u \rightsquigarrow v \text{
 3. **Transitiva:** Si $u \sim v$ y $v \sim w$, concatenando caminos dirigidos obtenemos $u \rightsquigarrow w$ y $w \rightsquigarrow u$, luego $u \sim w$.
 
 Como toda relación de equivalencia sobre un conjunto finito, **las componentes fuertemente conexas forman una partición disjunta del conjunto de vértices $V$**:
-$$V = C_1 \;\dot\cup\; C_2 \;\dot\cup\; \dots \;\dot\cup\; C_k$$
+$$
+V = C_1 \;\dot\cup\; C_2 \;\dot\cup\; \dots \;\dot\cup\; C_k
+$$
 Cada vértice del grafo pertenece a exactamente una componente fuertemente conexa.
 
 ---
@@ -316,7 +342,9 @@ En la diapositiva 43 de Kleinberg & Tardos (presentada en clase), se analiza el 
 
 > [!important] Teorema de Robert Tarjan (1972)
 > Todas las componentes fuertemente conexas de un grafo dirigido $G = (V, E)$ pueden encontrarse en tiempo lineal óptimo:
-> $$T(n, m) = O(n + m)$$
+> $$
+> T(n, m) = O(n + m)
+> $$
 > utilizando una sola pasada de DFS que mantiene valores de descubrimiento y números de ancestro más bajo alcanzable (*low-link values*).
 
 *Referencia histórica:* Tarjan, R. (1972), *Depth-First Search and Linear Graph Algorithms*, SIAM Journal on Computing, Vol. 1, No. 2, pp. 146–160.
@@ -332,9 +360,13 @@ En la diapositiva 43 de Kleinberg & Tardos (presentada en clase), se analiza el 
 > [!important] Definición formal de $G_{cc}$
 > Dada una digráfica $G = (V, E)$, su **gráfica de componentes conexas** $G_{cc} = (V_{cc}, E_{cc})$ (también conocida en la literatura como *grafo de condensación* o *Kernel DAG*) se define como:
 > 1. **Vértices:** Cada vértice de $G_{cc}$ corresponde a una componente fuertemente conexa completa de $G$:
->    $$V_{cc} = \{C_1, C_2, \dots, C_k\}$$
+>    $$
+>    V_{cc} = \{C_1, C_2, \dots, C_k\}
+>    $$
 > 2. **Aristas:** Existe una arista dirigida dirigida entre dos componentes distintas $X, Y \in V_{cc}$ ($X \neq Y$) si y solo si existe al menos una arista dirigida en $G$ que parte de algún nodo de $X$ y llega a algún nodo de $Y$:
->    $$(X, Y) \in E_{cc} \iff \exists u \in X, \; \exists v \in Y \quad \text{tal que } (u, v) \in E$$
+>    $$
+>    (X, Y) \in E_{cc} \iff \exists u \in X, \; \exists v \in Y \quad \text{tal que } (u, v) \in E
+>    $$
 
 ```
  Componente X                    Componente Y
@@ -358,7 +390,9 @@ En la diapositiva 43 de Kleinberg & Tardos (presentada en clase), se analiza el 
 #### Demostración formal por contradicción:
 1. Supongamos, por contradicción, que $G_{cc}$ **no** es un DAG.
 2. Si $G_{cc}$ no es un DAG, entonces contiene al menos un ciclo dirigido simple compuesto por $r \ge 2$ componentes distintas:
-   $$C_1 \to C_2 \to C_3 \to \dots \to C_r \to C_1$$
+   $$
+   C_1 \to C_2 \to C_3 \to \dots \to C_r \to C_1
+   $$
 3. Por la definición de arista en $G_{cc}$:
    - Como $(C_1, C_2) \in E_{cc}$, existe una arista $(u_1, v_2) \in E$ con $u_1 \in C_1$ y $v_2 \in C_2$.
    - Como $(C_2, C_3) \in E_{cc}$, existe una arista $(u_2, v_3) \in E$ con $u_2 \in C_2$ y $v_3 \in C_3$.
@@ -366,9 +400,13 @@ En la diapositiva 43 de Kleinberg & Tardos (presentada en clase), se analiza el 
    - Como $(C_r, C_1) \in E_{cc}$, existe una arista $(u_r, v_1) \in E$ con $u_r \in C_r$ y $v_1 \in C_1$.
 4. Ahora, elijamos dos nodos cualesquiera $x, y \in C_1 \cup C_2 \cup \dots \cup C_r$. Supongamos sin pérdida de generalidad que $x \in C_i$ e $y \in C_j$:
    - Para ir de $x$ a $y$: Dentro de $C_i$, como $C_i$ es fuertemente conexa, existe un camino $x \rightsquigarrow u_i$. Luego tomamos la arista $(u_i, v_{i+1})$ hacia $C_{i+1}$. Repitiendo este proceso a lo largo del ciclo de componentes, llegamos a $v_j \in C_j$. Finalmente, dentro de $C_j$ existe un camino de $v_j$ a $y$. Por lo tanto:
-     $$x \rightsquigarrow y$$
+     $$
+     x \rightsquigarrow y
+     $$
    - Para ir de $y$ a $x$: Continuando el recorrido por el resto del ciclo de componentes desde $C_j$ hasta $C_i$ de manera análoga, obtenemos:
-     $$y \rightsquigarrow x$$
+     $$
+     y \rightsquigarrow x
+     $$
 5. Por lo tanto, **todos los vértices de la unión** $C_1 \cup C_2 \cup \dots \cup C_r$ son mutuamente alcanzables entre sí en $G$.
 6. Esto significa que el conjunto unificado $C_1 \cup C_2 \cup \dots \cup C_r$ forma una única región fuertemente conexa estrictamente más grande que cualquiera de las componentes individuales.
 7. ¡Contradicción directa! Esto viola la **maximalidad** de cada componente $C_i$, pues por definición una SCC no puede ser extendida a un conjunto mayor de nodos mutuamente alcanzables.
@@ -384,9 +422,13 @@ Este resultado revela la estructura universal de cualquier grafo dirigido:
 3. **Consecuencia algorítmica:** Dado que $G_{cc}$ es un DAG, **siempre admite un ordenamiento topológico**. Podemos ordenar las componentes completas $C_1, \dots, C_k$ de tal forma que ninguna componente dependa circularmente de otra.
 
 En el ejemplo canónico de Tarjan:
-$$G_{cc} = (\{C_1, C_2, C_3, C_4\}, \{(C_1, C_2), (C_1, C_4), (C_2, C_3), (C_2, C_4)\})$$
+$$
+G_{cc} = (\{C_1, C_2, C_3, C_4\}, \{(C_1, C_2), (C_1, C_4), (C_2, C_3), (C_2, C_4)\})
+$$
 Un ordenamiento topológico válido de las componentes en $G_{cc}$ es:
-$$C_1 \longrightarrow C_2 \longrightarrow C_4 \longrightarrow C_3$$
+$$
+C_1 \longrightarrow C_2 \longrightarrow C_4 \longrightarrow C_3
+$$
 (o equivalentemente $C_1 \to C_2 \to C_3 \to C_4$).
 
 ---
@@ -420,7 +462,9 @@ El siguiente simulador permite ejecutar paso a paso el algoritmo `TopoSort-DFS` 
 
 ### Ejercicio 1: Traza completa de TopoSort con DFS
 **Problema:** Dado el DAG con vértices $\{A, B, C, D, E\}$ y aristas:
-$$E = \{(A, B), (A, C), (B, D), (C, D), (D, E)\}$$
+$$
+E = \{(A, B), (A, C), (B, D), (C, D), (D, E)\}
+$$
 Realizar la traza de `TopoSort-DFS` iniciando la exploración en $A$ (y resolviendo empates alfabéticamente).
 
 **Procedimiento:**
@@ -449,13 +493,17 @@ Realizar la traza de `TopoSort-DFS` iniciando la exploración en $A$ (y resolvie
 **Resultado:**
 - Tiempos de finalización: $A.f (10) > C.f (9) > B.f (7) > D.f (6) > E.f (5)$.
 - Orden topológico resultante:
-  $$A \longrightarrow C \longrightarrow B \longrightarrow D \longrightarrow E$$
+  $$
+  A \longrightarrow C \longrightarrow B \longrightarrow D \longrightarrow E
+  $$
 
 ---
 
 ### Ejercicio 2: Construcción de la Gráfica de Componentes Conexas ($G_{cc}$)
 **Problema:** Sea $G = (V, E)$ con $V = \{1, 2, 3, 4, 5, 6\}$ y aristas:
-$$E = \{(1, 2), (2, 3), (3, 1), (2, 4), (4, 5), (5, 6), (6, 4)\}$$
+$$
+E = \{(1, 2), (2, 3), (3, 1), (2, 4), (4, 5), (5, 6), (6, 4)\}
+$$
 Determinar las SCCs, construir $G_{cc}$ y verificar que $G_{cc}$ es un DAG.
 
 **Procedimiento:**

@@ -76,7 +76,9 @@ El inicio puede ser $0$, $1$ u otro entero adecuado. También podemos probar sol
 
 Queremos demostrar, para todo $n\ge0$:
 
-$$P(n):\quad f(n)=\sum_{i=0}^{n}i=\frac{n(n+1)}2.$$
+$$
+P(n):\quad f(n)=\sum_{i=0}^{n}i=\frac{n(n+1)}2.
+$$
 
 **Base $n=0$.** La suma es $0$ y la fórmula da $0(1)/2=0$.
 
@@ -106,7 +108,9 @@ Esta es exactamente la fórmula de $P(k+1)$. Por inducción, se cumple para todo
 
 **Paso:**
 
-$$2^{k+1}=2\cdot2^k>2k\ge k+1.$$
+$$
+2^{k+1}=2\cdot2^k>2k\ge k+1.
+$$
 
 La primera desigualdad usa la hipótesis y el hecho de multiplicar por un número positivo. La segunda equivale a $k\ge1$. Por tanto, $2^{k+1}>k+1$.
 
@@ -242,7 +246,9 @@ devolver menor
 
 **Invariante:** en la visita $x$ a la cabecera,
 
-$$c=x+1,\qquad \texttt{menor}=\min\{A[1],\ldots,A[x]\}.$$
+$$
+c=x+1,\qquad \texttt{menor}=\min\{A[1],\ldots,A[x]\}.
+$$
 
 Equivalentemente, `menor` es el mínimo de $A[1..c-1]$: lo ya procesado.
 
@@ -308,11 +314,15 @@ Para $n<2$ no entra al ciclo y devuelve correctamente `NO SE PUEDE`. Las fórmul
 
 Si la suma es **demasiado pequeña**, descartamos `lo`: incluso combinado con el mayor valor del intervalo, no alcanza $T$.
 
-$$A[lo]+A[j]\le A[lo]+A[hi]<T\qquad(lo<j\le hi).$$
+$$
+A[lo]+A[j]\le A[lo]+A[hi]<T\qquad(lo<j\le hi).
+$$
 
 Si la suma es **demasiado grande**, descartamos `hi`: incluso combinado con el menor valor del intervalo, supera $T$.
 
-$$A[i]+A[hi]\ge A[lo]+A[hi]>T\qquad(lo\le i<hi).$$
+$$
+A[i]+A[hi]\ge A[lo]+A[hi]>T\qquad(lo\le i<hi).
+$$
 
 ```mermaid
 flowchart TD
@@ -332,7 +342,9 @@ flowchart TD
 
 ### 5.3. Ejemplo de las diapositivas, paso a paso
 
-$$A=[-20,10,20,30,35,40,60,70],\qquad T=60.$$
+$$
+A=[-20,10,20,30,35,40,60,70],\qquad T=60.
+$$
 
 | Visita $x$ | `lo` | `hi` | Suma | Decisión |
 |---|---|---|---|---|
@@ -352,7 +364,9 @@ El intervalo activo conserva todas las soluciones posibles. Cada paso que no enc
 
 En la visita $x$ a la cabecera:
 
-$$\boxed{hi-lo=n-x.}$$
+$$
+\boxed{hi-lo=n-x.}
+$$
 
 **Base:** $x=1$, $hi=n$, $lo=1$; entonces $hi-lo=n-1$.
 
@@ -360,7 +374,9 @@ $$\boxed{hi-lo=n-x.}$$
 
 **Paso:** si encontramos la suma, se retorna inmediatamente. Si hay una siguiente visita, exactamente un puntero se mueve una posición hacia el otro:
 
-$$(hi-lo)_{\text{nuevo}}=(hi-lo)_{\text{anterior}}-1=n-k-1=n-(k+1).$$
+$$
+(hi-lo)_{\text{nuevo}}=(hi-lo)_{\text{anterior}}-1=n-k-1=n-(k+1).
+$$
 
 **Terminación:** a más tardar en la visita $x=n$, $hi-lo=0$, así que `lo < hi` es falso. Hay a lo más $n-1$ ejecuciones del cuerpo. La variante es $V=hi-lo$.
 
@@ -371,7 +387,9 @@ $$(hi-lo)_{\text{nuevo}}=(hi-lo)_{\text{anterior}}-1=n-k-1=n-(k+1).$$
 
 Usaremos esta formulación precisa:
 
-$$\boxed{\forall\,1\le i<j\le n,\quad A[i]+A[j]=T\ \Longrightarrow\ lo\le i<j\le hi.}$$
+$$
+\boxed{\forall\,1\le i<j\le n,\quad A[i]+A[j]=T\ \Longrightarrow\ lo\le i<j\le hi.}
+$$
 
 En palabras: **si existe una pareja solución, sus dos índices siguen dentro del intervalo activo**. Equivalentemente, ningún par que use al menos un índice descartado puede ser solución.
 
@@ -437,7 +455,9 @@ Suponiendo acceso al arreglo, suma y comparación de enteros de tamaño acotado 
 
 Para $n\ge1$, la cuenta de las diapositivas es:
 
-$$\tau(n)\le C_1+nC_2+(n-1)C_3+1=(C_2+C_3)n+C_1-C_3+1.$$
+$$
+\tau(n)\le C_1+nC_2+(n-1)C_3+1=(C_2+C_3)n+C_1-C_3+1.
+$$
 
 Es una **cota de peor caso**, no necesariamente el tiempo exacto de todas las entradas: un retorno temprano realiza menos iteraciones y distintas ramas pueden tener distintos costos.
 

@@ -521,11 +521,17 @@ La respuesta introduce los temas de la **Clase 10**:
 
 **Procedimiento:**
 1. Evaluar subfórmula antecedente:
-   $$I(\neg B, w) = 1 - 1 = 0 \implies I(A \vee \neg B, w) = \max(0, 0) = 0$$
+   $$
+   I(\neg B, w) = 1 - 1 = 0 \implies I(A \vee \neg B, w) = \max(0, 0) = 0
+   $$
 2. Evaluar subfórmula consecuente:
-   $$I(B \wedge C, w) = \min(1, 1) = 1$$
+   $$
+   I(B \wedge C, w) = \min(1, 1) = 1
+   $$
 3. Evaluar la implicación principal:
-   $$I(0 \Rightarrow 1, w) = 1$$
+   $$
+   I(0 \Rightarrow 1, w) = 1
+   $$
 
 **Resultado:** Sí, $I(f, w) = 1$. El modelo $w$ satisface la fórmula (la implicación con antecedente falso es siempre verdadera).
 

@@ -16,7 +16,9 @@ tags: [concepto, inteligencia-artificial, busqueda, heuristicas]
 
 Búsqueda informada que extrae el nodo con menor valor de [[Heurística|heurística]]:
 
-$$f(n)=h(n).$$
+$$
+f(n)=h(n).
+$$
 
 ## Intuición
 

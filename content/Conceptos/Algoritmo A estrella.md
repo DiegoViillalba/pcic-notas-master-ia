@@ -16,7 +16,9 @@ tags: [concepto, inteligencia-artificial, busqueda, heuristicas]
 
 Búsqueda informada que prioriza el menor costo total estimado:
 
-$$f(n)=g(n)+h(n),$$
+$$
+f(n)=g(n)+h(n),
+$$
 
 donde $g(n)$ es el costo real desde el inicio y $h(n)$ una [[Heurística|estimación]] del costo restante.
 

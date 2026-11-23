@@ -145,3 +145,20 @@ th:has(.katex) {
     overflow-wrap: anywhere;
   }
 }
+
+// Fórmulas display ($$ ... $$): una línea propia, centradas como en un
+// documento profesional. base.scss las pone en display:initial (inline), lo
+// que las deja pegadas a la izquierda; aquí se restaura el bloque centrado de
+// KaTeX. Si una fórmula es más ancha que la página, hace scroll horizontal.
+.katex-display {
+  display: block !important;
+  text-align: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  > .katex {
+    display: block;
+    text-align: center;
+    white-space: nowrap;
+  }
+}

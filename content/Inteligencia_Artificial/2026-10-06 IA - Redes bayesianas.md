@@ -65,15 +65,21 @@ Una raíz no tiene padres y necesita una distribución previa $P(X_i)$. Para cua
 
 Si el orden $X_1,\ldots,X_n$ es **topológico** —los padres aparecen antes que sus hijos—, la regla de la cadena siempre permite escribir:
 
-$$P(x_1,\ldots,x_n)=\prod_{i=1}^{n}P(x_i\mid x_1,\ldots,x_{i-1}).$$
+$$
+P(x_1,\ldots,x_n)=\prod_{i=1}^{n}P(x_i\mid x_1,\ldots,x_{i-1}).
+$$
 
 La red agrega supuestos de independencia que permiten reemplazar todos los predecesores por los padres:
 
-$$P(x_i\mid x_1,\ldots,x_{i-1})=P(x_i\mid\operatorname{pa}(X_i)).$$
+$$
+P(x_i\mid x_1,\ldots,x_{i-1})=P(x_i\mid\operatorname{pa}(X_i)).
+$$
 
 Por tanto, la distribución representada es:
 
-$$\boxed{P(x_1,\ldots,x_n)=\prod_{i=1}^{n}P(x_i\mid\operatorname{pa}(X_i)).}$$
+$$
+\boxed{P(x_1,\ldots,x_n)=\prod_{i=1}^{n}P(x_i\mid\operatorname{pa}(X_i)).}
+$$
 
 Aquí $\operatorname{Pa}(X_i)$ es el conjunto de variables padre y $\operatorname{pa}(X_i)$ sus valores en la asignación concreta.
 
@@ -90,19 +96,27 @@ Esta descripción coincide con [Berkeley CS 188, §6.3](https://inst.eecs.berkel
 
 **Paso 1.** La regla de la cadena, sin ninguna independencia, da:
 
-$$P(r,t,u)=P(r)P(t\mid r)P(u\mid r,t).$$
+$$
+P(r,t,u)=P(r)P(t\mid r)P(u\mid r,t).
+$$
 
 **Paso 2.** La estructura afirma $U\perp T\mid R$, de modo que:
 
-$$P(u\mid r,t)=P(u\mid r).$$
+$$
+P(u\mid r,t)=P(u\mid r).
+$$
 
 **Paso 3.** La representación se simplifica:
 
-$$P(r,t,u)=P(r)P(t\mid r)P(u\mid r).$$
+$$
+P(r,t,u)=P(r)P(t\mid r)P(u\mid r).
+$$
 
 **Paso 4.** Con $P(r)=0.3$, $P(t\mid r)=0.8$ y $P(u\mid r)=0.9$:
 
-$$P(r,t,u)=0.3(0.8)(0.9)=0.216.$$
+$$
+P(r,t,u)=0.3(0.8)(0.9)=0.216.
+$$
 
 Este producto corresponde a **una asignación completa**, «llueve, hay tráfico y lleva paraguas». Para obtener una marginal tendríamos que sumar las asignaciones de las variables que no interesan. El grafo no garantiza $T\perp U$ sin conocer $R$: ambos pueden aportar información sobre la lluvia.
 
@@ -116,11 +130,15 @@ Este producto corresponde a **una asignación completa**, «llueve, hay tráfico
 
 Las raíces son $B$ y $E$; $\operatorname{Pa}(A)=\{B,E\}$; $\operatorname{Pa}(J)=\operatorname{Pa}(M)=\{A\}$. La conjunta es:
 
-$$P(B,E,A,J,M)=P(B)P(E)P(A\mid B,E)P(J\mid A)P(M\mid A).$$
+$$
+P(B,E,A,J,M)=P(B)P(E)P(A\mid B,E)P(J\mid A)P(M\mid A).
+$$
 
 ### Paso 2: leer las CPT de la diapositiva
 
-$$P(b)=0.001,\qquad P(e)=0.002.$$
+$$
+P(b)=0.001,\qquad P(e)=0.002.
+$$
 
 | $B$ | $E$ | $P(a\mid B,E)$ |
 |---|---|---:|
@@ -155,12 +173,18 @@ No debemos multiplicar $P(j)$ y $P(m)$: las tablas disponibles son las probabili
 
 Como anticipo de inferencia, una consulta diferente es «¿hubo robo, dado que ambos llaman?»:
 
-$$P(b\mid j,m)=\frac{\displaystyle\sum_{e,a}P(b,e,a,j,m)}{\displaystyle\sum_{b',e,a}P(b',e,a,j,m)}.$$
+$$
+P(b\mid j,m)=\frac{\displaystyle\sum_{e,a}P(b,e,a,j,m)}{\displaystyle\sum_{b',e,a}P(b',e,a,j,m)}.
+$$
 
 Para cada valor $b'$ del robo, definimos $q_{b'}=P(a\mid b')$ sumando el terremoto:
 
-$$q_b=(0.002)(0.95)+(0.998)(0.94)=0.94002,$$
-$$q_{\neg b}=(0.002)(0.29)+(0.998)(0.001)=0.001578.$$
+$$
+q_b=(0.002)(0.95)+(0.998)(0.94)=0.94002,
+$$
+$$
+q_{\neg b}=(0.002)(0.29)+(0.998)(0.001)=0.001578.
+$$
 
 Ahora sumamos los dos valores de la alarma. Si suena, la probabilidad de ambas llamadas es $0.90(0.70)=0.63$; si no suena, es $0.05(0.01)=0.0005$. Los pesos conjuntos son:
 
@@ -175,7 +199,9 @@ $$
 
 Normalizamos:
 
-$$P(b\mid j,m)=\frac{w_b}{w_b+w_{\neg b}}\approx0.284172.$$
+$$
+P(b\mid j,m)=\frac{w_b}{w_b+w_{\neg b}}\approx0.284172.
+$$
 
 La probabilidad previa era 0.1 % y la posterior es aproximadamente 28.42 %. Las llamadas son evidencia de robo a través de la alarma; el cálculo conserva las explicaciones alternativas y los falsos positivos.
 
@@ -189,13 +215,17 @@ Selecciona **«Ambos llaman»** y compara los dos pesos con el cálculo anterior
 
 *Diapositivas 10–11.* Para variables discretas:
 
-$$X\perp Y\quad\Longleftrightarrow\quad P(x,y)=P(x)P(y)\quad\text{para todo }x,y.$$
+$$
+X\perp Y\quad\Longleftrightarrow\quad P(x,y)=P(x)P(y)\quad\text{para todo }x,y.
+$$
 
 Cuando $P(y)>0$, equivale a $P(x\mid y)=P(x)$: conocer $Y$ no cambia la distribución de $X$.
 
 La independencia condicional es:
 
-$$X\perp Y\mid Z\quad\Longleftrightarrow\quad P(x,y\mid z)=P(x\mid z)P(y\mid z),$$
+$$
+X\perp Y\mid Z\quad\Longleftrightarrow\quad P(x,y\mid z)=P(x\mid z)P(y\mid z),
+$$
 
 para todos los valores $x,y,z$ con $P(z)>0$. Equivalentemente, $P(x\mid y,z)=P(x\mid z)$ cuando el condicionamiento tiene probabilidad positiva.
 
@@ -219,7 +249,9 @@ En ambos modelos puede haber asociación entre los extremos sin evidencia, pero 
 
 *Diapositivas 16–18; AIMA, §13.2.1.* La **propiedad de Markov local** establece que cada variable es independiente de sus otros no descendientes dados sus padres:
 
-$$X_i\perp\bigl(\operatorname{NoDesc}(X_i)\setminus\operatorname{Pa}(X_i)\bigr)\mid\operatorname{Pa}(X_i).$$
+$$
+X_i\perp\bigl(\operatorname{NoDesc}(X_i)\setminus\operatorname{Pa}(X_i)\bigr)\mid\operatorname{Pa}(X_i).
+$$
 
 Un descendiente es un nodo al que podemos llegar siguiendo flechas desde $X_i$. Aquí «otros no descendientes» excluye también al propio nodo. La afirmación se hace sobre el conjunto completo, no únicamente sobre cada variable por separado.
 
@@ -229,13 +261,17 @@ Un descendiente es un nodo al que podemos llegar siguiendo flechas desde $X_i$. 
 
 **Paso 1.** Aplicamos la regla de la cadena en el orden $X,Y,Z,W$:
 
-$$P(x,y,z,w)=P(x)P(y\mid x)P(z\mid x,y)P(w\mid x,y,z).$$
+$$
+P(x,y,z,w)=P(x)P(y\mid x)P(z\mid x,y)P(w\mid x,y,z).
+$$
 
 **Paso 2.** Las hipótesis locales son $Z\perp X\mid Y$ y $W\perp\{X,Y\}\mid Z$.
 
 **Paso 3.** Sustituimos:
 
-$$P(x,y,z,w)=P(x)P(y\mid x)P(z\mid y)P(w\mid z).$$
+$$
+P(x,y,z,w)=P(x)P(y\mid x)P(z\mid y)P(w\mid z).
+$$
 
 **Paso 4.** Buscamos consecuencias adicionales. También se garantiza $X\perp W\mid Y$ y $X\perp W\mid Z$: cualquiera de esos nodos intermedios bloquea el único camino. Son consecuencias globales que veremos sistemáticamente con d-separación.
 
@@ -267,13 +303,21 @@ Por tanto, $\boxed{X\perp Z\mid Y}$. La igualdad se aplica donde el denominador 
 
 **Paso 3: comprobar por qué no hay garantía marginal.** Elegimos números didácticos:
 
-$$P(x)=0.5,\quad P(y\mid x)=0.8,\quad P(y\mid\neg x)=0.2,$$
-$$P(z\mid y)=0.9,\qquad P(z\mid\neg y)=0.1.$$
+$$
+P(x)=0.5,\quad P(y\mid x)=0.8,\quad P(y\mid\neg x)=0.2,
+$$
+$$
+P(z\mid y)=0.9,\qquad P(z\mid\neg y)=0.1.
+$$
 
 Sin observar $Y$, debemos sumar sus valores:
 
-$$P(z\mid x)=0.8(0.9)+0.2(0.1)=0.74,$$
-$$P(z\mid\neg x)=0.2(0.9)+0.8(0.1)=0.26.$$
+$$
+P(z\mid x)=0.8(0.9)+0.2(0.1)=0.74,
+$$
+$$
+P(z\mid\neg x)=0.2(0.9)+0.8(0.1)=0.26.
+$$
 
 Como son diferentes, en esta distribución $X$ y $Z$ son dependientes. Pero, si sabemos que llueve, $P(z\mid x,y)=P(z\mid\neg x,y)=0.9$.
 
@@ -289,24 +333,38 @@ En la diapositiva 21, $Y$ es la proximidad de una entrega, $X$ un foro activo y 
 
 **Paso 2: condicionar.** Dividimos por $P(y)$:
 
-$$P(x,z\mid y)=P(x\mid y)P(z\mid y).$$
+$$
+P(x,z\mid y)=P(x\mid y)P(z\mid y).
+$$
 
 Esto demuestra $\boxed{X\perp Z\mid Y}$.
 
 **Paso 3: ver la asociación al desconocer la causa.** Para una versión didáctica, usamos:
 
-$$P(y)=0.2,\quad P(x\mid y)=0.9,\quad P(x\mid\neg y)=0.1,$$
-$$P(z\mid y)=0.8,\qquad P(z\mid\neg y)=0.2.$$
+$$
+P(y)=0.2,\quad P(x\mid y)=0.9,\quad P(x\mid\neg y)=0.1,
+$$
+$$
+P(z\mid y)=0.8,\qquad P(z\mid\neg y)=0.2.
+$$
 
 Entonces:
 
-$$P(x)=0.2(0.9)+0.8(0.1)=0.26,$$
-$$P(z)=0.2(0.8)+0.8(0.2)=0.32,$$
-$$P(x,z)=0.2(0.9)(0.8)+0.8(0.1)(0.2)=0.16.$$
+$$
+P(x)=0.2(0.9)+0.8(0.1)=0.26,
+$$
+$$
+P(z)=0.2(0.8)+0.8(0.2)=0.32,
+$$
+$$
+P(x,z)=0.2(0.9)(0.8)+0.8(0.1)(0.2)=0.16.
+$$
 
 Pero $P(x)P(z)=0.0832\ne0.16$. Por ello, ver el foro activo cambia la probabilidad de encontrar lleno el laboratorio:
 
-$$P(z\mid x)=\frac{0.16}{0.26}\approx0.615385\ne0.32.$$
+$$
+P(z\mid x)=\frac{0.16}{0.26}\approx0.615385\ne0.32.
+$$
 
 Al conocer la entrega, ese aporte informativo desaparece: $P(z\mid x,y)=P(z\mid y)=0.8$.
 
@@ -316,7 +374,9 @@ Al conocer la entrega, ese aporte informativo desaparece: $P(z\mid x,y)=P(z\mid 
 
 *Diapositiva 22.* El tercer patrón invierte la regla anterior:
 
-$$R\rightarrow T\leftarrow B.$$
+$$
+R\rightarrow T\leftarrow B.
+$$
 
 $R$ es lluvia, $B$ un partido y $T$ tráfico. El nodo $T$ es un **colisionador** porque recibe las dos puntas de flecha **en este camino**. Añadimos el reporte $T'$ para anticipar la diapositiva 27.
 
@@ -326,7 +386,9 @@ $R$ es lluvia, $B$ un partido y $T$ tráfico. El nodo $T$ es un **colisionador**
 
 Para la tripleta aislada:
 
-$$P(r,b,t)=P(r)P(b)P(t\mid r,b).$$
+$$
+P(r,b,t)=P(r)P(b)P(t\mid r,b).
+$$
 
 Al marginalizar el tráfico:
 
@@ -352,15 +414,21 @@ Por tanto, $\boxed{R\perp B}$. El descendiente $T'$ no cambia esta conclusión m
 
 Al observar tráfico sobreviven tres mundos equiprobables:
 
-$$P(b\mid t)=\frac{2}{3}.$$
+$$
+P(b\mid t)=\frac{2}{3}.
+$$
 
 Si además sabemos que llueve, el tráfico ya está explicado y el partido conserva su previa:
 
-$$P(b\mid t,r)=\frac{1}{2}.$$
+$$
+P(b\mid t,r)=\frac{1}{2}.
+$$
 
 Si sabemos que **no** llueve, el partido es la única explicación dentro de este modelo:
 
-$$P(b\mid t,\neg r)=1.$$
+$$
+P(b\mid t,\neg r)=1.
+$$
 
 Estas probabilidades distintas prueban que, para esta CPT, $R$ y $B$ son dependientes dado $T$. Se suele llamar **explicación alternativa** o *explaining away*: una explicación conocida reduce la necesidad de otra. El sentido y la intensidad de la asociación dependen de la CPT; d-separación no los calcula.
 
@@ -368,7 +436,9 @@ Estas probabilidades distintas prueban que, para esta CPT, $R$ y $B$ son dependi
 
 Si el reporte $T'$ informa sobre $T$, observarlo también puede relacionar lluvia y partido, aunque no observemos el tráfico directamente. La regla gráfica es:
 
-$$\boxed{\text{Un colisionador se activa si se observa él o alguno de sus descendientes.}}$$
+$$
+\boxed{\text{Un colisionador se activa si se observa él o alguno de sus descendientes.}}
+$$
 
 Esto retira la garantía de independencia incluso si una CPT particular hace que el reporte sea poco informativo o completamente independiente del tráfico. La garantía se decide por la estructura; la relación efectiva depende de los parámetros.
 
@@ -466,7 +536,9 @@ La rama $R\rightarrow D$ no genera un segundo camino simple hacia $B$. No debemo
 
 *Diapositiva 29.* $R$: lluvia; $T$: tráfico; $D$: goteo del techo; $S$: tristeza. La conjunta es:
 
-$$P(r,t,d,s)=P(r)P(t\mid r)P(d\mid r)P(s\mid t,d).$$
+$$
+P(r,t,d,s)=P(r)P(t\mid r)P(d\mid r)P(s\mid t,d).
+$$
 
 ![[ia14-ejemplo3-dos-caminos.svg]]
 
@@ -507,16 +579,26 @@ En esta sección $B$: ladrón, $R$: mapache y $D$: perro ladra. Las letras se re
 
 ### Paso 1: verificar las previas y la independencia
 
-$$P(b)=\frac{100}{1000}=0.1,\quad P(r)=\frac{500}{1000}=0.5,$$
-$$P(b,r)=\frac{50}{1000}=0.05=P(b)P(r).$$
+$$
+P(b)=\frac{100}{1000}=0.1,\quad P(r)=\frac{500}{1000}=0.5,
+$$
+$$
+P(b,r)=\frac{50}{1000}=0.05=P(b)P(r).
+$$
 
 Las otras combinaciones de las dos causas tienen probabilidades $0.05,0.45,0.45$, correspondientes a $(b,\neg r)$, $(\neg b,r)$ y $(\neg b,\neg r)$. Todas coinciden con el producto de sus marginales. Así, esta tabla es compatible con las raíces independientes del grafo $B\rightarrow D\leftarrow R$.
 
 ### Paso 2: recuperar la CPT del ladrido
 
-$$P(d\mid b,r)=P(d\mid b,\neg r)=1,$$
-$$P(d\mid\neg b,r)=\frac{225}{225+225}=0.5,$$
-$$P(d\mid\neg b,\neg r)=\frac{45}{405+45}=0.1.$$
+$$
+P(d\mid b,r)=P(d\mid b,\neg r)=1,
+$$
+$$
+P(d\mid\neg b,r)=\frac{225}{225+225}=0.5,
+$$
+$$
+P(d\mid\neg b,\neg r)=\frac{45}{405+45}=0.1.
+$$
 
 Ahora podemos reconstruir cualquier fila como $P(b)P(r)P(d\mid b,r)$. Por ejemplo, $P(\neg b,\neg r,\neg d)=0.9(0.5)(0.9)=0.405$.
 
@@ -524,7 +606,9 @@ Ahora podemos reconstruir cualquier fila como $P(b)P(r)P(d\mid b,r)$. Por ejempl
 
 Hay $45+225+50+50=370$ ladridos, de los cuales $225+50=275$ ocurren con mapache:
 
-$$P(r\mid d)=\frac{275}{370}\approx0.743243.$$
+$$
+P(r\mid d)=\frac{275}{370}\approx0.743243.
+$$
 
 La observación aumenta la probabilidad de mapache de 50 % a 74.32 %.
 
@@ -532,7 +616,9 @@ La observación aumenta la probabilidad de mapache de 50 % a 74.32 %.
 
 Si además sabemos que había un ladrón:
 
-$$P(r\mid d,b)=\frac{50}{50+50}=0.5.$$
+$$
+P(r\mid d,b)=\frac{50}{50+50}=0.5.
+$$
 
 Como $0.5\ne0.743243$, el mapache y el ladrón **son dependientes dado el ladrido en esta distribución**. El ladrón ya explica el ladrido y reduce la necesidad de atribuirlo al mapache. Aquí tenemos tanto la explicación gráfica como una comprobación numérica.
 
@@ -542,7 +628,9 @@ Como $0.5\ne0.743243$, el mapache y el ladrón **son dependientes dado el ladrid
 
 *Diapositivas 18 y 30–31.* Debemos distinguir dos afirmaciones:
 
-$$X\text{ e }Y\text{ d-separados por }\mathcal E\quad\Longrightarrow\quad X\perp Y\mid\mathcal E$$
+$$
+X\text{ e }Y\text{ d-separados por }\mathcal E\quad\Longrightarrow\quad X\perp Y\mid\mathcal E
+$$
 
 en **toda distribución que factorice según ese grafo**.
 
@@ -561,7 +649,9 @@ Ambos modelos respetan la factorización de la cadena. Por ello, **«no garantiz
 
 Si la variable $X_i$ tiene $r_i$ valores y sus padres tienen $q_i$ configuraciones, una CPT sin restricciones adicionales necesita $(r_i-1)q_i$ parámetros libres. El total es:
 
-$$N_{\mathrm{BN}}=\sum_i(r_i-1)\prod_{X_j\in\operatorname{Pa}(X_i)}r_j.$$
+$$
+N_{\mathrm{BN}}=\sum_i(r_i-1)\prod_{X_j\in\operatorname{Pa}(X_i)}r_j.
+$$
 
 Para $n$ variables booleanas con a lo sumo $k$ padres, son a lo sumo $n2^k$ parámetros. La conjunta sin restricciones necesita $2^n-1$.
 

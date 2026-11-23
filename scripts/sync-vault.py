@@ -254,7 +254,7 @@ def fix_wikilink_paths(dry_run: bool) -> None:
 
 def fix_display_math(dry_run: bool) -> None:
     """Pone los delimitadores $$ de los bloques de matematica display en su
-    propia linea. Quartz/remark-math falla con "$$\\begin{aligned}" pegado en
+    propia linea (y vuelve bloque lo que va en una sola linea). Quartz/remark-math falla con "$$\\begin{aligned}" pegado en
     la misma linea (KaTeX recibe el bloque sin \\begin y la pagina se corta en
     ese punto). Obsidian si lo acepta, por eso en el vault no se nota."""
     log("Separando delimitadores $$ de bloques de matematica display")
@@ -273,6 +273,14 @@ def fix_display_math(dry_run: bool) -> None:
                 continue
             if not in_math:
                 m = open_re.match(line)
+                one = re.match(r"^(\s*(?:>\s*)*)\$\$(.+?)\$\$\s*$", line)
+                if one and one.group(2).strip() and "$$" not in one.group(2):
+                    # "$$ f $$" solo en su linea: remark-math lo toma como
+                    # formula inline; se convierte a bloque para centrarla.
+                    pre = one.group(1)
+                    out += [f"{pre}$$", f"{pre}{one.group(2).strip()}", f"{pre}$$"]
+                    dirty = True
+                    continue
                 if m and "$$" not in m.group(2):
                     prefix = m.group(1)
                     in_math = True

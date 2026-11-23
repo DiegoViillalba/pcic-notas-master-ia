@@ -34,7 +34,9 @@ Por la propiedad del árbol BFS, toda arista $\{u, v\} \in E$ une vértices cuyo
 > [!important] Lema de Bipartición en Capas BFS
 > Sea $G$ conexo con capas BFS $L_0, \dots, L_k$. Se cumple exactamente una de las siguientes dos afirmaciones:
 > 1. **Caso (i):** Ninguna arista de $G$ une dos nodos de la misma capa $\implies G$ es bipartito. La bipartición válida es:
->    $$V_1 = \bigcup_{i \text{ par}} L_i \quad (\text{Azul}), \qquad V_2 = \bigcup_{i \text{ impar}} L_i \quad (\text{Blanco})$$
+>    $$
+>    V_1 = \bigcup_{i \text{ par}} L_i \quad (\text{Azul}), \qquad V_2 = \bigcup_{i \text{ impar}} L_i \quad (\text{Blanco})
+>    $$
 > 2. **Caso (ii):** Existe una arista $e = \{x, y\}$ tal que $x, y \in L_j$ $\implies G$ contiene un **ciclo de longitud impar** y, por tanto, **no es bipartito**.
 
 ### Demostración del Caso (ii) y construcción del ciclo impar

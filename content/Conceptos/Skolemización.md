@@ -31,11 +31,15 @@ La **skolemización** elimina cuantificadores existenciales de una fórmula de [
 
 Sin dependencia universal:
 
-$$\exists y\,Gato(y)\quad\leadsto\quad Gato(c).$$
+$$
+\exists y\,Gato(y)\quad\leadsto\quad Gato(c).
+$$
 
 Con dependencia de $x$:
 
-$$\forall x\,\exists y\,Ama(y,x)\quad\leadsto\quad\forall x\,Ama(F(x),x).$$
+$$
+\forall x\,\exists y\,Ama(y,x)\quad\leadsto\quad\forall x\,Ama(F(x),x).
+$$
 
 $F(x)$ expresa «algún objeto que ama a $x$». No es necesario conocer cuál objeto es, pero puede variar con $x$.
 

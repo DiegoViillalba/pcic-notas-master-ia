@@ -18,7 +18,9 @@ Estrategia no informada que expande primero el nodo más profundo de la [[Fronte
 
 ## Regla
 
-$$f(n)=-\operatorname{profundidad}(n),$$
+$$
+f(n)=-\operatorname{profundidad}(n),
+$$
 
 entendida como una prioridad que favorece mayor profundidad. No compara costos ni cercanía a la meta.
 

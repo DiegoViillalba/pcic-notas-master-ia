@@ -654,7 +654,9 @@ La ruta voraz Arad → Sibiu → Fagaras → Bucharest cuesta $450$, más que la
 
 El [[Algoritmo A estrella|algoritmo A*]] combina costo recorrido y estimación restante:
 
-$$f(n)=g(n)+h(n).$$
+$$
+f(n)=g(n)+h(n).
+$$
 
 ### Ejemplo `s-a-d-G` de la diapositiva
 

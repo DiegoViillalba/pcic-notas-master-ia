@@ -47,7 +47,9 @@ Dos problemas distintos guían la sesión:
 
 Para vectores $x,y\in\mathbb R^d$, la familia de normas $p$ ($p\geq1$) induce distancias
 
-$$d_p(x,y)=\|x-y\|_p=\left(\sum_{j=1}^{d}|x_j-y_j|^p\right)^{1/p},\qquad d_\infty(x,y)=\max_j|x_j-y_j|.$$
+$$
+d_p(x,y)=\|x-y\|_p=\left(\sum_{j=1}^{d}|x_j-y_j|^p\right)^{1/p},\qquad d_\infty(x,y)=\max_j|x_j-y_j|.
+$$
 
 En particular, $L_1$ suma diferencias absolutas y $L_2$ mide distancia euclidiana. Una **métrica** cumple $d(x,y)\geq0$, $d(x,y)=0\Leftrightarrow x=y$, simetría y desigualdad triangular $d(x,z)\leq d(x,y)+d(y,z)$ (diapositiva 10). La forma de las regiones de cercanía cambia al cambiar la norma (diapositiva 11), y con ella pueden cambiar los vecinos y las asignaciones.
 
@@ -60,7 +62,9 @@ Antes de usar distancias, hay que decidir qué características representan el p
 
 Con un prototipo $\mu_j$ por grupo $C_j$, asignamos una nueva observación por cercanía:
 
-$$g(x)=\operatorname*{arg\,min}_{j\in\{1,\ldots,K\}}d(x,\mu_j).$$
+$$
+g(x)=\operatorname*{arg\,min}_{j\in\{1,\ldots,K\}}d(x,\mu_j).
+$$
 
 Si una clase tiene varias formas o regiones separadas, puede requerir **varios prototipos** (diapositivas 12–13). El **vecino más cercano** (NN) usa cada ejemplo almacenado como referencia; $k$-NN vota entre los $k$ vecinos más próximos. La diapositiva 14 presupone ejemplos *clasificados a priori*: **NN y k-NN son clasificadores supervisados en ese caso**, aunque aparezcan aquí para explicar asignación por distancia. El $K$ de k-means es el **número de grupos**; el $k$ de k-NN es el **número de vecinos**.
 
@@ -68,7 +72,9 @@ Si una clase tiene varias formas o regiones separadas, puede requerir **varios p
 
 El algoritmo de **Lloyd** (diapositivas 16–18) busca una partición $C_1,\ldots,C_K$ y centroides $\mu_j$ que reduzcan la suma de distancias euclidianas **al cuadrado**:
 
-$$J(C,\mu)=\sum_{j=1}^{K}\sum_{x_i\in C_j}\|x_i-\mu_j\|_2^2,\qquad \mu_j=\frac{1}{|C_j|}\sum_{x_i\in C_j}x_i.$$
+$$
+J(C,\mu)=\sum_{j=1}^{K}\sum_{x_i\in C_j}\|x_i-\mu_j\|_2^2,\qquad \mu_j=\frac{1}{|C_j|}\sum_{x_i\in C_j}x_i.
+$$
 
 1. Elegir $K$ y centroides iniciales.
 2. **Asignar** cada punto al centroide más cercano.
@@ -91,9 +97,15 @@ El recurso permite cambiar $K$ y avanzar alternadamente por **asignación** y **
 
 La **silueta** (diapositiva 20) compara, para cada punto $x_i$, su separación interna y externa:
 
-$$a(i)=\text{distancia media de }x_i\text{ a los demás puntos de su grupo},$$
-$$b(i)=\min_{C\ne C(i)}\ \text{distancia media de }x_i\text{ a los puntos de }C,$$
-$$\boxed{s(i)=\frac{b(i)-a(i)}{\max\{a(i),b(i)\}}\in[-1,1].}$$
+$$
+a(i)=\text{distancia media de }x_i\text{ a los demás puntos de su grupo},
+$$
+$$
+b(i)=\min_{C\ne C(i)}\ \text{distancia media de }x_i\text{ a los puntos de }C,
+$$
+$$
+\boxed{s(i)=\frac{b(i)-a(i)}{\max\{a(i),b(i)\}}\in[-1,1].}
+$$
 
 Si $a=1$ y $b=4$, $s=0.75$: el punto está más cerca, en promedio, de su propio grupo. Un valor cercano a **0** indica frontera difusa; uno **negativo** sugiere que está más cerca de otro grupo. El promedio de $s(i)$ resume el conjunto, pero no sustituye la interpretación del problema. Para un grupo de un solo punto, $a(i)$ no está definido; muchas implementaciones toman $s(i)=0$ por convención. La fórmula requiere al menos dos grupos.
 

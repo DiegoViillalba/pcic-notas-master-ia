@@ -17,7 +17,9 @@ tags: [concepto, inteligencia-artificial, logica, clausulas-horn]
 
 Una **cláusula de Horn** es una disyunción de literales que contiene como máximo un literal positivo. Por ejemplo, $\neg Humano(x)\vee Mortal(x)$ es una cláusula de Horn; expresa que si alguien es humano, entonces es mortal:
 
-$$Humano(x)\to Mortal(x).$$
+$$
+Humano(x)\to Mortal(x).
+$$
 
 Sus variables se entienden universalmente cuantificadas. La forma de regla general es $H\leftarrow B_1,\ldots,B_n$, equivalente a $B_1\land\cdots\land B_n\to H$.
 

@@ -35,7 +35,9 @@ Aprendizaje de estructura y otros enfoques | 22–24 |
 
 Una red bayesiana contiene un **grafo acíclico dirigido** y una CPT por variable. Para $X_1,\ldots,X_n$:
 
-$$P_\theta(x_1,\ldots,x_n)=\prod_{i=1}^{n}P_\theta(x_i\mid\operatorname{Pa}(X_i)).$$
+$$
+P_\theta(x_1,\ldots,x_n)=\prod_{i=1}^{n}P_\theta(x_i\mid\operatorname{Pa}(X_i)).
+$$
 
 El grafo determina qué variables son padres de cada nodo. Los **parámetros** $\theta$ son las probabilidades de las filas de las CPT. Cada ejemplo de entrenamiento es una asignación observada de variables; puede ser completa o parcial. Aprender parámetros mantiene fijo el grafo; aprender la estructura busca también las flechas.
 
@@ -45,7 +47,9 @@ La diapositiva 5 muestra un grafo de cuatro variables con varias CPT inicialment
 
 *Diapositivas 7–14.* Para una variable $X$ con padres $U=\operatorname{Pa}(X)$, definamos $N(x,u)$ como el número de ejemplos con $X=x$ y $U=u$, y $N(u)=\sum_xN(x,u)$. La estimación de **máxima verosimilitud** (MLE) de cada fila es:
 
-$$\boxed{\hat P_{\mathrm{ML}}(X=x\mid U=u)=\frac{N(x,u)}{N(u)}}\qquad\text{si }N(u)>0.$$
+$$
+\boxed{\hat P_{\mathrm{ML}}(X=x\mid U=u)=\frac{N(x,u)}{N(u)}}\qquad\text{si }N(u)>0.
+$$
 
 La idea es elegir $\theta$ que maximiza $P(D_{\mathrm{train}}\mid\theta)$, o equivalentemente su logaritmo. Con ejemplos completos e independientes, la log-verosimilitud se separa en sumas por CPT y por configuración de padres; por eso basta contar y normalizar **dentro de cada fila**. Esta derivación desarrolla la regla que las tablas de la presentación aplican.
 
@@ -53,7 +57,9 @@ La idea es elegir $\theta$ que maximiza $P(D_{\mathrm{train}}\mid\theta)$, o equ
 
 La diapositiva 8 usa $R\in\{1,2,3,4,5\}$ y diez calificaciones:
 
-$$D=\{1,3,4,4,4,4,4,5,5,5\}.$$
+$$
+D=\{1,3,4,4,4,4,4,5,5,5\}.
+$$
 
 | Calificación $r$ | 1 | 2 | 3 | 4 | 5 |
 |---|---:|---:|---:|---:|---:|
@@ -89,11 +95,15 @@ Compartir reduce la variabilidad cuando hay pocos datos, pero obliga a dos CPT a
 
 *Diapositiva 18.* Para evitar ceros debidos a muestras pequeñas, se agregan $\lambda$ observaciones ficticias **a cada valor** de una fila. Si $X$ tiene $k$ valores:
 
-$$\boxed{\hat P_{\lambda}(X=x\mid U=u)=\frac{N(x,u)+\lambda}{N(u)+k\lambda}},\qquad \lambda>0.$$
+$$
+\boxed{\hat P_{\lambda}(X=x\mid U=u)=\frac{N(x,u)+\lambda}{N(u)+k\lambda}},\qquad \lambda>0.
+$$
 
 En la fila de comedia hay $N(c)=2$ y $k=5$. Con $\lambda=1$:
 
-$$\hat P_1(R=2\mid G=c)=\frac{0+1}{2+5}=\frac17\approx0.143.$$
+$$
+\hat P_1(R=2\mid G=c)=\frac{0+1}{2+5}=\frac17\approx0.143.
+$$
 
 El denominador suma **cinco** pseudoconteos, no uno. Si $N(u)=0$ y $\lambda>0$, la fila resulta uniforme: $1/k$. A medida que crecen las observaciones, el efecto relativo del suavizado disminuye. Un $\lambda$ demasiado grande empuja las filas hacia la uniforme e introduce sesgo.
 
@@ -107,7 +117,9 @@ El recurso parte de los cinco pares $(G,R)$ de las diapositivas. Cambia el géne
 
 *Diapositivas 19–20.* Consideremos $G\to R_1$ y $G\to R_2$ cuando observamos las dos calificaciones, pero **no** el género. Cada registro tiene la forma $(?,r_1,r_2)$. No sabemos a qué fila de $P(R_1\mid G)$ y $P(R_2\mid G)$ asignarlo. La verosimilitud de un par observado debe sumar sobre el género oculto:
 
-$$P_\theta(r_1,r_2)=\sum_{g\in\{d,c\}}P_\theta(g)P_\theta(r_1\mid g)P_\theta(r_2\mid g).$$
+$$
+P_\theta(r_1,r_2)=\sum_{g\in\{d,c\}}P_\theta(g)P_\theta(r_1\mid g)P_\theta(r_2\mid g).
+$$
 
 Para todos los registros, se maximiza $\prod_j P_\theta(r_{1j},r_{2j})$, o la suma de sus logaritmos. El logaritmo de una **suma** mezcla los parámetros de las filas: ya no basta con asignar conteos enteros por observación. Este es el problema de **máxima verosimilitud marginal** mostrado en la diapositiva 20.
 
@@ -129,7 +141,9 @@ Se inicializan los parámetros y se repite hasta que el cambio sea pequeño. Cad
 
 La sola verosimilitud de entrenamiento suele favorecer redes cada vez más complejas: añadir padres permite más filas y puede acomodar mejor los datos vistos. Una puntuación sencilla que expresa la preferencia por parsimonia es
 
-$$S(G)=\max_\theta\log P(D_{\mathrm{train}}\mid G,\theta)-\rho\,C(G),\qquad\rho>0,$$
+$$
+S(G)=\max_\theta\log P(D_{\mathrm{train}}\mid G,\theta)-\rho\,C(G),\qquad\rho>0,
+$$
 
 donde $C(G)$ mide complejidad, por ejemplo el número de parámetros libres. Otra posibilidad es valorar predicción en datos no usados para ajustar el modelo. La diapositiva 23 escribe un término con signo **$+\rho\max|\operatorname{parents}|$** sin definir el signo de $\rho$; con $\rho>0$ ese término premiaría más padres, contrario a la nota de la diapositiva 22 («no queremos redes complejas»). Por ello, la expresión anterior muestra explícitamente una **penalización** y debe leerse como aclaración, no como transcripción literal de la fórmula proyectada.
 

@@ -49,15 +49,21 @@ El diagrama resume el orden de conversión que prepara una fórmula para resoluc
 
 ## Ejemplo mínimo
 
-$$\forall x\,[Humano(x)\to Mortal(x)]$$
+$$
+\forall x\,[Humano(x)\to Mortal(x)]
+$$
 
 se convierte en la cláusula:
 
-$$\neg Humano(x)\vee Mortal(x).$$
+$$
+\neg Humano(x)\vee Mortal(x).
+$$
 
 En cambio, un existencial bajo el alcance de $x$ necesita una función de Skolem:
 
-$$\forall x\,\exists y\,Ama(y,x)\quad\leadsto\quad Ama(F(x),x).$$
+$$
+\forall x\,\exists y\,Ama(y,x)\quad\leadsto\quad Ama(F(x),x).
+$$
 
 ## Distinción importante
 

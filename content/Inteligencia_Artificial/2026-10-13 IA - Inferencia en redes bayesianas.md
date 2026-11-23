@@ -52,11 +52,15 @@ Continuación de [[2026-10-06 IA - Redes bayesianas|Redes bayesianas: independen
 
 *Diapositivas 3–7; repaso de la sesión anterior.* Una red bayesiana es un DAG junto con distribuciones locales. La distribución conjunta se recupera multiplicando una distribución por nodo:
 
-$$P(x_1,\ldots,x_n)=\prod_{i=1}^{n}P(x_i\mid\operatorname{pa}(X_i)).$$
+$$
+P(x_1,\ldots,x_n)=\prod_{i=1}^{n}P(x_i\mid\operatorname{pa}(X_i)).
+$$
 
 En la cadena $R\rightarrow T\rightarrow L$:
 
-$$P(r,t,l)=P(r)P(t\mid r)P(l\mid t).$$
+$$
+P(r,t,l)=P(r)P(t\mid r)P(l\mid t).
+$$
 
 Cada término describe una parte del modelo. Su producto describe **un mundo completo**: una asignación de valores a todas las variables.
 
@@ -94,7 +98,9 @@ Por ejemplo, en la red de alarma, $P(B\mid j,m)$ pregunta por robo $B$ cuando Jo
 
 Una consulta posterior devuelve números para todos los valores:
 
-$$P(B\mid j,m)\approx\langle0.284172,\ 0.715828\rangle,$$
+$$
+P(B\mid j,m)\approx\langle0.284172,\ 0.715828\rangle,
+$$
 
 en el orden $(b,\neg b)$. La consulta $\arg\max_b P(B=b\mid j,m)$ devuelve un valor: aquí, «no robo».
 
@@ -117,11 +123,15 @@ Queremos $P(W\mid T=\text{frío})$.
 
 **Paso 2: calcular cuánto pesa la evidencia.** La probabilidad de frío es la suma de esos mundos:
 
-$$P(T=\text{frío})=0.2+0.3=0.5.$$
+$$
+P(T=\text{frío})=0.2+0.3=0.5.
+$$
 
 **Paso 3: cambiar el total de referencia.** Dentro de los mundos con frío, sol representa $0.2/0.5$ y lluvia representa $0.3/0.5$:
 
-$$P(W\mid T=\text{frío})=\langle0.4,0.6\rangle.$$
+$$
+P(W\mid T=\text{frío})=\langle0.4,0.6\rangle.
+$$
 
 La selección $\langle0.2,0.3\rangle$ todavía expresa masas respecto del universo original. La normalización expresa las proporciones **dentro del conjunto compatible con la observación**.
 
@@ -138,7 +148,9 @@ La conjunta es:
 
 Para $P(X\mid Y=-y)$, seleccionamos $0.3$ y $0.1$. La evidencia pesa $0.4$; por tanto:
 
-$$P(+x\mid-y)=\frac{0.3}{0.4}=0.75,\qquad P(-x\mid-y)=\frac{0.1}{0.4}=0.25.$$
+$$
+P(+x\mid-y)=\frac{0.3}{0.4}=0.75,\qquad P(-x\mid-y)=\frac{0.1}{0.4}=0.25.
+$$
 
 **Comprobación:** ambas probabilidades suman uno. Conservar $0.3$ y $0.1$ como respuesta confundiría una selección de la conjunta con una distribución condicional.
 
@@ -161,7 +173,9 @@ $$P(+x\mid-y)=\frac{0.3}{0.4}=0.75,\qquad P(-x\mid-y)=\frac{0.1}{0.4}=0.25.$$
 
 No conocemos estación ni temperatura. Para calcular sol, sumamos **todos los mundos que tienen sol**, aunque difieran en las otras dos variables:
 
-$$P(\text{sol})=0.30+0.10+0.10+0.15=0.65.$$
+$$
+P(\text{sol})=0.30+0.10+0.10+0.15=0.65.
+$$
 
 Análogamente, $P(\text{lluvia})=0.35$. Esto se llama **marginalizar** $S,T$: dejan de aparecer en la respuesta, pero sus posibilidades contribuyeron a ella.
 
@@ -171,7 +185,9 @@ Análogamente, $P(\text{lluvia})=0.35$. Esto se llama **marginalizar** $S,T$: de
 2. Sumar la temperatura, que sigue desconocida: sol pesa $0.10+0.15=0.25$ y lluvia pesa $0.05+0.20=0.25$.
 3. Normalizar por $P(\text{invierno})=0.50$.
 
-$$P(W\mid\text{invierno})=\langle0.5,0.5\rangle.$$
+$$
+P(W\mid\text{invierno})=\langle0.5,0.5\rangle.
+$$
 
 ### 4.3 Dos observaciones: $P(W\mid\text{invierno},\text{calor})$
 
@@ -189,21 +205,29 @@ $$
 
 *Diapositivas 9–10.* Llamemos $w(q)$ al peso de los mundos donde la consulta vale $q$ y se cumple la evidencia:
 
-$$\boxed{w(q)=P(q,\mathbf e)=\sum_{\mathbf h}P(q,\mathbf e,\mathbf h).}$$
+$$
+\boxed{w(q)=P(q,\mathbf e)=\sum_{\mathbf h}P(q,\mathbf e,\mathbf h).}
+$$
 
 La suma recorre **asignaciones completas** de las variables ocultas. Si hay dos ocultas booleanas, hay cuatro combinaciones, no dos.
 
 Sumando los pesos de todos los valores de la consulta recuperamos la masa de la evidencia:
 
-$$Z=\sum_q w(q)=P(\mathbf e).$$
+$$
+Z=\sum_q w(q)=P(\mathbf e).
+$$
 
 Por definición de probabilidad condicional:
 
-$$\boxed{P(q\mid\mathbf e)=\frac{w(q)}{Z}=\alpha w(q),\qquad\alpha=\frac1Z.}$$
+$$
+\boxed{P(q\mid\mathbf e)=\frac{w(q)}{Z}=\alpha w(q),\qquad\alpha=\frac1Z.}
+$$
 
 En una red bayesiana, cada mundo se obtiene mediante los factores locales:
 
-$$P(q\mid\mathbf e)=\alpha\sum_{\mathbf h}\prod_i P(x_i\mid\operatorname{pa}(X_i)),$$
+$$
+P(q\mid\mathbf e)=\alpha\sum_{\mathbf h}\prod_i P(x_i\mid\operatorname{pa}(X_i)),
+$$
 
 evaluando el producto en la asignación formada por $q,\mathbf e,\mathbf h$.
 
@@ -216,7 +240,9 @@ Sin evidencia, $Z=1$. Si la consulta contiene varias variables, $q$ recorre toda
 
 *Datos de las diapositivas 18–22.* Usaremos $R\to T\to L$. Podemos recordar $R$ como lluvia, $T$ como tráfico y $L$ como llegar tarde; esos nombres son una interpretación didáctica. Los números son los del PDF:
 
-$$P(r)=0.1,\qquad P(\neg r)=0.9.$$
+$$
+P(r)=0.1,\qquad P(\neg r)=0.9.
+$$
 
 | $R$ | $P(t\mid R)$ | $P(\neg t\mid R)$ |
 |---|---:|---:|
@@ -249,8 +275,12 @@ Cada fila se calcula como $P(R)P(T\mid R)P(L\mid T)$:
 
 ### Paso 3: sumar los mundos que coinciden en la consulta
 
-$$P(l)=0.024+0.002+0.027+0.081=0.134,$$
-$$P(\neg l)=0.056+0.018+0.063+0.729=0.866.$$
+$$
+P(l)=0.024+0.002+0.027+0.081=0.134,
+$$
+$$
+P(\neg l)=0.056+0.018+0.063+0.729=0.866.
+$$
 
 La respuesta es $P(L)=\langle0.134,0.866\rangle$ en el orden $(l,\neg l)$. No hace falta cambiar su escala: ya suma uno.
 
@@ -275,8 +305,12 @@ Un factor intermedio puede expresar una conjunta, una probabilidad de evidencia 
 
 Si observamos $R=r$, sustituimos ese valor en todos los factores que mencionan $R$:
 
-$$P(R)\longrightarrow P(r)=0.1,$$
-$$P(T\mid R)\longrightarrow f(T)=P(T\mid r)=\langle0.8,0.2\rangle.$$
+$$
+P(R)\longrightarrow P(r)=0.1,
+$$
+$$
+P(T\mid R)\longrightarrow f(T)=P(T\mid r)=\langle0.8,0.2\rangle.
+$$
 
 El primer factor queda como un **escalar**; el segundo ya solo depende de $T$. Seleccionar $R=r$ no es sumar sobre $R$: sabemos su valor.
 
@@ -284,7 +318,9 @@ El primer factor queda como un **escalar**; el segundo ya solo depende de $T$. S
 
 Si $f(R)=P(R)$ y $g(R,T)=P(T\mid R)$, su producto es:
 
-$$h(R,T)=f(R)g(R,T)=P(R,T).$$
+$$
+h(R,T)=f(R)g(R,T)=P(R,T).
+$$
 
 | $R$ | $T$ | $h(R,T)$ |
 |---|---|---:|
@@ -299,7 +335,9 @@ En general, al multiplicar $f(X,Y)$ por $g(Y,Z)$ obtenemos $h(X,Y,Z)$: **el alca
 
 Para eliminar $R$ de $h(R,T)$:
 
-$$k(T)=\sum_R h(R,T).$$
+$$
+k(T)=\sum_R h(R,T).
+$$
 
 Así, $k(t)=0.08+0.09=0.17$ y $k(\neg t)=0.02+0.81=0.83$.
 
@@ -314,23 +352,31 @@ El factor resultante conserva la probabilidad total de cada valor de $T$, sin co
 
 ### Paso 1: escribir los factores iniciales
 
-$$\mathcal F=\{P(R),\ P(T\mid R),\ P(L\mid T)\}.$$
+$$
+\mathcal F=\{P(R),\ P(T\mid R),\ P(L\mid T)\}.
+$$
 
 ### Paso 2: eliminar $R$
 
 Solo $P(R)$ y $P(T\mid R)$ mencionan $R$. Los multiplicamos y sumamos:
 
-$$f_1(T)=\sum_R P(R)P(T\mid R)=P(T).$$
+$$
+f_1(T)=\sum_R P(R)P(T\mid R)=P(T).
+$$
 
 Ya calculamos $f_1(t)=0.17$, $f_1(\neg t)=0.83$. Sustituimos los dos factores usados por este resumen:
 
-$$\mathcal F=\{f_1(T),\ P(L\mid T)\}.$$
+$$
+\mathcal F=\{f_1(T),\ P(L\mid T)\}.
+$$
 
 El factor $P(L\mid T)$ queda pendiente porque no dependía de $R$.
 
 ### Paso 3: unir los factores que mencionan $T$
 
-$$g(T,L)=f_1(T)P(L\mid T).$$
+$$
+g(T,L)=f_1(T)P(L\mid T).
+$$
 
 | $T$ | $L$ | $g(T,L)$ |
 |---|---|---:|
@@ -341,7 +387,9 @@ $$g(T,L)=f_1(T)P(L\mid T).$$
 
 ### Paso 4: eliminar $T$
 
-$$f_2(L)=\sum_T g(T,L).$$
+$$
+f_2(L)=\sum_T g(T,L).
+$$
 
 Por tanto, $f_2(l)=0.051+0.083=0.134$ y $f_2(\neg l)=0.119+0.747=0.866$. Recuperamos exactamente la misma distribución.
 
@@ -375,25 +423,39 @@ Empieza en **Cadena: $P(L)$** y avanza por los pasos. Compara **Enumeración** c
 
 ### Paso 1: restringir antes de operar
 
-$$\mathcal F=\{P(r)=0.1,\ P(T\mid r),\ P(L\mid T)\}.$$
+$$
+\mathcal F=\{P(r)=0.1,\ P(T\mid r),\ P(L\mid T)\}.
+$$
 
 ### Paso 2: eliminar la única oculta
 
-$$f(L)=\sum_T P(T\mid r)P(L\mid T).$$
+$$
+f(L)=\sum_T P(T\mid r)P(L\mid T).
+$$
 
-$$f(l)=0.8(0.3)+0.2(0.1)=0.26,$$
-$$f(\neg l)=0.8(0.7)+0.2(0.9)=0.74.$$
+$$
+f(l)=0.8(0.3)+0.2(0.1)=0.26,
+$$
+$$
+f(\neg l)=0.8(0.7)+0.2(0.9)=0.74.
+$$
 
 ### Paso 3: recuperar los pesos conjuntos
 
 Multiplicamos el factor escalar pendiente $P(r)$:
 
-$$w(L)=0.1f(L)=\langle0.026,0.074\rangle=P(L,r).$$
+$$
+w(L)=0.1f(L)=\langle0.026,0.074\rangle=P(L,r).
+$$
 
 ### Paso 4: normalizar
 
-$$Z=0.026+0.074=0.1,$$
-$$P(L\mid r)=\frac{\langle0.026,0.074\rangle}{0.1}=\langle0.26,0.74\rangle.$$
+$$
+Z=0.026+0.074=0.1,
+$$
+$$
+P(L\mid r)=\frac{\langle0.026,0.074\rangle}{0.1}=\langle0.26,0.74\rangle.
+$$
 
 **Interpretación:** sin conocer la lluvia, llegar tarde tenía probabilidad $13.4\%$; al saber que llueve, tiene $26\%$ en este modelo. La evidencia cambia el peso relativo de las posibilidades de tráfico.
 
@@ -411,13 +473,17 @@ flowchart TD
   A --> M["M: Mary llama"]
 ```
 
-$$P(B,E,A,J,M)=P(B)P(E)P(A\mid B,E)P(J\mid A)P(M\mid A).$$
+$$
+P(B,E,A,J,M)=P(B)P(E)P(A\mid B,E)P(J\mid A)P(M\mid A).
+$$
 
 Queremos $P(B\mid j,m)$. Conservamos $B$, fijamos $J,M$ y sumamos $A,E$.
 
 ### 10.1 Recuperar los datos necesarios
 
-$$P(b)=0.001,\qquad P(e)=0.002.$$
+$$
+P(b)=0.001,\qquad P(e)=0.002.
+$$
 
 | $B$ | $E$ | $P(a\mid B,E)$ |
 |---|---|---:|
@@ -437,7 +503,9 @@ Las probabilidades de los valores falsos se obtienen por complemento dentro de c
 
 La evidencia fija dos de las cinco variables. Quedan dos valores de $B$ y cuatro combinaciones de $A,E$:
 
-$$w(B)=\sum_E\sum_A P(B)P(E)P(A\mid B,E)P(j\mid A)P(m\mid A).$$
+$$
+w(B)=\sum_E\sum_A P(B)P(E)P(A\mid B,E)P(j\mid A)P(m\mid A).
+$$
 
 | $B$ | $E$ | $A$ | $P(B,E,A,j,m)$ |
 |---|---|---|---:|
@@ -452,23 +520,31 @@ $$w(B)=\sum_E\sum_A P(B)P(E)P(A\mid B,E)P(j\mid A)P(m\mid A).$$
 
 Por ejemplo, la primera fila es $(0.001)(0.002)(0.95)(0.90)(0.70)$. Sumando por $B$:
 
-$$w(b)=0.000592242590,\qquad w(\neg b)=0.001491857649.$$
+$$
+w(b)=0.000592242590,\qquad w(\neg b)=0.001491857649.
+$$
 
 ### 10.3 Eliminación: primero $A$, después $E$
 
 **Paso 1: factores restringidos.**
 
-$$\mathcal F=\{P(B),P(E),P(A\mid B,E),P(j\mid A),P(m\mid A)\}.$$
+$$
+\mathcal F=\{P(B),P(E),P(A\mid B,E),P(j\mid A),P(m\mid A)\}.
+$$
 
 $P(j\mid A)$ y $P(m\mid A)$ son factores sobre **$A$**, porque $J,M$ ya están fijos. No son posteriores sobre $A$ ni suman necesariamente uno al sumar $A$.
 
 **Paso 2: unir todos los factores con $A$ y eliminar $A$.**
 
-$$g(B,E)=\sum_A P(A\mid B,E)P(j\mid A)P(m\mid A).$$
+$$
+g(B,E)=\sum_A P(A\mid B,E)P(j\mid A)P(m\mid A).
+$$
 
 Si hay alarma, las dos llamadas pesan $0.90(0.70)=0.63$; si no hay alarma, pesan $0.05(0.01)=0.0005$. Para cada configuración de $B,E$:
 
-$$g(B,E)=0.63P(a\mid B,E)+0.0005[1-P(a\mid B,E)].$$
+$$
+g(B,E)=0.63P(a\mid B,E)+0.0005[1-P(a\mid B,E)].
+$$
 
 | $B$ | $E$ | $g(B,E)=P(j,m\mid B,E)$ |
 |---|---|---:|
@@ -481,26 +557,42 @@ Para verificar la primera entrada: $0.95(0.63)+0.05(0.0005)=0.598525$. Después 
 
 **Paso 3: unir todos los factores con $E$ y eliminar $E$.**
 
-$$h(B)=\sum_E P(E)g(B,E).$$
+$$
+h(B)=\sum_E P(E)g(B,E).
+$$
 
-$$h(b)=0.002(0.598525)+0.998(0.592230)=0.59224259,$$
-$$h(\neg b)=0.002(0.183055)+0.998(0.0011295)=0.001493351.$$
+$$
+h(b)=0.002(0.598525)+0.998(0.592230)=0.59224259,
+$$
+$$
+h(\neg b)=0.002(0.183055)+0.998(0.0011295)=0.001493351.
+$$
 
 Estos valores son $P(j,m\mid B)$: la probabilidad de ambas llamadas para cada estado de robo. **Todavía no** son $P(B\mid j,m)$.
 
 **Paso 4: unir los factores restantes.**
 
-$$w(B)=P(B)h(B).$$
+$$
+w(B)=P(B)h(B).
+$$
 
-$$w(b)=0.001(0.59224259)=0.000592242590,$$
-$$w(\neg b)=0.999(0.001493351)=0.001491857649.$$
+$$
+w(b)=0.001(0.59224259)=0.000592242590,
+$$
+$$
+w(\neg b)=0.999(0.001493351)=0.001491857649.
+$$
 
 Son exactamente los pesos que dio la enumeración. Escribimos $P(B)$ una sola vez: no vuelve a multiplicarse al sumar cada variable.
 
 **Paso 5: normalizar.**
 
-$$Z=P(j,m)=0.002084100239,$$
-$$\boxed{P(b\mid j,m)=\frac{0.000592242590}{0.002084100239}\approx0.284172.}$$
+$$
+Z=P(j,m)=0.002084100239,
+$$
+$$
+\boxed{P(b\mid j,m)=\frac{0.000592242590}{0.002084100239}\approx0.284172.}
+$$
 
 La previa de robo era $0.1\%$; la posterior es aproximadamente **$28.42\%$**. Las llamadas aumentan mucho la creencia en robo, pero no lo vuelven seguro: también pueden surgir por terremoto o por falsos positivos del modelo.
 
@@ -550,7 +642,9 @@ La descripción de las dos operaciones coincide con [Berkeley CS 188, §6.6](htt
 
 Para consultar $P(J\mid b)$, Mary no está observada ni es consulta. Como es una hoja:
 
-$$\sum_M P(M\mid A)=1.$$
+$$
+\sum_M P(M\mid A)=1.
+$$
 
 Podemos quitar esa rama antes de calcular. Repitiendo el argumento con hojas que dejan de ser relevantes, basta conservar consulta, evidencia y sus ancestros (AIMA, pp. 450–451). Esto **no** permite quitar cualquier variable oculta: en $P(B\mid j,m)$, $A,E$ contribuyen a la probabilidad de la evidencia y deben marginalizarse.
 
@@ -560,7 +654,9 @@ Podemos quitar esa rama antes de calcular. Repitiendo el argumento con hojas que
 
 Después de restringir la evidencia, tenemos:
 
-$$P(Z)\prod_{i=1}^{n}P(X_i\mid Z)P(y_i\mid X_i).$$
+$$
+P(Z)\prod_{i=1}^{n}P(X_i\mid Z)P(y_i\mid X_i).
+$$
 
 Las ocultas son $Z,X_1,\ldots,X_{n-1}$. $X_n$ se conserva como consulta.
 
@@ -568,13 +664,17 @@ Las ocultas son $Z,X_1,\ldots,X_{n-1}$. $X_n$ se conserva como consulta.
 
 Para cada rama que no contiene la consulta:
 
-$$m_i(Z)=\sum_{X_i}P(X_i\mid Z)P(y_i\mid X_i).$$
+$$
+m_i(Z)=\sum_{X_i}P(X_i\mid Z)P(y_i\mid X_i).
+$$
 
 El producto previo a la suma tiene alcance $\{Z,X_i\}$: cuatro entradas si ambas variables son booleanas. El resumen $m_i(Z)$ tiene dos entradas.
 
 Tras eliminar esas ramas, solo falta:
 
-$$w(X_n)=P(y_n\mid X_n)\sum_Z P(Z)P(X_n\mid Z)\prod_{i=1}^{n-1}m_i(Z).$$
+$$
+w(X_n)=P(y_n\mid X_n)\sum_Z P(Z)P(X_n\mid Z)\prod_{i=1}^{n-1}m_i(Z).
+$$
 
 El mayor producto sigue necesitando como máximo dos variables. Cada rama entrega un pequeño resumen sobre $Z$.
 
@@ -582,7 +682,9 @@ El mayor producto sigue necesitando como máximo dos variables. Cada rama entreg
 
 Para eliminar $Z$, debemos reunir $P(Z)$ y **todas** las CPT $P(X_i\mid Z)$:
 
-$$g(X_1,\ldots,X_n)=\sum_Z P(Z)\prod_{i=1}^{n}P(X_i\mid Z).$$
+$$
+g(X_1,\ldots,X_n)=\sum_Z P(Z)\prod_{i=1}^{n}P(X_i\mid Z).
+$$
 
 El producto previo depende de $Z,X_1,\ldots,X_n$: $n+1$ variables. El resultado de la suma conserva las $n$ variables $X_i$ juntas. Creamos una tabla grande antes de resumir las ramas.
 

@@ -57,7 +57,9 @@ $\theta=\{x/Sócrates\}$ convierte $Mortal(x)$ en $Mortal(Sócrates)$.
 
 Una **cláusula** es una disyunción de literales, como:
 
-$$\neg Humano(x)\vee Mortal(x).$$
+$$
+\neg Humano(x)\vee Mortal(x).
+$$
 
 La **cláusula vacía** $\square$ no tiene literales y siempre es falsa. Derivarla significa que las premisas usadas son incompatibles.
 
@@ -74,9 +76,13 @@ La portada anuncia el tema: **inferencia en lógica de primer orden**. La repres
 
 Por ejemplo, una base puede contener:
 
-$$\forall x\,[Humano(x)\to Mortal(x)]$$
+$$
+\forall x\,[Humano(x)\to Mortal(x)]
+$$
 
-$$Humano(Sócrates).$$
+$$
+Humano(Sócrates).
+$$
 
 La sentencia $Mortal(Sócrates)$ no aparece como hecho inicial, pero está vinculada lógicamente por la base. El objetivo de la clase es construir una prueba mecánica de esa consecuencia.
 
@@ -131,11 +137,15 @@ La diapositiva introduce dos convenciones esenciales.
 
 Después de convertir a cláusulas, se omiten los cuantificadores universales. Así,
 
-$$\neg Humano(x)\vee Mortal(x)$$
+$$
+\neg Humano(x)\vee Mortal(x)
+$$
 
 se interpreta como:
 
-$$\forall x\,[\neg Humano(x)\vee Mortal(x)].$$
+$$
+\forall x\,[\neg Humano(x)\vee Mortal(x)].
+$$
 
 La variable es universal **dentro de su cláusula**. Antes de combinar cláusulas distintas se aplica [[Estandarización aparte de variables|estandarización aparte]] para que dos variables llamadas $x$ no se confundan accidentalmente.
 
@@ -228,7 +238,9 @@ Cambiar el nombre de una variable ligada no cambia el significado; evita confund
 
 Ambos existenciales aparecen bajo el alcance de $\forall x$, por lo que sus testigos pueden depender de $x$. Introducimos dos funciones diferentes:
 
-$$y:=F(x),\qquad z:=G(x).$$
+$$
+y:=F(x),\qquad z:=G(x).
+$$
 
 La fórmula se convierte en:
 
@@ -284,17 +296,25 @@ El procedimiento tiene tres operaciones:
 
 ### Ejemplo de la diapositiva
 
-$$Animal(F(x))\vee Loves(G(x),x)$$
+$$
+Animal(F(x))\vee Loves(G(x),x)
+$$
 
-$$\neg Loves(u,v)\vee Feeds(u,v).$$
+$$
+\neg Loves(u,v)\vee Feeds(u,v).
+$$
 
 $Loves(G(x),x)$ y $Loves(u,v)$ se unifican mediante:
 
-$$\theta=\{u/G(x),\ v/x\}.$$
+$$
+\theta=\{u/G(x),\ v/x\}.
+$$
 
 Después de cancelar el par y sustituir en el resto:
 
-$$Animal(F(x))\vee Feeds(G(x),x).$$
+$$
+Animal(F(x))\vee Feeds(G(x),x).
+$$
 
 ### Cuándo falla la unificación
 
@@ -320,7 +340,9 @@ $$
 
 Para una prueba por refutación se añade la negación de la consulta:
 
-$$\neg Mortal(Sócrates).$$
+$$
+\neg Mortal(Sócrates).
+$$
 
 La tercera fórmula no es un hecho que creamos verdadero; es una hipótesis provisional que intentaremos volver incompatible con la base.
 
@@ -361,7 +383,9 @@ $$
 
 Por tanto:
 
-$$KB\models Mortal(Sócrates).$$
+$$
+KB\models Mortal(Sócrates).
+$$
 
 Este ejemplo es pequeño, pero ya contiene el patrón completo: negar la consulta, convertir a cláusulas, unificar, resolver y obtener $\square$.
 
@@ -412,11 +436,15 @@ $$
 
 La consulta es:
 
-$$G: Kills(Curiosity,Tuna).$$
+$$
+G: Kills(Curiosity,Tuna).
+$$
 
 Para refutar su negación añadimos:
 
-$$\neg G:\quad\neg Kills(Curiosity,Tuna).$$
+$$
+\neg G:\quad\neg Kills(Curiosity,Tuna).
+$$
 
 > [!note] Cambio de letras entre diapositivas
 > En la diapositiva 12 la pregunta aparece como inciso E. En la formalización se añaden los hechos sobre Tuna como E y F, por lo que la consulta pasa a llamarse G. Es solo un cambio de etiquetas.
@@ -507,7 +535,9 @@ Al cancelar los literales sobre $Loves(Jack,F(Jack))$ queda $R_5$. Después, $A_
 
 Como la suposición $\neg G$ conduce a contradicción:
 
-$$KB\models Kills(Curiosity,Tuna).$$
+$$
+KB\models Kills(Curiosity,Tuna).
+$$
 
 ### Laboratorio · Recorrer la prueba de Tuna
 

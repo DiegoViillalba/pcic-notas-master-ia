@@ -26,13 +26,17 @@ Función $h(n)$ que estima el costo mínimo restante desde el estado de un nodo 
 
 $h$ es admisible si nunca sobreestima:
 
-$$0\le h(n)\le h^*(n).$$
+$$
+0\le h(n)\le h^*(n).
+$$
 
 ## Consistencia
 
 $h$ es consistente si, para toda transición $n\xrightarrow{a}n'$,
 
-$$h(n)\le c(n,a,n')+h(n').$$
+$$
+h(n)\le c(n,a,n')+h(n').
+$$
 
 La consistencia es una desigualdad triangular y hace que los valores $f$ no disminuyan a lo largo de un camino. Toda heurística consistente es admisible si $h(G)=0$; la conversa no siempre vale.
 

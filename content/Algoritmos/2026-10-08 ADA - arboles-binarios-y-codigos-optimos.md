@@ -41,7 +41,9 @@ Sin conocer el código óptimo, ¿qué podemos afirmar con certeza sobre su form
 
 > [!summary] Idea de la clase
 > Todo código de prefijos es un árbol binario cuyas hojas son los símbolos: el camino de la raíz a una hoja, leyendo $0$ a la izquierda y $1$ a la derecha, es su palabra. Entonces $|\gamma(x)|=\operatorname{depth}(x)$ y
-> $$\operatorname{PBS}(T)=\sum_{x\in\Sigma}f_x\operatorname{depth}(x).$$
+> $$
+> \operatorname{PBS}(T)=\sum_{x\in\Sigma}f_x\operatorname{depth}(x).
+> $$
 > En un árbol óptimo: **(1)** todo nodo interno tiene dos hijos; **(2)** más profundo implica menos frecuente; **(3)** existe un óptimo en el que los **dos símbolos menos frecuentes son hermanos**. Esta última propiedad es la elección voraz de Huffman.
 
 ---

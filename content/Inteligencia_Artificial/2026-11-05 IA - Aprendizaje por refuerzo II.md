@@ -428,7 +428,9 @@ Para una tabla $Q_t$ fija al calcular el objetivo, la esperanza condicional de $
 
 > [!warning] Diapositiva 12: máximo y argmáximo tienen tipos distintos
 > La última igualdad debe contener $\max$, no $\arg\max$:
-> $$Q\!\left(s',\operatorname*{arg\,max}_{a'}Q(s',a')\right)=\max_{a'}Q(s',a').$$
+> $$
+> Q\!\left(s',\operatorname*{arg\,max}_{a'}Q(s',a')\right)=\max_{a'}Q(s',a').
+> $$
 > Aquí elegimos una acción del conjunto de argmáximos. El argmáximo devuelve una **acción**; el máximo devuelve un **valor numérico**, que sí puede sumarse a una recompensa. La diapositiva 13 utiliza correctamente el máximo.
 
 ### 7.5 Una actualización numérica completa

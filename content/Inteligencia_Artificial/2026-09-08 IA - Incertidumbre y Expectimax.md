@@ -547,7 +547,9 @@ $$
 **Lectura:** el resultado intermedio B puede igualarse mediante alguna mezcla entre el mejor A y el peor C. Evita saltos infinitos donde ninguna probabilidad de A compense abandonar B.
 
 e.g. Supongamos que tenemos 3 posibles rewards:
-$$A = 100 \qquad B = 50 \qquad C = 0 $$
+$$
+A = 100 \qquad B = 50 \qquad C = 0
+$$
 
 Si tenemos 2 situacioanes, una donde nos garatizan ue obtenedremos $50$ ccon total certeza o una loteria donde etenemos uuna pribabilidad p de ganar 100,, para una agente de risesgo neutral nautral cuta recompensa sea la cantidad la indiferencia de la eleccion ocurre en p =0.5 ya qeuqe e valor esperado es 0.5(100)+0.5(0)=50
 

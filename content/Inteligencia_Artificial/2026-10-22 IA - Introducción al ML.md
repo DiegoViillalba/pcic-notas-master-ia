@@ -63,23 +63,33 @@ Con $n$ ejemplos y $d$ columnas de diseño, agrupamos las entradas en $X\in\math
 
 Para una característica escalar, la recta es $\hat y_i=\theta_0+\theta_1x_i$. Con varias características se añade una columna constante de unos para el **sesgo** o intercepto:
 
-$$\mathbf{x}_i^{\mathsf T}=(1,x_{i1},\ldots,x_{i,d-1}),\qquad \hat y_i=\mathbf{x}_i^{\mathsf T}\boldsymbol\theta,\qquad \hat{\mathbf y}=X\boldsymbol\theta.$$
+$$
+\mathbf{x}_i^{\mathsf T}=(1,x_{i1},\ldots,x_{i,d-1}),\qquad \hat y_i=\mathbf{x}_i^{\mathsf T}\boldsymbol\theta,\qquad \hat{\mathbf y}=X\boldsymbol\theta.
+$$
 
 Aquí «lineal» significa **lineal en los parámetros $\boldsymbol\theta$**. La diapositiva 19 escribe «$x_{i1}=\theta_1$» para el sesgo; debe ser **$x_{i1}=1$**, con $\theta_1$ como coeficiente de esa columna (o $\theta_0$ si numeramos desde cero).
 
 La función de costo de las diapositivas 18–20 suma errores al cuadrado:
 
-$$J(\boldsymbol\theta)=\sum_{i=1}^{n}(y_i-\hat y_i)^2=\lVert\mathbf y-X\boldsymbol\theta\rVert_2^2.$$
+$$
+J(\boldsymbol\theta)=\sum_{i=1}^{n}(y_i-\hat y_i)^2=\lVert\mathbf y-X\boldsymbol\theta\rVert_2^2.
+$$
 
 Al expandir y derivar obtenemos
 
-$$J=\mathbf y^{\mathsf T}\mathbf y-2\boldsymbol\theta^{\mathsf T}X^{\mathsf T}\mathbf y+\boldsymbol\theta^{\mathsf T}X^{\mathsf T}X\boldsymbol\theta,$$
+$$
+J=\mathbf y^{\mathsf T}\mathbf y-2\boldsymbol\theta^{\mathsf T}X^{\mathsf T}\mathbf y+\boldsymbol\theta^{\mathsf T}X^{\mathsf T}X\boldsymbol\theta,
+$$
 
-$$\nabla_{\boldsymbol\theta}J=-2X^{\mathsf T}\mathbf y+2X^{\mathsf T}X\boldsymbol\theta=2X^{\mathsf T}(X\boldsymbol\theta-\mathbf y).$$
+$$
+\nabla_{\boldsymbol\theta}J=-2X^{\mathsf T}\mathbf y+2X^{\mathsf T}X\boldsymbol\theta=2X^{\mathsf T}(X\boldsymbol\theta-\mathbf y).
+$$
 
 Igualando a cero resultan las **ecuaciones normales** $X^{\mathsf T}X\hat{\boldsymbol\theta}=X^{\mathsf T}\mathbf y$. Si $X$ tiene rango columna completo,
 
-$$\boxed{\hat{\boldsymbol\theta}=(X^{\mathsf T}X)^{-1}X^{\mathsf T}\mathbf y.}$$
+$$
+\boxed{\hat{\boldsymbol\theta}=(X^{\mathsf T}X)^{-1}X^{\mathsf T}\mathbf y.}
+$$
 
 Si las columnas son dependientes, la inversa no existe; puede usarse la pseudoinversa o regularización. Para cálculo numérico suele ser mejor resolver con QR o SVD que formar explícitamente la inversa. **Aclaración:** la línea intermedia del gradiente en la diapositiva 20 omite el factor 2 del término cuadrático; la derivada anterior corresponde al $J$ definido allí, sin factor $1/2$.
 
@@ -87,7 +97,9 @@ Si las columnas son dependientes, la inversa no existe; puede usarse la pseudoin
 
 Si una recta no captura la relación, transformamos las entradas con $\boldsymbol\phi(\mathbf x)$ y mantenemos un modelo lineal en los coeficientes:
 
-$$\hat y(\mathbf x)=\boldsymbol\phi(\mathbf x)^{\mathsf T}\boldsymbol\theta.$$
+$$
+\hat y(\mathbf x)=\boldsymbol\phi(\mathbf x)^{\mathsf T}\boldsymbol\theta.
+$$
 
 Para una entrada escalar, $\boldsymbol\phi(x)=(1,x,x^2)$ permite una parábola. Con dos variables, $(1,x_1,x_2,x_1^2,x_2^2)$ añade curvatura separada; $x_1x_2$ añadiría interacción. La diapositiva 21 llama «núcleos» a estas transformaciones, pero **añadir características explícitas** no es lo mismo que aplicar el *kernel trick* de métodos duales.
 
@@ -113,11 +125,15 @@ Una predicción puntual $\hat y$ no dice cuánto desconocemos en otras entradas.
 
 Para entradas observadas $X$, nuevas entradas $X_*$ y valores latentes $\mathbf f$:
 
-$$\begin{pmatrix}\mathbf f\\\mathbf f_*\end{pmatrix}\sim\mathcal N\!\left(\begin{pmatrix}\boldsymbol\mu\\\boldsymbol\mu_*\end{pmatrix},\begin{pmatrix}K&K_*\\K_*^{\mathsf T}&K_{**}\end{pmatrix}\right),$$
+$$
+\begin{pmatrix}\mathbf f\\\mathbf f_*\end{pmatrix}\sim\mathcal N\!\left(\begin{pmatrix}\boldsymbol\mu\\\boldsymbol\mu_*\end{pmatrix},\begin{pmatrix}K&K_*\\K_*^{\mathsf T}&K_{**}\end{pmatrix}\right),
+$$
 
 donde $K=\kappa(X,X)$, $K_*=\kappa(X,X_*)$ y $K_{**}=\kappa(X_*,X_*)$. Condicionando la normal conjunta en observaciones **sin ruido**:
 
-$$\boxed{\boldsymbol\mu_{*\mid D}=\boldsymbol\mu_*+K_*^{\mathsf T}K^{-1}(\mathbf f-\boldsymbol\mu),\qquad \Sigma_{*\mid D}=K_{**}-K_*^{\mathsf T}K^{-1}K_*.}$$
+$$
+\boxed{\boldsymbol\mu_{*\mid D}=\boldsymbol\mu_*+K_*^{\mathsf T}K^{-1}(\mathbf f-\boldsymbol\mu),\qquad \Sigma_{*\mid D}=K_{**}-K_*^{\mathsf T}K^{-1}K_*.}
+$$
 
 La diapositiva propone $\kappa(x,x')=\sigma_f^2\exp\!\bigl(-\lVert x-x'\rVert^2/(2\ell^2)\bigr)$: $\sigma_f$ controla la amplitud y $\ell$ la escala de variación. **Si observamos $\mathbf y=\mathbf f+\boldsymbol\epsilon$ con ruido gaussiano de varianza $\sigma_n^2$**, se reemplaza $K^{-1}$ por $(K+\sigma_n^2I)^{-1}$ y $\mathbf f$ por $\mathbf y$ en la fórmula de la media; en la covarianza se reemplaza la misma inversa. Para predecir una observación nueva se suma $\sigma_n^2I$ a la covarianza latente. Esto distingue incertidumbre de la función y ruido de medición.
 
@@ -136,7 +152,9 @@ La media expresa la predicción y la varianza indica dónde el modelo es menos s
 
 Con filas $(1,v,p)$ en $X$, mínimos cuadrados da, redondeando,
 
-$$\hat{\boldsymbol\theta}\approx(24.9762,-0.2075,0.2092)^{\mathsf T},\qquad \hat y(v,p)=24.9762-0.2075v+0.2092p.$$
+$$
+\hat{\boldsymbol\theta}\approx(24.9762,-0.2075,0.2092)^{\mathsf T},\qquad \hat y(v,p)=24.9762-0.2075v+0.2092p.
+$$
 
 | Entrada $(v,p)$ | Sustitución | Predicción |
 |---|---|---:|

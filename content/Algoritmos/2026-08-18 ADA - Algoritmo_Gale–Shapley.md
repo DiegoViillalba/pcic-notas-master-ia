@@ -38,7 +38,9 @@ tags: [clase, algoritmos]
 
 El ejemplo es asignar egresados de medicina a hospitales. Hay dos conjuntos disjuntos del mismo tamaño:
 
-$$H=\{h_1,\ldots,h_n\},\qquad S=\{s_1,\ldots,s_n\}.$$ 
+$$
+H=\{h_1,\ldots,h_n\},\qquad S=\{s_1,\ldots,s_n\}.
+$$
 
 Cada hospital ordena a los estudiantes de más a menos preferido; cada estudiante ordena los hospitales. Las listas son la **entrada**, no la solución. En la instancia de las diapositivas, Atlanta prefiere $Xavier \succ Yolanda \succ Zeus$ mientras Xavier prefiere $$Boston \succ Atlanta \succ Chicago$$
 
@@ -48,7 +50,9 @@ Un [[Emparejamiento perfecto|emparejamiento]] $M$ es un conjunto de pares $(h,s)
 
 Para un par $(h,s)\notin M$, sea $M(h)$ el estudiante asignado a $h$ y $M(s)$ el hospital asignado a $s$. El par es [[Par inestable|inestable]] si:
 
-$$s \succ_h M(h)\quad\text{y}\quad h \succ_s M(s).$$
+$$
+s \succ_h M(h)\quad\text{y}\quad h \succ_s M(s).
+$$
 
 Es decir, ambos prefieren al otro sobre su pareja actual; podrían mejorar mediante un acuerdo bilateral, por lo que el resultado no se sostiene. Un emparejamiento estable es uno perfecto sin pares inestables.
 

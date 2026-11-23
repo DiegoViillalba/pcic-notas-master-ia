@@ -28,7 +28,9 @@ Las CPT son factores iniciales. Los productos, las restricciones por evidencia y
 
 Para $f(X,Y)$ y $g(Y,Z)$:
 
-$$h(X,Y,Z)=f(X,Y)g(Y,Z).$$
+$$
+h(X,Y,Z)=f(X,Y)g(Y,Z).
+$$
 
 El alcance del producto es la unión de los alcances; se multiplican entradas con el mismo valor compartido de $Y$. Es un producto punto a punto sobre asignaciones compatibles, no multiplicación de matrices.
 

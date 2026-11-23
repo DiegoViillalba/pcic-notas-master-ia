@@ -278,7 +278,9 @@ $$
 A(1,n+1)\overset{(3)}{=}A\big(0,A(1,n)\big)\overset{\text{hip.}}{=}A(0,n+2)\overset{(1)}{=}(n+2)+1=(n+1)+2.
 $$
 
-$$\therefore\ A(1,z)=z+2.$$
+$$
+\therefore\ A(1,z)=z+2.
+$$
 
 ### 7.2. `A(2, z) = 2z + 3` — inducción sobre `z`, usando el resultado anterior
 
@@ -289,7 +291,9 @@ $$
 A(2,n+1)=A\big(1,A(2,n)\big)\overset{\text{hip.}}{=}A(1,2n+3)\overset{\S7.1}{=}(2n+3)+2=2(n+1)+3.
 $$
 
-$$\therefore\ A(2,z)=2z+3.$$
+$$
+\therefore\ A(2,z)=2z+3.
+$$
 
 ### 7.3. `A(3, z) = 2^(z+3) − 3`
 

@@ -47,11 +47,15 @@ La búsqueda termina de dos maneras:
 
 Un **átomo** es una expresión como $R(X)$ o $mortal(socrates)$. Un **literal** es un átomo o su negación. Una **cláusula** es una disyunción de literales:
 
-$$\neg S(X)\vee T(X).$$
+$$
+\neg S(X)\vee T(X).
+$$
 
 Esta cláusula tiene una lectura equivalente como implicación:
 
-$$S(X)\to T(X),$$
+$$
+S(X)\to T(X),
+$$
 
 y como regla de Prolog:
 
@@ -61,15 +65,21 @@ t(X) :- s(X).
 
 En general, la regla
 
-$$A\leftarrow B_1,\ldots,B_m$$
+$$
+A\leftarrow B_1,\ldots,B_m
+$$
 
 abrevia
 
-$$B_1\land\cdots\land B_m\to A,$$
+$$
+B_1\land\cdots\land B_m\to A,
+$$
 
 y en forma clausal se escribe
 
-$$A\vee\neg B_1\vee\cdots\vee\neg B_m.$$
+$$
+A\vee\neg B_1\vee\cdots\vee\neg B_m.
+$$
 
 La **cabeza** es $A$ y el **cuerpo** contiene $B_1,\ldots,B_m$. Una regla de esta forma es una cláusula definida: contiene exactamente un literal positivo.
 
@@ -83,11 +93,15 @@ La consulta conjunta
 
 se representa como la cláusula objetivo
 
-$$\leftarrow A_1,A_2,\ldots,A_n,$$
+$$
+\leftarrow A_1,A_2,\ldots,A_n,
+$$
 
 equivalente a
 
-$$\neg A_1\vee\neg A_2\vee\cdots\vee\neg A_n.$$
+$$
+\neg A_1\vee\neg A_2\vee\cdots\vee\neg A_n.
+$$
 
 La flecha hacia la izquierda puede leerse como: «todavía falta demostrar estas metas».
 
@@ -100,7 +114,9 @@ La flecha hacia la izquierda puede leerse como: «todavía falta demostrar estas
 
 Si dos cláusulas contienen literales complementarios que pueden unificarse, esos literales se eliminan y el unificador se aplica a todo lo restante. Sean
 
-$$C\vee L \qquad\text{y}\qquad D\vee\neg L',$$
+$$
+C\vee L \qquad\text{y}\qquad D\vee\neg L',
+$$
 
 y sea $\theta$ un unificador de $L$ y $L'$. Entonces:
 
@@ -119,15 +135,21 @@ El resultado se llama **resolvente**. En lógica proposicional los literales com
 
 Supongamos que el programa contiene una regla cuya cabeza puede unificarse con la meta seleccionada $A_k$:
 
-$$A\leftarrow B_1,\ldots,B_m,$$
+$$
+A\leftarrow B_1,\ldots,B_m,
+$$
 
 y que el objetivo actual es
 
-$$\leftarrow A_1,\ldots,A_{k-1},A_k,A_{k+1},\ldots,A_n.$$
+$$
+\leftarrow A_1,\ldots,A_{k-1},A_k,A_{k+1},\ldots,A_n.
+$$
 
 Primero se renombran las variables de la regla si hace falta, para que sean independientes de las del objetivo. Después se calcula
 
-$$\theta=UMG(A,A_k),$$
+$$
+\theta=UMG(A,A_k),
+$$
 
 donde UMG significa **unificador más general**. El siguiente objetivo es:
 
@@ -144,11 +166,15 @@ Es decir: se elimina la meta resuelta $A_k$ y, en su lugar, se insertan las prem
 
 La regla equivale a:
 
-$$A\vee\neg B_1\vee\cdots\vee\neg B_m,$$
+$$
+A\vee\neg B_1\vee\cdots\vee\neg B_m,
+$$
 
 y el objetivo equivale a:
 
-$$\neg A_1\vee\cdots\vee\neg A_k\vee\cdots\vee\neg A_n.$$
+$$
+\neg A_1\vee\cdots\vee\neg A_k\vee\cdots\vee\neg A_n.
+$$
 
 Al resolver $A$ con $\neg A_k$ se cancelan esos dos literales. Queda:
 
@@ -179,7 +205,9 @@ $$
 
 Queremos probar:
 
-$$S\models R(X).$$
+$$
+S\models R(X).
+$$
 
 La prueba por refutación agrega la negación de la conclusión, $\neg R(X)$, y busca derivar $\square$:
 
@@ -205,7 +233,9 @@ $$
 
 Como $S\cup\{\neg R(X)\}$ es inconsistente, concluimos:
 
-$$\boxed{S\models R(X).}$$
+$$
+\boxed{S\models R(X).}
+$$
 
 > [!note] Refutación frente a esquema de búsqueda
 > Una **refutación** muestra una secuencia que sí alcanza $\square$. El **esquema de búsqueda** contiene también las elecciones alternativas que el algoritmo pudo haber intentado. Por eso el segundo suele ser mucho más ancho que la prueba final.

@@ -66,7 +66,9 @@ def Topo_Iterativo(G):
 
 ### Análisis formal de complejidad:
 - **Tiempo de ejecución:** El bucle se ejecuta $n$ veces. En cada iteración, buscar un vértice con $\text{in-degree} = 0$ sin estructuras auxiliares requiere escanear la gráfica completa en $O(n + m)$ operaciones:
-  $$T(n, m) = (n + 1) \cdot O(n) + n \cdot O(n + m) = O(n^2 + nm)$$
+  $$
+  T(n, m) = (n + 1) \cdot O(n) + n \cdot O(n + m) = O(n^2 + nm)
+  $$
 - **Espacio de memoria:** $S(n, m) = O(n)$ para la lista $L$.
 
 ---
@@ -109,9 +111,13 @@ def Topo_Iterativo_Mejorado(G):
 - **Extracción de vértices:** Cada vértice entra y sale de la cola $S$ exactamente una vez $\implies O(n)$ acumulado.
 - **Actualización de aristas:** Cada arista $(v, w)$ se recorre una sola vez cuando se procesa su origen $v$. El decremento `in-degree[w] -= 1` toma $O(1)$ por arista $\implies O(m)$ acumulado.
 - **Tiempo total:**
-  $$T(n, m) = O(n + m)$$
+  $$
+  T(n, m) = O(n + m)
+  $$
 - **Espacio total:**
-  $$S(n, m) = O(n) \quad \text{para almacenar la cola } S \text{ y el vector } \text{in-degree}$$
+  $$
+  S(n, m) = O(n) \quad \text{para almacenar la cola } S \text{ y el vector } \text{in-degree}
+  $$
 
 ---
 

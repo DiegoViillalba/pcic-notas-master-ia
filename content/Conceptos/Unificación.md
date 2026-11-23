@@ -24,7 +24,9 @@ tags:
 
 La **unificación** busca una sustitución $\theta$ que haga sintácticamente iguales dos términos o átomos de [[Lógica de primer orden|primer orden]]:
 
-$$Subst(\theta,p)=Subst(\theta,q).$$
+$$
+Subst(\theta,p)=Subst(\theta,q).
+$$
 
 Cuando existe, interesa el **unificador más general** (UMG): uno que impone solo las igualdades necesarias y del cual pueden obtenerse unificadores más específicos mediante sustituciones adicionales.
 
@@ -32,15 +34,21 @@ Formalmente, $\theta$ unifica $p$ y $q$ si $p\theta=q\theta$. Un UMG es más gen
 
 ## Ejemplo mínimo
 
-$$Humano(x)\quad\text{y}\quad Humano(Sócrates)$$
+$$
+Humano(x)\quad\text{y}\quad Humano(Sócrates)
+$$
 
 se unifican con:
 
-$$\theta=\{x/Sócrates\}.$$
+$$
+\theta=\{x/Sócrates\}.
+$$
 
 También:
 
-$$Loves(G(x),x)\quad\text{y}\quad Loves(u,v)$$
+$$
+Loves(G(x),x)\quad\text{y}\quad Loves(u,v)
+$$
 
 se unifican con $\theta=\{u/G(x),v/x\}$.
 

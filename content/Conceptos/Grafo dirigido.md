@@ -32,9 +32,13 @@ Se interpreta que la arista sale del vértice $u$ (origen o cola) y entra al vé
 
 Para cada vértice $v \in V$:
 - **Grado de entrada ($\text{in-degree}(v)$):** Número de aristas que entran a $v$:
-  $$\text{in-degree}(v) = |\{u \in V \mid (u, v) \in E\}|$$
+  $$
+  \text{in-degree}(v) = |\{u \in V \mid (u, v) \in E\}|
+  $$
 - **Grado de salida ($\text{out-degree}(v)$):** Número de aristas que salen de $v$:
-  $$\text{out-degree}(v) = |\{w \in V \mid (v, w) \in E\}|$$
+  $$
+  \text{out-degree}(v) = |\{w \in V \mid (v, w) \in E\}|
+  $$
 
 Lema del apretón de manos para digrafos:
 $$

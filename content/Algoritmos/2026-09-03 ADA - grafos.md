@@ -50,7 +50,9 @@ El recorrido de ideas es:
 
 Un grafo se denota por:
 
-$$G=(V,E).$$
+$$
+G=(V,E).
+$$
 
 - **$G$** es el objeto completo: vértices y conexiones.
 - **$V$** es el conjunto de vértices, también llamados nodos. Cada elemento representa un objeto.
@@ -66,8 +68,12 @@ En un grafo **no dirigido**, una arista $\{u,v\}$ no distingue origen y destino.
 En los ejemplos de esta clase trabajamos con grafos finitos **simples**: sin lazos de un vértice a sí mismo y sin varias aristas distintas entre el mismo par. Esta convención importa al contar aristas y al interpretar ciclos.
 
 > [!example] El grafo que reutilizaremos
-> $$V=\{1,2,3,4,5,6,7,8\}$$
-> $$E=\{1-2,1-3,2-3,2-4,2-5,3-5,3-7,3-8,4-5,5-6,7-8\}.$$
+> $$
+> V=\{1,2,3,4,5,6,7,8\}
+> $$
+> $$
+> E=\{1-2,1-3,2-3,2-4,2-5,3-5,3-7,3-8,4-5,5-6,7-8\}.
+> $$
 > Por tanto, **$n=8$ y $m=11$**. Es el grafo de la diapositiva 3, redibujado en las visualizaciones.
 
 
@@ -226,11 +232,15 @@ Para saber si existe $3-8$, recorremos `Adj[3]` hasta encontrar 8 o terminar. En
 
 Necesitamos $n$ entradas principales, incluyendo las de vértices aislados. El total de entradas de vecinos es:
 
-$$\sum_{u\in V}\deg(u)=2m.$$
+$$
+\sum_{u\in V}\deg(u)=2m.
+$$
 
 Cada arista tiene dos extremos, así que contribuye una unidad al grado de cada extremo. En el ejemplo:
 
-$$2+4+5+2+4+1+2+2=22=2(11).$$
+$$
+2+4+5+2+4+1+2+2=22=2(11).
+$$
 
 Por ello, el espacio es $\Theta(n+2m)=\Theta(n+m)$. **Quitar el factor 2 en notación asintótica no significa que la segunda copia desaparezca de la implementación.**
 
@@ -305,7 +315,9 @@ es decir, un camino cuya primera y última etiqueta coinciden. Es **simple** si 
 
 El ejemplo de la diapositiva 11 es:
 
-$$1\to2\to4\to5\to3\to1.$$
+$$
+1\to2\to4\to5\to3\to1.
+$$
 
 Tiene cinco aristas, comienza y termina en 1, y no repite ningún otro vértice. Por eso es un ciclo simple de longitud 5.
 
@@ -758,11 +770,15 @@ Las aplicaciones de las diapositivas son conexiones en una red social, recorrer 
 
 Construimos capas:
 
-$$L_0=\{s\}.$$
+$$
+L_0=\{s\}.
+$$
 
 $L_1$ contiene los vecinos de $s$ todavía no descubiertos. $L_2$ contiene los vecinos de $L_1$ que no pertenecen a ninguna capa anterior. En general:
 
-$$L_{i+1}=\{v\notin L_0\cup\cdots\cup L_i:\exists u\in L_i\text{ con }u-v\in E\}.$$
+$$
+L_{i+1}=\{v\notin L_0\cup\cdots\cup L_i:\exists u\in L_i\text{ con }u-v\in E\}.
+$$
 
 Leamos la fórmula por partes:
 
@@ -887,7 +903,9 @@ Así probamos ambas inclusiones, no solo que BFS produce algún camino. En conse
 
 La diapositiva 19 afirma que, para una arista $x-y$ de la componente explorada:
 
-$$|d(s,x)-d(s,y)|\le1.$$
+$$
+|d(s,x)-d(s,y)|\le1.
+$$
 
 Supón que $x$ está en la capa $i$. Llegar a $x$ y dar un paso a $y$ produce un camino de longitud $i+1$, por lo que $d(s,y)\le i+1$. Como la arista no tiene dirección, también podemos intercambiar $x$ y $y$. Juntas, ambas desigualdades limitan la diferencia a uno.
 
@@ -903,7 +921,9 @@ Contemos trabajo real usando listas de adyacencia:
 4. La suma de grados en todo el grafo es $2m$.
 5. Cada consulta hace trabajo constante: prueba de descubrimiento y, si corresponde, asignaciones y operación de cola.
 
-$$T(n,m)=O(n)+O(n)+O\left(\sum_{u\in V}\deg(u)\right)=O(n+m).$$
+$$
+T(n,m)=O(n)+O(n)+O\left(\sum_{u\in V}\deg(u)\right)=O(n+m).
+$$
 
 La cota $O(n^2)$ de las diapositivas es válida, pero puede ser holgada: multiplica hasta $n$ vértices por hasta $n$ posibles vecinos. Sumar los tamaños reales de las listas explica la cota más precisa.
 
@@ -930,7 +950,9 @@ La **componente conexa que contiene a $s$** es el conjunto de todos los vértice
 
 En el dibujo de la diapositiva 21:
 
-$$C_1=\{1,2,3,4,5,6,7,8\},\qquad C_2=\{9,10\},\qquad C_3=\{11,12,13\}.$$
+$$
+C_1=\{1,2,3,4,5,6,7,8\},\qquad C_2=\{9,10\},\qquad C_3=\{11,12,13\}.
+$$
 
 Las dos aristas de la última componente son $11-12$ y $12-13$. No hay aristas entre las tres componentes. BFS desde 1 solo visita $C_1$; no tiene forma de “saltar” a 9. Un vértice aislado también sería una componente válida, de tamaño uno.
 

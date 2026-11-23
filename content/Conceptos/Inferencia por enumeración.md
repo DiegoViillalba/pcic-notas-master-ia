@@ -28,7 +28,9 @@ Una variable oculta no se considera falsa ni se fija arbitrariamente: sus distin
 
 Para consulta $Q$, evidencia $\mathbf e$ y ocultas $\mathcal H$:
 
-$$w(q)=\sum_{\mathbf h}P(q,\mathbf e,\mathbf h),\qquad P(q\mid\mathbf e)=\frac{w(q)}{\sum_{q'}w(q')}.$$
+$$
+w(q)=\sum_{\mathbf h}P(q,\mathbf e,\mathbf h),\qquad P(q\mid\mathbf e)=\frac{w(q)}{\sum_{q'}w(q')}.
+$$
 
 En una red bayesiana, la probabilidad de cada mundo es el producto de sus probabilidades locales. La posterior está definida por esta fórmula cuando la evidencia tiene probabilidad positiva.
 

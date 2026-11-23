@@ -28,10 +28,14 @@ tags:
 Dada una [[Grafo dirigido|gráfica dirigida]] $G = (V, E)$, su **gráfica de componentes conexas** $G_{cc} = (V_{cc}, E_{cc})$ (conocida también como *grafo de condensación*, *Kernel DAG* o *Component DAG*) es la gráfica cuyos vértices representan las [[Conectividad fuerte|componentes fuertemente conexas (SCC)]] de $G$, y cuyas aristas representan la conectividad dirigida entre componentes distintas:
 
 1. **Conjunto de vértices:**
-   $$V_{cc} = \{C_1, C_2, \dots, C_k\}$$
+   $$
+   V_{cc} = \{C_1, C_2, \dots, C_k\}
+   $$
    donde cada $C_i \subseteq V$ es una componente fuertemente conexa maximal de $G$.
 2. **Conjunto de aristas:** Para dos componentes distintas $X, Y \in V_{cc}$ ($X \neq Y$):
-   $$(X, Y) \in E_{cc} \iff \exists u \in X, \; \exists v \in Y \quad \text{tal que } (u, v) \in E$$
+   $$
+   (X, Y) \in E_{cc} \iff \exists u \in X, \; \exists v \in Y \quad \text{tal que } (u, v) \in E
+   $$
 
 No se permiten auto-aristas o bucles en $G_{cc}$ (las dependencias internas dentro de una misma componente quedan absorbidas dentro del supernodo). Si existen múltiples aristas de $X$ a $Y$ en $G$, se colapsan a una única macro-arista dirigida en $E_{cc}$.
 
@@ -44,7 +48,9 @@ No se permiten auto-aristas o bucles en $G_{cc}$ (las dependencias internas dent
 
 ### Demostración por contradicción
 1. Supongamos que $G_{cc}$ no es un DAG. Entonces existe un ciclo dirigido simple entre componentes:
-   $$C_1 \to C_2 \to \dots \to C_r \to C_1 \quad (r \ge 2)$$
+   $$
+   C_1 \to C_2 \to \dots \to C_r \to C_1 \quad (r \ge 2)
+   $$
 2. Por la definición de arista en $G_{cc}$, para cada paso del ciclo existe una arista $(u_i, v_{i+1}) \in E$ con $u_i \in C_i$ y $v_{i+1} \in C_{i+1}$ (y $(u_r, v_1) \in E$ con $u_r \in C_r$ y $v_1 \in C_1$).
 3. Dado que cada componente $C_i$ es fuertemente conexa, dentro de $C_i$ existe un camino dirigido entre cualquier par de sus nodos.
 4. Por lo tanto, podemos construir un camino dirigido desde cualquier nodo de $C_1$ hacia cualquier nodo de $C_2$, de ahí a $C_3$, y eventualmente regresar a $C_1$.

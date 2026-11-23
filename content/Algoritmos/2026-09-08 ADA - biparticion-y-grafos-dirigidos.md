@@ -110,11 +110,15 @@ Sea $C = v_1 - v_2 - v_3 - \dots - v_{2k+1} - v_1$ un ciclo simple con $2k + 1$ 
 2. Sin pérdida de generalidad, asignemos el color $0$ al nodo $v_1$: $\text{color}(v_1) = 0$.
 3. Como $v_2$ es vecino de $v_1$, forzosamente $\text{color}(v_2) = 1$.
 4. De forma inductiva, para cada nodo $v_i$ del ciclo:
-   $$\text{color}(v_i) = (i - 1) \pmod 2$$
+   $$
+   \text{color}(v_i) = (i - 1) \pmod 2
+   $$
    - Todos los nodos con índice impar ($v_1, v_3, v_5, \dots$) deben tener color $0$.
    - Todos los nodos con índice par ($v_2, v_4, v_6, \dots$) deben tener color $1$.
 5. Al llegar al último nodo del ciclo, $v_{2k+1}$ (cuyo índice es impar), debe tener obligatoriamente:
-   $$\text{color}(v_{2k+1}) = 0$$
+   $$
+   \text{color}(v_{2k+1}) = 0
+   $$
 6. Sin embargo, en el ciclo existe la arista de cierre $\{v_{2k+1}, v_1\}$. Ambos extremos tienen color $0$, lo cual viola la definición de $2$-coloración.
 7. Por contradicción, ningún ciclo de longitud impar puede ser 2-coloreado.
 
@@ -155,7 +159,9 @@ Supongamos que existe una arista $e = \{x, y\}$ donde ambos nodos están en el m
    - El camino en el árbol de $y$ ascendiendo a $z$ (longitud $j - i$).
    - El camino en el árbol de $z$ descendiendo a $x$ (longitud $j - i$).
 4. La longitud total de este ciclo simple es:
-   $$\text{Longitud} = 1 + (j - i) + (j - i) = 1 + 2(j - i)$$
+   $$
+   \text{Longitud} = 1 + (j - i) + (j - i) = 1 + 2(j - i)
+   $$
 5. Como $j \ge i$, la diferencia $(j - i)$ es un entero mayor o igual a cero. La cantidad $2(j - i)$ es forzosamente un número par. Al sumarle $1$, obtenemos un **número estrictamente impar**.
 6. Por lo tanto, hemos aislado un ciclo simple de longitud impar en $G$, certificando que $G$ no es bipartito.
 
@@ -207,7 +213,9 @@ Experimenta interactivamente con la prueba de 2-colorabilidad por capas de BFS y
 
 Un **grafo dirigido** o **digrafo** $G = (V, E)$ se compone de vértices $V$ y aristas dirigidas $E$. Cada arista es un **par ordenado**:
 
-$$(u, v) \in E$$
+$$
+(u, v) \in E
+$$
 
 - Sale del nodo $u$ y entra al nodo $v$.
 - La orientación es crítica: $(u, v)$ no garantiza la existencia de $(v, u)$.
@@ -217,7 +225,9 @@ $$(u, v) \in E$$
 - $\text{in-degree}(v)$: Número de aristas que entran a $v$.
 - $\text{out-degree}(v)$: Número de aristas que salen de $v$.
 
-$$\sum_{v \in V} \text{in-degree}(v) = \sum_{v \in V} \text{out-degree}(v) = m = |E|$$
+$$
+\sum_{v \in V} \text{in-degree}(v) = \sum_{v \in V} \text{out-degree}(v) = m = |E|
+$$
 
 ### 5.3 Aplicaciones canónicas de digrafos
 
@@ -269,9 +279,13 @@ Comprobar directamente la definición evaluando todos los pares requeriría veri
   - Por la condición (2), existe un camino dirigido $u \rightsquigarrow s$.
   - Por la condición (1), existe un camino dirigido $s \rightsquigarrow v$.
   - Concatenando ambos caminos pasando por el testigo $s$, obtenemos un camino dirigido válido:
-    $$u \rightsquigarrow s \rightsquigarrow v$$
+    $$
+    u \rightsquigarrow s \rightsquigarrow v
+    $$
   - De forma idéntica, concatenando el camino $v \rightsquigarrow s$ con $s \rightsquigarrow u$, obtenemos:
-    $$v \rightsquigarrow s \rightsquigarrow u$$
+    $$
+    v \rightsquigarrow s \rightsquigarrow u
+    $$
   - Como $u$ y $v$ fueron elegidos arbitrariamente, todo par es mutuamente alcanzable.
 
 ```
@@ -284,7 +298,9 @@ Comprobar directamente la definición evaluando todos los pares requeriría veri
 ### 7.3 Algoritmo en tiempo $O(m + n)$ mediante dos recorridos BFS
 
 Para verificar si todo nodo alcanza a $s$, construimos el **grafo reverso $G^{rev}$** invirtiendo el sentido de todas las aristas de $G$. Notemos que:
-$$u \rightsquigarrow s \text{ en } G \iff s \rightsquigarrow u \text{ en } G^{rev}$$
+$$
+u \rightsquigarrow s \text{ en } G \iff s \rightsquigarrow u \text{ en } G^{rev}
+$$
 
 ```python
 def es_fuertemente_conexo(G):
@@ -360,7 +376,9 @@ Maximal significa que no se puede agregar ningún otro vértice a $C$ sin destru
 
 ### Ejercicio 2: Prueba de conectividad fuerte con nodo testigo
 **Problema:** Sea el digrafo con vértices $\{1, 2, 3, 4\}$ y aristas:
-$$E = \{(1, 2), (2, 3), (3, 1), (2, 4), (4, 3)\}$$
+$$
+E = \{(1, 2), (2, 3), (3, 1), (2, 4), (4, 3)\}
+$$
 Demostrar mediante el lema del nodo testigo si es fuertemente conexo tomando $s = 1$.
 
 **Procedimiento:**

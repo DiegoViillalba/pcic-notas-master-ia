@@ -82,11 +82,15 @@ En una red de dependencias, una arista dirigida $(v_i, v_j)$ formaliza una **res
 
 Dado un grafo dirigido $G = (V, E)$ con $n = |V|$ vértices, un **ordenamiento topológico** es una permutación lineal de sus nodos:
 
-$$v_1, v_2, \dots, v_n$$
+$$
+v_1, v_2, \dots, v_n
+$$
 
 tal que para **toda arista dirigida** $(v_i, v_j) \in E$, el índice de $v_i$ en la secuencia es estrictamente menor que el índice de $v_j$:
 
-$$(v_i, v_j) \in E \implies i < j$$
+$$
+(v_i, v_j) \in E \implies i < j
+$$
 
 ### Representación visual: El grafo canónico del hexágono
 
@@ -126,11 +130,17 @@ Al proyectar los vértices sobre una línea horizontal según un orden topológi
 1. Supongamos que $G$ tiene un orden topológico $v_1, v_2, \dots, v_n$ y que, al mismo tiempo, $G$ contiene un ciclo dirigido $C$.
 2. Sea $v_i$ el nodo del ciclo $C$ que tiene el **índice más bajo** en el orden topológico (es decir, el que aparece más a la izquierda en la línea).
 3. Sea $v_j$ el nodo inmediatamente anterior a $v_i$ en el ciclo $C$. Por tanto, la arista dirigida $(v_j, v_i)$ pertenece al grafo:
-   $$(v_j, v_i) \in E$$
+   $$
+   (v_j, v_i) \in E
+   $$
 4. Por haber elegido a $v_i$ como el nodo de índice mínimo en $C$, todos los demás nodos de $C$ tienen un índice mayor; en particular:
-   $$i < j$$
+   $$
+   i < j
+   $$
 5. Sin embargo, dado que $(v_j, v_i) \in E$ y la secuencia es un orden topológico válido, por definición de orden topológico se debe cumplir que el origen precede al destino:
-   $$j < i$$
+   $$
+   j < i
+   $$
 6. Obtenemos simultáneamente $i < j$ y $j < i$, lo cual es una **contradicción lógica directa** ($i < j < i$).
 7. Por lo tanto, ningún grafo que admita un orden topológico puede contener un ciclo dirigido. $G$ es forzosamente un DAG. $\blacksquare$
 
@@ -147,15 +157,21 @@ Para demostrar el regreso ($\impliedby$), necesitamos garantizar que siempre exi
 
 ### Demostración por contradicción (Paseo hacia atrás):
 1. Supongamos que $G$ es un DAG pero **ningún** nodo tiene grado de entrada cero; es decir, todo nodo $u \in V$ tiene al menos una arista que entra a él:
-   $$\text{in-degree}(u) \ge 1 \quad \forall u \in V$$
+   $$
+   \text{in-degree}(u) \ge 1 \quad \forall u \in V
+   $$
 2. Elijamos un vértice inicial cualquiera $v_1 \in V$.
 3. Como $\text{in-degree}(v_1) \ge 1$, existe una arista $(v_2, v_1) \in E$. Damos un paso hacia atrás y nos paramos en $v_2$.
 4. Como $\text{in-degree}(v_2) \ge 1$, existe una arista $(v_3, v_2) \in E$. Retrocedemos a $v_3$.
 5. Repetimos este retroceso paso a paso de forma indefinida:
-   $$\dots \to v_4 \to v_3 \to v_2 \to v_1$$
+   $$
+   \dots \to v_4 \to v_3 \to v_2 \to v_1
+   $$
 6. Como el conjunto de vértices $V$ es finito ($|V| = n$), tras dar a lo más $n$ pasos hacia atrás, por el **principio del palomar**, forzosamente visitaremos por segunda vez algún vértice $w$ ya visitado anteriormente.
 7. La secuencia de nodos visitados entre la primera visita a $w$ y la segunda visita a $w$ constituye un **ciclo dirigido**:
-   $$w \to \dots \to x \to u \to w$$
+   $$
+   w \to \dots \to x \to u \to w
+   $$
 8. Esto contradice la hipótesis de que $G$ es un DAG (no tiene ciclos).
 9. Por contradicción, la suposición inicial es falsa: **debe existir al menos un nodo con $\text{in-degree} = 0$**. $\blacksquare$
 
@@ -175,7 +191,9 @@ Con el lema de la fuente, demostramos que todo DAG tiene un orden topológico me
   3. $G'$ tiene $n - 1$ vértices y sigue siendo un DAG, pues eliminar vértices y aristas nunca puede crear ciclos nuevos.
   4. Por hipótesis de inducción, $G'$ posee un ordenamiento topológico: $u_1, u_2, \dots, u_{n-1}$.
   5. Construimos el orden para $G$ colocando a $v$ en la primera posición:
-     $$v, u_1, u_2, \dots, u_{n-1}$$
+     $$
+     v, u_1, u_2, \dots, u_{n-1}
+     $$
   6. ¿Es este orden válido para $G$? Sí, porque como $\text{in-degree}(v) = 0$, **ninguna arista en $G$ entra a $v$**; todas las aristas incidentes a $v$ salen de él hacia los nodos de $G'$, cumpliendo estrictamente la condición de precedencia $i < j$. $\blacksquare$
 
 ---
@@ -230,15 +248,21 @@ End Topo-Rec
 - El cuerpo del bucle se ejecuta exactamente $n$ veces:
   - Encontrar un vértice sin aristas de entrada escaneando la representación de la gráfica toma **$O(n + m)$**.
   - Al ejecutarse $n$ veces, este costo acumulado es:
-    $$n \times O(n + m) = O(n^2 + nm)$$
+    $$
+    n \times O(n + m) = O(n^2 + nm)
+    $$
   - Las operaciones $L = L \cdot v$ y la eliminación toman $O(1)$.
 - **Tiempo total:**
-  $$T(n, m) = O(n^2 + nm)$$
+  $$
+  T(n, m) = O(n^2 + nm)
+  $$
 
 #### Análisis formal de espacio en memoria (Diapositiva 5)
 - La lista o cadena $L$ almacena los $n$ vértices en secuencia.
 - **Espacio total:**
-  $$S(n, m) = O(n)$$
+  $$
+  S(n, m) = O(n)
+  $$
 
 ---
 
@@ -286,18 +310,24 @@ End Topo-Rec
    - Cuando se procesa el nodo $v$, recorremos sus aristas salientes. A lo largo de toda la ejecución del algoritmo, **cada arista dirigida $(v, w) \in E$ es examinada exactamente una sola vez**.
    - En cada arista, se realiza un decremento $O(1)$ (`in-neighbourhood(w) = in-neighbourhood(w) - 1`) y una comparación.
    - La suma acumulada del costo de todas las aristas es:
-     $$\sum_{v \in V} \text{out-degree}(v) = m \implies O(m)$$
+     $$
+     \sum_{v \in V} \text{out-degree}(v) = m \implies O(m)
+     $$
 4. **Verificación final:**
    - Comparar $|L| < n$ toma $O(1)$.
 5. **Tiempo total de ejecución:**
-   $$T(n, m) = O(1) + O(n + m) + O(n) + O(m) = O(n + m)$$
+   $$
+   T(n, m) = O(1) + O(n + m) + O(n) + O(m) = O(n + m)
+   $$
 
 #### Análisis formal de espacio en memoria (Diapositiva 8)
 - El arreglo `in-neighbourhood` requiere tamaño $n \implies O(n)$.
 - La cola $S$ almacena a lo más $n$ vértices $\implies O(n)$.
 - La lista de salida $L$ almacena a lo más $n$ vértices $\implies O(n)$.
 - **Espacio total:**
-  $$S(n, m) = O(n)$$
+  $$
+  S(n, m) = O(n)
+  $$
 
 ---
 
@@ -309,7 +339,9 @@ End Topo-Rec
 3. Si el ciclo no tiene dependencias externas (o cuando estas ya se procesaron), ninguno de los nodos del ciclo entrará jamás a la cola $S$.
 4. La cola $S$ se vaciará prematuramente antes de que todos los nodos hayan sido procesados.
 5. Al terminar el bucle, la longitud de la lista de salida será estrictamente menor que el número total de vértices:
-   $$|L| < n$$
+   $$
+   |L| < n
+   $$
 6. Esta condición simple $|L| < n$ certifica formalmente que la gráfica contiene al menos un ciclo y retorna `NO-DAG` en tiempo $O(n + m)$.
 
 ---
@@ -340,7 +372,9 @@ Ejecuta paso a paso el algoritmo de Kahn sobre el grafo canónico hexagonal de 7
 
 ### Ejercicio 1: Traza completa del Algoritmo de Kahn
 **Problema:** Obtener un orden topológico para el DAG con vértices $\{A, B, C, D, E\}$ y aristas:
-$$E = \{(A, B), (A, C), (B, D), (C, D), (D, E)\}$$
+$$
+E = \{(A, B), (A, C), (B, D), (C, D), (D, E)\}
+$$
 
 **Procedimiento:**
 1. **Paso 0 (Inicialización):**
@@ -386,7 +420,9 @@ $$E = \{(A, B), (A, C), (B, D), (C, D), (D, E)\}$$
 3. Para cada uno de los $k$ vértices restantes en la ronda actual ($k \le n$), debe verificar si alguna de las aristas del grafo entra a él.
 4. Escanear toda la estructura de la gráfica toma tiempo proporcional a sus vértices y aristas actuales: $O(n + m)$ por cada búsqueda.
 5. Al repetirse esta búsqueda en las $n$ rondas del bucle:
-   $$\sum_{i=1}^n O(n + m) = n \cdot O(n + m) = O(n^2 + nm)$$
+   $$
+   \sum_{i=1}^n O(n + m) = n \cdot O(n + m) = O(n^2 + nm)
+   $$
 6. Sumando la condición de parada del `While` ($(n+1) \times O(n) = O(n^2)$), el tiempo global queda dominado por $O(n^2 + nm)$.
 
 ---
