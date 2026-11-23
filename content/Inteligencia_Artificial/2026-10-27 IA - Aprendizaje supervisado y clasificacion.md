@@ -72,8 +72,10 @@ Si se divide entre $n$, cambia la escala de la pérdida y del gradiente, pero no
 
 Usando $\sigma'(z)=\sigma(z)(1-\sigma(z))$ y $\boldsymbol\pi=(\pi_1,\ldots,\pi_n)^\mathsf T$:
 
-$$\boxed{\nabla J(\boldsymbol\theta)=X^\mathsf T(\boldsymbol\pi-\mathbf y)},\qquad
-\boxed{\nabla^2J(\boldsymbol\theta)=X^\mathsf T\operatorname{diag}\!\bigl(\pi_i(1-\pi_i)\bigr)X.}$$
+$$
+\boxed{\nabla J(\boldsymbol\theta)=X^\mathsf T(\boldsymbol\pi-\mathbf y)},\qquad
+\boxed{\nabla^2J(\boldsymbol\theta)=X^\mathsf T\operatorname{diag}\!\bigl(\pi_i(1-\pi_i)\bigr)X.}
+$$
 
 Para cualquier vector $\mathbf v$, $\mathbf v^\mathsf T\nabla^2J\mathbf v=\sum_i\pi_i(1-\pi_i)(\mathbf x_i^\mathsf T\mathbf v)^2\geq0$: la pérdida es **convexa** en los parámetros. La diapositiva 9 afirma «positiva definida»; en general solo podemos asegurar **semidefinida positiva**. Es definida positiva si $X$ tiene rango columna completo y todas las probabilidades están estrictamente entre 0 y 1 para parámetros finitos. En datos perfectamente separables y sin regularización, el mínimo de la pérdida puede no alcanzarse con pesos finitos: los coeficientes crecen mientras la pérdida se acerca a cero.
 
@@ -93,8 +95,10 @@ Si encadenamos solo capas afines, toda la composición vuelve a ser afín. Las a
 
 Una red con una capa oculta para dos clases puede escribirse como
 
-$$\mathbf h=\phi(W_1\mathbf x+\mathbf b_1),\qquad
-\pi=\sigma(\mathbf w_2^\mathsf T\mathbf h+b_2).$$
+$$
+\mathbf h=\phi(W_1\mathbf x+\mathbf b_1),\qquad
+\pi=\sigma(\mathbf w_2^\mathsf T\mathbf h+b_2).
+$$
 
 La capa oculta crea nuevas características; la salida convierte el puntaje final en probabilidad. Los parámetros de todas las capas se ajustan con gradientes calculados mediante la regla de la cadena (*retropropagación*). La presentación muestra la arquitectura, pero no desarrolla esa derivación.
 

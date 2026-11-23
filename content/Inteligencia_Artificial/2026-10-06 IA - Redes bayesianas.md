@@ -140,12 +140,14 @@ Cada probabilidad del valor falso es el complemento de la correspondiente entrad
 
 Queremos que suene la alarma y llamen ambos, sin robo ni terremoto:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(\neg b,\neg e,a,j,m)
 &=P(\neg b)P(\neg e)P(a\mid\neg b,\neg e)P(j\mid a)P(m\mid a)\\
 &=(0.999)(0.998)(0.001)(0.90)(0.70)\\
 &=0.00062811126.
-\end{aligned}$$
+\end{aligned}
+$$
 
 No debemos multiplicar $P(j)$ y $P(m)$: las tablas disponibles son las probabilidades **condicionadas a la alarma**.
 
@@ -162,12 +164,14 @@ $$q_{\neg b}=(0.002)(0.29)+(0.998)(0.001)=0.001578.$$
 
 Ahora sumamos los dos valores de la alarma. Si suena, la probabilidad de ambas llamadas es $0.90(0.70)=0.63$; si no suena, es $0.05(0.01)=0.0005$. Los pesos conjuntos son:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 w_b&=0.001\,[0.63q_b+0.0005(1-q_b)]\\
 &=0.00059224259,\\
 w_{\neg b}&=0.999\,[0.63q_{\neg b}+0.0005(1-q_{\neg b})]\\
 &=0.001491857649.
-\end{aligned}$$
+\end{aligned}
+$$
 
 Normalizamos:
 
@@ -251,11 +255,13 @@ En el ejemplo de la diapositiva 20, $X$ es baja presión, $Y$ lluvia y $Z$ tráf
 
 **Paso 2: observar el medio.** Al fijar $Y=y$, la red deja de necesitar $X$ para predecir $Z$:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(z\mid x,y)
 &=\frac{P(x)P(y\mid x)P(z\mid y)}{P(x)P(y\mid x)}\\
 &=P(z\mid y).
-\end{aligned}$$
+\end{aligned}
+$$
 
 Por tanto, $\boxed{X\perp Z\mid Y}$. La igualdad se aplica donde el denominador es positivo.
 
@@ -324,10 +330,12 @@ $$P(r,b,t)=P(r)P(b)P(t\mid r,b).$$
 
 Al marginalizar el tráfico:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(r,b)&=P(r)P(b)\sum_tP(t\mid r,b)\\
 &=P(r)P(b).
-\end{aligned}$$
+\end{aligned}
+$$
 
 Por tanto, $\boxed{R\perp B}$. El descendiente $T'$ no cambia esta conclusión mientras se mantenga sin observar: al sumarlo, su distribución condicional suma 1.
 

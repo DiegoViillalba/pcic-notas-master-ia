@@ -171,10 +171,12 @@ $$S_{\mathrm{LW}}(\mathbf z\mid\mathbf e)=\prod_{Z_i\notin\mathcal E}P(z_i\mid\o
 
 Al multiplicarla por el peso recuperamos la conjunta:
 
-$$S_{\mathrm{LW}}(\mathbf z\mid\mathbf e)w(\mathbf z,\mathbf e)
+$$
+S_{\mathrm{LW}}(\mathbf z\mid\mathbf e)w(\mathbf z,\mathbf e)
 =\prod_{Z_i\notin\mathcal E}P(z_i\mid\operatorname{pa}(Z_i))
 \prod_{E_i\in\mathcal E}P(e_i\mid\operatorname{pa}(E_i))
-=P(\mathbf z,\mathbf e).$$
+=P(\mathbf z,\mathbf e).
+$$
 
 Los cocientes de sumas ponderadas se acercan así a la posterior. Esta es la igualdad que aparece abreviada en la diapositiva 17. No afirma que las muestras **sin peso** sigan la posterior.
 

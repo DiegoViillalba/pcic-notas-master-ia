@@ -644,20 +644,20 @@ La diapositiva 17 presenta:
 
 | Opción | Lotería | Valor monetario esperado |
 |---|---|---:|
-| A | $[0.8,\$4k;0.2,\$0]$ | $\$3.2k$ |
-| B | $[1,\$3k;0,\$0]$ | $\$3k$ |
-| C | $[0.2,\$4k;0.8,\$0]$ | $\$0.8k$ |
-| D | $[0.25,\$3k;0.75,\$0]$ | $\$0.75k$ |
+| A | $[0.8,\mathdollar 4k;0.2,\mathdollar 0]$ | $\mathdollar 3.2k$ |
+| B | $[1,\mathdollar 3k;0,\mathdollar 0]$ | $\mathdollar 3k$ |
+| C | $[0.2,\mathdollar 4k;0.8,\mathdollar 0]$ | $\mathdollar 0.8k$ |
+| D | $[0.25,\mathdollar 3k;0.75,\mathdollar 0]$ | $\mathdollar 0.75k$ |
 
-La presentación indica que mucha gente responde $B\succ A$ y $C\succ D$. Veamos las consecuencias bajo utilidad esperada, suponiendo $U(\$0)=0$.
+La presentación indica que mucha gente responde $B\succ A$ y $C\succ D$. Veamos las consecuencias bajo utilidad esperada, suponiendo $U(\mathdollar 0)=0$.
 
 ### 13.1 Primera preferencia
 
 $$
 \begin{aligned}
 B\succ A
-&\Rightarrow U(\$3k)>0.8U(\$4k)+0.2U(\$0)\\
-&\Rightarrow U(\$3k)>0.8U(\$4k).
+&\Rightarrow U(\mathdollar 3k)>0.8U(\mathdollar 4k)+0.2U(\mathdollar 0)\\
+&\Rightarrow U(\mathdollar 3k)>0.8U(\mathdollar 4k).
 \end{aligned}
 $$
 
@@ -666,8 +666,8 @@ $$
 $$
 \begin{aligned}
 C\succ D
-&\Rightarrow 0.2U(\$4k)>0.25U(\$3k)\\
-&\Rightarrow 0.8U(\$4k)>U(\$3k).
+&\Rightarrow 0.2U(\mathdollar 4k)>0.25U(\mathdollar 3k)\\
+&\Rightarrow 0.8U(\mathdollar 4k)>U(\mathdollar 3k).
 \end{aligned}
 $$
 
@@ -676,9 +676,9 @@ $$
 Las preferencias estrictas exigen simultáneamente:
 
 $$
-U(\$3k)>0.8U(\$4k)
+U(\mathdollar 3k)>0.8U(\mathdollar 4k)
 \quad\text{y}\quad
-U(\$3k)<0.8U(\$4k).
+U(\mathdollar 3k)<0.8U(\mathdollar 4k).
 $$
 
 No existe un solo valor que satisfaga ambas. Por eso este patrón de preferencias viola las condiciones de la representación simple por utilidad esperada sobre esos premios. Psicológicamente suele asociarse con dar un peso especial a la certeza, pero el punto matemático de la diapositiva es la incompatibilidad de las dos desigualdades.
@@ -687,7 +687,7 @@ No existe un solo valor que satisfaga ambas. Por eso este patrón de preferencia
 
 <iframe src="utilidad-esperada-loterias.htm" style="width:100%;height:600px;border:1px solid var(--lightgray);border-radius:4px;" loading="lazy"></iframe>
 
-**Idea central si el laboratorio no carga:** al normalizar $U(\$4k)=1$, elegir B sobre A requiere $U(\$3k)>0.8$, mientras que elegir C sobre D requiere $U(\$3k)<0.8$.
+**Idea central si el laboratorio no carga:** al normalizar $U(\mathdollar 4k)=1$, elegir B sobre A requiere $U(\mathdollar 3k)>0.8$, mientras que elegir C sobre D requiere $U(\mathdollar 3k)<0.8$.
 
 ---
 
@@ -775,7 +775,7 @@ No son intercambiables sin reformular el problema. A* necesita costos y heuríst
 4. Los nodos valen $(8,4,7)$; escoge la izquierda.
 5. El máximo y el mínimo dependen del orden; una esperanza también depende de las distancias numéricas.
 6. J3 compara la tercera coordenada: $5>1$.
-7. Exigen $U(\$3k)>0.8U(\$4k)$ y también $U(\$3k)<0.8U(\$4k)$.
+7. Exigen $U(\mathdollar 3k)>0.8U(\mathdollar 4k)$ y también $U(\mathdollar 3k)<0.8U(\mathdollar 4k)$.
 8. Resultados posibles por acción, probabilidades y utilidades, además de restricciones de riesgo.
 
 </details>

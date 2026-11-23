@@ -297,20 +297,23 @@ Las diapositivas 15 y 16 introducen el principio geométrico y conjuntista funda
 > Una base de conocimiento $KB = \{f_1, f_2, \dots, f_k\}$ representa la conjunción lógica de todas sus fórmulas. Por tanto, el conjunto de modelos donde la $KB$ es verdadera corresponde a la **intersección** de los modelos de cada una de sus fórmulas:
 > $$
 > M(KB) = \bigcap_{f \in KB} M(f)
+>
 > $$
 
 ### 7.1 El ejemplo de Rain y Wet (Diapositiva 15)
 
 Consideremos el espacio de 4 modelos formado por las variables $\text{Rain}$ (filas) y $\text{Wet}$ (columnas):
 
-$$\begin{array}{cc|c|c|}
+$$
+\begin{array}{cc|c|c|}
 & & \text{Wet}=0 & \text{Wet}=1 \\
 \hline
 \text{Rain}=0 & & w_1 & w_2 \\
 \hline
 \text{Rain}=1 & & w_3 & w_4 \\
 \hline
-\end{array}$$
+\end{array}
+$$
 
 - $M(\text{Rain})$: Son las celdas donde $\text{Rain}=1 \implies \{w_3, w_4\}$ (2 modelos).
 - $M(\text{Rain} \to \text{Wet})$: Por definición de implicación, incluye $\{w_1, w_2, w_4\}$ (3 modelos; solo excluye $w_3$ donde llueve y el piso no se moja).

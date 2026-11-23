@@ -40,7 +40,7 @@ El ejemplo es asignar egresados de medicina a hospitales. Hay dos conjuntos disj
 
 $$H=\{h_1,\ldots,h_n\},\qquad S=\{s_1,\ldots,s_n\}.$$ 
 
-Cada hospital ordena a los estudiantes de más a menos preferido; cada estudiante ordena los hospitales. Las listas son la **entrada**, no la solución. En la instancia de las diapositivas, Atlanta prefiere $$Xavier \succ Yolanda \succ Zeu$s$$ mientras Xavier prefiere $$Boston \succ Atlanta \succ Chicago$$
+Cada hospital ordena a los estudiantes de más a menos preferido; cada estudiante ordena los hospitales. Las listas son la **entrada**, no la solución. En la instancia de las diapositivas, Atlanta prefiere $Xavier \succ Yolanda \succ Zeus$ mientras Xavier prefiere $$Boston \succ Atlanta \succ Chicago$$
 
 ### 2. Emparejamiento perfecto y estabilidad (diapositivas 5–8)
 

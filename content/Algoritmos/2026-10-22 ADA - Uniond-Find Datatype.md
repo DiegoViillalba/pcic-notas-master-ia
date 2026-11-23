@@ -253,6 +253,7 @@ Ahora $1$ y $2$ cuelgan directamente de $8$: la próxima `FIND(1)` es de un paso
 > Con unión ponderada (por tamaño o rango) **y** compresión de caminos, cualquier secuencia de $m\ge n$ operaciones `MAKE-SET`, `FIND` y `UNION` sobre $n$ elementos cuesta
 > $$
 > O(m\,\alpha(m,n)),
+>
 > $$
 > donde $\alpha$ es la **inversa de la función de Ackermann**.
 

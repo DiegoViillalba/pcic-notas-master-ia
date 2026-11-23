@@ -276,7 +276,8 @@ $$
 
 con condición inicial
 
-$$T(0)=90.
+$$
+T(0)=90.
 $$
 
 Por tanto, nuestra función es
@@ -739,7 +740,8 @@ $$
 
 Por eso decimos que el error local de truncamiento de Euler es
 
-$$O(h^2).
+$$
+O(h^2).
 $$
 
 El símbolo $O(h^2)$ no significa que el error sea exactamente $h^2$. Significa que, para $h$ suficientemente pequeño, su magnitud puede acotarse por una constante multiplicada por $h^2$.
@@ -773,7 +775,8 @@ $$
 
 Bajo las hipótesis matemáticas apropiadas, el error global del método de Euler satisface
 
-$$E_{\mathrm{global}}=O(h).
+$$
+E_{\mathrm{global}}=O(h).
 $$
 
 Por esta razón decimos que Euler es un método de primer orden.
@@ -930,7 +933,8 @@ Por tanto, si graficamos el error contra $h$ en escala log-log, la pendiente deb
 
 Para Euler esperamos una pendiente cercana a
 
-$$1.
+$$
+1.
 $$
 
 

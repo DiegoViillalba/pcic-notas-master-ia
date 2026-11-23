@@ -252,6 +252,82 @@ def fix_wikilink_paths(dry_run: bool) -> None:
         log(f"  {total} wikilink(s) simplificados")
 
 
+def fix_display_math(dry_run: bool) -> None:
+    """Pone los delimitadores $$ de los bloques de matematica display en su
+    propia linea. Quartz/remark-math falla con "$$\\begin{aligned}" pegado en
+    la misma linea (KaTeX recibe el bloque sin \\begin y la pagina se corta en
+    ese punto). Obsidian si lo acepta, por eso en el vault no se nota."""
+    log("Separando delimitadores $$ de bloques de matematica display")
+    open_re = re.compile(r"^(\s*(?:>\s*)*)\$\$(.*)$")
+    changed = 0
+    for md in CONTENT_DIR.rglob("*.md"):
+        if md == CONTENT_DIR / "index.md":
+            continue
+        out, in_math, in_code, dirty = [], False, False, False
+        prefix = ""
+        for line in md.read_text(encoding="utf-8").split("\n"):
+            if not in_math and line.lstrip(" >").startswith("```"):
+                in_code = not in_code
+            if in_code:
+                out.append(line)
+                continue
+            if not in_math:
+                m = open_re.match(line)
+                if m and "$$" not in m.group(2):
+                    prefix = m.group(1)
+                    in_math = True
+                    if m.group(2).strip():
+                        out += [f"{prefix}$$", f"{prefix}{m.group(2).strip()}"]
+                        dirty = True
+                        continue
+                out.append(line)
+            else:
+                idx = line.find("$$")
+                if idx == -1:
+                    out.append(line)
+                    continue
+                in_math = False
+                before, after = line[:idx], line[idx + 2 :]
+                if before.strip():
+                    out.append(before.rstrip())
+                    out.append(f"{prefix}$${after}")
+                    dirty = True
+                else:
+                    out.append(line)
+        if dirty:
+            changed += 1
+            if not dry_run:
+                md.write_text("\n".join(out), encoding="utf-8")
+    log(f"  {changed} nota(s) con bloques $$ corregidos")
+
+
+def fix_math_dollars(dry_run: bool) -> None:
+    """Dentro de matematica, cambia "\\$" por "\\mathdollar ". Quartz le quita
+    la barra al escape de markdown antes de que KaTeX vea la formula, asi que
+    "$U(\\$3k)$" llega como "U($3k)" y KaTeX falla con un "$" suelto. Fuera de
+    matematica "\\$" se deja igual (es el escape normal de markdown)."""
+    log("Reemplazando \\$ dentro de formulas por \\mathdollar")
+    display_re = re.compile(r"\$\$(.+?)\$\$", re.S)
+    inline_re = re.compile(r"(?<![\\$])\$(?!\$)((?:[^$\\\n]|\\.)+?)\$(?!\$)")
+
+    def swap(m: re.Match) -> str:
+        body = m.group(1).replace("\\$", "\\mathdollar ")
+        return m.group(0)[: m.start(1) - m.start()] + body + m.group(0)[m.end(1) - m.start() :]
+
+    changed = 0
+    for md in CONTENT_DIR.rglob("*.md"):
+        text = md.read_text(encoding="utf-8")
+        if "\\$" not in text:
+            continue
+        new = display_re.sub(swap, text)
+        new = inline_re.sub(swap, new)
+        if new != text:
+            changed += 1
+            if not dry_run:
+                md.write_text(new, encoding="utf-8")
+    log(f"  {changed} nota(s) con \\$ en formulas corregidas")
+
+
 def _sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -349,6 +425,8 @@ def main() -> None:
     normalize_unicode(args.dry_run)
     fix_html_embeds(args.dry_run)
     fix_wikilink_paths(args.dry_run)
+    fix_display_math(args.dry_run)
+    fix_math_dollars(args.dry_run)
     dedupe_identical_files(args.dry_run)
     build_site(args.dry_run)
     git_publish(push=not args.no_push, dry_run=args.dry_run)

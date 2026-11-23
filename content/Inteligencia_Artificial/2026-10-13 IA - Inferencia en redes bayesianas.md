@@ -177,9 +177,11 @@ $$P(W\mid\text{invierno})=\langle0.5,0.5\rangle.$$
 
 Ahora sobreviven solo dos filas, con pesos $0.10$ y $0.05$. No queda ninguna variable oculta:
 
-$$P(W\mid\text{invierno},\text{calor})
+$$
+P(W\mid\text{invierno},\text{calor})
 =\left\langle\frac{0.10}{0.15},\frac{0.05}{0.15}\right\rangle
-=\left\langle\frac23,\frac13\right\rangle.$$
+=\left\langle\frac23,\frac13\right\rangle.
+$$
 
 **Qué cambió entre las tres consultas:** fijamos diferentes evidencias y sumamos diferentes variables. La conjunta sigue siendo la misma.
 
@@ -345,10 +347,12 @@ Por tanto, $f_2(l)=0.051+0.083=0.134$ y $f_2(\neg l)=0.119+0.747=0.866$. Recuper
 
 ### Por qué podemos cambiar el orden de las cuentas
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(L)&=\sum_T\sum_R P(R)P(T\mid R)P(L\mid T)\\
 &=\sum_T P(L\mid T)\underbrace{\sum_R P(R)P(T\mid R)}_{f_1(T)}.
-\end{aligned}$$
+\end{aligned}
+$$
 
 Sacamos $P(L\mid T)$ de la suma sobre $R$ porque **no depende de $R$**. Usamos la propiedad distributiva y guardamos el resultado de la suma interna. Esa reutilización conecta con [[Programación dinámica|programación dinámica]].
 
@@ -502,12 +506,14 @@ La previa de robo era $0.1\%$; la posterior es aproximadamente **$28.42\%$**. La
 
 ### 10.4 La ecuación que resume todo el procedimiento
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(B\mid j,m)
 &=\alpha\sum_E\sum_A P(B)P(E)P(A\mid B,E)P(j\mid A)P(m\mid A)\\
 &=\alpha P(B)\sum_E P(E)\underbrace{\sum_A P(A\mid B,E)P(j\mid A)P(m\mid A)}_{g(B,E)}\\
 &=\alpha P(B)h(B).
-\end{aligned}$$
+\end{aligned}
+$$
 
 Esta es la misma idea de la cadena, aplicada a una red mayor: mover fuera de cada suma lo que no depende de la variable sumada y conservar los resúmenes para reutilizarlos.
 

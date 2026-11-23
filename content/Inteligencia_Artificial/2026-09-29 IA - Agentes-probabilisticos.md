@@ -193,17 +193,21 @@ $$P(T=t)=\sum_wP(T=t,W=w).$$
 
 Aplicándolo a la tabla:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(T=\mathrm{hot})&=0.4+0.1=0.5,\\
 P(T=\mathrm{cold})&=0.2+0.3=0.5.
-\end{aligned}$$
+\end{aligned}
+$$
 
 Si queremos conocer $W$, eliminamos $T$ mediante una suma:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(W=\mathrm{sun})&=0.4+0.2=0.6,\\
 P(W=\mathrm{rain})&=0.1+0.3=0.4.
-\end{aligned}$$
+\end{aligned}
+$$
 
 **No borramos filas ni tomamos un promedio.** Sumamos las posibilidades mutuamente excluyentes de la variable que dejamos de consultar. Tampoco elegimos la fila más probable: eso respondería otra pregunta.
 
@@ -222,8 +226,10 @@ $$P(T=t\mid W=w)=\frac{P(T=t,W=w)}{P(W=w)}.$$
 3. **Calcular la masa de la evidencia:** $P(\mathrm{rain})=0.1+0.3=0.4$.
 4. **Normalizar:** dividimos cada peso entre $0.4$.
 
-$$P(\mathrm{hot}\mid\mathrm{rain})=0.25,\qquad
-P(\mathrm{cold}\mid\mathrm{rain})=0.75.$$
+$$
+P(\mathrm{hot}\mid\mathrm{rain})=0.25,\qquad
+P(\mathrm{cold}\mid\mathrm{rain})=0.75.
+$$
 
 Ahora ambas probabilidades suman 1. En cambio, $0.1$ y $0.3$ eran probabilidades conjuntas y sumaban la probabilidad de la evidencia, no 1.
 
@@ -396,10 +402,12 @@ donde el primer factor es $P(x_1)$. Se usan condicionales definidos en los event
 
 Para el orden $R,T,U$:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(t,r,u)&=P(r)P(t,u\mid r)\\
 &=P(r)P(t\mid r)P(u\mid r,t).
-\end{aligned}$$
+\end{aligned}
+$$
 
 Esta igualdad no requiere $T\perp U\mid R$. Cambiar el orden de las variables cambia los factores, pero no la probabilidad de la asignación completa.
 
@@ -540,11 +548,13 @@ Esto supone $B\perp E$, $J\perp\{B,E\}\mid A$ y $M\perp\{B,E,J\}\mid A$.
 
 Queremos la probabilidad de que **no** haya robo ni terremoto, suene la alarma, John llame y Mary no llame:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(-b,-e,+a,+j,-m)
 &=0.999(0.998)(0.001)(0.9)(0.3)\\
 &=0.00026919054.
-\end{aligned}$$
+\end{aligned}
+$$
 
 Multiplicamos un factor por nodo. El factor de Mary es $0.3$, porque la asignación dice que **no llama** y la alarma sí suena.
 
@@ -552,8 +562,10 @@ Multiplicamos un factor por nodo. El factor de Mary es $0.3$, porque la asignaci
 
 Una conjunta de cinco booleanos tiene 32 filas y 31 parámetros libres. La red requiere:
 
-$$\underbrace{1}_{B}+\underbrace{1}_{E}+\underbrace{4}_{A\mid B,E}
-+\underbrace{2}_{J\mid A}+\underbrace{2}_{M\mid A}=10$$
+$$
+\underbrace{1}_{B}+\underbrace{1}_{E}+\underbrace{4}_{A\mid B,E}
++\underbrace{2}_{J\mid A}+\underbrace{2}_{M\mid A}=10
+$$
 
 parámetros libres. Si guardamos también los complementos, las CPT contienen 20 probabilidades. **Filas o números almacenados y parámetros libres son conteos distintos.**
 
@@ -655,12 +667,14 @@ $$P(x,y,z,w)=P(x)P(y\mid x)P(z\mid y)P(w\mid z).$$
 
 Además se puede obtener $X\perp W\mid Y$. En efecto:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(w\mid x,y)
 &=\sum_zP(w,z\mid x,y)\\
 &=\sum_zP(w\mid z)P(z\mid y)\\
 &=P(w\mid y).
-\end{aligned}$$
+\end{aligned}
+$$
 
 La expresión final no depende de $x$. También $X\perp\{Z,W\}\mid Y$ y $Y\perp W\mid Z$. La estructura contiene consecuencias que van más allá de leer cada CPT por separado.
 
@@ -690,12 +704,14 @@ $$P(x,y,z)=P(x)P(y\mid x)P(z\mid y).$$
 
 Para $P(x,y)>0$:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(z\mid x,y)
 &=\frac{P(x,y,z)}{P(x,y)}\\
 &=\frac{P(x)P(y\mid x)P(z\mid y)}{P(x)P(y\mid x)}\\
 &=P(z\mid y).
-\end{aligned}$$
+\end{aligned}
+$$
 
 Una vez conocida la lluvia, la presión baja ya no añade información sobre tráfico **en este modelo**. Esta es la cancelación que desarrolla la diapositiva 31.
 

@@ -89,9 +89,11 @@ La diapositiva propone dos temas que deben distinguirse:
 
 La conexión se establece mediante refutación:
 
-$$KB\models\alpha
+$$
+KB\models\alpha
 \quad\Longleftrightarrow\quad
-KB\land\neg\alpha\text{ es insatisfactible}.$$
+KB\land\neg\alpha\text{ es insatisfactible}.
+$$
 
 Por eso no añadimos la consulta $\alpha$ a la base; añadimos su negación. Si esa suposición conduce a $\square$, la consulta original queda demostrada.
 
