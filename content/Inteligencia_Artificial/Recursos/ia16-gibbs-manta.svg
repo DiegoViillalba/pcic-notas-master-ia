@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="600" viewBox="0 0 840 600" role="img" aria-labelledby="t d">
+<title id="t">Gibbs: actualizar S con su manta de Markov</title>
+<desc id="d">Se vuelve a sortear S dado C, R y W.</desc>
+<defs><marker id="a0" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#55626e"/></marker><marker id="a1" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#1f9d55"/></marker><marker id="a2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#d64545"/></marker><marker id="a3" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7b4fb8"/></marker></defs>
+<style>text{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;fill:#26333d;text-anchor:middle}.ttl{font-size:23px;font-weight:700}.sub{font-size:18px;font-weight:600;fill:#41566e}.sym{font-size:24px;font-weight:700}.lab{font-size:16px;fill:#4a5560;paint-order:stroke;stroke:#fbfaf6;stroke-width:6px;stroke-linejoin:round}.badge{font-size:13px;font-weight:700}.chip{font-size:14px;fill:#41566e}.verd{font-size:15px;font-weight:700}.note{font-size:15px;fill:#4a5560}.foot{font-size:17px;fill:#26333d}.leg{font-size:14px;fill:#4a5560;text-anchor:start}</style>
+<rect x="1" y="1" width="838" height="598" rx="14" fill="#fbfaf6" stroke="#d8d4c8" stroke-width="2"/>
+<text class="ttl" x="420.0" y="38">Gibbs: actualizar S con su manta de Markov</text>
+<line x1="393.4" y1="137.5" x2="279.8" y2="221.1" stroke="#55626e" stroke-width="2.4" marker-end="url(#a0)"/>
+<line x1="446.6" y1="137.5" x2="560.2" y2="221.1" stroke="#55626e" stroke-width="2.4" marker-end="url(#a0)"/>
+<line x1="276.6" y1="262.5" x2="390.2" y2="346.1" stroke="#55626e" stroke-width="2.4" marker-end="url(#a0)"/>
+<line x1="563.4" y1="262.5" x2="449.8" y2="346.1" stroke="#55626e" stroke-width="2.4" marker-end="url(#a0)"/>
+<circle cx="420" cy="118" r="30" fill="#fff0b8" stroke="#c49a00" stroke-width="3"/>
+<text class="sym" x="420" y="126">C</text>
+<text class="lab" x="420" y="168">nublado</text>
+<circle cx="250" cy="243" r="30" fill="#fbd5d5" stroke="#c93a3a" stroke-width="3"/>
+<text class="sym" x="250" y="251">S</text>
+<text class="lab" x="250" y="293">aspersor</text>
+<text class="badge" x="250" y="313" fill="#c93a3a">se actualiza</text>
+<circle cx="590" cy="243" r="30" fill="#fff0b8" stroke="#c49a00" stroke-width="3"/>
+<text class="sym" x="590" y="251">R</text>
+<text class="lab" x="590" y="293">lluvia</text>
+<circle cx="420" cy="368" r="30" fill="#fff0b8" stroke="#c49a00" stroke-width="3"/>
+<text class="sym" x="420" y="376">W</text>
+<text class="lab" x="420" y="418">pasto mojado</text>
+<rect x="524" y="105" width="43" height="26" rx="13" fill="#fff" stroke="#b9b5a8"/><text class="chip" x="545" y="123">P(C)</text>
+<rect x="77" y="230" width="76" height="26" rx="13" fill="#fff" stroke="#b9b5a8"/><text class="chip" x="115" y="248">P(S | C)</text>
+<rect x="687" y="230" width="76" height="26" rx="13" fill="#fff" stroke="#b9b5a8"/><text class="chip" x="725" y="248">P(R | C)</text>
+<rect x="544" y="355" width="92" height="26" rx="13" fill="#fff" stroke="#b9b5a8"/><text class="chip" x="590" y="373">P(W | S,R)</text>
+<rect x="215" y="450" width="410" height="30" rx="15" fill="#e6ebf2" stroke="#41566e"/><text class="verd" x="420.0" y="470" fill="#41566e">Manta de S = {C, R, W}: P(s | c) P(−w | s, +r)</text>
+<text class="note" x="420.0" y="508">C es su padre, W su hijo y R el otro padre de W.</text>
+<text class="foot" x="420.0" y="546">P(c,s,r,w) = P(c) P(s|c) P(r|c) P(w|s,r)</text>
+<circle cx="326" cy="574" r="8" fill="#fff0b8" stroke="#c49a00" stroke-width="2"/><text class="leg" x="340" y="579">resaltado</text>
+<circle cx="434" cy="574" r="8" fill="#fbd5d5" stroke="#c93a3a" stroke-width="2"/><text class="leg" x="448" y="579">consulta</text>
+</svg>

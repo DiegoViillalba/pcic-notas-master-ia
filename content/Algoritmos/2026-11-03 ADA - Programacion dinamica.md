@@ -66,7 +66,7 @@ En un **algoritmo voraz**, se inspeccionan los elementos en cierto orden y se to
 
 Un ejemplo intuitivo de superposición es la recurrencia de Fibonacci: calcular $F(5)$ pide $F(4)$ y $F(3)$; calcular $F(4)$ vuelve a pedir $F(3)$. Si guardamos $F(3)$ la primera vez, la segunda consulta cuesta tiempo constante. En un problema de optimización la tabla guarda, además, el mejor valor para un **estado** precisamente definido. «Recordar resultados» solo es útil si el estado contiene toda la información necesaria para decidir el futuro.
 
-![[pd-paradigmas.svg]]
+![Subproblemas independientes y superpuestos](pd-paradigmas.svg)
 
 **Lectura del diagrama.** A la izquierda, los hijos de cada llamada son independientes. A la derecha, dos rutas llegan al mismo estado $OPT(3)$: allí aparece el trabajo repetido que la PD elimina. El diagrama es conceptual; la recurrencia concreta de intervalos se deduce más abajo.
 
@@ -197,7 +197,7 @@ OPT(j)=\begin{cases}
 \end{cases}
 $$
 
-![[pd-decision-binaria.svg]]
+![Elección binaria para OPT(j)](pd-decision-binaria.svg)
 
 **Lectura del diagrama.** Al excluir $j$ avanzamos al prefijo $j-1$ sin ganancia inmediata. Al incluirlo sumamos $w_j$ y saltamos a $p(j)$, porque los índices intermedios no son compatibles. Esta demostración es la **subestructura óptima** de la que habla la diapositiva: una solución óptima contiene soluciones óptimas de subproblemas apropiados.
 

@@ -50,7 +50,7 @@ Recorrido recomendado: entender el automóvil → experimentar con el descuento 
 
 En [[2026-10-27 IA - Aprendizaje supervisado y clasificacion|aprendizaje supervisado]] recibimos pares entrada–respuesta. Aquí una recompensa puede decirnos que una consecuencia fue favorable, sin revelar cuál era la mejor acción. Además, la decisión de hoy cambia los datos que veremos mañana. Si un automóvil acelera, avanza más, pero puede calentar su motor; una decisión rentable ahora puede eliminar oportunidades futuras.
 
-![[ia21-ciclo-agente.svg]]
+![Aprender al actuar](ia21-ciclo-agente.svg)
 
 **Lectura del diagrama:** en el instante $t$, el agente observa $S_t$, elige $A_t$ y recibe $R_{t+1}$ y $S_{t+1}$. Usaremos siempre esa convención: la recompensa con índice $t+1$ corresponde a la transición que comienza en $t$.
 
@@ -107,7 +107,7 @@ Berkeley desarrolla esta formulación y la propiedad de Markov en [CS 188, §4.1
 
 *Diapositivas 6–8; reconstrucción del grafo original.* Escribamos $C=$ Cool, $W=$ Warm y $O=$ Overheated. Las acciones son Slow y Fast. Usaremos $C$ como estado inicial para los ejemplos, aunque calcularemos valores para ambos estados no terminales.
 
-![[ia21-mdp-auto.svg]]
+![Modelo completo del automóvil](ia21-mdp-auto.svg)
 
 | Estado | Acción | Sucesor | Probabilidad | Recompensa |
 |---|---|---|---:|---:|
@@ -144,7 +144,7 @@ Una tabla de política explícita puede ejecutarse como un agente de reflejo: ob
 
 La diapositiva 9 compara $[1,2,2]$ con $[2,3,4]$: con suma sin descuento ganan $9$ frente a $5$. Al comparar $[0,0,1]$ con $[1,0,0]$, ambas suman uno, pero un descuento positivo menor que uno favorece recibirlo antes.
 
-![[ia21-descuento.svg]]
+![Descomposición del retorno](ia21-descuento.svg)
 
 El **retorno descontado** desde $t$ es
 
@@ -266,7 +266,7 @@ $$
 \boxed{V^*(s)=\max_{a\in\mathcal A(s)}\sum_{s'}T(s,a,s')\left[R(s,a,s')+\gamma V^*(s')\right].}
 $$
 
-![[ia21-bellman-backup.svg]]
+![Una actualización de Bellman](ia21-bellman-backup.svg)
 
 **Lectura:** primero fijamos una acción, luego promediamos sus posibles resultados; finalmente comparamos acciones. El agente elige $a$, pero no elige qué $s'$ ocurre. Por eso $\max_a\mathbb E[\cdot\mid a]$ no se sustituye por una expectativa de máximos que permitiera decidir después de observar el azar.
 
@@ -515,7 +515,7 @@ $$
 
 Por tanto $V^{\pi_{\mathrm{nueva}}}\geq V^\pi$ en todos los estados. Evaluar exactamente y mejorar repetidamente produce **iteración de políticas**. Conservar la acción actual si ya es maximizadora evita cambios innecesarios por empates.
 
-![[ia21-iteracion-politicas.svg|700]]
+![Ciclo de iteración de políticas](ia21-iteracion-politicas.svg)
 
 **Idea del diagrama:** evaluar mantiene fija la política; mejorar mantiene fijo el vector de valor recién calculado. Si la política ya es codiciosa con respecto a su propio valor, satisface Bellman de optimalidad y es óptima. Berkeley organiza este ciclo en [CS 188, §4.4](https://inst.eecs.berkeley.edu/~cs188/textbook/mdp/policies-iteration.html).
 
@@ -565,7 +565,7 @@ Con transiciones densas, un barrido de valores cuesta $O(|\mathcal S|^2|\mathcal
 
 **Esta sección prepara la continuación; no se atribuye a las 24 diapositivas.** Hasta aquí conocemos las probabilidades y recompensas del automóvil. El problema de RL aparece cuando el agente necesita aprender sin recibir esas tablas. Berkeley hace esta separación explícita en [§5.1](https://inst.eecs.berkeley.edu/~cs188/textbook/rl/rl.html).
 
-![[ia21-planificacion-aprendizaje.svg]]
+![Del modelo a las muestras](ia21-planificacion-aprendizaje.svg)
 
 ### 11.1 Dos caminos para usar la experiencia
 

@@ -336,6 +336,33 @@ def fix_math_dollars(dry_run: bool) -> None:
     log(f"  {changed} nota(s) con \\$ en formulas corregidas")
 
 
+SVG_EMBED_RE = re.compile(r"(?<!`)!\[\[([^\]|]+\.svg)(?:\|[^\]]*)?\]\](?!`)")
+
+
+def fix_svg_embeds(dry_run: bool) -> None:
+    """Convierte ![[x.svg]] en una imagen markdown ![alt](x.svg).
+    Quartz traduce el wikilink de un SVG a <object data="x.svg"> con la ruta
+    sin resolver (relativa a la nota, no a Recursos/), asi que el navegador
+    recibe un 404 y el diagrama nunca aparece. Como imagen markdown la ruta si
+    se resuelve. El alt se toma del <title> del SVG."""
+    log("Convirtiendo incrustaciones de SVG a imagenes")
+    titles = {}
+    for svg in CONTENT_DIR.rglob("*.svg"):
+        m = re.search(r"<title[^>]*>(.*?)</title>", svg.read_text(encoding="utf-8", errors="ignore"), re.S)
+        titles[svg.name] = re.sub(r"[\[\]\n]", " ", m.group(1)).strip() if m else ""
+    changed = 0
+    for md in CONTENT_DIR.rglob("*.md"):
+        text = md.read_text(encoding="utf-8")
+        new = SVG_EMBED_RE.sub(
+            lambda m: f"![{titles.get(Path(m.group(1)).name, '')}]({Path(m.group(1)).name})", text
+        )
+        if new != text:
+            changed += 1
+            if not dry_run:
+                md.write_text(new, encoding="utf-8")
+    log(f"  {changed} nota(s) con SVG convertidos")
+
+
 def _sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -435,6 +462,7 @@ def main() -> None:
     fix_wikilink_paths(args.dry_run)
     fix_display_math(args.dry_run)
     fix_math_dollars(args.dry_run)
+    fix_svg_embeds(args.dry_run)
     dedupe_identical_files(args.dry_run)
     build_site(args.dry_run)
     git_publish(push=not args.no_push, dry_run=args.dry_run)

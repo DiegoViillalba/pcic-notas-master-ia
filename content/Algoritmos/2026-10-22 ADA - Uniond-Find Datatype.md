@@ -426,7 +426,7 @@ En el laboratorio, abre casillas y observa cuándo aparece un camino azul entre 
 
 La secuencia de estudio queda cerrada aquí: [[2026-09-29 ADA - Contunuacion-scheduling|Dijkstra]] → [[2026-10-06 ADA - codigos-de-prefijos|cortes, ciclos y MST]] → [[2026-10-08 ADA - arboles-binarios-y-codigos-optimos|Prim y Kruskal]] → [[2026-10-13 ADA - algoritmo-de-huffman|Borůvka]] → [[2026-10-20 ADA - bienary heap y heap sort|clustering y arborescencias]] → **Union-Find**. Las arborescencias son dirigidas y requieren la contracción de ciclos de Edmonds; Union-Find resuelve otra necesidad: saber si los extremos de una arista **no dirigida** ya están conectados mientras Kruskal construye su bosque.
 
-![[union-find-kruskal.svg]]
+![Union-Find detecta si una arista conecta componentes diferentes](union-find-kruskal.svg)
 
 En la figura, las raíces de dos árboles codifican dos componentes. `find(u)≠find(v)` significa que añadir $(u,v)$ no forma ciclo; después de aceptarla, `union(u,v)` fusiona las componentes. La ruta interna de cada árbol puede cambiar por compresión de caminos sin cambiar la partición que representa.
 

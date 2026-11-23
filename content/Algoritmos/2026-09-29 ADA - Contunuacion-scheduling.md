@@ -849,7 +849,7 @@ El recurso siguiente permite ejecutar las cuatro ideas principales paso a paso: 
 
 ## Puente visual y práctica de examen: Dijkstra (*Greedy II*, diapositivas 3–20)
 
-![[dijkstra-frontera.svg]]
+![Frontera de Dijkstra: distancias definitivas y tentativas](dijkstra-frontera.svg)
 
 La frontera separa vértices con distancia **definitiva** ($S$) de vértices con distancia **tentativa**. Al extraer el mínimo de la cola, toda ruta alternativa que aún no se exploró debe cruzar la frontera; con longitudes no negativas, ese desvío no puede mejorar la llave elegida. La ilustración deja visible qué afirma el invariante y qué papel cumple la hipótesis $\ell_e\ge 0$.
 

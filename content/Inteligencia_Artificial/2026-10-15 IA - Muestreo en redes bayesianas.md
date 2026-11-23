@@ -76,13 +76,7 @@ Por ejemplo, $U=0.65$ devuelve verde. El mismo mecanismo sirve para cada fila de
 
 *Diapositivas 10–11 y 16.* El ejemplo tiene $C$ = nublado, $S$ = aspersor, $R$ = lluvia y $W$ = pasto mojado:
 
-```mermaid
-flowchart TD
-  C[Nublado C] --> S[Aspersor S]
-  C --> R[Lluvia R]
-  S --> W[Pasto mojado W]
-  R --> W
-```
+![Red del muestreo: nublado, aspersor, lluvia y pasto](ia16-red-aspersor.svg)
 
 Usaremos $+x$ para «$X$ es verdadero» y $-x$ para «$X$ es falso». Las CPT de las diapositivas son:
 
@@ -125,6 +119,8 @@ Estas cifras permiten juzgar si una estimación se acerca a la respuesta del **m
 
 ## 4. Muestreo previo: generar mundos completos
 
+![Muestreo previo: sortear en orden topológico](ia16-muestreo-previo.svg)
+
 *Diapositivas 10–11.* Recorremos la red en **orden topológico**, de modo que los padres de cada nodo ya estén asignados:
 
 ```text
@@ -145,6 +141,8 @@ El orden entre $S$ y $R$ puede intercambiarse. La probabilidad de generar un mun
 
 ## 5. Muestreo por rechazo: conservar solo mundos compatibles
 
+![Evidencia +w: consulta P(C | +w)](ia16-rechazo-pesos.svg)
+
 *Diapositivas 12–14.* Para estimar $P(Q\mid\mathbf e)$, generamos mundos completos por muestreo previo y contamos únicamente los que cumplen la evidencia. Para $P(C\mid+w)$:
 
 ```text
@@ -162,6 +160,8 @@ La razón converge a $P(+c\mid+w)$: entre los mundos generados de la conjunta, f
 El costo aparece cuando la evidencia es rara. La fracción aceptada se aproxima a $P(\mathbf e)$, por lo que, con $N$ intentos, esperamos alrededor de $NP(\mathbf e)$ muestras útiles. Si $P(\mathbf e)=0.001$, unos 1,000 intentos producen **en promedio** solo una muestra aceptada. La evidencia no participa en la generación: se usa después para filtrar. Si no se acepta ninguna, la razón $0/0$ queda indefinida; no la reemplazamos por cero.
 
 ## 6. Verosimilitud con pesos: fijar la evidencia y corregir el sesgo
+
+![Evidencia +w: consulta P(C | +w)](ia16-rechazo-pesos.svg)
 
 *Diapositivas 15–17.* Ahora asignamos directamente el valor observado a cada variable de evidencia. Sorteamos solo las demás en orden topológico. Cada muestra recibe un peso inicial 1; por cada nodo observado $E_i=e_i$, multiplicamos por la probabilidad local de observar ese valor dados **los padres que quedaron en esa muestra**:
 
@@ -215,6 +215,8 @@ El explorador usa exactamente las CPT de §3. Permite comparar cómo cambia la e
 Para $P(S\mid+r)$, la diapositiva 19 fija $R=+r$ e inicia $C,S,W$; luego actualiza sucesivamente uno de esos nodos. La evidencia permanece fija en cada estado. **Las muestras consecutivas están correlacionadas**: no son nuevos mundos independientes como en muestreo previo.
 
 ### 7.1 Solo hace falta la manta de Markov
+
+![Gibbs: actualizar S con su manta de Markov](ia16-gibbs-manta.svg)
 
 Para actualizar $X$, los factores que no mencionan $X$ son iguales para todos sus valores y se cancelan al normalizar. Basta usar su CPT y las CPT de sus hijos:
 

@@ -416,7 +416,7 @@ Queremos dividir $n$ objetos en exactamente $k$ grupos no vacíos. La presentaci
 
 El algoritmo de **enlace simple** es Kruskal detenido al quedar $k$ componentes: se unen repetidamente los dos grupos conectados por el par de objetos más cercano. Equivale a calcular un MST y quitarle sus $k-1$ aristas más caras. La siguiente arista que Kruskal **habría** aceptado al continuar determina la separación de los $k$ grupos. Los empates pueden producir particiones distintas con el mismo valor óptimo. El **dendrograma** registra las fusiones a distintos umbrales de distancia; las diapositivas muestran un ejemplo aplicado a perfiles de expresión genética de tumores.
 
-![[clustering-mst.svg]]
+![MST en una recta y cortes para clustering de enlace simple](clustering-mst.svg)
 
 **Prueba de optimalidad.** Sea $d^*$ la separación de la partición obtenida por Kruskal. Cualquier partición alternativa en $k$ grupos debe separar al menos dos vértices que nuestra solución dejó conectados por aristas de costo $\le d^*$; si no, todos nuestros $k$ grupos quedarían íntegros y la partición alternativa sería la misma. En el camino del MST entre esos dos vértices hay una arista que cruza grupos alternativos, de costo $\le d^*$. La separación alternativa no supera $d^*$.
 
@@ -441,7 +441,7 @@ Una **arborescencia** con raíz $r$ es el análogo dirigido de un árbol generad
 
 Elegir la arista entrante más barata de cada vértice parece óptimo porque cada arborescencia necesita una por vértice. Si las elegidas **no** forman un ciclo, ya son óptimas: alcanzan simultáneamente todas las cotas inferiores. Si forman un ciclo, la decisión local es incompatible con tener caminos desde $r$ y hay que corregirla.
 
-![[arborescencia-ciclo.svg]]
+![Edmonds: romper el ciclo de entradas mínimas](arborescencia-ciclo.svg)
 
 ### Costos reducidos y contracción de Edmonds
 

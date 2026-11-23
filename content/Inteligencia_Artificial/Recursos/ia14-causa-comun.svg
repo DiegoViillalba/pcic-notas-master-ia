@@ -1,20 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="700" height="400" viewBox="0 0 700 400" role="img" aria-labelledby="title desc">
-<title id="title">Causa común: observar el origen bloquea</title>
-<desc id="desc">Y apunta a X; Y apunta a Z. El camino X ← Y → Z está activo sin evidencia.
-Al observar Y: X ⟂ Z | Y.</desc>
-<style>
-svg{color-scheme:light dark;--bg:#fafbf9;--ink:#1d3035;--line:#536971;--node:#ffffff;--accent:#146879;--soft:#dceff0;--muted:#53646c}
-@media(prefers-color-scheme:dark){svg{--bg:#182228;--ink:#edf3f4;--line:#a9bdc5;--node:#23333c;--accent:#81d2dc;--soft:#264c56;--muted:#bdcbd0}}
-.canvas{fill:var(--bg)}text{font-family:system-ui,sans-serif;fill:var(--ink);text-anchor:middle} .heading{font-size:23px;font-weight:600}.label{font-size:18px}.small{font-size:16px;fill:var(--muted)}.symbol{font-size:24px;font-weight:600}.edge{stroke:var(--line);stroke-width:2;fill:none}.node{fill:var(--node);stroke:var(--line);stroke-width:1.7}.observed{fill:var(--soft);stroke:var(--accent);stroke-width:2.5}
-</style>
-<rect class="canvas" width="700" height="400" rx="12"/>
-<text class="heading" x="350" y="36">Causa común: observar el origen bloquea</text>
-<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="var(--line)"/></marker></defs>
-<line class="edge" x1="325.75" y1="120.88" x2="198.04" y2="230.86" marker-end="url(#arrow)"/>
-<line class="edge" x1="374.25" y1="120.88" x2="501.96" y2="230.86" marker-end="url(#arrow)"/>
-<circle class="node " cx="350" cy="100" r="32"/><text class="symbol" x="350" y="108">Y</text><text class="label" x="397" y="106" style="text-anchor:start">Entrega próxima</text>
-<circle class="node " cx="170" cy="255" r="32"/><text class="symbol" x="170" y="263">X</text><text class="label" x="170" y="313" style="text-anchor:middle">Foro activo</text>
-<circle class="node " cx="530" cy="255" r="32"/><text class="symbol" x="530" y="263">Z</text><text class="label" x="530" y="313" style="text-anchor:middle">Laboratorio lleno</text>
-<text class="small" x="350" y="360">El camino X ← Y → Z está activo sin evidencia.</text>
-<text class="small" x="350" y="383">Al observar Y: X ⟂ Z | Y.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="798" viewBox="0 0 840 798" role="img" aria-labelledby="t d">
+<title id="t">Causa común: observar el origen bloquea</title>
+<desc id="d">Y apunta a X y a Z.</desc>
+<defs><marker id="a0" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#55626e"/></marker><marker id="a1" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#1f9d55"/></marker><marker id="a2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#d64545"/></marker><marker id="a3" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7b4fb8"/></marker></defs>
+<style>text{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;fill:#26333d;text-anchor:middle}.ttl{font-size:23px;font-weight:700}.sub{font-size:18px;font-weight:600;fill:#41566e}.sym{font-size:24px;font-weight:700}.lab{font-size:16px;fill:#4a5560;paint-order:stroke;stroke:#fbfaf6;stroke-width:6px;stroke-linejoin:round}.badge{font-size:13px;font-weight:700}.chip{font-size:14px;fill:#41566e}.verd{font-size:15px;font-weight:700}.note{font-size:15px;fill:#4a5560}.foot{font-size:17px;fill:#26333d}.leg{font-size:14px;fill:#4a5560;text-anchor:start}</style>
+<rect x="1" y="1" width="838" height="796" rx="14" fill="#fbfaf6" stroke="#d8d4c8" stroke-width="2"/>
+<text class="ttl" x="420.0" y="38">Causa común: observar el origen bloquea</text>
+<text class="sub" x="420.0" y="84">Sin evidencia</text>
+<line x1="393.1" y1="157.1" x2="260.2" y2="251.6" stroke="#1f9d55" stroke-width="3.2" marker-end="url(#a1)"/>
+<line x1="446.9" y1="157.1" x2="579.8" y2="251.6" stroke="#1f9d55" stroke-width="3.2" marker-end="url(#a1)"/>
+<circle cx="420" cy="138" r="30" fill="#dbe9fb" stroke="#2f6fbd" stroke-width="2.2"/>
+<text class="sym" x="420" y="146">Y</text>
+<text class="lab" x="420" y="188">entrega próxima</text>
+<circle cx="230" cy="273" r="30" fill="#fde5cc" stroke="#d8731a" stroke-width="2.2"/>
+<text class="sym" x="230" y="281">X</text>
+<text class="lab" x="230" y="323">foro activo</text>
+<circle cx="610" cy="273" r="30" fill="#fde5cc" stroke="#d8731a" stroke-width="2.2"/>
+<text class="sym" x="610" y="281">Z</text>
+<text class="lab" x="610" y="323">laboratorio lleno</text>
+<rect x="311" y="333" width="217" height="30" rx="15" fill="#fbdcdc" stroke="#c93a3a"/><text class="verd" x="420.0" y="353" fill="#c93a3a">Camino X ← Y → Z activo</text>
+<line x1="60" y1="385" x2="780" y2="385" stroke="#d8d4c8" stroke-dasharray="2 5"/>
+<text class="sub" x="420.0" y="423">Con Y observado</text>
+<line x1="393.1" y1="496.1" x2="260.2" y2="590.6" stroke="#d64545" stroke-width="2.4" stroke-dasharray="7 5" marker-end="url(#a2)"/>
+<line x1="446.9" y1="496.1" x2="579.8" y2="590.6" stroke="#d64545" stroke-width="2.4" stroke-dasharray="7 5" marker-end="url(#a2)"/>
+<circle cx="420" cy="477" r="30" fill="#c9efd6" stroke="#1f8a4c" stroke-width="3"/>
+<text class="sym" x="420" y="485">Y</text>
+<text class="lab" x="420" y="527">entrega próxima</text>
+<text class="badge" x="420" y="547" fill="#1f8a4c">observado</text>
+<circle cx="230" cy="612" r="30" fill="#fde5cc" stroke="#d8731a" stroke-width="2.2"/>
+<text class="sym" x="230" y="620">X</text>
+<text class="lab" x="230" y="662">foro activo</text>
+<circle cx="610" cy="612" r="30" fill="#fde5cc" stroke="#d8731a" stroke-width="2.2"/>
+<text class="sym" x="610" y="620">Z</text>
+<text class="lab" x="610" y="662">laboratorio lleno</text>
+<rect x="295" y="694" width="251" height="30" rx="15" fill="#d7f2e0" stroke="#1f8a4c"/><text class="verd" x="420.0" y="714" fill="#1f8a4c">Camino bloqueado: X ⊥ Z | Y</text>
+<circle cx="227" cy="772" r="8" fill="#dbe9fb" stroke="#2f6fbd" stroke-width="2"/><text class="leg" x="241" y="777">raíz / causa</text>
+<circle cx="360" cy="772" r="8" fill="#fde5cc" stroke="#d8731a" stroke-width="2"/><text class="leg" x="374" y="777">efecto</text>
+<circle cx="443" cy="772" r="8" fill="#c9efd6" stroke="#1f8a4c" stroke-width="2"/><text class="leg" x="457" y="777">evidencia observada</text>
 </svg>

@@ -48,7 +48,7 @@ tags:
 
 *Diapositivas 3–8.* Imagina que queremos reconocer un objeto en una imagen. Una decisión directa a partir de todos los píxeles puede ser difícil. Podemos construir representaciones intermedias: combinaciones locales de píxeles, patrones, partes y, finalmente, evidencia para una clase. **Cada etapa vuelve a expresar la información de una forma útil para la siguiente.**
 
-![[ia23-representaciones.svg]]
+![Profundidad: transformar la representación antes de decidir](ia23-representaciones.svg)
 
 En una red profunda no tenemos que escribir manualmente todos esos detectores: el entrenamiento ajusta las transformaciones. La jerarquía de bordes, formas y objetos de la diapositiva 8 es una **intuición ilustrativa**; una capa real no tiene obligatoriamente una interpretación humana tan limpia.
 
@@ -68,7 +68,7 @@ Una capa realiza una combinación ponderada de sus entradas y aplica una activac
 2. **Backward o retropropagación:** recorrer las dependencias en sentido inverso para saber cuánto influye cada parámetro en la pérdida.
 3. **Actualización:** usar esos gradientes para cambiar los parámetros, por ejemplo con descenso de gradiente.
 
-![[ia23-grafo-gradientes.svg]]
+![Forward, backward y actualización son tres operaciones distintas](ia23-grafo-gradientes.svg)
 
 La pérdida es un número que resume qué tan mala fue una predicción según el objetivo elegido. El gradiente indica cómo cambiaría ese número ante pequeñas variaciones de los parámetros. **Retropropagación calcula gradientes; el optimizador decide cómo usarlos.**
 
@@ -120,7 +120,7 @@ En «El perro mordió el hueso porque estaba hambriento», el contexto puede ayu
 
 El transformer combina atención, redes por posición, normalización y conexiones residuales. Un modelo causal impide que cada posición vea tokens futuros al predecir el siguiente. La sección 13 muestra un bloque simplificado y hace explícita esa restricción.
 
-![[ia23-etapas-entrenamiento.svg]]
+![Etapas de aprendizaje de un modelo de lenguaje](ia23-etapas-entrenamiento.svg)
 
 **Autosupervisión:** las etiquetas se obtienen de los propios datos, por ejemplo ocultando qué token viene después. **Transferencia:** reutilizar lo aprendido para otra tarea. **Ajuste supervisado con instrucciones:** aprender de pares de consulta y respuesta deseada. **RLHF:** una etapa adicional posible que utiliza retroalimentación humana para orientar el comportamiento mediante una señal de recompensa. El ajuste con instrucciones y RLHF son procesos distinguibles; la diapositiva 37 los presenta juntos.
 
@@ -455,7 +455,7 @@ Con $v_1=(1,0)$ y $v_2=(0,1)$, la salida es $o\approx(0.6698,0.3302)$. Aunque $k
 
 *Diapositivas 31–32.* Este esquema didáctico muestra una variante **pre-LayerNorm** de un modelo solo decodificador. Omite dropout. Es coherente con el orden de normalización de la figura de la diapositiva 31; no intenta representar todas las variantes de transformer.
 
-![[ia23-transformer-causal.svg]]
+![Transformer causal con bloque pre-LayerNorm simplificado](ia23-transformer-causal.svg)
 
 $$
 \widetilde H=H+\operatorname{MHA}_{\mathrm{causal}}(\operatorname{LN}(H)),

@@ -238,6 +238,8 @@ Sin evidencia, $Z=1$. Si la consulta contiene varias variables, $q$ recorre toda
 
 ## 6. Enumeración: una cadena pequeña que podemos resolver a mano
 
+![Cadena R → T → L: consulta P(L)](ia15-cadena-consulta-l.svg)
+
 *Datos de las diapositivas 18–22.* Usaremos $R\to T\to L$. Podemos recordar $R$ como lluvia, $T$ como tráfico y $L$ como llegar tarde; esos nombres son una interpretación didáctica. Los números son los del PDF:
 
 $$
@@ -348,6 +350,8 @@ El factor resultante conserva la probabilidad total de cada valor de $T$, sin co
 
 ## 8. Eliminación de variables: la misma cadena con tablas menores
 
+![Cadena R → T → L: consulta P(L)](ia15-cadena-consulta-l.svg)
+
 *Diapositivas 22 y 25.* Queremos otra vez $P(L)$. Ahora usaremos el orden $R,T$.
 
 ### Paso 1: escribir los factores iniciales
@@ -419,6 +423,8 @@ Empieza en **Cadena: $P(L)$** y avanza por los pasos. Compara **Enumeración** c
 
 ## 9. Incorporar evidencia: $P(L\mid r)$
 
+![Cadena R → T → L: consulta P(L | r)](ia15-cadena-evidencia-r.svg)
+
 *Diapositiva 23.* Ahora sabemos que llueve. Consulta $L$, evidencia $R=r$, oculta $T$.
 
 ### Paso 1: restringir antes de operar
@@ -465,13 +471,7 @@ Podríamos cancelar desde el principio el escalar positivo $P(r)$, común a todo
 
 *Diapositivas 10 y 26–28; CPT de la clase anterior y AIMA.* La estructura es:
 
-```mermaid
-flowchart TD
-  B["B: robo"] --> A["A: alarma"]
-  E["E: terremoto"] --> A
-  A --> J["J: John llama"]
-  A --> M["M: Mary llama"]
-```
+![Alarma: consulta P(B | j, m)](ia15-alarma-consulta.svg)
 
 $$
 P(B,E,A,J,M)=P(B)P(E)P(A\mid B,E)P(J\mid A)P(M\mid A).
@@ -650,6 +650,8 @@ Podemos quitar esa rama antes de calcular. Repitiendo el argumento con hojas que
 
 ## 12. El orden cambia el costo, aunque no cambie la respuesta
 
+![Causa común con ramas: Z → Xᵢ → Yᵢ](ia15-poliarbol-ramas.svg)
+
 *Diapositiva 29.* Consideremos una causa común $Z$ con ramas $Z\to X_i\to Y_i$, para $i=1,\ldots,n$. Todas las $Y_i=y_i$ están observadas y queremos $P(X_n\mid y_1,\ldots,y_n)$.
 
 Después de restringir la evidencia, tenemos:
@@ -731,6 +733,8 @@ Un **poliárbol** es un DAG cuyo grafo subyacente no tiene ciclos no dirigidos: 
 
 Todos los modelos bayesianos de esta clase son DAG, pero no todos son poliárboles. La red $R\to T$, $R\to D$, $T\to S\leftarrow D$ tiene un ciclo al ignorar flechas y no es un poliárbol.
 
+![Un DAG que no es poliárbol](ia15-no-poliarbol.svg)
+
 En poliárboles existe una estrategia eficiente para inferencia exacta. AIMA, p. 451, mide el tamaño de la red por las **entradas de sus CPT**: la inferencia puede ser lineal en ese tamaño. Para traducirlo a «lineal en nodos» también necesitamos que los dominios y el número de padres estén acotados. Una CPT con muchos padres puede ser enorme aunque el grafo no tenga ciclos no dirigidos. Y el ejemplo de §12 demuestra que elegir un mal orden puede desperdiciar una estructura favorable.
 
 La siguiente sesión del material introduce **inferencia aproximada por muestreo**. No asumimos que toda consulta requiere aproximación: primero evaluamos la estructura, el orden y el tamaño de los factores que se producirían.
@@ -750,12 +754,16 @@ Dos valores de una consulta tienen pesos $0.06$ y $0.14$. ¿Cuál es la masa de 
 
 En $R\to T\to L$, calcula $P(L\mid\neg r)$. ¿Qué variable debes sumar?
 
+![Cadena R → T → L: consulta P(L | ¬r)](ia15-cadena-evidencia-no-r.svg)
+
 > [!check]- Solución B
 > Consulta $L$, evidencia $R=\text{falso}$, oculta $T$. $P(l\mid\neg r)=0.1(0.3)+0.9(0.1)=0.12$ y $P(\neg l\mid\neg r)=0.88$. Los pesos conjuntos son $0.9\langle0.12,0.88\rangle=\langle0.108,0.792\rangle$ y suman $P(\neg r)=0.9$.
 
 ### C. Evidencia en el nodo intermedio
 
 Calcula $P(L\mid t)$ y explica por qué desconocer $R$ ya no cambia la respuesta.
+
+![Cadena R → T → L: consulta P(L | t)](ia15-cadena-evidencia-t.svg)
 
 > [!check]- Solución C
 > $P(L\mid t)=\langle0.3,0.7\rangle$, directamente de su CPT. $P(R,t,L)=P(R)P(t\mid R)P(L\mid t)$; al sumar $R$ obtenemos $P(t)P(L\mid t)$ y al normalizar se cancela $P(t)$. La independencia $L\perp R\mid T$ justifica el resultado.
@@ -764,6 +772,8 @@ Calcula $P(L\mid t)$ y explica por qué desconocer $R$ ya no cambia la respuesta
 
 Al eliminar $A$ en la red de alarma, alguien suma solo $P(A\mid B,E)$ y obtiene uno. Después conserva $P(j\mid A)$ y $P(m\mid A)$. ¿Qué falló?
 
+![Alarma: consulta P(B | j, m)](ia15-alarma-consulta.svg)
+
 > [!check]- Solución D
 > No reunió todos los factores que dependían de $A$. Las llamadas siguen mencionando una variable supuestamente eliminada y se perdió su relación con la alarma. La operación correcta es $\sum_A P(A\mid B,E)P(j\mid A)P(m\mid A)$, que produce el factor $g(B,E)$ de §10.
 
@@ -771,12 +781,16 @@ Al eliminar $A$ en la red de alarma, alguien suma solo $P(A\mid B,E)$ y obtiene 
 
 Si eliminamos primero $E$, ¿qué alcance tiene el resumen? ¿Cambia $P(B\mid j,m)$?
 
+![Alarma: consulta P(B | j, m)](ia15-alarma-consulta.svg)
+
 > [!check]- Solución E
 > $u(A,B)=\sum_E P(E)P(A\mid B,E)$ tiene alcance $\{A,B\}$. Después calculamos $h(B)=\sum_A u(A,B)P(j\mid A)P(m\mid A)$ y multiplicamos por $P(B)$. La posterior es la misma: los órdenes válidos cambian la organización de las cuentas, no la suma total.
 
 ### F. Predecir una tabla antes de construirla
 
 En §12 con $n=8$, ¿cuántas entradas tiene el producto que construimos para eliminar $Z$ primero? ¿Y el factor después de sumarlo?
+
+![Causa común con ramas: Z → Xᵢ → Yᵢ](ia15-poliarbol-ramas.svg)
 
 > [!check]- Solución F
 > Antes: alcance $\{Z,X_1,\ldots,X_8\}$, $2^9=512$ entradas. Después: alcance $\{X_1,\ldots,X_8\}$, $2^8=256$. El orden que elimina las ramas primero mantiene productos de cuatro entradas y resúmenes de dos.

@@ -1,20 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="700" height="400" viewBox="0 0 700 400" role="img" aria-labelledby="title desc">
-<title id="title">MIT: causas alternativas de un ladrido</title>
-<desc id="desc">B apunta a D; R apunta a D. P(B)=0.1; P(R)=0.5; B y R son independientes a priori.
-Escuchar el ladrido puede relacionar las dos explicaciones.</desc>
-<style>
-svg{color-scheme:light dark;--bg:#fafbf9;--ink:#1d3035;--line:#536971;--node:#ffffff;--accent:#146879;--soft:#dceff0;--muted:#53646c}
-@media(prefers-color-scheme:dark){svg{--bg:#182228;--ink:#edf3f4;--line:#a9bdc5;--node:#23333c;--accent:#81d2dc;--soft:#264c56;--muted:#bdcbd0}}
-.canvas{fill:var(--bg)}text{font-family:system-ui,sans-serif;fill:var(--ink);text-anchor:middle} .heading{font-size:23px;font-weight:600}.label{font-size:18px}.small{font-size:16px;fill:var(--muted)}.symbol{font-size:24px;font-weight:600}.edge{stroke:var(--line);stroke-width:2;fill:none}.node{fill:var(--node);stroke:var(--line);stroke-width:1.7}.observed{fill:var(--soft);stroke:var(--accent);stroke-width:2.5}
-</style>
-<rect class="canvas" width="700" height="400" rx="12"/>
-<text class="heading" x="350" y="36">MIT: causas alternativas de un ladrido</text>
-<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="var(--line)"/></marker></defs>
-<line class="edge" x1="203.65" y1="121.56" x2="322.66" y2="230.07" marker-end="url(#arrow)"/>
-<line class="edge" x1="496.35" y1="121.56" x2="377.34" y2="230.07" marker-end="url(#arrow)"/>
-<circle class="node " cx="180" cy="100" r="32"/><text class="symbol" x="180" y="108">B</text><text class="label" x="227" y="106" style="text-anchor:start">Ladrón</text>
-<circle class="node " cx="520" cy="100" r="32"/><text class="symbol" x="520" y="108">R</text><text class="label" x="567" y="106" style="text-anchor:start">Mapache</text>
-<circle class="node " cx="350" cy="255" r="32"/><text class="symbol" x="350" y="263">D</text><text class="label" x="350" y="313" style="text-anchor:middle">Perro ladra</text>
-<text class="small" x="350" y="360">P(B)=0.1; P(R)=0.5; B y R son independientes a priori.</text>
-<text class="small" x="350" y="383">Escuchar el ladrido puede relacionar las dos explicaciones.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="784" viewBox="0 0 840 784" role="img" aria-labelledby="t d">
+<title id="t">MIT: causas alternativas de un ladrido</title>
+<desc id="d">B→D←R.</desc>
+<defs><marker id="a0" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#55626e"/></marker><marker id="a1" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#1f9d55"/></marker><marker id="a2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#d64545"/></marker><marker id="a3" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#7b4fb8"/></marker></defs>
+<style>text{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;fill:#26333d;text-anchor:middle}.ttl{font-size:23px;font-weight:700}.sub{font-size:18px;font-weight:600;fill:#41566e}.sym{font-size:24px;font-weight:700}.lab{font-size:16px;fill:#4a5560;paint-order:stroke;stroke:#fbfaf6;stroke-width:6px;stroke-linejoin:round}.badge{font-size:13px;font-weight:700}.chip{font-size:14px;fill:#41566e}.verd{font-size:15px;font-weight:700}.note{font-size:15px;fill:#4a5560}.foot{font-size:17px;fill:#26333d}.leg{font-size:14px;fill:#4a5560;text-anchor:start}</style>
+<rect x="1" y="1" width="838" height="782" rx="14" fill="#fbfaf6" stroke="#d8d4c8" stroke-width="2"/>
+<text class="ttl" x="420.0" y="38">MIT: causas alternativas de un ladrido</text>
+<text class="sub" x="420.0" y="84">A priori</text>
+<line x1="286.0" y1="158.3" x2="390.8" y2="240.2" stroke="#d64545" stroke-width="2.4" stroke-dasharray="7 5" marker-end="url(#a2)"/>
+<line x1="554.0" y1="158.3" x2="449.2" y2="240.2" stroke="#d64545" stroke-width="2.4" stroke-dasharray="7 5" marker-end="url(#a2)"/>
+<circle cx="260" cy="138" r="30" fill="#dbe9fb" stroke="#2f6fbd" stroke-width="2.2"/>
+<text class="sym" x="260" y="146">B</text>
+<text class="lab" x="260" y="188">ladrón</text>
+<circle cx="580" cy="138" r="30" fill="#dbe9fb" stroke="#2f6fbd" stroke-width="2.2"/>
+<text class="sym" x="580" y="146">R</text>
+<text class="lab" x="580" y="188">mapache</text>
+<circle cx="420" cy="263" r="30" fill="#ece1fa" stroke="#7b4fb8" stroke-width="2.2"/>
+<text class="sym" x="420" y="271">D</text>
+<text class="lab" x="420" y="313">perro ladra</text>
+<rect x="74" y="125" width="92" height="26" rx="13" fill="#fff" stroke="#b9b5a8"/><text class="chip" x="120" y="143">P(B) = 0.1</text>
+<rect x="674" y="125" width="92" height="26" rx="13" fill="#fff" stroke="#b9b5a8"/><text class="chip" x="720" y="143">P(R) = 0.5</text>
+<rect x="324" y="329" width="192" height="30" rx="15" fill="#d7f2e0" stroke="#1f8a4c"/><text class="verd" x="420.0" y="349" fill="#1f8a4c">B y R independientes</text>
+<line x1="60" y1="381" x2="780" y2="381" stroke="#d8d4c8" stroke-dasharray="2 5"/>
+<text class="sub" x="420.0" y="419">Se escucha el ladrido</text>
+<line x1="286.0" y1="493.3" x2="390.8" y2="575.2" stroke="#1f9d55" stroke-width="3.2" marker-end="url(#a1)"/>
+<line x1="554.0" y1="493.3" x2="449.2" y2="575.2" stroke="#1f9d55" stroke-width="3.2" marker-end="url(#a1)"/>
+<circle cx="260" cy="473" r="30" fill="#dbe9fb" stroke="#2f6fbd" stroke-width="2.2"/>
+<text class="sym" x="260" y="481">B</text>
+<text class="lab" x="260" y="523">ladrón</text>
+<circle cx="580" cy="473" r="30" fill="#dbe9fb" stroke="#2f6fbd" stroke-width="2.2"/>
+<text class="sym" x="580" y="481">R</text>
+<text class="lab" x="580" y="523">mapache</text>
+<circle cx="420" cy="598" r="30" fill="#c9efd6" stroke="#1f8a4c" stroke-width="3"/>
+<text class="sym" x="420" y="606">D</text>
+<text class="lab" x="420" y="648">perro ladra</text>
+<text class="badge" x="420" y="668" fill="#1f8a4c">observado</text>
+<rect x="74" y="460" width="92" height="26" rx="13" fill="#fff" stroke="#b9b5a8"/><text class="chip" x="120" y="478">P(B) = 0.1</text>
+<rect x="674" y="460" width="92" height="26" rx="13" fill="#fff" stroke="#b9b5a8"/><text class="chip" x="720" y="478">P(R) = 0.5</text>
+<rect x="227" y="680" width="385" height="30" rx="15" fill="#fbdcdc" stroke="#c93a3a"/><text class="verd" x="420.0" y="700" fill="#c93a3a">Causas alternativas: B y R pasan a depender</text>
+<circle cx="211" cy="758" r="8" fill="#dbe9fb" stroke="#2f6fbd" stroke-width="2"/><text class="leg" x="225" y="763">raíz / causa</text>
+<circle cx="343" cy="758" r="8" fill="#ece1fa" stroke="#7b4fb8" stroke-width="2"/><text class="leg" x="357" y="763">intermedio</text>
+<circle cx="459" cy="758" r="8" fill="#c9efd6" stroke="#1f8a4c" stroke-width="2"/><text class="leg" x="473" y="763">evidencia observada</text>
 </svg>

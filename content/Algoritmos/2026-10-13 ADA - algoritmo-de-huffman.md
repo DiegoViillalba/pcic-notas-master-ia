@@ -375,7 +375,7 @@ Al cierre, el profesor habló de los **strandbeests** (“bestias de playa” en
 
 Borůvka parte de $n$ componentes unitarias. En **cada fase**, cada componente elige su arista saliente de costo mínimo. Las aristas elegidas se agregan al bosque y se contraen las componentes resultantes. Cada una de estas elecciones aplica la regla azul; las elecciones duplicadas se añaden una sola vez. Para que la explicación simultánea sea sencilla, la presentación supone costos distintos. Con empates puede fijarse un orden total consistente sobre las aristas.
 
-![[boruvka-contraccion.svg]]
+![Una fase de Borůvka contrae pares de componentes](boruvka-contraccion.svg)
 
 **Por qué son pocas fases.** Cada componente elige una arista hacia otra, así que después de la fase toda componente nueva contiene al menos dos anteriores. Si había $q$ componentes, quedan a lo sumo $q/2$. Por tanto hay a lo sumo $\lceil\log_2 n\rceil$ fases. Se pueden encontrar las componentes y escanear todas las aristas en $O(m+n)$ por fase; el costo total es $O(m\log n)$ en un grafo conexo.
 

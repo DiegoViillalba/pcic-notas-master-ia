@@ -70,6 +70,8 @@ La suma de probabilidades es 1. El cero en la calificación 2 significa **«no a
 
 ### 2.2 Padres: una fila por género
 
+![Aprender CPT contando: género y calificación](ia17-genero-calificacion.svg)
+
 *Diapositivas 9–10.* Sea $G\in\{d=\text{drama},c=\text{comedia}\}$ con la flecha $G\to R$. Los datos son $(d,4),(d,4),(d,5),(c,1),(c,5)$. La conjunta queda $P(G,R)=P(G)P(R\mid G)$.
 
 | Fila | Frecuencia estimada |
@@ -86,6 +88,8 @@ Por ejemplo, la pregunta de la diapositiva 17 es $P(R=2\mid G=c)$: **MLE da $0/2
 La diapositiva 12 añade un segundo padre $A$ («ganó un premio»), con $G\to R\leftarrow A$. Ahora cada par $(g,a)$ necesita su propia fila $P(R\mid g,a)$; hay menos ejemplos por fila. La diapositiva 14 muestra $G\to R_1$ y $G\to R_2$, las calificaciones de John y Mary: el mismo género alimenta dos CPT distintas. Una red con más padres puede expresar más patrones, pero también dispersa los datos entre más filas.
 
 ### 2.3 Compartir parámetros
+
+![Compartir parámetros](ia17-parametros-compartidos.svg)
 
 *Diapositiva 15.* Si imponemos que dos distribuciones condicionales usen los **mismos parámetros**, sus observaciones pueden combinarse para estimarlos. Por ejemplo, si se supone $P(R_1\mid G)=P(R_2\mid G)$, los conteos de John y Mary se agrupan por género antes de normalizar. Con los tres dramas de la diapositiva 13, las seis calificaciones combinadas son $4,4,5,5,4,3$: la fila compartida daría $P(R=4\mid d)=3/6$.
 
@@ -115,6 +119,8 @@ El recurso parte de los cinco pares $(G,R)$ de las diapositivas. Cambia el géne
 
 ## 4. Datos incompletos: la variable oculta ya no se puede contar
 
+![Datos incompletos: el género no se observa](ia17-genero-oculto.svg)
+
 *Diapositivas 19–20.* Consideremos $G\to R_1$ y $G\to R_2$ cuando observamos las dos calificaciones, pero **no** el género. Cada registro tiene la forma $(?,r_1,r_2)$. No sabemos a qué fila de $P(R_1\mid G)$ y $P(R_2\mid G)$ asignarlo. La verosimilitud de un par observado debe sumar sobre el género oculto:
 
 $$
@@ -136,6 +142,8 @@ Se inicializan los parámetros y se repite hasta que el cambio sea pequeño. Cad
 > En la clase de muestreo, inferíamos variables desconocidas para **responder una consulta** con un modelo fijo. En el paso E de EM, inferimos variables faltantes para **reestimar las CPT**. Ambos pueden usar cálculo de posteriores, pero persiguen objetivos distintos.
 
 ## 5. Si tampoco sabemos la estructura
+
+![Aprender la estructura: candidatos sobre G, A y R](ia17-busqueda-estructura.svg)
 
 *Diapositivas 22–23.* El espacio de búsqueda son los grafos dirigidos **acíclicos** sobre las variables. Para cada candidato se ajustan sus parámetros y se evalúa qué tan bien explica los datos. Una búsqueda local puede agregar, quitar o invertir una flecha, siempre que el resultado siga siendo acíclico. Las diapositivas mencionan ascenso de colinas, recocido simulado, algoritmos genéticos y búsqueda tabú.
 

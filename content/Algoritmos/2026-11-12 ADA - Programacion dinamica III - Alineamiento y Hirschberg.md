@@ -130,7 +130,7 @@ Imagina que el alineamiento ya está terminado y observa su última columna. Só
 
 Al quitar esa columna queda **el mismo problema sobre prefijos más pequeños**. Necesitamos dos índices porque una decisión puede consumir una letra de una cadena, de la otra o de ambas.
 
-![[pd2-tres-decisiones.svg]]
+![Tres decisiones de la última columna](pd2-tres-decisiones.svg)
 
 **Lectura del diagrama:** emparejar consume dos letras; un hueco consume sólo una. El resto de cada opción es un subproblema que la tabla ya sabe resolver.
 
@@ -310,7 +310,7 @@ Si el interactivo no carga: cada costo nuevo depende únicamente de `prev[i−1]
 
 Cada casilla representa cuántas letras de ambas cadenas ya consumimos. Una decisión del alineamiento es un movimiento: derecha, abajo o diagonal. Así, construir un alineamiento es recorrer una cuadrícula desde la esquina inicial hasta la final.
 
-![[pd2-grafo-de-edicion.svg]]
+![La tabla es un grafo de edición](pd2-grafo-de-edicion.svg)
 
 **Lectura del diagrama:** avanzar a la derecha consume una letra de $y$; bajar consume una de $x$; la diagonal consume ambas. El costo del camino es la suma de las columnas del alineamiento.
 
@@ -400,7 +400,7 @@ Dibuja una línea vertical en medio de la cuadrícula. Todo camino del inicio al
 
 No elegimos la fila media por geometría. Elegimos la fila que hace menor el costo de **llegar más continuar**.
 
-![[pd2-corte-hirschberg.svg]]
+![Corte óptimo de PALETTE y PALATE](pd2-corte-hirschberg.svg)
 
 **Lectura del diagrama:** la columna media es $j^*=3$. Se puede pasar por $(3,3)$ con costo total $3$. Sólo conservamos el rectángulo anterior y el posterior a ese punto para las llamadas recursivas.
 

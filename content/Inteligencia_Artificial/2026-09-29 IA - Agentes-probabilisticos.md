@@ -420,7 +420,7 @@ $$
 T\perp U\mid R.
 $$
 
-![[ia29-lluvia-trafico-paraguas.svg]]
+![Lluvia, tráfico y paraguas](ia29-lluvia-trafico-paraguas.svg)
 
 **Lectura del grafo:** lluvia es el padre común de tráfico y uso de paraguas. El dibujo representa el supuesto del modelo; la ausencia de una flecha entre sus hijos no garantiza independencia sin observar la lluvia.
 
@@ -445,6 +445,8 @@ $$
 donde el primer factor es $P(x_1)$. Se usan condicionales definidos en los eventos de probabilidad positiva; las ramas de masa cero no contribuyen a la conjunta.
 
 ### Paso 1: descomponer sin asumir independencia
+
+![Regla de la cadena: del grafo completo al supuesto del modelo](ia29-regla-cadena-grafo.svg)
 
 Para el orden $R,T,U$:
 
@@ -566,7 +568,7 @@ Como complemento de [CS 188, §6.4 Structure of Bayes Nets](https://inst.eecs.be
 | $J$ | John calls: John llama |
 | $M$ | Mary calls: Mary llama |
 
-![[ia29-red-alarma.svg]]
+![Red bayesiana de alarma](ia29-red-alarma.svg)
 
 **Lectura del grafo:** las flechas entran desde los padres de cada tabla. Robo y terremoto son raíces; las dos llamadas comparten la alarma como padre.
 
@@ -635,6 +637,8 @@ En general, un nodo con $d_i$ valores y padres de tamaños $d_j$ necesita $(d_i-
 
 ### 14.5 Consulta de apoyo: ¿hubo robo si ambos llaman?
 
+![Alarma: consulta P(B | j, m)](ia15-alarma-consulta.svg)
+
 Esta es una ampliación para preparar la siguiente sesión. [CS 188, §6.2 Probability Inference](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/inference.html) organiza la enumeración en tres operaciones: seleccionar evidencia, sumar variables ocultas y normalizar.
 
 Para $P(B\mid+j,+m)$:
@@ -699,7 +703,7 @@ La probabilidad sube de **0.1 %** a aproximadamente **28.42 %**. Las llamadas ap
 
 *Diapositiva 22.* La imagen muestra fuego, humo y un detector; no fija un DAG ni una CPT. Una **propuesta de modelado** es:
 
-![[ia29-fuego-humo-alarma.svg]]
+![Fuego, humo y alarma: dos modelos posibles](ia29-fuego-humo-alarma.svg)
 
 **Lectura del diagrama:** arriba, la alarma responde al humo; abajo, humo y alarma son efectos del fuego. Cada propuesta expresa una independencia distinta.
 
@@ -717,7 +721,7 @@ Un modelo alternativo con $F\to H$ y $F\to A$ supone $H\perp A\mid F$. No son el
 
 *Diapositiva 24.* Aquí sí se muestra el grafo:
 
-![[ia29-red-caries.svg]]
+![Caries: una causa común, dos observaciones](ia29-red-caries.svg)
 
 **Lectura del grafo:** el dolor y la detección son dos observaciones de una causa común. No hay una flecha directa entre ellas, pero pueden aportar información una sobre otra cuando no conocemos la caries.
 
@@ -733,7 +737,7 @@ y el supuesto es $T\perp K\mid C$. Sin observar $C$, un dolor puede informar sob
 
 *Diapositiva 28.* El grafo es:
 
-![[ia29-cadena-cuatro-nodos.svg]]
+![Cadena de cuatro nodos: observar bloquea el camino](ia29-cadena-cuatro-nodos.svg)
 
 **Lectura del diagrama:** arriba el camino transmite información indirecta; abajo se fija $Z$ como evidencia y el único camino entre $X$ y $W$ queda bloqueado. El nodo relleno representa una observación.
 
@@ -766,7 +770,7 @@ La expresión final no depende de $x$. También $X\perp\{Z,W\}\mid Y$ y $Y\perp 
 
 *Diapositivas 29 y 31.* Consideremos $X\to Y\to Z$: presión baja → lluvia → tráfico.
 
-![[ia29-cadena-presion-lluvia-trafico.svg]]
+![Presión → lluvia → tráfico](ia29-cadena-presion-lluvia-trafico.svg)
 
 **Lectura del diagrama:** compara la misma cadena antes y después de conocer la lluvia. La evidencia conserva las flechas del modelo y bloquea el paso de información adicional entre los extremos.
 
@@ -812,7 +816,7 @@ Una vez conocida la lluvia, la presión baja ya no añade información sobre tr�
 
 ### 18.1 Las tres tripletas
 
-![[ia29-tripletas-d-separacion.svg]]
+![Las tres tripletas y el efecto de observar Y](ia29-tripletas-d-separacion.svg)
 
 **Lectura del diagrama:** compara las dos columnas de cada fila. Observar el centro bloquea cadenas y causas comunes; en un efecto común activa el camino. «Activo» indica que la independencia no está garantizada por la estructura.
 
@@ -838,7 +842,7 @@ $$
 
 El terremoto ofrece una explicación alternativa de la alarma. Este efecto se conoce como **explicación alternativa** o *explaining away*; no es una ley de que toda observación de un colisionador siempre reduzca cualquier probabilidad.
 
-![[ia29-colisionador-descendiente.svg]]
+![Observar un descendiente activa el colisionador](ia29-colisionador-descendiente.svg)
 
 **Lectura del diagrama:** $Y$ sigue sin observarse, pero conocer su descendiente $D$ activa el camino $X\to Y\leftarrow Z$. Las marcas de evidencia no representan nuevas aristas.
 

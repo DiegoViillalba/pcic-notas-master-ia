@@ -542,7 +542,7 @@ En la pestaña **Árbol del código** puedes ver cómo cada código de la clase 
 
 Las tres rutinas son formas concretas de aplicar las reglas de corte y ciclo de la [[2026-10-06 ADA - codigos-de-prefijos|sección anterior]]. Todas producen un MST en un grafo no dirigido y conexo, pero recorren las aristas de manera distinta.
 
-![[mst-tres-recorridos.svg]]
+![Prim, Kruskal y borrado inverso](mst-tres-recorridos.svg)
 
 | Método | Decisión | Invariante visible | Estructura |
 |---|---|---|---|

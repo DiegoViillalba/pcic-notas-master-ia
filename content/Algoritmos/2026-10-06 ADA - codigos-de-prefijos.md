@@ -413,7 +413,7 @@ Los cortes y ciclos modelan redes de comunicación, carreteras, cableado y conex
 
 Un **árbol generador** de un grafo no dirigido y conexo toca todos los vértices, es conexo y no tiene ciclos. Son equivalentes: tener $n-1$ aristas y ser conexo; tener $n-1$ aristas y ser acíclico; perder conectividad al quitar cualquier arista; crear un ciclo al agregar cualquier arista ajena. Un MST minimiza la **suma** de costos de sus $n-1$ aristas.
 
-![[mst-corte-ciclo.svg]]
+![Un ciclo y un corte en un árbol generador mínimo](mst-corte-ciclo.svg)
 
 **Dos intercambios fundamentales.** Agregar a un árbol una arista $e$ crea un único ciclo; quitar otra arista $f$ de ese ciclo vuelve a dar un árbol. Quitar $f$ de un árbol crea dos componentes; agregar cualquier arista $e$ que cruce ese corte vuelve a dar un árbol. En ambos casos, si $c(e)<c(f)$, el árbol original no era mínimo. La figura muestra ambos movimientos sobre el mismo grafo.
 

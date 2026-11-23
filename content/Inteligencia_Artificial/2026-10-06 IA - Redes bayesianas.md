@@ -92,7 +92,7 @@ Esta descripción coincide con [Berkeley CS 188, §6.3](https://inst.eecs.berkel
 
 *Diapositiva 12; desarrollo numérico didáctico.* $R$: llueve; $T$: hay tráfico; $U$: una persona lleva paraguas. Suponemos que, una vez conocida la lluvia, saber si hay tráfico no aporta información adicional sobre el paraguas.
 
-![[ia14-lluvia-trafico-paraguas.svg]]
+![Una independencia reduce la tabla](ia14-lluvia-trafico-paraguas.svg)
 
 **Paso 1.** La regla de la cadena, sin ninguna independencia, da:
 
@@ -124,7 +124,7 @@ Este producto corresponde a **una asignación completa**, «llueve, hay tráfico
 
 *Diapositiva 6; AIMA, figura 13.2.* Usamos $B$: robo, $E$: terremoto, $A$: alarma, $J$: John llama y $M$: Mary llama. Todas son booleanas. Una letra minúscula, como $b$, abrevia el evento $B=\mathrm{true}$; $\neg b$ significa $B=\mathrm{false}$.
 
-![[ia14-red-alarma.svg]]
+![Alarma: cinco variables, cinco factores](ia14-red-alarma.svg)
 
 ### Paso 1: leer los padres
 
@@ -238,7 +238,7 @@ La expresión se refiere a **todos los valores posibles de $Z$**, no solamente a
 
 La diapositiva 11 plantea el escenario sin fijar una única estructura. Dos modelos razonables son:
 
-![[ia29-fuego-humo-alarma.svg]]
+![Fuego, humo y alarma: dos modelos posibles](ia29-fuego-humo-alarma.svg)
 
 - **El fuego produce humo y activa un detector térmico:** $H\leftarrow F\rightarrow A$. La hipótesis es $H\perp A\mid F$.
 - **Un detector de humo activa la alarma:** $F\rightarrow H\rightarrow A$. La hipótesis es $F\perp A\mid H$.
@@ -257,7 +257,7 @@ Un descendiente es un nodo al que podemos llegar siguiendo flechas desde $X_i$. 
 
 ### Ejemplo 2: la cadena de cuatro nodos de la diapositiva 17
 
-![[ia14-cadena-cuatro.svg]]
+![Padres y conexiones indirectas](ia14-cadena-cuatro.svg)
 
 **Paso 1.** Aplicamos la regla de la cadena en el orden $X,Y,Z,W$:
 
@@ -285,7 +285,7 @@ $$
 
 En el ejemplo de la diapositiva 20, $X$ es baja presión, $Y$ lluvia y $Z$ tráfico.
 
-![[ia14-cadena-presion.svg]]
+![Cadena: observar el medio bloquea](ia14-cadena-presion.svg)
 
 **Paso 1: factorizar.** $P(x,y,z)=P(x)P(y\mid x)P(z\mid y)$.
 
@@ -327,7 +327,7 @@ Como son diferentes, en esta distribución $X$ y $Z$ son dependientes. Pero, si 
 
 En la diapositiva 21, $Y$ es la proximidad de una entrega, $X$ un foro activo y $Z$ un laboratorio lleno.
 
-![[ia14-causa-comun.svg]]
+![Causa común: observar el origen bloquea](ia14-causa-comun.svg)
 
 **Paso 1: factorizar.** $P(x,y,z)=P(y)P(x\mid y)P(z\mid y)$.
 
@@ -380,7 +380,7 @@ $$
 
 $R$ es lluvia, $B$ un partido y $T$ tráfico. El nodo $T$ es un **colisionador** porque recibe las dos puntas de flecha **en este camino**. Añadimos el reporte $T'$ para anticipar la diapositiva 27.
 
-![[ia14-efecto-comun.svg]]
+![Efecto común y evidencia descendiente](ia14-efecto-comun.svg)
 
 ### Paso 1: demostrar la independencia sin observar el efecto
 
@@ -461,6 +461,8 @@ En la última fila, **observar un descendiente de $Y$ también activa la triplet
 
 ### Procedimiento manual
 
+![Las tres tripletas y el efecto de observar Y](ia29-tripletas-d-separacion.svg)
+
 1. Escribir los extremos y el conjunto exacto de evidencia.
 2. Marcar las variables observadas; tanto un valor verdadero como uno falso cuentan como observación.
 3. Enumerar todos los caminos simples entre los extremos, ignorando la dirección para recorrerlos.
@@ -488,7 +490,7 @@ La secuencia por tripletas se apoya en [Berkeley CS 188, §6.5](https://inst.eec
 
 *Diapositiva 27.* La red es $R\rightarrow T\leftarrow B$, $T\rightarrow T'$. **$T'$ es otra variable**, por ejemplo un reporte posterior de tráfico; no es la negación de $T$.
 
-![[ia14-efecto-comun.svg]]
+![Efecto común y evidencia descendiente](ia14-efecto-comun.svg)
 
 Solo hay un camino simple entre $R$ y $B$: $R\rightarrow T\leftarrow B$.
 
@@ -504,7 +506,7 @@ Para $R\perp T'\mid T$, el camino relevante cambia a $R\rightarrow T\rightarrow 
 
 *Diapositiva 28.* Las aristas son $L\rightarrow R$, $R\rightarrow D$, $R\rightarrow T$, $B\rightarrow T$ y $T\rightarrow T'$.
 
-![[ia14-ejemplo2.svg]]
+![Ejemplo 2: abrir y volver a bloquear](ia14-ejemplo2.svg)
 
 Para recordar el escenario, $L$ puede representar baja presión; $R$, lluvia; $D$, goteo; $B$, partido; $T$, tráfico; y $T'$, su reporte. La solución depende de las flechas, no de esos nombres.
 
@@ -540,7 +542,7 @@ $$
 P(r,t,d,s)=P(r)P(t\mid r)P(d\mid r)P(s\mid t,d).
 $$
 
-![[ia14-ejemplo3-dos-caminos.svg]]
+![Ejemplo 3: deben bloquearse todos los caminos](ia14-ejemplo3-dos-caminos.svg)
 
 Entre $T$ y $D$ hay exactamente dos caminos simples:
 
@@ -562,7 +564,7 @@ Entre $T$ y $D$ hay exactamente dos caminos simples:
 
 Las [*Probabilistic Inference Notes* de Patrick Winston, pp. 1–2](https://ocw.mit.edu/courses/6-034-artificial-intelligence-fall-2010/3e6200ca84af05d95712045abedce9e9_MIT6_034F10_bayes.pdf) comienzan con 1000 observaciones de un perro, un ladrón y un mapache. Retomamos sus conteos y desarrollamos las consultas para ilustrar un colisionador.
 
-![[ia14-mit-perro-mapache.svg]]
+![MIT: causas alternativas de un ladrido](ia14-mit-perro-mapache.svg)
 
 En esta sección $B$: ladrón, $R$: mapache y $D$: perro ladra. Las letras se reutilizan respecto del ejemplo anterior, pero **representan otras variables**.
 
@@ -638,6 +640,8 @@ Si existe un camino activo, la estructura deja de obligar a la independencia. Pu
 
 ### Un contraejemplo muestra la diferencia
 
+![La topología no obliga a la dependencia](ia14-contraejemplo-cadena.svg)
+
 Para la estructura $X\rightarrow Y\rightarrow Z$, tomemos $X$ como una moneda justa:
 
 - Si $Y=X$ y $Z=Y$, los extremos coinciden siempre. $P(X=1,Z=1)=0.5$, pero $P(X=1)P(Z=1)=0.25$: son dependientes.
@@ -672,6 +676,8 @@ Estos dos resultados proceden de AIMA, §13.2.1, pp. 436–438. Amplían las dia
 
 ### 11.1 Manto de Markov
 
+![Manto de Markov en la red de alarma](ia14-manto-markov.svg)
+
 El **manto de Markov** de un nodo contiene sus padres, sus hijos y los otros padres de sus hijos. Dado ese conjunto, el nodo es independiente de los demás nodos de la red.
 
 En la red de alarma:
@@ -684,6 +690,8 @@ En la red de alarma:
 La propiedad local y el manto de Markov se presentan también en [Berkeley CS 188, §6.4](https://inst.eecs.berkeley.edu/~cs188/textbook/bayes-nets/structure.html).
 
 ### 11.2 Método del subgrafo ancestral y moralización
+
+![Moralización: verificar d-separación con el subgrafo ancestral](ia14-moralizacion.svg)
 
 Para consultar $X\perp Y\mid\mathcal E$ también podemos:
 
@@ -705,6 +713,8 @@ Antes de desplegar cada solución, escribe extremos, evidencia y todos los camin
 
 ### A. Cadena $X\rightarrow Y\rightarrow Z\rightarrow W$
 
+![Padres y conexiones indirectas](ia14-cadena-cuatro.svg)
+
 1. ¿Se garantiza $X\perp W\mid Y$?
 2. ¿Se garantiza $X\perp Z\mid W$?
 
@@ -713,6 +723,8 @@ Antes de desplegar cada solución, escribe extremos, evidencia y todos los camin
 > 2. No. En $X\rightarrow Y\rightarrow Z$, $Y$ sigue sin observar. $W$ es un descendiente fuera del camino y observarlo no bloquea $Y$.
 
 ### B. Red de alarma
+
+![Alarma: cinco variables, cinco factores](ia14-red-alarma.svg)
 
 3. ¿Se garantiza $J\perp M\mid A$?
 4. ¿Se garantiza $B\perp E\mid J$?
@@ -723,6 +735,8 @@ Antes de desplegar cada solución, escribe extremos, evidencia y todos los camin
 
 ### C. Ejemplo 2 de clase
 
+![Ejemplo 2: abrir y volver a bloquear](ia14-ejemplo2.svg)
+
 5. ¿Se garantiza $D\perp B\mid T$?
 6. ¿Se garantiza $D\perp B\mid T,R$?
 
@@ -732,6 +746,8 @@ Antes de desplegar cada solución, escribe extremos, evidencia y todos los camin
 > 6. Sí. Aunque $T$ se abre, $R$ observado bloquea el camino.
 
 ### D. Ejemplo 3 de clase
+
+![Ejemplo 3: deben bloquearse todos los caminos](ia14-ejemplo3-dos-caminos.svg)
 
 7. ¿Se garantiza $T\perp D\mid S$?
 8. ¿Existe un conjunto de evidencia entre los otros nodos que garantice $R\perp T$?
